@@ -1,5 +1,5 @@
 {
-  "meta": {
+  "META": {
     "ticker": "META",
     "company": "Meta Platforms Inc.",
     "current_price": 705.28,
@@ -161,15 +161,15 @@
       }
     ],
     "emerging_trends": [
-      "\ud83e\udd16 AI Developments - LLaMA 4 Model Release",
-      "\ud83d\udcca Q4 Earnings Beat Street Expectations",
-      "\u2696\ufe0f Regulatory Scrutiny in EU Markets",
-      "\ud83c\udfae Metaverse Strategy Refinement",
-      "\ud83d\udcb0 Strong Advertising Revenue Growth"
+      "🤖 AI Developments - LLaMA 4 Model Release",
+      "📊 Q4 Earnings Beat Street Expectations",
+      "⚖️ Regulatory Scrutiny in EU Markets",
+      "🎮 Metaverse Strategy Refinement",
+      "💰 Strong Advertising Revenue Growth"
     ],
     "last_updated": "2025-11-21T14:27:28.927646"
   },
-  "nvidia": {
+  "NVDA": {
     "ticker": "NVDA",
     "company": "NVIDIA Corporation",
     "current_price": 209.68,
@@ -331,11 +331,11 @@
       }
     ],
     "emerging_trends": [
-      "\ud83e\udd16 AI Chip Demand Surge for Data Centers",
-      "\ud83d\ude80 Blackwell GPU Architecture Success",
-      "\ud83c\udfae Gaming Segment Recovery Signals",
-      "\u2601\ufe0f Cloud Provider Strategic Partnerships",
-      "\ud83c\udf0f Export Restrictions to China Impact"
+      "🤖 AI Chip Demand Surge for Data Centers",
+      "🚀 Blackwell GPU Architecture Success",
+      "🎮 Gaming Segment Recovery Signals",
+      "☁️ Cloud Provider Strategic Partnerships",
+      "🌏 Export Restrictions to China Impact"
     ],
     "last_updated": "2025-11-21T14:27:28.927662"
   }
