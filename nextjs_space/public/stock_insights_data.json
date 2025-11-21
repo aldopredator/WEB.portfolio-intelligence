@@ -1,0 +1,376 @@
+{
+    "META": {
+        "stock_data": {
+            "ticker": "META",
+            "current_price": 589.15,
+            "change": -1.17,
+            "change_percent": -0.2,
+            "52_week_high": 796.25,
+            "52_week_low": 479.8,
+            "price_movement_30_days": [
+                {
+                    "Date": "2025-10-22",
+                    "Close": 733.4099731445312
+                },
+                {
+                    "Date": "2025-10-23",
+                    "Close": 734.0
+                },
+                {
+                    "Date": "2025-10-24",
+                    "Close": 738.3599853515625
+                },
+                {
+                    "Date": "2025-10-27",
+                    "Close": 750.8200073242188
+                },
+                {
+                    "Date": "2025-10-28",
+                    "Close": 751.4400024414062
+                },
+                {
+                    "Date": "2025-10-29",
+                    "Close": 751.6699829101562
+                },
+                {
+                    "Date": "2025-10-30",
+                    "Close": 666.469970703125
+                },
+                {
+                    "Date": "2025-10-31",
+                    "Close": 648.3499755859375
+                },
+                {
+                    "Date": "2025-11-03",
+                    "Close": 637.7100219726562
+                },
+                {
+                    "Date": "2025-11-04",
+                    "Close": 627.3200073242188
+                },
+                {
+                    "Date": "2025-11-05",
+                    "Close": 635.9500122070312
+                },
+                {
+                    "Date": "2025-11-06",
+                    "Close": 618.9400024414062
+                },
+                {
+                    "Date": "2025-11-07",
+                    "Close": 621.7100219726562
+                },
+                {
+                    "Date": "2025-11-10",
+                    "Close": 631.760009765625
+                },
+                {
+                    "Date": "2025-11-11",
+                    "Close": 627.0800170898438
+                },
+                {
+                    "Date": "2025-11-12",
+                    "Close": 609.010009765625
+                },
+                {
+                    "Date": "2025-11-13",
+                    "Close": 609.8900146484375
+                },
+                {
+                    "Date": "2025-11-14",
+                    "Close": 609.4600219726562
+                },
+                {
+                    "Date": "2025-11-17",
+                    "Close": 602.010009765625
+                },
+                {
+                    "Date": "2025-11-18",
+                    "Close": 597.6900024414062
+                },
+                {
+                    "Date": "2025-11-19",
+                    "Close": 590.3200073242188
+                },
+                {
+                    "Date": "2025-11-20",
+                    "Close": 589.1500244140625
+                }
+            ],
+            "analyst_recommendations": {
+                "recommendations": [
+                    {
+                        "period": "0m",
+                        "strongBuy": 9,
+                        "buy": 50,
+                        "hold": 8,
+                        "sell": 0,
+                        "strongSell": 1
+                    },
+                    {
+                        "period": "-1m",
+                        "strongBuy": 9,
+                        "buy": 48,
+                        "hold": 10,
+                        "sell": 0,
+                        "strongSell": 1
+                    },
+                    {
+                        "period": "-2m",
+                        "strongBuy": 9,
+                        "buy": 50,
+                        "hold": 8,
+                        "sell": 0,
+                        "strongSell": 1
+                    },
+                    {
+                        "period": "-3m",
+                        "strongBuy": 9,
+                        "buy": 50,
+                        "hold": 8,
+                        "sell": 0,
+                        "strongSell": 1
+                    }
+                ],
+                "target_price": 837.4155,
+                "consensus": "strong_buy"
+            }
+        },
+        "analyst_recommendations": {
+            "recommendations": [
+                {
+                    "period": "0m",
+                    "strongBuy": 9,
+                    "buy": 50,
+                    "hold": 8,
+                    "sell": 0,
+                    "strongSell": 1
+                },
+                {
+                    "period": "-1m",
+                    "strongBuy": 9,
+                    "buy": 48,
+                    "hold": 10,
+                    "sell": 0,
+                    "strongSell": 1
+                },
+                {
+                    "period": "-2m",
+                    "strongBuy": 9,
+                    "buy": 50,
+                    "hold": 8,
+                    "sell": 0,
+                    "strongSell": 1
+                },
+                {
+                    "period": "-3m",
+                    "strongBuy": 9,
+                    "buy": 50,
+                    "hold": 8,
+                    "sell": 0,
+                    "strongSell": 1
+                }
+            ],
+            "target_price": 837.4155,
+            "consensus": "strong_buy"
+        },
+        "latest_news": [],
+        "social_sentiment": {
+            "positive": 50.0,
+            "neutral": 31.58,
+            "negative": 18.42
+        },
+        "emerging_trends": [
+            "AI Developments",
+            "Earnings Reports",
+            "Regulatory Issues"
+        ]
+    },
+    "NVDA": {
+        "stock_data": {
+            "ticker": "NVDA",
+            "current_price": 180.64,
+            "change": -5.88,
+            "change_percent": -3.15,
+            "52_week_high": 212.19,
+            "52_week_low": 86.62,
+            "price_movement_30_days": [
+                {
+                    "Date": "2025-10-22",
+                    "Close": 180.27999877929688
+                },
+                {
+                    "Date": "2025-10-23",
+                    "Close": 182.16000366210938
+                },
+                {
+                    "Date": "2025-10-24",
+                    "Close": 186.25999450683594
+                },
+                {
+                    "Date": "2025-10-27",
+                    "Close": 191.49000549316406
+                },
+                {
+                    "Date": "2025-10-28",
+                    "Close": 201.02999877929688
+                },
+                {
+                    "Date": "2025-10-29",
+                    "Close": 207.0399932861328
+                },
+                {
+                    "Date": "2025-10-30",
+                    "Close": 202.88999938964844
+                },
+                {
+                    "Date": "2025-10-31",
+                    "Close": 202.49000549316406
+                },
+                {
+                    "Date": "2025-11-03",
+                    "Close": 206.8800048828125
+                },
+                {
+                    "Date": "2025-11-04",
+                    "Close": 198.69000244140625
+                },
+                {
+                    "Date": "2025-11-05",
+                    "Close": 195.2100067138672
+                },
+                {
+                    "Date": "2025-11-06",
+                    "Close": 188.0800018310547
+                },
+                {
+                    "Date": "2025-11-07",
+                    "Close": 188.14999389648438
+                },
+                {
+                    "Date": "2025-11-10",
+                    "Close": 199.0500030517578
+                },
+                {
+                    "Date": "2025-11-11",
+                    "Close": 193.16000366210938
+                },
+                {
+                    "Date": "2025-11-12",
+                    "Close": 193.8000030517578
+                },
+                {
+                    "Date": "2025-11-13",
+                    "Close": 186.86000061035156
+                },
+                {
+                    "Date": "2025-11-14",
+                    "Close": 190.1699981689453
+                },
+                {
+                    "Date": "2025-11-17",
+                    "Close": 186.60000610351562
+                },
+                {
+                    "Date": "2025-11-18",
+                    "Close": 181.36000061035156
+                },
+                {
+                    "Date": "2025-11-19",
+                    "Close": 186.52000427246094
+                },
+                {
+                    "Date": "2025-11-20",
+                    "Close": 180.63999938964844
+                }
+            ],
+            "analyst_recommendations": {
+                "recommendations": [
+                    {
+                        "period": "0m",
+                        "strongBuy": 11,
+                        "buy": 49,
+                        "hold": 3,
+                        "sell": 1,
+                        "strongSell": 0
+                    },
+                    {
+                        "period": "-1m",
+                        "strongBuy": 10,
+                        "buy": 49,
+                        "hold": 4,
+                        "sell": 1,
+                        "strongSell": 0
+                    },
+                    {
+                        "period": "-2m",
+                        "strongBuy": 10,
+                        "buy": 48,
+                        "hold": 4,
+                        "sell": 1,
+                        "strongSell": 0
+                    },
+                    {
+                        "period": "-3m",
+                        "strongBuy": 10,
+                        "buy": 47,
+                        "hold": 6,
+                        "sell": 1,
+                        "strongSell": 0
+                    }
+                ],
+                "target_price": 246.80772,
+                "consensus": "strong_buy"
+            }
+        },
+        "analyst_recommendations": {
+            "recommendations": [
+                {
+                    "period": "0m",
+                    "strongBuy": 11,
+                    "buy": 49,
+                    "hold": 3,
+                    "sell": 1,
+                    "strongSell": 0
+                },
+                {
+                    "period": "-1m",
+                    "strongBuy": 10,
+                    "buy": 49,
+                    "hold": 4,
+                    "sell": 1,
+                    "strongSell": 0
+                },
+                {
+                    "period": "-2m",
+                    "strongBuy": 10,
+                    "buy": 48,
+                    "hold": 4,
+                    "sell": 1,
+                    "strongSell": 0
+                },
+                {
+                    "period": "-3m",
+                    "strongBuy": 10,
+                    "buy": 47,
+                    "hold": 6,
+                    "sell": 1,
+                    "strongSell": 0
+                }
+            ],
+            "target_price": 246.80772,
+            "consensus": "strong_buy"
+        },
+        "latest_news": [],
+        "social_sentiment": {
+            "positive": 46.0,
+            "neutral": 36.0,
+            "negative": 18.0
+        },
+        "emerging_trends": [
+            "AI Developments",
+            "Earnings Reports",
+            "Regulatory Issues"
+        ]
+    }
+}
