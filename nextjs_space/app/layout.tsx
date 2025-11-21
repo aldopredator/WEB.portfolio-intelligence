@@ -6,15 +6,15 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Stock Insights Dashboard | Meta & Nvidia Analysis",
-  description: "Comprehensive stock analysis dashboard for Meta and Nvidia with real-time data, analyst recommendations, and social sentiment.",
+  title: "Stock Insights Dashboard | Stocks & ETF Analysis",
+  description: "Comprehensive stock analysis dashboard for stocks and ETFs with real-time data, analyst recommendations, and social sentiment.",
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
   },
   openGraph: {
-    title: "Stock Insights Dashboard | Meta & Nvidia Analysis",
-    description: "Comprehensive stock analysis dashboard for Meta and Nvidia with real-time data, analyst recommendations, and social sentiment.",
+    title: "Stock Insights Dashboard | Stocks & ETF Analysis",
+    description: "Comprehensive stock analysis dashboard for stocks and ETFs with real-time data, analyst recommendations, and social sentiment.",
     images: ['/og-image.png'],
   },
 };
