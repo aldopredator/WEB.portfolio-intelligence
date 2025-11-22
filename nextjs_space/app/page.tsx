@@ -52,7 +52,7 @@ export default async function Home() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-white">Stock Insights Dashboard</h1>
-                <p className="text-slate-400 text-sm">Real-time analysis for Stocks & ETF</p>
+                <p className="text-slate-400 text-sm">Real-time analysis for Stocks, Bonds & ETF</p>
               </div>
             </div>
             <div className="flex items-center gap-3 bg-slate-800/50 rounded-lg px-4 py-3 border border-slate-700">
