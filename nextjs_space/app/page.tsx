@@ -29,15 +29,16 @@ export default async function Home() {
   const stockData = await getStockData();
   const metaData = stockData?.META;
   const nvdaData = stockData?.NVDA;
-  
-  const lastUpdated = stockData?.timestamp 
+  const googData = stockData?.GOOG;
+
+  const lastUpdated = stockData?.timestamp
     ? new Date(stockData.timestamp).toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
     : 'Unknown';
 
   return (
@@ -79,23 +80,23 @@ export default async function Home() {
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
               <PriceCard stock={metaData?.stock_data} />
-              <PriceChart 
-                data={metaData?.stock_data?.price_movement_30_days ?? []} 
-                ticker="META" 
+              <PriceChart
+                data={metaData?.stock_data?.price_movement_30_days ?? []}
+                ticker="META"
               />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
-              <AnalystCard 
-                data={metaData?.analyst_recommendations} 
+              <AnalystCard
+                data={metaData?.analyst_recommendations}
                 currentPrice={metaData?.stock_data?.current_price ?? 0}
               />
-              <SentimentCard 
-                sentiment={metaData?.social_sentiment} 
+              <SentimentCard
+                sentiment={metaData?.social_sentiment}
                 ticker="META"
               />
-              <TrendsCard 
-                trends={metaData?.emerging_trends ?? []} 
+              <TrendsCard
+                trends={metaData?.emerging_trends ?? []}
                 ticker="META"
               />
             </div>
@@ -116,23 +117,23 @@ export default async function Home() {
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
               <PriceCard stock={nvdaData?.stock_data} />
-              <PriceChart 
-                data={nvdaData?.stock_data?.price_movement_30_days ?? []} 
-                ticker="NVDA" 
+              <PriceChart
+                data={nvdaData?.stock_data?.price_movement_30_days ?? []}
+                ticker="NVDA"
               />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
-              <AnalystCard 
-                data={nvdaData?.analyst_recommendations} 
+              <AnalystCard
+                data={nvdaData?.analyst_recommendations}
                 currentPrice={nvdaData?.stock_data?.current_price ?? 0}
               />
-              <SentimentCard 
-                sentiment={nvdaData?.social_sentiment} 
+              <SentimentCard
+                sentiment={nvdaData?.social_sentiment}
                 ticker="NVDA"
               />
-              <TrendsCard 
-                trends={nvdaData?.emerging_trends ?? []} 
+              <TrendsCard
+                trends={nvdaData?.emerging_trends ?? []}
                 ticker="NVDA"
               />
             </div>
@@ -141,7 +142,44 @@ export default async function Home() {
           </div>
         )}
 
-        {!metaData && !nvdaData && (
+        {/* Google Section */}
+        {googData && (
+          <div className="mt-16">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-rose-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">G</span>
+              </div>
+              <h2 className="text-3xl font-bold text-white">Alphabet Inc. (GOOG)</h2>
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+              <PriceCard stock={googData?.stock_data} />
+              <PriceChart
+                data={googData?.stock_data?.price_movement_30_days ?? []}
+                ticker="GOOG"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+              <AnalystCard
+                data={googData?.analyst_recommendations}
+                currentPrice={googData?.stock_data?.current_price ?? 0}
+              />
+              <SentimentCard
+                sentiment={googData?.social_sentiment}
+                ticker="GOOG"
+              />
+              <TrendsCard
+                trends={googData?.emerging_trends ?? []}
+                ticker="GOOG"
+              />
+            </div>
+
+            <RecommendationCard stock={googData} ticker="GOOG" />
+          </div>
+        )}
+
+        {!metaData && !nvdaData && !googData && (
           <div className="text-center py-20">
             <p className="text-slate-400 text-lg">No stock data available</p>
           </div>
