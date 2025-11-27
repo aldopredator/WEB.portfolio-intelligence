@@ -45,9 +45,6 @@ export interface StockInfo {
 }
 
 export interface StockInsightsData {
-  META: StockInfo;
-  NVDA: StockInfo;
-  GOOG: StockInfo;
-  TSLA: StockInfo;
+  [key: string]: StockInfo | string | undefined;
   timestamp?: string;
 }

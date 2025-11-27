@@ -25,15 +25,29 @@ async function getStockData(): Promise<StockInsightsData> {
   }
 }
 
+
+const STOCK_CONFIG = [
+  { ticker: 'META', name: 'Meta Platforms (META)', color: 'bg-blue-500', letter: 'M' },
+  { ticker: 'NVDA', name: 'Nvidia Corporation (NVDA)', color: 'bg-emerald-500', letter: 'N' },
+  { ticker: 'GOOG', name: 'Alphabet Inc. (GOOG)', color: 'bg-rose-500', letter: 'G' },
+  { ticker: 'TSLA', name: 'Tesla, Inc. (TSLA)', color: 'bg-red-600', letter: 'T' },
+  { ticker: 'BRKB', name: 'Berkshire Hathaway Inc. (BRKB)', color: 'bg-slate-600', letter: 'B' },
+  { ticker: 'ISRG', name: 'Intuitive Surgical Inc. (ISRG)', color: 'bg-indigo-500', letter: 'I' },
+  { ticker: 'NFLX', name: 'Netflix Inc. (NFLX)', color: 'bg-red-700', letter: 'N' },
+  { ticker: 'GOOGL', name: 'Alphabet Inc. (GOOGL)', color: 'bg-blue-600', letter: 'G' },
+  { ticker: 'AMZN', name: 'Amazon.com Inc. (AMZN)', color: 'bg-orange-500', letter: 'A' },
+  { ticker: 'IDXX', name: 'IDEXX Laboratories Inc. (IDXX)', color: 'bg-yellow-600', letter: 'I' },
+  { ticker: 'III', name: '3i Group plc (III)', color: 'bg-sky-600', letter: '3' },
+  { ticker: 'PLTR', name: 'Palantir Technologies Inc. (PLTR)', color: 'bg-stone-500', letter: 'P' },
+  { ticker: 'QBTS', name: 'D-Wave Quantum Inc. (QBTS)', color: 'bg-violet-600', letter: 'Q' },
+  { ticker: 'RGTI', name: 'Rigetti Computing Inc. (RGTI)', color: 'bg-cyan-600', letter: 'R' },
+];
+
 export default async function Home() {
   const stockData = await getStockData();
-  const metaData = stockData?.META;
-  const nvdaData = stockData?.NVDA;
-  const googData = stockData?.GOOG;
-  const tslaData = stockData?.TSLA;
 
   const lastUpdated = stockData?.timestamp
-    ? new Date(stockData.timestamp).toLocaleString('en-US', {
+    ? new Date(stockData.timestamp as string).toLocaleString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -69,155 +83,50 @@ export default async function Home() {
       </div>
 
       <div className="max-w-[1800px] mx-auto px-6 py-8">
-        {/* Meta Section */}
-        {metaData && (
-          <div className="mb-16">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">M</span>
+        {STOCK_CONFIG.map((config, index) => {
+          const data = stockData?.[config.ticker];
+
+          // Type guard to ensure data is StockInfo object and not string/undefined
+          if (!data || typeof data === 'string' || !('stock_data' in data)) return null;
+
+          return (
+            <div key={config.ticker} className={index > 0 ? "mt-16" : ""}>
+              <div className="flex items-center gap-3 mb-6">
+                <div className={`w-10 h-10 ${config.color} rounded-lg flex items-center justify-center`}>
+                  <span className="text-white font-bold text-lg">{config.letter}</span>
+                </div>
+                <h2 className="text-3xl font-bold text-white">{config.name}</h2>
               </div>
-              <h2 className="text-3xl font-bold text-white">Meta Platforms (META)</h2>
-            </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-              <PriceCard stock={metaData?.stock_data} />
-              <PriceChart
-                data={metaData?.stock_data?.price_movement_30_days ?? []}
-                ticker="META"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
-              <AnalystCard
-                data={metaData?.analyst_recommendations}
-                currentPrice={metaData?.stock_data?.current_price ?? 0}
-              />
-              <SentimentCard
-                sentiment={metaData?.social_sentiment}
-                ticker="META"
-              />
-              <TrendsCard
-                trends={metaData?.emerging_trends ?? []}
-                ticker="META"
-              />
-            </div>
-
-            <RecommendationCard stock={metaData} ticker="META" />
-          </div>
-        )}
-
-        {/* Nvidia Section */}
-        {nvdaData && (
-          <div>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">N</span>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+                <PriceCard stock={data.stock_data} />
+                <PriceChart
+                  data={data.stock_data.price_movement_30_days ?? []}
+                  ticker={config.ticker}
+                />
               </div>
-              <h2 className="text-3xl font-bold text-white">Nvidia Corporation (NVDA)</h2>
-            </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-              <PriceCard stock={nvdaData?.stock_data} />
-              <PriceChart
-                data={nvdaData?.stock_data?.price_movement_30_days ?? []}
-                ticker="NVDA"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
-              <AnalystCard
-                data={nvdaData?.analyst_recommendations}
-                currentPrice={nvdaData?.stock_data?.current_price ?? 0}
-              />
-              <SentimentCard
-                sentiment={nvdaData?.social_sentiment}
-                ticker="NVDA"
-              />
-              <TrendsCard
-                trends={nvdaData?.emerging_trends ?? []}
-                ticker="NVDA"
-              />
-            </div>
-
-            <RecommendationCard stock={nvdaData} ticker="NVDA" />
-          </div>
-        )}
-
-        {/* Google Section */}
-        {googData && (
-          <div className="mt-16">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-rose-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">G</span>
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+                <AnalystCard
+                  data={data.analyst_recommendations}
+                  currentPrice={data.stock_data.current_price ?? 0}
+                />
+                <SentimentCard
+                  sentiment={data.social_sentiment}
+                  ticker={config.ticker}
+                />
+                <TrendsCard
+                  trends={data.emerging_trends ?? []}
+                  ticker={config.ticker}
+                />
               </div>
-              <h2 className="text-3xl font-bold text-white">Alphabet Inc. (GOOG)</h2>
+
+              <RecommendationCard stock={data} ticker={config.ticker} />
             </div>
+          );
+        })}
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-              <PriceCard stock={googData?.stock_data} />
-              <PriceChart
-                data={googData?.stock_data?.price_movement_30_days ?? []}
-                ticker="GOOG"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
-              <AnalystCard
-                data={googData?.analyst_recommendations}
-                currentPrice={googData?.stock_data?.current_price ?? 0}
-              />
-              <SentimentCard
-                sentiment={googData?.social_sentiment}
-                ticker="GOOG"
-              />
-              <TrendsCard
-                trends={googData?.emerging_trends ?? []}
-                ticker="GOOG"
-              />
-            </div>
-
-            <RecommendationCard stock={googData} ticker="GOOG" />
-          </div>
-        )}
-
-        {/* Tesla Section */}
-        {tslaData && (
-          <div className="mt-16">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">T</span>
-              </div>
-              <h2 className="text-3xl font-bold text-white">Tesla, Inc. (TSLA)</h2>
-            </div>
-
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-              <PriceCard stock={tslaData?.stock_data} />
-              <PriceChart
-                data={tslaData?.stock_data?.price_movement_30_days ?? []}
-                ticker="TSLA"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
-              <AnalystCard
-                data={tslaData?.analyst_recommendations}
-                currentPrice={tslaData?.stock_data?.current_price ?? 0}
-              />
-              <SentimentCard
-                sentiment={tslaData?.social_sentiment}
-                ticker="TSLA"
-              />
-              <TrendsCard
-                trends={tslaData?.emerging_trends ?? []}
-                ticker="TSLA"
-              />
-            </div>
-
-            <RecommendationCard stock={tslaData} ticker="TSLA" />
-          </div>
-        )}
-
-        {!metaData && !nvdaData && !googData && !tslaData && (
+        {Object.keys(stockData || {}).length === 0 && (
           <div className="text-center py-20">
             <p className="text-slate-400 text-lg">No stock data available</p>
           </div>
