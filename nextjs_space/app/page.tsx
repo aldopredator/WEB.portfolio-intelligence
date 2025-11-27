@@ -95,10 +95,11 @@ async function getStockData(): Promise<StockInsightsData> {
           try {
             const cfg = STOCK_CONFIG.find(c => c.ticker === ticker);
             const companyName = cfg?.name;
-            const fallbackArticles = mergedData[ticker]?.latest_news ?? [];
-            const sentiment = await fetchAndScoreSentiment(ticker, companyName, fallbackArticles);
-            if (sentiment && mergedData[ticker] && typeof mergedData[ticker] === 'object') {
-              mergedData[ticker].social_sentiment = sentiment;
+            const stockEntry = mergedData[ticker];
+            const fallbackArticles = (stockEntry && typeof stockEntry === 'object' && 'latest_news' in stockEntry) ? (stockEntry as any).latest_news : [];
+            const sentiment = await fetchAndScoreSentiment(ticker, companyName, fallbackArticles as any[]);
+            if (sentiment && stockEntry && typeof stockEntry === 'object') {
+              (stockEntry as any).social_sentiment = sentiment;
             }
           } catch (e) {
             // ignore per-ticker sentiment errors
