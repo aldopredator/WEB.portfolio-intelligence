@@ -24,7 +24,7 @@ const STOCK_CONFIG = [
   { ticker: 'BRKB', name: 'Berkshire Hathaway Inc. (BRKB)', color: 'bg-slate-600', letter: 'B' },
   { ticker: 'ISRG', name: 'Intuitive Surgical Inc. (ISRG)', color: 'bg-indigo-500', letter: 'I' },
   { ticker: 'NFLX', name: 'Netflix Inc. (NFLX)', color: 'bg-red-700', letter: 'N' },
-  { ticker: 'GOOGL', name: 'Alphabet Inc. (GOOGL)', color: 'bg-blue-600', letter: 'G' },
+  
   { ticker: 'IDXX', name: 'IDEXX Laboratories Inc. (IDXX)', color: 'bg-yellow-600', letter: 'I' },
   { ticker: 'III', name: '3i Group plc (III)', color: 'bg-sky-600', letter: '3' },
   { ticker: 'PLTR', name: 'Palantir Technologies Inc. (PLTR)', color: 'bg-stone-500', letter: 'P' },
@@ -159,9 +159,9 @@ export default async function Home() {
           return (
             <div key={config.ticker} className={index > 0 ? "mt-16" : ""}>
               <div className="flex items-center gap-3 mb-6">
-                <div className={`w-10 h-10 ${config.color} rounded-lg flex items-center justify-center`}>
-                  <span className="text-white font-bold text-lg">{config.letter}</span>
-                </div>
+                <div className={`w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center`}>
+                        <img src={`/logos/${config.ticker}.svg`} alt={`${config.ticker} logo`} className="w-10 h-10 object-cover" />
+                      </div>
                 <h2 className="text-3xl font-bold text-white">{config.name}</h2>
               </div>
 
@@ -188,8 +188,6 @@ export default async function Home() {
                   ticker={config.ticker}
                 />
               </div>
-
-              <RecommendationCard stock={data} ticker={config.ticker} />
             </div>
           );
         })}

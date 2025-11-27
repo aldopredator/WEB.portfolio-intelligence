@@ -21,10 +21,12 @@ export function CompanyHighlights({ data, ticker }: CompanyHighlightsProps) {
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-          <p className="text-slate-400 text-sm mb-1">Market Cap</p>
-          <p className="text-white font-bold text-lg">{formatMarketCap(stock?.market_cap ?? 0, stock?.currency ?? '$')}</p>
-        </div>
+        {stock?.market_cap ? (
+          <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+            <p className="text-slate-400 text-sm mb-1">Market Cap</p>
+            <p className="text-white font-bold text-lg">{formatMarketCap(stock.market_cap, stock?.currency ?? '$')}</p>
+          </div>
+        ) : null}
 
         <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
           <p className="text-slate-400 text-sm mb-1">Volume</p>
@@ -32,12 +34,7 @@ export function CompanyHighlights({ data, ticker }: CompanyHighlightsProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-          <p className="text-slate-400 text-sm mb-1">Previous Close</p>
-          <p className="text-white font-semibold text-lg">{formatPrice(stock?.previous_close ?? 0)}</p>
-        </div>
-
+      <div className="grid grid-cols-1 gap-4">
         <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
           <p className="text-slate-400 text-sm mb-1">Currency</p>
           <p className="text-white font-semibold text-lg">{stock?.currency ?? 'USD'}</p>
