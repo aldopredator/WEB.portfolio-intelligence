@@ -12,11 +12,56 @@ import type { StockInsightsData } from '@/lib/types';
 
 async function getStockData(): Promise<StockInsightsData> {
   try {
+    // Read static data (analyst recommendations, sentiment, trends, etc.)
     const filePath = path.join(process.cwd(), 'public', 'stock_insights_data.json');
     const fileContents = await fs.readFile(filePath, 'utf8');
-    const data = JSON.parse(fileContents);
+    const staticData = JSON.parse(fileContents);
+
+    // Get all stock tickers from the config
+    const tickers = STOCK_CONFIG.map(config => config.ticker).join(',');
+
+    // Fetch real-time prices from our API route
+    try {
+      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/stock?tickers=${tickers}`;
+      const response = await fetch(apiUrl, {
+        cache: 'no-store',
+      });
+
+      if (response.ok) {
+        const { data: realTimePrices } = await response.json();
+
+        // Merge real-time prices with static data
+        const mergedData: StockInsightsData = { ...staticData };
+
+        Object.keys(realTimePrices).forEach((ticker) => {
+          if (mergedData[ticker] && typeof mergedData[ticker] === 'object' && 'stock_data' in mergedData[ticker]) {
+            const stockInfo = mergedData[ticker];
+            if (typeof stockInfo !== 'string') {
+              // Update only the price-related fields with real-time data
+              stockInfo.stock_data = {
+                ...stockInfo.stock_data,
+                current_price: realTimePrices[ticker].current_price,
+                change: realTimePrices[ticker].change,
+                change_percent: realTimePrices[ticker].change_percent,
+                '52_week_high': realTimePrices[ticker]['52_week_high'],
+                '52_week_low': realTimePrices[ticker]['52_week_low'],
+              };
+            }
+          }
+        });
+
+        return {
+          ...mergedData,
+          timestamp: new Date().toISOString()
+        };
+      }
+    } catch (apiError) {
+      console.error('Error fetching real-time prices, using static data:', apiError);
+    }
+
+    // Fallback to static data if API fails
     return {
-      ...data,
+      ...staticData,
       timestamp: new Date().toISOString()
     };
   } catch (error) {
@@ -25,7 +70,7 @@ async function getStockData(): Promise<StockInsightsData> {
   }
 }
 
-
+// Stock configuration - moved before getStockData since it's now used there
 const STOCK_CONFIG = [
   { ticker: 'META', name: 'Meta Platforms (META)', color: 'bg-blue-500', letter: 'M' },
   { ticker: 'NVDA', name: 'Nvidia Corporation (NVDA)', color: 'bg-emerald-500', letter: 'N' },
@@ -42,6 +87,7 @@ const STOCK_CONFIG = [
   { ticker: 'QBTS', name: 'D-Wave Quantum Inc. (QBTS)', color: 'bg-violet-600', letter: 'Q' },
   { ticker: 'RGTI', name: 'Rigetti Computing Inc. (RGTI)', color: 'bg-cyan-600', letter: 'R' },
 ];
+
 
 export default async function Home() {
   const stockData = await getStockData();
