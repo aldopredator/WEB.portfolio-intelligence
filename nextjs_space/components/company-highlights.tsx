@@ -1,4 +1,4 @@
-import { BuildingWarehouse, Activity } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import type { StockInfo } from '@/lib/types';
 import { formatPrice, formatLargeNumber, formatMarketCap } from '@/lib/stock-utils';
 
@@ -17,7 +17,7 @@ export function CompanyHighlights({ data, ticker }: CompanyHighlightsProps) {
           <h3 className="text-xl font-bold text-white mb-1">Company Highlights</h3>
           <p className="text-slate-400 text-sm">Key live company metrics</p>
         </div>
-        <BuildingWarehouse className="w-6 h-6 text-blue-400" />
+        <Sparkles className="w-6 h-6 text-blue-400" />
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-4">
