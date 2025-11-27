@@ -56,38 +56,6 @@ export function formatLargeNumber(value: number | undefined | null): string {
 }
 
 export function formatMarketCap(value: number | undefined | null, currency = '$'): string {
-  // Server-only sentiment helper moved to `lib/sentiment.ts` to avoid importing
-  // server-side APIs (fs, fetch) into client bundles. See `lib/sentiment.ts`.
-            // ignore and fall back
-          }
-        }
-      }
-    }
-
-    // If no articles from API, try fallbackArticles (from static JSON)
-    if ((!articles || articles.length === 0) && Array.isArray(fallbackArticles) && fallbackArticles.length > 0) {
-      // Expect fallback articles to have title/summary fields; adapt if different
-      articles = fallbackArticles.slice(0, 10).map((a: any) => ({ title: a.title || a.headline || a.summary || '', description: a.description || a.summary || '' }));
-    }
-
-    if (!articles || articles.length === 0) return null;
-
-    let positive = 0, neutral = 0, negative = 0;
-    for (const a of articles) {
-      const text = `${a.title ?? ''} ${a.description ?? ''}`;
-      const s = scoreText(text);
-      if (s > 0) positive += 1;
-      else if (s < 0) negative += 1;
-      else neutral += 1;
-    }
-
-    const total = positive + neutral + negative || 1;
-    return {
-      positive: Math.round((positive / total) * 100),
-      neutral: Math.round((neutral / total) * 100),
-      negative: Math.round((negative / total) * 100)
-    };
-  } catch (err) {
-    return null;
-  }
+  if (!value) return 'N/A';
+  return `${currency}${formatLargeNumber(value)}`;
 }
