@@ -40,7 +40,12 @@ async function getStockData(): Promise<StockInsightsData> {
 
     // Fetch real-time prices from our API route
     try {
-      const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/stock?tickers=${tickers}`;
+      // Use Vercel URL or localhost for development
+      const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+        : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
+      const apiUrl = `${baseUrl}/api/stock?tickers=${tickers}`;
       const response = await fetch(apiUrl, {
         cache: 'no-store',
       });
