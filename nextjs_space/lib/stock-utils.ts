@@ -47,6 +47,19 @@ export function formatPrice(price: number): string {
   return `$${price?.toFixed?.(2) ?? '0.00'}`;
 }
 
+export function formatLargeNumber(value: number | undefined | null): string {
+  const n = Number(value ?? 0);
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(2)}K`;
+  return `${n}`;
+}
+
+export function formatMarketCap(value: number | undefined | null, currency = '$'): string {
+  if (!value) return 'N/A';
+  return `${currency}${formatLargeNumber(value)}`;
+}
+
 export function formatPercent(percent: number): string {
   const sign = (percent ?? 0) >= 0 ? '+' : '';
   return `${sign}${percent?.toFixed?.(2) ?? '0.00'}%`;

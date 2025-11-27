@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { PriceCard } from '@/components/price-card';
 import { PriceChart } from '@/components/price-chart';
-import { AnalystCard } from '@/components/analyst-card';
+import { CompanyHighlights } from '@/components/company-highlights';
 import { SentimentCard } from '@/components/sentiment-card';
 import { ProsConsCard } from '@/components/pros-cons-card';
 import { RecommendationCard } from '@/components/recommendation-card';
@@ -61,7 +61,10 @@ async function getStockData(): Promise<StockInsightsData> {
               change_percent: realTimePrices[ticker].change_percent,
               '52_week_high': realTimePrices[ticker]['52_week_high'],
               '52_week_low': realTimePrices[ticker]['52_week_low'],
-              price_movement_30_days: realTimePrices[ticker].price_history,
+                    price_movement_30_days: realTimePrices[ticker].price_history,
+                    market_cap: realTimePrices[ticker].market_cap ?? stockInfo.stock_data?.market_cap,
+                    volume: realTimePrices[ticker].volume ?? stockInfo.stock_data?.volume,
+                    currency: realTimePrices[ticker].currency ?? stockInfo.stock_data?.currency,
             };
 
             // Update target price if available
@@ -171,9 +174,9 @@ export default async function Home() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
-                <AnalystCard
-                  data={data.analyst_recommendations}
-                  currentPrice={data.stock_data.current_price ?? 0}
+                <CompanyHighlights
+                  data={data}
+                  ticker={config.ticker}
                 />
                 <SentimentCard
                   sentiment={data.social_sentiment}

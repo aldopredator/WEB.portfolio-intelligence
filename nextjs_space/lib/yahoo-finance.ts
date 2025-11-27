@@ -20,6 +20,9 @@ export interface StockQuote {
     '52_week_low': number;
     price_history: { Date: string; Close: number }[];
     target_price: number;
+    market_cap?: number;
+    volume?: number;
+    currency?: string;
 }
 
 /**
@@ -70,6 +73,9 @@ export async function fetchYahooQuote(ticker: string): Promise<StockQuote | null
 
         // Extract target price if available (often in meta.targetMeanPrice)
         const target_price = meta.targetMeanPrice || 0;
+        const market_cap = meta.marketCap || (meta?.marketCap?.raw ?? 0) || 0;
+        const volume = meta.regularMarketVolume || 0;
+        const currency = meta.currency || '';
 
         return {
             ticker,
@@ -80,7 +86,10 @@ export async function fetchYahooQuote(ticker: string): Promise<StockQuote | null
             '52_week_high': Number((meta.fiftyTwoWeekHigh || 0).toFixed(2)),
             '52_week_low': Number((meta.fiftyTwoWeekLow || 0).toFixed(2)),
             price_history,
-            target_price
+            target_price,
+            market_cap: Number(market_cap),
+            volume: Number(volume),
+            currency
         };
     } catch (error) {
         console.error(`Error fetching quote for ${ticker}:`, error);
