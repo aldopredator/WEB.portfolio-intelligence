@@ -23,7 +23,7 @@ export function CompanyHighlights({ data, ticker }: CompanyHighlightsProps) {
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
           <p className="text-slate-400 text-sm mb-1">Market Cap</p>
-          <p className="text-white font-bold text-lg">{formatMarketCap(stock?.market_cap ?? data?.analyst_recommendations?.price_target ?? 0, stock?.currency ?? '$')}</p>
+          <p className="text-white font-bold text-lg">{formatMarketCap(stock?.market_cap ?? 0, stock?.currency ?? '$')}</p>
         </div>
 
         <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
