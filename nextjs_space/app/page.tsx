@@ -9,6 +9,7 @@ import { TrendsCard } from '@/components/trends-card';
 import { RecommendationCard } from '@/components/recommendation-card';
 import { BarChart3, RefreshCw } from 'lucide-react';
 import type { StockInsightsData } from '@/lib/types';
+import { fetchMultipleQuotes } from '@/lib/yahoo-finance';
 
 // Force dynamic rendering so prices are fetched at runtime, not build time
 export const dynamic = 'force-dynamic';
@@ -43,20 +44,11 @@ async function getStockData(): Promise<StockInsightsData> {
     // Merge real-time prices with static data
     const mergedData: StockInsightsData = { ...staticData };
 
-    // Fetch real-time prices from our API route
+    // Fetch real-time prices directly (no HTTP call needed for server components)
     try {
-      // Use Vercel URL or localhost for development
-      const protocol = process.env.VERCEL_ENV === 'production' ? 'https' : 'http';
-      const host = process.env.VERCEL_URL || 'localhost:3000';
-      const baseUrl = `${protocol}://${host}`;
+      const realTimePrices = await fetchMultipleQuotes(tickers.split(','));
 
-      const apiUrl = `${baseUrl}/api/stock?tickers=${tickers}`;
-      const response = await fetch(apiUrl, {
-        cache: 'no-store',
-      });
-
-      if (response.ok) {
-        const { data: realTimePrices } = await response.json();
+      if (realTimePrices) {
 
         // Merge real-time prices with static data
         const mergedData: StockInsightsData = { ...staticData };
