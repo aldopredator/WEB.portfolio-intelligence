@@ -104,21 +104,44 @@ export async function fetchAndScoreSentiment(ticker: string, companyName?: strin
   }
 
   try {
-    // If NEWS_API_KEY is provided, try to fetch recent news via NewsAPI.org
-    const apiKey = process.env.NEWS_API_KEY || process.env.NEWSAPI_KEY;
+    // Prefer Finnhub if available
+    const finnhubKey = process.env.FINNHUB_API_KEY || process.env.FINNHUB_KEY;
     let articles: Array<{ title?: string; description?: string }> = [];
 
-    if (apiKey) {
-      const q = encodeURIComponent(`${companyName ?? ticker} stock OR ${ticker}`);
-      const url = `https://newsapi.org/v2/everything?q=${q}&language=en&pageSize=10&sortBy=publishedAt&apiKey=${apiKey}`;
+    if (finnhubKey) {
       try {
+        const to = new Date();
+        const from = new Date();
+        from.setDate(to.getDate() - 7); // last 7 days
+        const fromStr = from.toISOString().split('T')[0];
+        const toStr = to.toISOString().split('T')[0];
+        const url = `https://finnhub.io/api/v1/company-news?symbol=${encodeURIComponent(ticker)}&from=${fromStr}&to=${toStr}&token=${finnhubKey}`;
         const res = await fetch(url, { cache: 'no-store' } as any);
         if (res.ok) {
           const json = await res.json();
-          articles = (json.articles || []).map((a: any) => ({ title: a.title, description: a.description }));
+          // Finnhub returns an array of news items with 'headline' and 'summary'
+          articles = (json || []).slice(0, 20).map((a: any) => ({ title: a.headline || a.summary || '', description: a.summary || '' }));
         }
       } catch (e) {
-        // ignore and fall back
+        // ignore and fall back to other sources
+      }
+    }
+
+    // If no Finnhub articles, try NewsAPI if available
+    if ((!articles || articles.length === 0)) {
+      const apiKey = process.env.NEWS_API_KEY || process.env.NEWSAPI_KEY;
+      if (apiKey) {
+        const q = encodeURIComponent(`${companyName ?? ticker} stock OR ${ticker}`);
+        const url = `https://newsapi.org/v2/everything?q=${q}&language=en&pageSize=10&sortBy=publishedAt&apiKey=${apiKey}`;
+        try {
+          const res = await fetch(url, { cache: 'no-store' } as any);
+          if (res.ok) {
+            const json = await res.json();
+            articles = (json.articles || []).map((a: any) => ({ title: a.title, description: a.description }));
+          }
+        } catch (e) {
+          // ignore and fall back
+        }
       }
     }
 
