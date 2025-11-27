@@ -88,3 +88,64 @@ export function getOverallSentiment(sentiment: { positive: number; neutral: numb
   
   return { label: 'Mixed', color: '#6b7280' };
 }
+
+// Simple keyword-based sentiment scoring as a fallback or lightweight option.
+export async function fetchAndScoreSentiment(ticker: string, companyName?: string, fallbackArticles?: Array<any>): Promise<{ positive: number; neutral: number; negative: number } | null> {
+  const positiveWords = ['good', 'great', 'bull', 'beat', 'up', 'gain', 'growth', 'outperform', 'positive', 'rise'];
+  const negativeWords = ['bad', 'fall', 'miss', 'down', 'drop', 'loss', 'decline', 'underperform', 'negative', 'sell'];
+
+  function scoreText(text: string) {
+    if (!text) return 0;
+    const t = text.toLowerCase();
+    let score = 0;
+    for (const w of positiveWords) if (t.includes(w)) score += 1;
+    for (const w of negativeWords) if (t.includes(w)) score -= 1;
+    return score;
+  }
+
+  try {
+    // If NEWS_API_KEY is provided, try to fetch recent news via NewsAPI.org
+    const apiKey = process.env.NEWS_API_KEY || process.env.NEWSAPI_KEY;
+    let articles: Array<{ title?: string; description?: string }> = [];
+
+    if (apiKey) {
+      const q = encodeURIComponent(`${companyName ?? ticker} stock OR ${ticker}`);
+      const url = `https://newsapi.org/v2/everything?q=${q}&language=en&pageSize=10&sortBy=publishedAt&apiKey=${apiKey}`;
+      try {
+        const res = await fetch(url, { cache: 'no-store' } as any);
+        if (res.ok) {
+          const json = await res.json();
+          articles = (json.articles || []).map((a: any) => ({ title: a.title, description: a.description }));
+        }
+      } catch (e) {
+        // ignore and fall back
+      }
+    }
+
+    // If no articles from API, try fallbackArticles (from static JSON)
+    if ((!articles || articles.length === 0) && Array.isArray(fallbackArticles) && fallbackArticles.length > 0) {
+      // Expect fallback articles to have title/summary fields; adapt if different
+      articles = fallbackArticles.slice(0, 10).map((a: any) => ({ title: a.title || a.headline || a.summary || '', description: a.description || a.summary || '' }));
+    }
+
+    if (!articles || articles.length === 0) return null;
+
+    let positive = 0, neutral = 0, negative = 0;
+    for (const a of articles) {
+      const text = `${a.title ?? ''} ${a.description ?? ''}`;
+      const s = scoreText(text);
+      if (s > 0) positive += 1;
+      else if (s < 0) negative += 1;
+      else neutral += 1;
+    }
+
+    const total = positive + neutral + negative || 1;
+    return {
+      positive: Math.round((positive / total) * 100),
+      neutral: Math.round((neutral / total) * 100),
+      negative: Math.round((negative / total) * 100)
+    };
+  } catch (err) {
+    return null;
+  }
+}

@@ -10,6 +10,7 @@ import { RecommendationCard } from '@/components/recommendation-card';
 import { BarChart3, RefreshCw } from 'lucide-react';
 import type { StockInsightsData } from '@/lib/types';
 import { fetchMultipleQuotes } from '@/lib/yahoo-finance';
+import { fetchAndScoreSentiment } from '@/lib/stock-utils';
 
 // Force dynamic rendering so prices are fetched at runtime, not build time
 export const dynamic = 'force-dynamic';
@@ -88,6 +89,21 @@ async function getStockData(): Promise<StockInsightsData> {
             stockInfo.cons = []; // Initialize empty cons
           }
         });
+
+        // Attempt to enrich social sentiment using NewsAPI (if key provided) or fallback to static latest_news
+        await Promise.allSettled(Object.keys(mergedData).map(async (ticker) => {
+          try {
+            const cfg = STOCK_CONFIG.find(c => c.ticker === ticker);
+            const companyName = cfg?.name;
+            const fallbackArticles = mergedData[ticker]?.latest_news ?? [];
+            const sentiment = await fetchAndScoreSentiment(ticker, companyName, fallbackArticles);
+            if (sentiment && mergedData[ticker] && typeof mergedData[ticker] === 'object') {
+              mergedData[ticker].social_sentiment = sentiment;
+            }
+          } catch (e) {
+            // ignore per-ticker sentiment errors
+          }
+        }));
 
         return {
           ...mergedData,
