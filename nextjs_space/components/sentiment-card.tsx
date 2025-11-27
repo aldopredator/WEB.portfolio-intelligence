@@ -27,10 +27,7 @@ export function SentimentCard({ sentiment, ticker }: SentimentCardProps) {
           <h3 className="text-xl font-bold text-white mb-1">Social Sentiment</h3>
           <p className="text-slate-400 text-sm">Community mood analysis</p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded border border-amber-500/30">Not Real-Time</span>
-          <Heart className="w-6 h-6 text-pink-400" />
-        </div>
+        <Heart className="w-6 h-6 text-pink-400" />
       </div>
 
       <div className="bg-slate-800/50 rounded-lg p-4 mb-6 border border-slate-700">
