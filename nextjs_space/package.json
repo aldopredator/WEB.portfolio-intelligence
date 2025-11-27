@@ -6,7 +6,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "diagnose": "powershell -ExecutionPolicy Bypass -File ./scripts/diagnose.ps1"
+    "diagnose": "powershell -ExecutionPolicy Bypass -File ./scripts/diagnose.ps1",
+    "clear-cache": "powershell -ExecutionPolicy Bypass -File ./scripts/clear-cache.ps1"
   },
   "prisma": {
     "seed": "tsx --require dotenv/config scripts/seed.ts"
