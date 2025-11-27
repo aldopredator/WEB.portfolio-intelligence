@@ -28,6 +28,11 @@ export interface StockData {
   '52_week_low': number;
   price_movement_30_days: PriceMovement[];
   analyst_recommendations: AnalystData;
+  // Optional real-time fields sourced from Yahoo Finance
+  previous_close?: number;
+  market_cap?: number;
+  volume?: number;
+  currency?: string;
 }
 
 export interface SocialSentiment {
