@@ -14,7 +14,10 @@ export function ProsConsCard({ pros, cons, ticker }: ProsConsCardProps) {
           <h3 className="text-xl font-bold text-white mb-1">Pros & Cons</h3>
           <p className="text-slate-400 text-sm">Key factors for {ticker ?? 'stock'}</p>
         </div>
-        <Sparkles className="w-6 h-6 text-purple-400" />
+        <div className="flex items-center gap-2">
+          <span className="text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded border border-amber-500/30">Not Real-Time</span>
+          <Sparkles className="w-6 h-6 text-purple-400" />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

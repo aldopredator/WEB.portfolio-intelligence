@@ -33,7 +33,10 @@ export function AnalystCard({ data, currentPrice }: AnalystCardProps) {
           <h3 className="text-xl font-bold text-white mb-1">Analyst Recommendations</h3>
           <p className="text-slate-400 text-sm">Professional analyst ratings</p>
         </div>
-        <Target className="w-6 h-6 text-blue-400" />
+        <div className="flex items-center gap-2">
+          <span className="text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded border border-amber-500/30">Not Real-Time</span>
+          <Target className="w-6 h-6 text-blue-400" />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-6">
