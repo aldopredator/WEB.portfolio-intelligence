@@ -10,6 +10,11 @@ import { RecommendationCard } from '@/components/recommendation-card';
 import { BarChart3, RefreshCw } from 'lucide-react';
 import type { StockInsightsData } from '@/lib/types';
 
+// Force dynamic rendering to fetch prices at runtime, not build time
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+
 // Stock configuration - must be defined before getStockData
 const STOCK_CONFIG = [
   { ticker: 'META', name: 'Meta Platforms (META)', color: 'bg-blue-500', letter: 'M' },
@@ -34,61 +39,44 @@ async function getStockData(): Promise<StockInsightsData> {
     const filePath = path.join(process.cwd(), 'public', 'stock_insights_data.json');
     const fileContents = await fs.readFile(filePath, 'utf8');
     const staticData = JSON.parse(fileContents);
+    const { data: realTimePrices } = await response.json();
 
-    // Get all stock tickers from the config
-    const tickers = STOCK_CONFIG.map(config => config.ticker).join(',');
+    // Merge real-time prices with static data
+    const mergedData: StockInsightsData = { ...staticData };
 
-    // Fetch real-time prices from our API route
-    try {
-      // Use Vercel URL or localhost for development
-      const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-        : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-
-      const apiUrl = `${baseUrl}/api/stock?tickers=${tickers}`;
-      const response = await fetch(apiUrl, {
-        cache: 'no-store',
-      });
-
-      if (response.ok) {
-        const { data: realTimePrices } = await response.json();
-
-        // Merge real-time prices with static data
-        const mergedData: StockInsightsData = { ...staticData };
-
-        Object.keys(realTimePrices).forEach((ticker) => {
-          const stockInfo = mergedData[ticker];
-          if (stockInfo && typeof stockInfo === 'object' && 'stock_data' in stockInfo) {
-            // Update only the price-related fields with real-time data
-            stockInfo.stock_data = {
-              ...stockInfo.stock_data,
-              current_price: realTimePrices[ticker].current_price,
-              change: realTimePrices[ticker].change,
-              change_percent: realTimePrices[ticker].change_percent,
-              '52_week_high': realTimePrices[ticker]['52_week_high'],
-              '52_week_low': realTimePrices[ticker]['52_week_low'],
-            };
-          }
-        });
-
-        return {
-          ...mergedData,
-          timestamp: new Date().toISOString()
+    Object.keys(realTimePrices).forEach((ticker) => {
+      const stockInfo = mergedData[ticker];
+      if (stockInfo && typeof stockInfo === 'object' && 'stock_data' in stockInfo) {
+        // Update only the price-related fields with real-time data
+        stockInfo.stock_data = {
+          ...stockInfo.stock_data,
+          current_price: realTimePrices[ticker].current_price,
+          change: realTimePrices[ticker].change,
+          change_percent: realTimePrices[ticker].change_percent,
+          '52_week_high': realTimePrices[ticker]['52_week_high'],
+          '52_week_low': realTimePrices[ticker]['52_week_low'],
         };
       }
-    } catch (apiError) {
-      console.error('Error fetching real-time prices, using static data:', apiError);
-    }
+    });
 
-    // Fallback to static data if API fails
     return {
-      ...staticData,
+      ...mergedData,
       timestamp: new Date().toISOString()
     };
-  } catch (error) {
-    console.error('Error reading stock data:', error);
-    return {} as StockInsightsData;
   }
+    } catch (apiError) {
+  console.error('Error fetching real-time prices, using static data:', apiError);
+}
+
+// Fallback to static data if API fails
+return {
+  ...staticData,
+  timestamp: new Date().toISOString()
+};
+  } catch (error) {
+  console.error('Error reading stock data:', error);
+  return {} as StockInsightsData;
+}
 }
 
 
