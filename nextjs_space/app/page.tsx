@@ -39,17 +39,15 @@ async function getStockData(): Promise<StockInsightsData> {
     const filePath = path.join(process.cwd(), 'public', 'stock_insights_data.json');
     const fileContents = await fs.readFile(filePath, 'utf8');
     const staticData = JSON.parse(fileContents);
-    const { data: realTimePrices } = await response.json();
 
-    // Merge real-time prices with static data
-    const mergedData: StockInsightsData = { ...staticData };
+    // Get all stock tickers from the config
+    const tickers = STOCK_CONFIG.map(config => config.ticker).join(',');
 
     // Fetch real-time prices directly (no HTTP call needed for server components)
     try {
       const realTimePrices = await fetchMultipleQuotes(tickers.split(','));
 
-      if (realTimePrices) {
-
+      if (realTimePrices && Object.keys(realTimePrices).length > 0) {
         // Merge real-time prices with static data
         const mergedData: StockInsightsData = { ...staticData };
 
@@ -73,26 +71,19 @@ async function getStockData(): Promise<StockInsightsData> {
           timestamp: new Date().toISOString()
         };
       }
-    });
+    } catch (apiError) {
+      console.error('Error fetching real-time prices, using static data:', apiError);
+    }
 
+    // Fallback to static data if API fails or returns no data
     return {
-      ...mergedData,
+      ...staticData,
       timestamp: new Date().toISOString()
     };
-  }
-    } catch (apiError) {
-  console.error('Error fetching real-time prices, using static data:', apiError);
-}
-
-// Fallback to static data if API fails
-return {
-  ...staticData,
-  timestamp: new Date().toISOString()
-};
   } catch (error) {
-  console.error('Error reading stock data:', error);
-  return {} as StockInsightsData;
-}
+    console.error('Error reading stock data:', error);
+    return {} as StockInsightsData;
+  }
 }
 
 
