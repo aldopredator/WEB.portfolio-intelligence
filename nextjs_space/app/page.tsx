@@ -52,19 +52,17 @@ async function getStockData(): Promise<StockInsightsData> {
         const mergedData: StockInsightsData = { ...staticData };
 
         Object.keys(realTimePrices).forEach((ticker) => {
-          if (mergedData[ticker] && typeof mergedData[ticker] === 'object' && 'stock_data' in mergedData[ticker]) {
-            const stockInfo = mergedData[ticker];
-            if (typeof stockInfo !== 'string') {
-              // Update only the price-related fields with real-time data
-              stockInfo.stock_data = {
-                ...stockInfo.stock_data,
-                current_price: realTimePrices[ticker].current_price,
-                change: realTimePrices[ticker].change,
-                change_percent: realTimePrices[ticker].change_percent,
-                '52_week_high': realTimePrices[ticker]['52_week_high'],
-                '52_week_low': realTimePrices[ticker]['52_week_low'],
-              };
-            }
+          const stockInfo = mergedData[ticker];
+          if (stockInfo && typeof stockInfo === 'object' && 'stock_data' in stockInfo) {
+            // Update only the price-related fields with real-time data
+            stockInfo.stock_data = {
+              ...stockInfo.stock_data,
+              current_price: realTimePrices[ticker].current_price,
+              change: realTimePrices[ticker].change,
+              change_percent: realTimePrices[ticker].change_percent,
+              '52_week_high': realTimePrices[ticker]['52_week_high'],
+              '52_week_low': realTimePrices[ticker]['52_week_low'],
+            };
           }
         });
 
