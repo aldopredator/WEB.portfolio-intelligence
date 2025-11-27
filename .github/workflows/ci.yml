@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
 
       - name: Print environment
         run: |
@@ -37,6 +40,30 @@ jobs:
         working-directory: nextjs_space
         run: |
           yarn install --frozen-lockfile || yarn install
+
+      - name: Patch lockfile by running local Next build (will modify lockfile if needed)
+        working-directory: nextjs_space
+        env:
+          CI: true
+        run: |
+          set -o pipefail
+          # Run a lightweight Next build to allow Next to patch swc deps in the lockfile
+          npx next@14.2.28 build --no-lint || true
+
+      - name: Commit patched lockfile if changed
+        working-directory: nextjs_space
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain yarn.lock)" ]; then
+            git add yarn.lock package-lock.json || true
+            git commit -m "chore(ci): patch lockfile for swc binaries [skip ci]" || true
+            git push origin HEAD:main || true
+          else
+            echo "No lockfile changes"
+          fi
 
       - name: Build (capture log)
         working-directory: nextjs_space
