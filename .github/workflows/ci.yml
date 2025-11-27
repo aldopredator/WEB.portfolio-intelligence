@@ -1,0 +1,59 @@
+name: CI - Next.js Build (nextjs_space)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-nextjs:
+    name: Build Next.js (nextjs_space)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Print environment
+        run: |
+          pwd
+          ls -la
+          node --version || true
+          npm --version || true
+          yarn --version || true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Enable Corepack (ensures Yarn available)
+        run: |
+          corepack enable
+          corepack prepare yarn@stable --activate
+
+      - name: Install dependencies (nextjs_space)
+        working-directory: nextjs_space
+        run: |
+          yarn install --frozen-lockfile || yarn install
+
+      - name: Build (capture log)
+        working-directory: nextjs_space
+        run: |
+          set -o pipefail
+          yarn build 2>&1 | tee build.log
+
+      - name: Upload build log
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs_space-build-log
+          path: nextjs_space/build.log
+
+      - name: Upload .next (optional, may be large)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs_space-next-output
+          path: nextjs_space/.next
+          if-no-files-found: ignore
