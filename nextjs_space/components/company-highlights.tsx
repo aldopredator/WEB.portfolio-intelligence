@@ -20,26 +20,79 @@ export function CompanyHighlights({ data, ticker }: CompanyHighlightsProps) {
         <Sparkles className="w-6 h-6 text-blue-400" />
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        {stock?.market_cap ? (
+      {/* Market Data Section */}
+      <div className="mb-6">
+        <h4 className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-3">Market Data</h4>
+        <div className="grid grid-cols-2 gap-4">
+          {stock?.market_cap ? (
+            <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+              <p className="text-slate-400 text-sm mb-1">Market Cap</p>
+              <p className="text-white font-bold text-lg">{formatMarketCap(stock.market_cap, stock?.currency ?? '$')}</p>
+            </div>
+          ) : null}
+
           <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-            <p className="text-slate-400 text-sm mb-1">Market Cap</p>
-            <p className="text-white font-bold text-lg">{formatMarketCap(stock.market_cap, stock?.currency ?? '$')}</p>
+            <p className="text-slate-400 text-sm mb-1">Volume</p>
+            <p className="text-white font-bold text-lg">{formatLargeNumber(stock?.volume ?? 0)}</p>
           </div>
-        ) : null}
 
-        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-          <p className="text-slate-400 text-sm mb-1">Volume</p>
-          <p className="text-white font-bold text-lg">{formatLargeNumber(stock?.volume ?? 0)}</p>
+          <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+            <p className="text-slate-400 text-sm mb-1">Currency</p>
+            <p className="text-white font-semibold text-lg">{stock?.currency ?? 'USD'}</p>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
-        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-          <p className="text-slate-400 text-sm mb-1">Currency</p>
-          <p className="text-white font-semibold text-lg">{stock?.currency ?? 'USD'}</p>
+      {/* Valuation Metrics Section */}
+      {(stock?.pe_ratio || stock?.pb_ratio || stock?.dividend_yield) ? (
+        <div className="mb-6">
+          <h4 className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-3">Valuation</h4>
+          <div className="grid grid-cols-2 gap-4">
+            {stock?.pe_ratio ? (
+              <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                <p className="text-slate-400 text-sm mb-1">P/E Ratio</p>
+                <p className="text-white font-bold text-lg">{stock.pe_ratio.toFixed(2)}</p>
+              </div>
+            ) : null}
+
+            {stock?.pb_ratio ? (
+              <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                <p className="text-slate-400 text-sm mb-1">P/B Ratio</p>
+                <p className="text-white font-bold text-lg">{stock.pb_ratio.toFixed(2)}</p>
+              </div>
+            ) : null}
+
+            {stock?.dividend_yield ? (
+              <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                <p className="text-slate-400 text-sm mb-1">Dividend Yield</p>
+                <p className="text-white font-bold text-lg">{stock.dividend_yield.toFixed(2)}%</p>
+              </div>
+            ) : null}
+          </div>
         </div>
-      </div>
+      ) : null}
+
+      {/* Profitability Metrics Section */}
+      {(stock?.roe || stock?.debt_to_equity) ? (
+        <div>
+          <h4 className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-3">Profitability</h4>
+          <div className="grid grid-cols-2 gap-4">
+            {stock?.roe ? (
+              <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                <p className="text-slate-400 text-sm mb-1">ROE</p>
+                <p className="text-white font-bold text-lg">{stock.roe.toFixed(2)}%</p>
+              </div>
+            ) : null}
+
+            {stock?.debt_to_equity ? (
+              <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                <p className="text-slate-400 text-sm mb-1">Debt-to-Equity</p>
+                <p className="text-white font-bold text-lg">{stock.debt_to_equity.toFixed(2)}</p>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

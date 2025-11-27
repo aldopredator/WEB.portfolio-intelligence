@@ -33,6 +33,12 @@ export interface StockData {
   market_cap?: number;
   volume?: number;
   currency?: string;
+  // Finnhub metrics
+  pe_ratio?: number;
+  pb_ratio?: number;
+  debt_to_equity?: number;
+  roe?: number;
+  dividend_yield?: number;
 }
 
 export interface SocialSentiment {

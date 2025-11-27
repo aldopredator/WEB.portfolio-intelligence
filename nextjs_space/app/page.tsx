@@ -11,6 +11,7 @@ import { BarChart3, RefreshCw } from 'lucide-react';
 import type { StockInsightsData } from '@/lib/types';
 import { fetchMultipleQuotes } from '@/lib/yahoo-finance';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
+import { fetchFinnhubMetrics } from '@/lib/finnhub-metrics';
 import { isRecord } from '@/lib/utils';
 
 // Force dynamic rendering so prices are fetched at runtime, not build time
@@ -91,19 +92,28 @@ async function getStockData(): Promise<StockInsightsData> {
           }
         });
 
-        // Attempt to enrich social sentiment using NewsAPI (if key provided) or fallback to static latest_news
+        // Attempt to enrich social sentiment and financial metrics
         await Promise.allSettled(Object.keys(mergedData).map(async (ticker) => {
           try {
             const cfg = STOCK_CONFIG.find(c => c.ticker === ticker);
             const companyName = cfg?.name;
             const stockEntry = mergedData[ticker];
+            
+            // Fetch sentiment
             const fallbackArticles = isRecord(stockEntry) && 'latest_news' in stockEntry ? (stockEntry as any).latest_news : [];
             const sentiment = await fetchAndScoreSentiment(ticker, companyName, fallbackArticles as any[]);
             if (sentiment && isRecord(stockEntry)) {
               stockEntry.social_sentiment = sentiment as any;
             }
+
+            // Fetch financial metrics from Finnhub
+            const metrics = await fetchFinnhubMetrics(ticker);
+            if (metrics && isRecord(stockEntry) && stockEntry.stock_data) {
+              // Merge metrics into stock_data
+              Object.assign(stockEntry.stock_data, metrics);
+            }
           } catch (e) {
-            // ignore per-ticker sentiment errors
+            // ignore per-ticker enrichment errors
           }
         }));
 
