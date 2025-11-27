@@ -59,3 +59,32 @@ export function formatMarketCap(value: number | undefined | null, currency = '$'
   if (!value) return 'N/A';
   return `${currency}${formatLargeNumber(value)}`;
 }
+
+export function formatPercent(percent: number): string {
+  const sign = (percent ?? 0) >= 0 ? '+' : '';
+  return `${sign}${percent?.toFixed?.(2) ?? '0.00'}%`;
+}
+
+export function getSentimentColor(type: 'positive' | 'neutral' | 'negative'): string {
+  const colors = {
+    positive: '#10b981',
+    neutral: '#f59e0b',
+    negative: '#ef4444'
+  };
+  return colors?.[type] ?? '#6b7280';
+}
+
+export function getOverallSentiment(sentiment: { positive: number; neutral: number; negative: number }): {
+  label: string;
+  color: string;
+} {
+  const pos = sentiment?.positive ?? 0;
+  const neg = sentiment?.negative ?? 0;
+  
+  if (pos > 50) return { label: 'Very Positive', color: '#10b981' };
+  if (pos > 40 && pos > neg) return { label: 'Positive', color: '#34d399' };
+  if (neg > 40) return { label: 'Negative', color: '#ef4444' };
+  if (Math.abs(pos - neg) < 10) return { label: 'Neutral', color: '#f59e0b' };
+  
+  return { label: 'Mixed', color: '#6b7280' };
+}
