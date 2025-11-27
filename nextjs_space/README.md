@@ -1,6 +1,8 @@
 
 # 📊 Stock Insights Dashboard
 
+[![CI - Next.js Build](https://github.com/aldopredator/WEB.portfolio-intelligence/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/aldopredator/WEB.portfolio-intelligence/actions/workflows/ci.yml)
+
 A sleek, data-rich dashboard for tracking real-time stock insights for **Meta (META)** and **Nvidia (NVDA)**. Built with Next.js 14, TypeScript, and Tailwind CSS.
 
 ![Dashboard Preview](public/og-image.png)
