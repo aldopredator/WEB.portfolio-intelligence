@@ -18,6 +18,8 @@ export interface StockQuote {
     previous_close: number;
     '52_week_high': number;
     '52_week_low': number;
+    price_history: { Date: string; Close: number }[];
+    target_price: number;
 }
 
 /**
@@ -26,8 +28,8 @@ export interface StockQuote {
  */
 export async function fetchYahooQuote(ticker: string): Promise<StockQuote | null> {
     try {
-        // Yahoo Finance query API endpoint
-        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}`;
+        // Yahoo Finance query API endpoint with historical data
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=1mo&interval=1d`;
 
         const response = await fetch(url, {
             headers: {
@@ -56,6 +58,19 @@ export async function fetchYahooQuote(ticker: string): Promise<StockQuote | null
         const change = currentPrice - previousClose;
         const changePercent = (change / previousClose) * 100;
 
+        // Extract historical data
+        const timestamps = result.timestamp || [];
+        const quotes = result.indicators?.quote?.[0] || {};
+        const closes = quotes.close || [];
+
+        const price_history = timestamps.map((timestamp: number, index: number) => ({
+            Date: new Date(timestamp * 1000).toISOString(),
+            Close: closes[index] || 0
+        })).filter((item: any) => item.Close > 0); // Filter out null/zero values
+
+        // Extract target price if available (often in meta.targetMeanPrice)
+        const target_price = meta.targetMeanPrice || 0;
+
         return {
             ticker,
             current_price: Number(currentPrice.toFixed(2)),
@@ -64,6 +79,8 @@ export async function fetchYahooQuote(ticker: string): Promise<StockQuote | null
             previous_close: Number(previousClose.toFixed(2)),
             '52_week_high': Number((meta.fiftyTwoWeekHigh || 0).toFixed(2)),
             '52_week_low': Number((meta.fiftyTwoWeekLow || 0).toFixed(2)),
+            price_history,
+            target_price
         };
     } catch (error) {
         console.error(`Error fetching quote for ${ticker}:`, error);

@@ -5,7 +5,7 @@ import { PriceCard } from '@/components/price-card';
 import { PriceChart } from '@/components/price-chart';
 import { AnalystCard } from '@/components/analyst-card';
 import { SentimentCard } from '@/components/sentiment-card';
-import { TrendsCard } from '@/components/trends-card';
+import { ProsConsCard } from '@/components/pros-cons-card';
 import { RecommendationCard } from '@/components/recommendation-card';
 import { BarChart3, RefreshCw } from 'lucide-react';
 import type { StockInsightsData } from '@/lib/types';
@@ -53,7 +53,7 @@ async function getStockData(): Promise<StockInsightsData> {
         Object.keys(realTimePrices).forEach((ticker) => {
           const stockInfo = mergedData[ticker];
           if (stockInfo && typeof stockInfo === 'object' && 'stock_data' in stockInfo) {
-            // Update only the price-related fields with real-time data
+            // Update price-related fields with real-time data
             stockInfo.stock_data = {
               ...stockInfo.stock_data,
               current_price: realTimePrices[ticker].current_price,
@@ -61,7 +61,28 @@ async function getStockData(): Promise<StockInsightsData> {
               change_percent: realTimePrices[ticker].change_percent,
               '52_week_high': realTimePrices[ticker]['52_week_high'],
               '52_week_low': realTimePrices[ticker]['52_week_low'],
+              price_movement_30_days: realTimePrices[ticker].price_history,
             };
+
+            // Update target price if available
+            if (realTimePrices[ticker].target_price > 0) {
+              stockInfo.analyst_recommendations = {
+                ...stockInfo.analyst_recommendations,
+                target_price: realTimePrices[ticker].target_price
+              };
+            }
+          }
+        });
+
+        // Map static emerging_trends to pros (temporary migration)
+        Object.keys(mergedData).forEach((ticker) => {
+          const stockInfo = mergedData[ticker];
+          if (stockInfo && typeof stockInfo === 'object') {
+            // Handle migration from emerging_trends to pros/cons
+            // @ts-ignore - emerging_trends might still exist in the static JSON
+            const trends = stockInfo.emerging_trends || [];
+            stockInfo.pros = trends; // Use existing trends as pros for now
+            stockInfo.cons = []; // Initialize empty cons
           }
         });
 
@@ -158,8 +179,9 @@ export default async function Home() {
                   sentiment={data.social_sentiment}
                   ticker={config.ticker}
                 />
-                <TrendsCard
-                  trends={data.emerging_trends ?? []}
+                <ProsConsCard
+                  pros={data.pros ?? []}
+                  cons={data.cons ?? []}
                   ticker={config.ticker}
                 />
               </div>

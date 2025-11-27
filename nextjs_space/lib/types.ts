@@ -41,7 +41,8 @@ export interface StockInfo {
   analyst_recommendations: AnalystData;
   latest_news: any[];
   social_sentiment: SocialSentiment;
-  emerging_trends: string[];
+  pros: string[];
+  cons: string[];
 }
 
 export interface StockInsightsData {
