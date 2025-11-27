@@ -10,7 +10,7 @@ import { RecommendationCard } from '@/components/recommendation-card';
 import { BarChart3, RefreshCw } from 'lucide-react';
 import type { StockInsightsData } from '@/lib/types';
 import { fetchMultipleQuotes } from '@/lib/yahoo-finance';
-import { fetchAndScoreSentiment } from '@/lib/stock-utils';
+import { fetchAndScoreSentiment } from '@/lib/sentiment';
 import { isRecord } from '@/lib/utils';
 
 // Force dynamic rendering so prices are fetched at runtime, not build time
