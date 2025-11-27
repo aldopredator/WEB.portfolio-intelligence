@@ -17,15 +17,14 @@ export const revalidate = 0;
 
 // Stock configuration - must be defined before getStockData
 const STOCK_CONFIG = [
-  { ticker: 'META', name: 'Meta Platforms (META)', color: 'bg-blue-500', letter: 'M' },
-  { ticker: 'NVDA', name: 'Nvidia Corporation (NVDA)', color: 'bg-emerald-500', letter: 'N' },
   { ticker: 'GOOG', name: 'Alphabet Inc. (GOOG)', color: 'bg-rose-500', letter: 'G' },
   { ticker: 'TSLA', name: 'Tesla, Inc. (TSLA)', color: 'bg-red-600', letter: 'T' },
+  { ticker: 'NVDA', name: 'Nvidia Corporation (NVDA)', color: 'bg-emerald-500', letter: 'N' },
+  { ticker: 'AMZN', name: 'Amazon.com Inc. (AMZN)', color: 'bg-orange-500', letter: 'A' },
   { ticker: 'BRKB', name: 'Berkshire Hathaway Inc. (BRKB)', color: 'bg-slate-600', letter: 'B' },
   { ticker: 'ISRG', name: 'Intuitive Surgical Inc. (ISRG)', color: 'bg-indigo-500', letter: 'I' },
   { ticker: 'NFLX', name: 'Netflix Inc. (NFLX)', color: 'bg-red-700', letter: 'N' },
   { ticker: 'GOOGL', name: 'Alphabet Inc. (GOOGL)', color: 'bg-blue-600', letter: 'G' },
-  { ticker: 'AMZN', name: 'Amazon.com Inc. (AMZN)', color: 'bg-orange-500', letter: 'A' },
   { ticker: 'IDXX', name: 'IDEXX Laboratories Inc. (IDXX)', color: 'bg-yellow-600', letter: 'I' },
   { ticker: 'III', name: '3i Group plc (III)', color: 'bg-sky-600', letter: '3' },
   { ticker: 'PLTR', name: 'Palantir Technologies Inc. (PLTR)', color: 'bg-stone-500', letter: 'P' },
