@@ -1,0 +1,492 @@
+{
+    "META": {
+        "stock_data": {
+            "ticker": "META",
+            "company": "Meta Platforms (META)",
+            "current_price": 595.00,
+            "change": 12.50,
+            "change_percent": 2.15,
+            "52_week_high": 714.00,
+            "52_week_low": 476.00,
+            "price_movement_30_days": [
+                {
+                    "date": "2025-10-28",
+                    "price": 580.12
+                },
+                {
+                    "date": "2025-10-29",
+                    "price": 585.45
+                },
+                {
+                    "date": "2025-10-30",
+                    "price": 582.30
+                },
+                {
+                    "date": "2025-10-31",
+                    "price": 588.90
+                },
+                {
+                    "date": "2025-11-01",
+                    "price": 590.15
+                },
+                {
+                    "date": "2025-11-02",
+                    "price": 592.40
+                },
+                {
+                    "date": "2025-11-03",
+                    "price": 589.80
+                },
+                {
+                    "date": "2025-11-04",
+                    "price": 593.25
+                },
+                {
+                    "date": "2025-11-05",
+                    "price": 595.00
+                }
+            ]
+        },
+        "analyst_recommendations": {
+            "strong_buy": 28,
+            "buy": 15,
+            "hold": 5,
+            "sell": 1,
+            "strong_sell": 0,
+            "consensus": "Strong Buy",
+            "price_target": 685.00
+        },
+        "social_sentiment": {
+            "positive": 75,
+            "neutral": 20,
+            "negative": 5,
+            "overall": "Bullish"
+        },
+        "latest_news": [
+            {
+                "title": "Meta Reports Strong Ad Revenue",
+                "summary": "Quarterly results exceed analyst expectations driven by AI investments.",
+                "source": "Financial Times",
+                "date": "2025-11-27",
+                "url": "https://ft.com"
+            }
+        ],
+        "emerging_trends": [
+            "🤖 AI Integration",
+            "💰 Strong Cash Flow"
+        ]
+    },
+    "NVDA": {
+        "stock_data": {
+            "ticker": "NVDA",
+            "company": "Nvidia Corporation (NVDA)",
+            "current_price": 140.00,
+            "change": 3.50,
+            "change_percent": 2.56,
+            "52_week_high": 168.00,
+            "52_week_low": 112.00,
+            "price_movement_30_days": [
+                {
+                    "date": "2025-11-01",
+                    "price": 135.20
+                },
+                {
+                    "date": "2025-11-05",
+                    "price": 140.00
+                }
+            ]
+        },
+        "analyst_recommendations": {
+            "strong_buy": 35,
+            "buy": 10,
+            "hold": 3,
+            "sell": 0,
+            "strong_sell": 0,
+            "consensus": "Strong Buy",
+            "price_target": 165.00
+        },
+        "social_sentiment": {
+            "positive": 85,
+            "neutral": 10,
+            "negative": 5,
+            "overall": "Very Bullish"
+        },
+        "latest_news": [],
+        "emerging_trends": [
+            "📈 AI Chip Demand"
+        ]
+    },
+    "GOOG": {
+        "stock_data": {
+            "ticker": "GOOG",
+            "company": "Alphabet Inc. Class C (GOOG)",
+            "current_price": 175.00,
+            "change": -1.20,
+            "change_percent": -0.68,
+            "52_week_high": 210.00,
+            "52_week_low": 140.00,
+            "price_movement_30_days": []
+        },
+        "analyst_recommendations": {
+            "strong_buy": 20,
+            "buy": 20,
+            "hold": 8,
+            "sell": 2,
+            "strong_sell": 0,
+            "consensus": "Buy",
+            "price_target": 195.00
+        },
+        "social_sentiment": {
+            "positive": 60,
+            "neutral": 30,
+            "negative": 10,
+            "overall": "Positive"
+        },
+        "latest_news": [],
+        "emerging_trends": [
+            "☁️ Cloud Growth"
+        ]
+    },
+    "TSLA": {
+        "stock_data": {
+            "ticker": "TSLA",
+            "company": "Tesla, Inc. (TSLA)",
+            "current_price": 248.00,
+            "change": 5.80,
+            "change_percent": 2.39,
+            "52_week_high": 297.60,
+            "52_week_low": 198.40,
+            "price_movement_30_days": []
+        },
+        "analyst_recommendations": {
+            "strong_buy": 10,
+            "buy": 15,
+            "hold": 15,
+            "sell": 5,
+            "strong_sell": 2,
+            "consensus": "Hold",
+            "price_target": 260.00
+        },
+        "social_sentiment": {
+            "positive": 50,
+            "neutral": 20,
+            "negative": 30,
+            "overall": "Neutral"
+        },
+        "latest_news": [],
+        "emerging_trends": [
+            "🚗 EV Competition"
+        ]
+    },
+    "BRKB": {
+        "stock_data": {
+            "ticker": "BRKB",
+            "company": "Berkshire Hathaway Inc. (BRKB)",
+            "current_price": 465.50,
+            "change": 2.10,
+            "change_percent": 0.45,
+            "52_week_high": 558.60,
+            "52_week_low": 372.40,
+            "price_movement_30_days": []
+        },
+        "analyst_recommendations": {
+            "strong_buy": 5,
+            "buy": 10,
+            "hold": 5,
+            "sell": 0,
+            "strong_sell": 0,
+            "consensus": "Buy",
+            "price_target": 500.00
+        },
+        "social_sentiment": {
+            "positive": 70,
+            "neutral": 25,
+            "negative": 5,
+            "overall": "Positive"
+        },
+        "latest_news": [],
+        "emerging_trends": [
+            "🛡️ Defensive Play"
+        ]
+    },
+    "ISRG": {
+        "stock_data": {
+            "ticker": "ISRG",
+            "company": "Intuitive Surgical Inc. (ISRG)",
+            "current_price": 385.20,
+            "change": 4.50,
+            "change_percent": 1.18,
+            "52_week_high": 462.24,
+            "52_week_low": 308.16,
+            "price_movement_30_days": []
+        },
+        "analyst_recommendations": {
+            "strong_buy": 12,
+            "buy": 8,
+            "hold": 4,
+            "sell": 1,
+            "strong_sell": 0,
+            "consensus": "Buy",
+            "price_target": 420.00
+        },
+        "social_sentiment": {
+            "positive": 65,
+            "neutral": 30,
+            "negative": 5,
+            "overall": "Positive"
+        },
+        "latest_news": [],
+        "emerging_trends": [
+            "🏥 MedTech Growth"
+        ]
+    },
+    "NFLX": {
+        "stock_data": {
+            "ticker": "NFLX",
+            "company": "Netflix Inc. (NFLX)",
+            "current_price": 620.15,
+            "change": -5.20,
+            "change_percent": -0.83,
+            "52_week_high": 744.18,
+            "52_week_low": 496.12,
+            "price_movement_30_days": []
+        },
+        "analyst_recommendations": {
+            "strong_buy": 15,
+            "buy": 12,
+            "hold": 8,
+            "sell": 2,
+            "strong_sell": 0,
+            "consensus": "Buy",
+            "price_target": 650.00
+        },
+        "social_sentiment": {
+            "positive": 55,
+            "neutral": 35,
+            "negative": 10,
+            "overall": "Neutral"
+        },
+        "latest_news": [],
+        "emerging_trends": [
+            "📺 Streaming Wars"
+        ]
+    },
+    "GOOGL": {
+        "stock_data": {
+            "ticker": "GOOGL",
+            "company": "Alphabet Inc. Class A (GOOGL)",
+            "current_price": 176.40,
+            "change": -1.10,
+            "change_percent": -0.62,
+            "52_week_high": 211.68,
+            "52_week_low": 141.12,
+            "price_movement_30_days": []
+        },
+        "analyst_recommendations": {
+            "strong_buy": 22,
+            "buy": 18,
+            "hold": 7,
+            "sell": 1,
+            "strong_sell": 0,
+            "consensus": "Buy",
+            "price_target": 198.00
+        },
+        "social_sentiment": {
+            "positive": 62,
+            "neutral": 28,
+            "negative": 10,
+            "overall": "Positive"
+        },
+        "latest_news": [],
+        "emerging_trends": [
+            "🤖 Gemini AI"
+        ]
+    },
+    "AMZN": {
+        "stock_data": {
+            "ticker": "AMZN",
+            "company": "Amazon.com Inc. (AMZN)",
+            "current_price": 182.30,
+            "change": 2.80,
+            "change_percent": 1.56,
+            "52_week_high": 218.76,
+            "52_week_low": 145.84,
+            "price_movement_30_days": []
+        },
+        "analyst_recommendations": {
+            "strong_buy": 38,
+            "buy": 10,
+            "hold": 2,
+            "sell": 0,
+            "strong_sell": 0,
+            "consensus": "Strong Buy",
+            "price_target": 210.00
+        },
+        "social_sentiment": {
+            "positive": 80,
+            "neutral": 15,
+            "negative": 5,
+            "overall": "Bullish"
+        },
+        "latest_news": [],
+        "emerging_trends": [
+            "📦 E-commerce Dominance"
+        ]
+    },
+    "IDXX": {
+        "stock_data": {
+            "ticker": "IDXX",
+            "company": "IDEXX Laboratories Inc. (IDXX)",
+            "current_price": 510.60,
+            "change": 1.20,
+            "change_percent": 0.24,
+            "52_week_high": 612.72,
+            "52_week_low": 408.48,
+            "price_movement_30_days": []
+        },
+        "analyst_recommendations": {
+            "strong_buy": 8,
+            "buy": 10,
+            "hold": 6,
+            "sell": 1,
+            "strong_sell": 0,
+            "consensus": "Buy",
+            "price_target": 540.00
+        },
+        "social_sentiment": {
+            "positive": 60,
+            "neutral": 35,
+            "negative": 5,
+            "overall": "Positive"
+        },
+        "latest_news": [],
+        "emerging_trends": [
+            "🐶 Pet Healthcare"
+        ]
+    },
+    "III": {
+        "stock_data": {
+            "ticker": "III",
+            "company": "3i Group plc (III)",
+            "current_price": 32.40,
+            "change": 0.45,
+            "change_percent": 1.41,
+            "52_week_high": 38.88,
+            "52_week_low": 25.92,
+            "price_movement_30_days": []
+        },
+        "analyst_recommendations": {
+            "strong_buy": 4,
+            "buy": 6,
+            "hold": 4,
+            "sell": 0,
+            "strong_sell": 0,
+            "consensus": "Buy",
+            "price_target": 36.00
+        },
+        "social_sentiment": {
+            "positive": 55,
+            "neutral": 40,
+            "negative": 5,
+            "overall": "Neutral"
+        },
+        "latest_news": [],
+        "emerging_trends": [
+            "💼 Private Equity"
+        ]
+    },
+    "PLTR": {
+        "stock_data": {
+            "ticker": "PLTR",
+            "company": "Palantir Technologies Inc. (PLTR)",
+            "current_price": 24.80,
+            "change": 1.10,
+            "change_percent": 4.64,
+            "52_week_high": 29.76,
+            "52_week_low": 19.84,
+            "price_movement_30_days": []
+        },
+        "analyst_recommendations": {
+            "strong_buy": 8,
+            "buy": 10,
+            "hold": 12,
+            "sell": 5,
+            "strong_sell": 3,
+            "consensus": "Hold",
+            "price_target": 22.00
+        },
+        "social_sentiment": {
+            "positive": 85,
+            "neutral": 5,
+            "negative": 10,
+            "overall": "Very Bullish"
+        },
+        "latest_news": [],
+        "emerging_trends": [
+            "🛡️ Defense Tech"
+        ]
+    },
+    "QBTS": {
+        "stock_data": {
+            "ticker": "QBTS",
+            "company": "D-Wave Quantum Inc. (QBTS)",
+            "current_price": 1.45,
+            "change": -0.05,
+            "change_percent": -3.33,
+            "52_week_high": 1.74,
+            "52_week_low": 1.16,
+            "price_movement_30_days": []
+        },
+        "analyst_recommendations": {
+            "strong_buy": 2,
+            "buy": 3,
+            "hold": 2,
+            "sell": 0,
+            "strong_sell": 0,
+            "consensus": "Buy",
+            "price_target": 2.50
+        },
+        "social_sentiment": {
+            "positive": 40,
+            "neutral": 40,
+            "negative": 20,
+            "overall": "Neutral"
+        },
+        "latest_news": [],
+        "emerging_trends": [
+            "⚛️ Quantum Computing"
+        ]
+    },
+    "RGTI": {
+        "stock_data": {
+            "ticker": "RGTI",
+            "company": "Rigetti Computing Inc. (RGTI)",
+            "current_price": 1.15,
+            "change": 0.02,
+            "change_percent": 1.77,
+            "52_week_high": 1.38,
+            "52_week_low": 0.92,
+            "price_movement_30_days": []
+        },
+        "analyst_recommendations": {
+            "strong_buy": 1,
+            "buy": 4,
+            "hold": 2,
+            "sell": 0,
+            "strong_sell": 0,
+            "consensus": "Buy",
+            "price_target": 2.00
+        },
+        "social_sentiment": {
+            "positive": 45,
+            "neutral": 45,
+            "negative": 10,
+            "overall": "Neutral"
+        },
+        "latest_news": [],
+        "emerging_trends": [
+            "⚛️ Quantum Hardware"
+        ]
+    },
+    "timestamp": "2025-11-27T12:00:00.000Z"
+}
