@@ -515,5 +515,177 @@
     ],
     "last_updated": "2025-11-21T14:27:28.927662"
   },
+  "TSLA": {
+    "stock_data": {
+      "ticker": "TSLA",
+      "company": "Tesla, Inc.",
+      "current_price": 248.50,
+      "change": 12.45,
+      "change_percent": 5.27,
+      "52_week_high": 271.00,
+      "52_week_low": 138.80,
+      "price_movement_30_days": [
+        {
+          "date": "2025-10-22",
+          "price": 215.20
+        },
+        {
+          "date": "2025-10-23",
+          "price": 218.45
+        },
+        {
+          "date": "2025-10-24",
+          "price": 222.10
+        },
+        {
+          "date": "2025-10-25",
+          "price": 219.50
+        },
+        {
+          "date": "2025-10-26",
+          "price": 215.80
+        },
+        {
+          "date": "2025-10-27",
+          "price": 217.20
+        },
+        {
+          "date": "2025-10-28",
+          "price": 225.40
+        },
+        {
+          "date": "2025-10-29",
+          "price": 228.10
+        },
+        {
+          "date": "2025-10-30",
+          "price": 232.50
+        },
+        {
+          "date": "2025-10-31",
+          "price": 229.80
+        },
+        {
+          "date": "2025-11-01",
+          "price": 235.20
+        },
+        {
+          "date": "2025-11-02",
+          "price": 233.90
+        },
+        {
+          "date": "2025-11-03",
+          "price": 238.40
+        },
+        {
+          "date": "2025-11-04",
+          "price": 242.10
+        },
+        {
+          "date": "2025-11-05",
+          "price": 245.50
+        },
+        {
+          "date": "2025-11-06",
+          "price": 248.20
+        },
+        {
+          "date": "2025-11-07",
+          "price": 252.80
+        },
+        {
+          "date": "2025-11-08",
+          "price": 249.90
+        },
+        {
+          "date": "2025-11-09",
+          "price": 255.10
+        },
+        {
+          "date": "2025-11-10",
+          "price": 258.50
+        },
+        {
+          "date": "2025-11-11",
+          "price": 262.20
+        },
+        {
+          "date": "2025-11-12",
+          "price": 255.50
+        },
+        {
+          "date": "2025-11-13",
+          "price": 252.10
+        },
+        {
+          "date": "2025-11-14",
+          "price": 258.40
+        },
+        {
+          "date": "2025-11-15",
+          "price": 255.80
+        },
+        {
+          "date": "2025-11-16",
+          "price": 252.10
+        },
+        {
+          "date": "2025-11-17",
+          "price": 258.50
+        },
+        {
+          "date": "2025-11-18",
+          "price": 260.20
+        },
+        {
+          "date": "2025-11-19",
+          "price": 255.50
+        },
+        {
+          "date": "2025-11-20",
+          "price": 248.50
+        }
+      ]
+    },
+    "analyst_recommendations": {
+      "strong_buy": 15,
+      "buy": 12,
+      "hold": 18,
+      "sell": 5,
+      "strong_sell": 2,
+      "consensus": "Hold",
+      "price_target": 260.00
+    },
+    "social_sentiment": {
+      "positive": 55,
+      "neutral": 25,
+      "negative": 20,
+      "overall": "Mixed"
+    },
+    "latest_news": [
+      {
+        "title": "Tesla Cybertruck Production Ramps Up",
+        "summary": "Giga Texas sees increased output as supply chain issues ease.",
+        "source": "Electrek",
+        "date": "2025-11-21",
+        "url": "https://electrek.co"
+      },
+      {
+        "title": "FSD Beta v13 Released to Wide Audience",
+        "summary": "Major improvements in urban driving capabilities reported by early testers.",
+        "source": "Teslarati",
+        "date": "2025-11-20",
+        "url": "https://www.teslarati.com"
+      }
+    ],
+    "emerging_trends": [
+      "🛻 Cybertruck Volume Production",
+      "🤖 Optimus Bot Development Updates",
+      "🔋 4680 Battery Cell Yield Improvements",
+      "🚗 FSD Licensing Talks with OEMs",
+      "📉 EV Price War Stabilization"
+    ],
+    "last_updated": "2025-11-21T14:27:28.927662"
+  },
   "timestamp": "2025-11-21T14:27:28.927662"
 }

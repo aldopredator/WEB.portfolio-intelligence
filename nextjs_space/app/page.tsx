@@ -30,6 +30,7 @@ export default async function Home() {
   const metaData = stockData?.META;
   const nvdaData = stockData?.NVDA;
   const googData = stockData?.GOOG;
+  const tslaData = stockData?.TSLA;
 
   const lastUpdated = stockData?.timestamp
     ? new Date(stockData.timestamp).toLocaleString('en-US', {
@@ -179,7 +180,44 @@ export default async function Home() {
           </div>
         )}
 
-        {!metaData && !nvdaData && !googData && (
+        {/* Tesla Section */}
+        {tslaData && (
+          <div className="mt-16">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">T</span>
+              </div>
+              <h2 className="text-3xl font-bold text-white">Tesla, Inc. (TSLA)</h2>
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+              <PriceCard stock={tslaData?.stock_data} />
+              <PriceChart
+                data={tslaData?.stock_data?.price_movement_30_days ?? []}
+                ticker="TSLA"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+              <AnalystCard
+                data={tslaData?.analyst_recommendations}
+                currentPrice={tslaData?.stock_data?.current_price ?? 0}
+              />
+              <SentimentCard
+                sentiment={tslaData?.social_sentiment}
+                ticker="TSLA"
+              />
+              <TrendsCard
+                trends={tslaData?.emerging_trends ?? []}
+                ticker="TSLA"
+              />
+            </div>
+
+            <RecommendationCard stock={tslaData} ticker="TSLA" />
+          </div>
+        )}
+
+        {!metaData && !nvdaData && !googData && !tslaData && (
           <div className="text-center py-20">
             <p className="text-slate-400 text-lg">No stock data available</p>
           </div>
