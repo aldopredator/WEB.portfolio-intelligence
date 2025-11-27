@@ -12,3 +12,8 @@ export function formatDuration(seconds: number): string {
 
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
 }
+
+// Type guard: narrow unknown to an object with string keys
+export function isRecord<T = Record<string, unknown>>(value: unknown): value is T {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}

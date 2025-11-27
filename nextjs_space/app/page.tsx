@@ -11,6 +11,7 @@ import { BarChart3, RefreshCw } from 'lucide-react';
 import type { StockInsightsData } from '@/lib/types';
 import { fetchMultipleQuotes } from '@/lib/yahoo-finance';
 import { fetchAndScoreSentiment } from '@/lib/stock-utils';
+import { isRecord } from '@/lib/utils';
 
 // Force dynamic rendering so prices are fetched at runtime, not build time
 export const dynamic = 'force-dynamic';
@@ -96,10 +97,10 @@ async function getStockData(): Promise<StockInsightsData> {
             const cfg = STOCK_CONFIG.find(c => c.ticker === ticker);
             const companyName = cfg?.name;
             const stockEntry = mergedData[ticker];
-            const fallbackArticles = (stockEntry && typeof stockEntry === 'object' && 'latest_news' in stockEntry) ? (stockEntry as any).latest_news : [];
+            const fallbackArticles = isRecord(stockEntry) && 'latest_news' in stockEntry ? (stockEntry as any).latest_news : [];
             const sentiment = await fetchAndScoreSentiment(ticker, companyName, fallbackArticles as any[]);
-            if (sentiment && stockEntry && typeof stockEntry === 'object') {
-              (stockEntry as any).social_sentiment = sentiment;
+            if (sentiment && isRecord(stockEntry)) {
+              stockEntry.social_sentiment = sentiment as any;
             }
           } catch (e) {
             // ignore per-ticker sentiment errors
