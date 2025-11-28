@@ -6,9 +6,11 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
 
 interface StockDetailsCardProps {
   ticker: string;
+  marketCap?: number;
   peRatio?: number;
   roe?: number;
   profitMargin?: number;
@@ -19,6 +21,7 @@ interface StockDetailsCardProps {
 
 export default function StockDetailsCard({
   ticker,
+  marketCap,
   peRatio,
   roe,
   profitMargin,
@@ -26,11 +29,18 @@ export default function StockDetailsCard({
   dividendYield,
   pbRatio,
 }: StockDetailsCardProps) {
-  const details = [
+  const valuationMetrics = [
+    { label: 'Market Cap', value: marketCap ? `$${(marketCap / 1e9).toFixed(2)}B` : 'N/A' },
     { label: 'P/E Ratio', value: peRatio?.toFixed(2) || 'N/A' },
+    { label: 'P/B Ratio', value: pbRatio?.toFixed(2) || 'N/A' },
+  ];
+
+  const profitabilityMetrics = [
     { label: 'ROE', value: roe ? `${roe.toFixed(2)}%` : 'N/A%' },
     { label: 'Profit Margin', value: profitMargin ? `${profitMargin.toFixed(2)}%` : 'N/A%' },
-    { label: 'P/B Ratio', value: pbRatio?.toFixed(2) || 'N/A' },
+  ];
+
+  const financialHealthMetrics = [
     { label: 'D/E Ratio', value: debtToEquity?.toFixed(2) || 'N/A' },
     { label: 'Dividend Yield', value: dividendYield ? `${dividendYield.toFixed(2)}%` : 'N/A%' },
   ];
@@ -41,28 +51,127 @@ export default function StockDetailsCard({
         <Typography component="h2" variant="h6" sx={{ mb: 3, fontSize: '1.5rem', fontWeight: 700 }}>
           Stock Details
         </Typography>
-        <Stack spacing={3}>
-          {details.map((detail, index) => (
-            <Stack
-              key={index}
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{
-                pb: 2,
-                borderBottom: index < details.length - 1 ? '1px solid' : 'none',
-                borderColor: 'divider',
-              }}
-            >
-              <Typography variant="h6" sx={{ fontSize: '1.25rem', color: 'text.secondary' }}>
-                {detail.label}
-              </Typography>
-              <Typography variant="h5" sx={{ fontSize: '1.5rem', fontWeight: 700 }}>
-                {detail.value}
-              </Typography>
-            </Stack>
-          ))}
-        </Stack>
+
+        {/* Valuation Pillar */}
+        <Box sx={{ mb: 3 }}>
+          <Typography
+            variant="overline"
+            sx={{
+              color: 'primary.main',
+              fontWeight: 700,
+              fontSize: '0.75rem',
+              letterSpacing: 1,
+              mb: 2,
+              display: 'block',
+            }}
+          >
+            VALUATION
+          </Typography>
+          <Stack spacing={2}>
+            {valuationMetrics.map((detail, index) => (
+              <Stack
+                key={index}
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{
+                  pb: index < valuationMetrics.length - 1 ? 1.5 : 0,
+                  borderBottom: index < valuationMetrics.length - 1 ? '1px solid' : 'none',
+                  borderColor: 'divider',
+                }}
+              >
+                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                  {detail.label}
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {detail.value}
+                </Typography>
+              </Stack>
+            ))}
+          </Stack>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Profitability Pillar */}
+        <Box sx={{ mb: 3 }}>
+          <Typography
+            variant="overline"
+            sx={{
+              color: 'success.main',
+              fontWeight: 700,
+              fontSize: '0.75rem',
+              letterSpacing: 1,
+              mb: 2,
+              display: 'block',
+            }}
+          >
+            PROFITABILITY
+          </Typography>
+          <Stack spacing={2}>
+            {profitabilityMetrics.map((detail, index) => (
+              <Stack
+                key={index}
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{
+                  pb: index < profitabilityMetrics.length - 1 ? 1.5 : 0,
+                  borderBottom: index < profitabilityMetrics.length - 1 ? '1px solid' : 'none',
+                  borderColor: 'divider',
+                }}
+              >
+                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                  {detail.label}
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {detail.value}
+                </Typography>
+              </Stack>
+            ))}
+          </Stack>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Financial Health Pillar */}
+        <Box>
+          <Typography
+            variant="overline"
+            sx={{
+              color: 'warning.main',
+              fontWeight: 700,
+              fontSize: '0.75rem',
+              letterSpacing: 1,
+              mb: 2,
+              display: 'block',
+            }}
+          >
+            FINANCIAL HEALTH
+          </Typography>
+          <Stack spacing={2}>
+            {financialHealthMetrics.map((detail, index) => (
+              <Stack
+                key={index}
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{
+                  pb: index < financialHealthMetrics.length - 1 ? 1.5 : 0,
+                  borderBottom: index < financialHealthMetrics.length - 1 ? '1px solid' : 'none',
+                  borderColor: 'divider',
+                }}
+              >
+                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                  {detail.label}
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {detail.value}
+                </Typography>
+              </Stack>
+            ))}
+          </Stack>
+        </Box>
       </CardContent>
     </Card>
   );

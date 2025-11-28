@@ -25,6 +25,8 @@ interface PriceHistoryChartProps {
   currentPrice: number;
   priceChange: number;
   priceChangePercent: number;
+  weekLow52?: number;
+  weekHigh52?: number;
 }
 
 export default function PriceHistoryChart({
@@ -33,6 +35,8 @@ export default function PriceHistoryChart({
   currentPrice,
   priceChange,
   priceChangePercent,
+  weekLow52,
+  weekHigh52,
 }: PriceHistoryChartProps) {
   const theme = useTheme();
 
@@ -75,6 +79,31 @@ export default function PriceHistoryChart({
             Last 30 days price movement
           </Typography>
         </Stack>
+
+        {/* 52 Week Range Section */}
+        {weekLow52 !== undefined && weekHigh52 !== undefined && (
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{
+              mt: 2,
+              mb: 2,
+              p: 2,
+              backgroundColor: 'action.hover',
+              borderRadius: 1,
+            }}
+          >
+            <Stack flex={1}>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                52 Week Range
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                ${weekLow52.toFixed(0)} - ${weekHigh52.toFixed(0)}
+              </Typography>
+            </Stack>
+          </Stack>
+        )}
+
         <LineChart
           colors={colorPalette}
           xAxis={[

@@ -7,7 +7,6 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import StatCard, { StatCardProps } from './StatCard';
 import PriceHistoryChart from './PriceHistoryChart';
-import MetricsBarChart from './MetricsBarChart';
 import StockDetailsCard from './StockDetailsCard';
 import ProsConsCard from './ProsConsCard';
 import SocialSentimentCard from './SocialSentimentCard';
@@ -30,23 +29,8 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
     return <Typography>Stock data not available</Typography>;
   }
 
-  // Generate stat cards data
+  // Generate stat cards data - only Volume now
   const statCards: StatCardProps[] = [
-    {
-      title: 'Current Price',
-      value: `$${stock.current_price?.toFixed(2) || '0.00'}`,
-      interval: 'Live',
-      trend: (stock.change_percent || 0) >= 0 ? 'up' : 'down',
-      data: stock.price_movement_30_days?.slice(-15).map(d => d.Close) || [],
-      ticker: selectedStock,
-    },
-    {
-      title: 'Market Cap',
-      value: `$${((stock.market_cap || 0) / 1e9).toFixed(2)}B`,
-      interval: 'Total',
-      trend: 'neutral',
-      data: Array.from({ length: 15 }, (_, i) => (stock.market_cap || 0) / 1e9 + Math.random() * 10),
-    },
     {
       title: 'Volume',
       value: `${((stock.volume || 0) / 1e6).toFixed(2)}M`,
@@ -54,31 +38,41 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
       trend: 'up',
       data: Array.from({ length: 15 }, (_, i) => (stock.volume || 0) / 1e6 + Math.random() * 5),
     },
-    {
-      title: '52 Week Range',
-      value: `$${stock['52_week_low']?.toFixed(0) || '0'} - $${stock['52_week_high']?.toFixed(0) || '0'}`,
-      interval: 'Range',
-      trend: 'neutral',
-      data: stock.price_movement_30_days?.slice(-15).map(d => d.Close) || [],
-    },
   ];
+
+  // Get company name from stock config
+  const companyNameMap: Record<string, string> = {
+    'GOOG': 'Alphabet',
+    'TSLA': 'Tesla',
+    'NVDA': 'Nvidia',
+    'AMZN': 'Amazon',
+    'BRK-B': 'Berkshire Hathaway',
+    'ISRG': 'Intuitive Surgical',
+    'NFLX': 'Netflix',
+    'IDXX': 'IDEXX Laboratories',
+    'III': '3i Group',
+    'PLTR': 'Palantir',
+    'QBTS': 'D-Wave Quantum',
+    'RGTI': 'Rigetti Computing',
+  };
 
   return (
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
       {/* Stat Cards */}
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-        {selectedStock} Overview
+        {companyNameMap[selectedStock] || selectedStock} ({selectedStock})
       </Typography>
       <Box
         sx={{
           display: 'grid',
           gridTemplateColumns: {
             xs: 'repeat(1, 1fr)',
-            sm: 'repeat(2, 1fr)',
-            lg: 'repeat(4, 1fr)',
+            sm: 'repeat(1, 1fr)',
+            lg: 'repeat(1, 1fr)',
           },
           gap: 2,
           mb: 2,
+          maxWidth: '300px',
         }}
       >
         {statCards.map((card, index) => (
@@ -99,7 +93,7 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
       >
         {/* Left Column: Charts */}
         <Stack spacing={2}>
-          {/* Price History Chart */}
+          {/* Price History Chart with 52 Week Range */}
           {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
             <PriceHistoryChart
               data={stock.price_movement_30_days}
@@ -107,28 +101,24 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               currentPrice={stock.current_price || 0}
               priceChange={stock.change || 0}
               priceChangePercent={stock.change_percent || 0}
+              weekLow52={stock['52_week_low']}
+              weekHigh52={stock['52_week_high']}
             />
           )}
-
-          {/* Financial Metrics Bar Chart */}
-          <MetricsBarChart
-            ticker={selectedStock}
-            metrics={{
-              pe_ratio: (stockEntry as any).pe_ratio,
-              pb_ratio: (stockEntry as any).pb_ratio,
-              roe: (stockEntry as any).roe,
-              profit_margin: (stockEntry as any).profit_margin,
-              debt_to_equity: (stockEntry as any).debt_to_equity,
-              dividend_yield: (stockEntry as any).dividend_yield,
-            }}
-          />
         </Stack>
 
-        {/* Right Column: Stock Details, Pros & Cons, Sentiment */}
+        {/* Right Column: Social Sentiment, Stock Details, Pros & Cons */}
         <Stack spacing={2}>
-          {/* Stock Details */}
+          {/* Social Sentiment - moved higher */}
+          <SocialSentimentCard
+            ticker={selectedStock}
+            sentiment={stockEntry.social_sentiment}
+          />
+
+          {/* Stock Details with Market Cap */}
           <StockDetailsCard
             ticker={selectedStock}
+            marketCap={stock.market_cap}
             peRatio={(stockEntry as any).pe_ratio}
             roe={(stockEntry as any).roe}
             profitMargin={(stockEntry as any).profit_margin}
@@ -142,12 +132,6 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
             ticker={selectedStock}
             pros={stockEntry.pros}
             cons={stockEntry.cons}
-          />
-
-          {/* Social Sentiment */}
-          <SocialSentimentCard
-            ticker={selectedStock}
-            sentiment={stockEntry.social_sentiment}
           />
         </Stack>
       </Box>
