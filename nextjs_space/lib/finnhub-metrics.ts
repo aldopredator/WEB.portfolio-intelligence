@@ -41,7 +41,7 @@ export interface FinnhubMetrics {
   book_value_per_share?: number;
 }
 
-const METRICS_CACHE_TTL_MS = 3600000; // 1 hour default
+const METRICS_CACHE_TTL_MS = 86400000; // 24 hours (extended TTL for serverless stability; stale data better than no data)
 
 /**
  * Fetch comprehensive financial data from Finnhub including metrics and company info

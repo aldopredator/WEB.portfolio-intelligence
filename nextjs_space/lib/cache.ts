@@ -41,8 +41,10 @@ export async function getCached<T = any>(key: string, ttlMs: number): Promise<T 
     }
     const age = Date.now() - (entry.ts || 0);
     if (age > ttlMs) {
-      console.log(`[CACHE] EXPIRED - Key: ${key}, Age: ${Math.round(age / 1000)}s, TTL: ${Math.round(ttlMs / 1000)}s`);
-      return null;
+      console.log(`[CACHE] EXPIRED - Key: ${key}, Age: ${Math.round(age / 1000)}s, TTL: ${Math.round(ttlMs / 1000)}s. Returning stale data (stale-while-revalidate).`);
+      // Return stale data rather than null to ensure metrics are always available
+      // This is critical for serverless deployments where cache is ephemeral
+      return entry.data as T;
     }
     console.log(`[CACHE] HIT - Key: ${key}, Age: ${Math.round(age / 1000)}s`);
     return entry.data as T;
