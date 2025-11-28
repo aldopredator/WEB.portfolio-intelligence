@@ -45,38 +45,36 @@ export default function RecommendationTrendsCard({ ticker, trends = [] }: Recomm
         </Stack>
 
         {recentTrends.length > 0 ? (
-          <>
-            <Box sx={{ width: '100%', height: 250 }}>
-              <BarChart
-                xAxis={[
-                  {
-                    scaleType: 'band',
-                    data: periods,
-                  },
-                ]}
-                series={[
-                  { data: strongBuyData, label: 'Strong Buy', color: '#10b981', stack: 'recommendations' },
-                  { data: buyData, label: 'Buy', color: '#34d399', stack: 'recommendations' },
-                  { data: holdData, label: 'Hold', color: '#fbbf24', stack: 'recommendations' },
-                  { data: sellData, label: 'Sell', color: '#fb923c', stack: 'recommendations' },
-                  { data: strongSellData, label: 'Strong Sell', color: '#f87171', stack: 'recommendations' },
-                ]}
-                height={250}
-                margin={{ left: 40, right: 10, top: 30, bottom: 30 }}
-                slotProps={{
-                  legend: {
-                    direction: 'row',
-                    position: { vertical: 'top', horizontal: 'middle' },
-                    padding: 0,
-                    itemMarkWidth: 10,
-                    itemMarkHeight: 10,
-                    markGap: 5,
-                    itemGap: 10,
-                  },
-                }}
-              />
-            </Box>
-          </>
+          <Box sx={{ width: '100%', height: '100%', minHeight: 350 }}>
+            <BarChart
+              xAxis={[
+                {
+                  scaleType: 'band',
+                  data: periods,
+                },
+              ]}
+              series={[
+                { data: strongBuyData, label: 'Strong Buy', color: '#10b981', stack: 'recommendations' },
+                { data: buyData, label: 'Buy', color: '#34d399', stack: 'recommendations' },
+                { data: holdData, label: 'Hold', color: '#fbbf24', stack: 'recommendations' },
+                { data: sellData, label: 'Sell', color: '#fb923c', stack: 'recommendations' },
+                { data: strongSellData, label: 'Strong Sell', color: '#f87171', stack: 'recommendations' },
+              ]}
+              height={350}
+              margin={{ left: 40, right: 10, top: 30, bottom: 30 }}
+              slotProps={{
+                legend: {
+                  direction: 'row',
+                  position: { vertical: 'top', horizontal: 'middle' },
+                  padding: 0,
+                  itemMarkWidth: 10,
+                  itemMarkHeight: 10,
+                  markGap: 5,
+                  itemGap: 10,
+                },
+              }}
+            />
+          </Box>
         ) : (
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             No recommendation trend data available

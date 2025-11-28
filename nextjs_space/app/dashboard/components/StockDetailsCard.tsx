@@ -44,10 +44,6 @@ export default function StockDetailsCard({
     { label: 'Profit Margin', value: profitMargin ? `${profitMargin.toFixed(2)}%` : 'N/A%' },
   ];
 
-  const financialHealthMetrics = [
-    { label: 'Dividend Yield', value: dividendYield ? `${dividendYield.toFixed(2)}%` : 'N/A%' },
-  ];
-
   return (
     <Card sx={{ height: '100%' }}>
       <CardContent>
@@ -121,47 +117,6 @@ export default function StockDetailsCard({
                 sx={{
                   pb: index < profitabilityMetrics.length - 1 ? 1.5 : 0,
                   borderBottom: index < profitabilityMetrics.length - 1 ? '1px solid' : 'none',
-                  borderColor: 'divider',
-                }}
-              >
-                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                  {detail.label}
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {detail.value}
-                </Typography>
-              </Stack>
-            ))}
-          </Stack>
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
-
-        {/* Financial Health Pillar */}
-        <Box>
-          <Typography
-            variant="overline"
-            sx={{
-              color: 'warning.main',
-              fontWeight: 700,
-              fontSize: '0.75rem',
-              letterSpacing: 1,
-              mb: 2,
-              display: 'block',
-            }}
-          >
-            FINANCIAL HEALTH
-          </Typography>
-          <Stack spacing={2}>
-            {financialHealthMetrics.map((detail, index) => (
-              <Stack
-                key={index}
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{
-                  pb: index < financialHealthMetrics.length - 1 ? 1.5 : 0,
-                  borderBottom: index < financialHealthMetrics.length - 1 ? '1px solid' : 'none',
                   borderColor: 'divider',
                 }}
               >
