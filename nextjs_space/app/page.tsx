@@ -37,6 +37,13 @@ const STOCK_CONFIG = [
 
 async function getStockData(): Promise<StockInsightsData> {
   try {
+    console.log('[INIT] Starting data fetch...');
+    console.log('[INIT] Environment check:', {
+      hasFinnhubKey: !!process.env.FINNHUB_API_KEY,
+      hasNewsApiKey: !!process.env.NEWS_API_KEY,
+      nodeEnv: process.env.NODE_ENV
+    });
+
     // Read static data (analyst recommendations, sentiment, trends, etc.)
     const filePath = path.join(process.cwd(), 'public', 'stock_insights_data.json');
     const fileContents = await fs.readFile(filePath, 'utf8');
@@ -93,8 +100,10 @@ async function getStockData(): Promise<StockInsightsData> {
         });
 
         // Attempt to enrich social sentiment and financial metrics
+        console.log('[DATA] Starting enrichment for all tickers...');
         await Promise.allSettled(Object.keys(mergedData).map(async (ticker) => {
           try {
+            console.log(`[DATA] Enriching ${ticker}...`);
             const cfg = STOCK_CONFIG.find(c => c.ticker === ticker);
             const companyName = cfg?.name;
             const stockEntry = mergedData[ticker];
@@ -104,6 +113,9 @@ async function getStockData(): Promise<StockInsightsData> {
             const sentiment = await fetchAndScoreSentiment(ticker, companyName, []);
             if (sentiment && isRecord(stockEntry)) {
               stockEntry.social_sentiment = sentiment as any;
+              console.log(`[DATA] ${ticker} - Sentiment updated`);
+            } else {
+              console.warn(`[DATA] ${ticker} - No sentiment data received`);
             }
 
             // Fetch financial metrics from Finnhub
@@ -111,11 +123,15 @@ async function getStockData(): Promise<StockInsightsData> {
             if (metrics && isRecord(stockEntry) && stockEntry.stock_data) {
               // Merge metrics into stock_data
               Object.assign(stockEntry.stock_data, metrics);
+              console.log(`[DATA] ${ticker} - Finnhub metrics merged`);
+            } else {
+              console.warn(`[DATA] ${ticker} - No Finnhub metrics received`);
             }
           } catch (e) {
-            // ignore per-ticker enrichment errors
+            console.error(`[DATA] ${ticker} - Error during enrichment:`, e);
           }
         }));
+        console.log('[DATA] Enrichment complete for all tickers');
 
         return {
           ...mergedData,
