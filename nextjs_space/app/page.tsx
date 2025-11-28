@@ -16,7 +16,7 @@ import { isRecord } from '@/lib/utils';
 
 // Force dynamic rendering so prices are fetched at runtime, not build time
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 1800; // Revalidate every 30 minutes (1800 seconds)
 
 // Stock configuration - must be defined before getStockData
 const STOCK_CONFIG = [

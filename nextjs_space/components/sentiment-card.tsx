@@ -32,7 +32,17 @@ export function SentimentCard({ sentiment, ticker }: SentimentCardProps) {
           <h3 className="text-xl font-bold text-white mb-1">Social Sentiment</h3>
           <p className="text-slate-400 text-sm">Community mood analysis</p>
         </div>
-        <Heart className="w-6 h-6 text-pink-400" />
+        <div className="flex items-center gap-2">
+          {sentiment.isStale && (
+            <span className="text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded border border-amber-500/30 flex items-center gap-1">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Stale Data
+            </span>
+          )}
+          <Heart className="w-6 h-6 text-pink-400" />
+        </div>
       </div>
 
       <div className="bg-slate-800/50 rounded-lg p-4 mb-6 border border-slate-700">

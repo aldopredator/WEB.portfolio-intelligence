@@ -66,6 +66,8 @@ export interface SocialSentiment {
   positive: number;
   neutral: number;
   negative: number;
+  isStale?: boolean;
+  lastUpdated?: string;
 }
 
 export interface StockInfo {

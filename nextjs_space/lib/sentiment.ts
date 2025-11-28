@@ -1,7 +1,11 @@
 import { getCached, setCached } from './cache';
 
 // Simple keyword-based sentiment scoring as a fallback or lightweight option.
-export async function fetchAndScoreSentiment(ticker: string, companyName?: string, fallbackArticles?: Array<any>): Promise<{ positive: number; neutral: number; negative: number } | null> {
+export async function fetchAndScoreSentiment(
+  ticker: string,
+  companyName?: string,
+  fallbackArticles?: Array<any>
+): Promise<{ positive: number; neutral: number; negative: number; lastUpdated?: string; isStale?: boolean } | null> {
   console.log(`[SENTIMENT] Starting sentiment analysis for ${ticker}`);
 
   const positiveWords = ['good', 'great', 'bull', 'beat', 'up', 'gain', 'growth', 'outperform', 'positive', 'rise'];
@@ -18,15 +22,18 @@ export async function fetchAndScoreSentiment(ticker: string, companyName?: strin
 
   try {
     // Prefer Finnhub if available; cache responses to reduce calls
-    const ttlMs = Number(process.env.SENTIMENT_CACHE_TTL_MS ?? '600000'); // default 10 minutes
+    const ttlMs = Number(process.env.SENTIMENT_CACHE_TTL_MS ?? '1800000'); // default 30 minutes
     const finnhubKey = process.env.FINNHUB_API_KEY || process.env.FINNHUB_KEY;
     let articles: Array<{ title?: string; description?: string }> = [];
+    let isFromRealTimeAPI = false;
+    let dataTimestamp = new Date().toISOString();
 
     if (finnhubKey) {
       const cacheKey = `finnhub:${ticker}`;
       const cached = await getCached<{ title?: string; description?: string }[]>(cacheKey, ttlMs);
       if (cached) {
         articles = cached;
+        isFromRealTimeAPI = true;
         console.log(`[SENTIMENT] ${ticker} - Using cached Finnhub news (${articles.length} articles)`);
       } else {
         try {
@@ -45,6 +52,7 @@ export async function fetchAndScoreSentiment(ticker: string, companyName?: strin
             // Finnhub returns an array of news items with 'headline' and 'summary'
             articles = (json || []).slice(0, 20).map((a: any) => ({ title: a.headline || a.summary || '', description: a.summary || '' }));
             await setCached(cacheKey, articles);
+            isFromRealTimeAPI = true;
             console.log(`[SENTIMENT] ${ticker} - Fetched ${articles.length} articles from Finnhub`);
           } else {
             console.warn(`[SENTIMENT] ${ticker} - Finnhub API returned status ${res.status}`);
@@ -65,6 +73,7 @@ export async function fetchAndScoreSentiment(ticker: string, companyName?: strin
         const cached = await getCached<{ title?: string; description?: string }[]>(cacheKey, ttlMs);
         if (cached) {
           articles = cached;
+          isFromRealTimeAPI = true;
           console.log(`[SENTIMENT] ${ticker} - Using cached NewsAPI articles (${articles.length} articles)`);
         } else {
           const q = encodeURIComponent(`${companyName ?? ticker} stock OR ${ticker}`);
@@ -76,6 +85,7 @@ export async function fetchAndScoreSentiment(ticker: string, companyName?: strin
               const json = await res.json();
               articles = (json.articles || []).map((a: any) => ({ title: a.title, description: a.description }));
               await setCached(cacheKey, articles);
+              isFromRealTimeAPI = true;
               console.log(`[SENTIMENT] ${ticker} - Fetched ${articles.length} articles from NewsAPI`);
             } else {
               console.warn(`[SENTIMENT] ${ticker} - NewsAPI returned status ${res.status}`);
@@ -89,7 +99,14 @@ export async function fetchAndScoreSentiment(ticker: string, companyName?: strin
       }
     }
 
-    // No fallback to static data - we only want real-time sentiment
+    // If no articles from API, try fallbackArticles (from static JSON)
+    if ((!articles || articles.length === 0) && Array.isArray(fallbackArticles) && fallbackArticles.length > 0) {
+      // Expect fallback articles to have title/summary fields; adapt if different
+      articles = fallbackArticles.slice(0, 10).map((a: any) => ({ title: a.title || a.headline || a.summary || '', description: a.description || a.summary || '' }));
+      isFromRealTimeAPI = false;
+      console.log(`[SENTIMENT] ${ticker} - Using ${articles.length} fallback articles from static data (STALE)`);
+    }
+
     if (!articles || articles.length === 0) {
       console.warn(`[SENTIMENT] ${ticker} - No articles found for sentiment analysis`);
       return null;
@@ -108,13 +125,16 @@ export async function fetchAndScoreSentiment(ticker: string, companyName?: strin
     const result = {
       positive: Math.round((positive / total) * 100),
       neutral: Math.round((neutral / total) * 100),
-      negative: Math.round((negative / total) * 100)
+      negative: Math.round((negative / total) * 100),
+      lastUpdated: dataTimestamp,
+      isStale: !isFromRealTimeAPI
     };
 
     console.log(`[SENTIMENT] ${ticker} - Analysis complete:`, {
       articlesAnalyzed: total,
       result,
-      breakdown: { positive, neutral, negative }
+      breakdown: { positive, neutral, negative },
+      isStale: !isFromRealTimeAPI
     });
 
     return result;
