@@ -8,7 +8,16 @@ export default async function ScreeningPage() {
   // Fetch real stock data
   const stockData = await getStockData();
   
-  // Build screening results from real data
+  // Define screening criteria (matching criteria page)
+  const CRITERIA = {
+    maxPE: 20,
+    maxPB: 3,
+    minYTD: 0,
+    minWeek52: 10,
+    excludeSectors: ['Alcohol', 'Gambling'],
+  };
+  
+  // Build screening results from real data with actual filtering
   const recommendedStocks = STOCK_CONFIG.map((config) => {
     const data = stockData[config.ticker];
     const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
@@ -17,20 +26,34 @@ export default async function ScreeningPage() {
       return null;
     }
 
-    // Calculate returns (if price history available)
-    let ytdReturn = 'N/A';
-    let week52Return = 'N/A';
-    
-    if (stockInfo.change_percent !== undefined) {
-      ytdReturn = `${stockInfo.change_percent >= 0 ? '+' : ''}${stockInfo.change_percent.toFixed(1)}%`;
-    }
+    // Calculate returns
+    let ytdReturnValue = stockInfo.change_percent || 0;
+    let week52ReturnValue = 0;
     
     if (stockInfo['52_week_high'] && stockInfo['52_week_low'] && stockInfo.current_price) {
-      const weekRange = stockInfo['52_week_high'] - stockInfo['52_week_low'];
       const currentFromLow = stockInfo.current_price - stockInfo['52_week_low'];
-      const week52Pct = (currentFromLow / stockInfo['52_week_low']) * 100;
-      week52Return = `${week52Pct >= 0 ? '+' : ''}${week52Pct.toFixed(1)}%`;
+      week52ReturnValue = (currentFromLow / stockInfo['52_week_low']) * 100;
     }
+
+    // Apply screening criteria
+    const passes = {
+      pe: !stockInfo.pe_ratio || stockInfo.pe_ratio < CRITERIA.maxPE,
+      pb: !stockInfo.pb_ratio || stockInfo.pb_ratio < CRITERIA.maxPB,
+      ytd: ytdReturnValue > CRITERIA.minYTD,
+      week52: week52ReturnValue > CRITERIA.minWeek52,
+      sector: !CRITERIA.excludeSectors.includes(config.sector),
+    };
+
+    const passCount = Object.values(passes).filter(Boolean).length;
+    const matchScore = Math.round((passCount / Object.keys(passes).length) * 100);
+
+    // Only include stocks that pass all criteria
+    if (matchScore < 100) {
+      return null;
+    }
+
+    const ytdReturn = `${ytdReturnValue >= 0 ? '+' : ''}${ytdReturnValue.toFixed(1)}%`;
+    const week52Return = `${week52ReturnValue >= 0 ? '+' : ''}${week52ReturnValue.toFixed(1)}%`;
 
     return {
       ticker: config.ticker,
@@ -40,9 +63,9 @@ export default async function ScreeningPage() {
       ytd: ytdReturn,
       week52: week52Return,
       pb: stockInfo.pb_ratio?.toFixed(2) || 'N/A',
-      matchScore: 100, // You can implement actual screening logic here
+      matchScore,
     };
-  }).filter((stock): stock is NonNullable<typeof stock> => stock !== null); // Remove null entries and fix TypeScript
+  }).filter((stock): stock is NonNullable<typeof stock> => stock !== null);
 
   return (
     <main className="min-h-screen">
