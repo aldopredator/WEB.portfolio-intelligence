@@ -51,76 +51,76 @@ export default function CompanyInfoCard({
             </Avatar>
           )}
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, fontSize: '1.5rem' }}>
               {companyName || ticker}
             </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               {ticker}
             </Typography>
           </Box>
         </Stack>
 
         {(industry || sector || subSector || country || marketCapitalization || weburl) && (
-          <Stack spacing={1.5}>
+          <Stack spacing={2}>
             {industry && (
               <Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
                   Industry
                 </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
                   {industry}
                 </Typography>
               </Box>
             )}
             {sector && (
               <Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
                   Sector
                 </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
                   {sector}
                 </Typography>
               </Box>
             )}
             {subSector && (
               <Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
                   Sub-Sector
                 </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
                   {subSector}
                 </Typography>
               </Box>
             )}
             {country && (
               <Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
                   Country
                 </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
                   {country}
                 </Typography>
               </Box>
             )}
             {marketCapitalization && (
               <Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
                   Market Cap
                 </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
                   {currency || '$'}{(marketCapitalization / 1e9).toFixed(2)}B
                 </Typography>
               </Box>
             )}
             {weburl && (
               <Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
                   Website
                 </Typography>
                 <Typography
-                  variant="body2"
+                  variant="h6"
                   sx={{
-                    fontWeight: 600,
+                    fontWeight: 700,
                     color: 'primary.main',
                     textDecoration: 'none',
                     '&:hover': { textDecoration: 'underline' },
