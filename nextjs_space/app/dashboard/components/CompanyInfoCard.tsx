@@ -16,6 +16,10 @@ interface CompanyInfoCardProps {
   industry?: string;
   sector?: string;
   subSector?: string;
+  country?: string;
+  marketCapitalization?: number;
+  currency?: string;
+  weburl?: string;
 }
 
 export default function CompanyInfoCard({
@@ -25,6 +29,10 @@ export default function CompanyInfoCard({
   industry,
   sector,
   subSector,
+  country,
+  marketCapitalization,
+  currency,
+  weburl,
 }: CompanyInfoCardProps) {
   return (
     <Card variant="outlined" sx={{ height: '100%' }}>
@@ -52,7 +60,7 @@ export default function CompanyInfoCard({
           </Box>
         </Stack>
 
-        {(industry || sector || subSector) && (
+        {(industry || sector || subSector || country || marketCapitalization || weburl) && (
           <Stack spacing={1.5}>
             {industry && (
               <Box>
@@ -81,6 +89,48 @@ export default function CompanyInfoCard({
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                   {subSector}
+                </Typography>
+              </Box>
+            )}
+            {country && (
+              <Box>
+                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                  Country
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  {country}
+                </Typography>
+              </Box>
+            )}
+            {marketCapitalization && (
+              <Box>
+                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                  Market Cap
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  {currency || '$'}{(marketCapitalization / 1e9).toFixed(2)}B
+                </Typography>
+              </Box>
+            )}
+            {weburl && (
+              <Box>
+                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                  Website
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 600,
+                    color: 'primary.main',
+                    textDecoration: 'none',
+                    '&:hover': { textDecoration: 'underline' },
+                  }}
+                  component="a"
+                  href={weburl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {weburl.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}
                 </Typography>
               </Box>
             )}

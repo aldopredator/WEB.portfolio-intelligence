@@ -79,6 +79,7 @@ export interface CompanyProfile {
   country?: string;
   marketCapitalization?: number;
   currency?: string;
+  weburl?: string;
 }
 
 export interface NewsArticle {

@@ -69,6 +69,10 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
             industry={stockEntry.company_profile.industry}
             sector={stockEntry.company_profile.sector}
             subSector={stockEntry.company_profile.subSector}
+            country={stockEntry.company_profile.country}
+            marketCapitalization={stockEntry.company_profile.marketCapitalization}
+            currency={stockEntry.company_profile.currency}
+            weburl={stockEntry.company_profile.weburl}
           />
         </Box>
       )}

@@ -10,6 +10,7 @@ export interface CompanyProfile {
   country?: string;
   marketCapitalization?: number;
   currency?: string;
+  weburl?: string;
 }
 
 export interface NewsArticle {
@@ -269,6 +270,7 @@ export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfil
         country: data.country,
         marketCapitalization: data.marketCapitalization ? data.marketCapitalization * 1000000 : undefined,
         currency: data.currency,
+        weburl: data.weburl,
       };
     }
   } catch (error) {
