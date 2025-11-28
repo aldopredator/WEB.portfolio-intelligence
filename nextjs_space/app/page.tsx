@@ -110,6 +110,13 @@ async function getStockData(): Promise<StockInsightsData> {
           if (metrics.price_history && metrics.price_history.length > 0) {
             (stockEntry.stock_data as any).price_movement_30_days = metrics.price_history;
           }
+          // For 52-week high/low
+          if (typeof metrics['52_week_high'] === 'number') {
+            (stockEntry.stock_data as any)['52_week_high'] = metrics['52_week_high'];
+          }
+          if (typeof metrics['52_week_low'] === 'number') {
+            (stockEntry.stock_data as any)['52_week_low'] = metrics['52_week_low'];
+          }
           // For percent change, use Finnhub dp (already handled above)
           console.log(`[DATA] ${ticker} - Finnhub metrics merged`);
         } else {

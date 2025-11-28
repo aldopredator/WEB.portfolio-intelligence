@@ -40,6 +40,8 @@ export interface FinnhubMetrics {
   change?: number; // Finnhub d (absolute change)
   current_price?: number; // Finnhub c (current price)
   previous_close?: number; // Finnhub pc (previous close)
+  '52_week_high'?: number; // Finnhub h (52-week high)
+  '52_week_low'?: number; // Finnhub l (52-week low)
 
   // Historical data
   price_history?: Array<{ Date: string; Close: number }>;
@@ -160,15 +162,21 @@ async function fetchFinnhubMetricsInternal(ticker: string, apiKey: string): Prom
         if (typeof quoteData.dp === 'number') {
           result.change_percent = Number(quoteData.dp.toFixed(2));
         }
-          if (typeof quoteData.d === 'number') {
-            result.change = Number(quoteData.d.toFixed(2));
-          }
-          if (typeof quoteData.c === 'number') {
-            result.current_price = Number(quoteData.c.toFixed(2));
-          }
-          if (typeof quoteData.pc === 'number') {
-            result.previous_close = Number(quoteData.pc.toFixed(2));
-          }
+        if (typeof quoteData.d === 'number') {
+          result.change = Number(quoteData.d.toFixed(2));
+        }
+        if (typeof quoteData.c === 'number') {
+          result.current_price = Number(quoteData.c.toFixed(2));
+        }
+        if (typeof quoteData.pc === 'number') {
+          result.previous_close = Number(quoteData.pc.toFixed(2));
+        }
+        if (typeof quoteData.h === 'number') {
+          result['52_week_high'] = Number(quoteData.h.toFixed(2));
+        }
+        if (typeof quoteData.l === 'number') {
+          result['52_week_low'] = Number(quoteData.l.toFixed(2));
+        }
         console.log(`[FINNHUB] ${ticker} - Fetched quote data`);
       }
     } catch (e) {
@@ -180,19 +188,25 @@ async function fetchFinnhubMetricsInternal(ticker: string, apiKey: string): Prom
       const toTimestamp = Math.floor(Date.now() / 1000);
       const fromTimestamp = toTimestamp - (30 * 24 * 60 * 60); // 30 days ago
       const candleUrl = `https://finnhub.io/api/v1/stock/candle?symbol=${ticker}&resolution=D&from=${fromTimestamp}&to=${toTimestamp}&token=${apiKey}`;
+      console.log(`[FINNHUB] ${ticker} - Fetching candle data from ${new Date(fromTimestamp * 1000).toISOString()} to ${new Date(toTimestamp * 1000).toISOString()}`);
       const candleResponse = await fetch(candleUrl, {
-        next: { revalidate: METRICS_CACHE_TTL_SECONDS }
+        next: { revalidate: 86400 } // 1 day for price history (more frequent than metrics)
       } as any);
 
       if (candleResponse.ok) {
         const candleData = await candleResponse.json();
+        console.log(`[FINNHUB] ${ticker} - Candle response status: ${candleData.s}`);
         if (candleData.s === 'ok' && candleData.t && candleData.c) {
           result.price_history = candleData.t.map((timestamp: number, index: number) => ({
             Date: new Date(timestamp * 1000).toISOString(),
             Close: Number(candleData.c[index].toFixed(2))
           })).filter((item: any) => item.Close > 0);
           console.log(`[FINNHUB] ${ticker} - Fetched ${result.price_history?.length || 0} days of price history`);
+        } else {
+          console.warn(`[FINNHUB] ${ticker} - Candle data not available or invalid status: ${candleData.s}`);
         }
+      } else {
+        console.warn(`[FINNHUB] ${ticker} - Candle API returned status ${candleResponse.status}`);
       }
     } catch (e) {
       console.error(`[FINNHUB] ${ticker} - Error fetching candle data:`, e);
