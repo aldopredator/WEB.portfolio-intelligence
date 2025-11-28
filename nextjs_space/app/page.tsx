@@ -110,7 +110,7 @@ export default function CRUDDashboard() {
       stocks={stocks}
       title={selectedStock}
     >
-      <Box>
+      <Box sx={{ minWidth: '1200px' }}>
         {/* Header Section */}
         <Box mb={3}>
           <Typography variant="h4" fontWeight={700} gutterBottom>
