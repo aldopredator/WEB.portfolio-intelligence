@@ -24,7 +24,7 @@ const STOCK_CONFIG = [
   { ticker: 'TSLA', name: 'Tesla, Inc. (TSLA)', color: 'bg-red-600', letter: 'T' },
   { ticker: 'NVDA', name: 'Nvidia Corporation (NVDA)', color: 'bg-emerald-500', letter: 'N' },
   { ticker: 'AMZN', name: 'Amazon.com Inc. (AMZN)', color: 'bg-orange-500', letter: 'A' },
-  { ticker: 'BRKB', name: 'Berkshire Hathaway Inc. (BRKB)', color: 'bg-slate-600', letter: 'B' },
+  { ticker: 'BRK-B', name: 'Berkshire Hathaway Inc. (BRK-B)', color: 'bg-slate-600', letter: 'B' },
   { ticker: 'ISRG', name: 'Intuitive Surgical Inc. (ISRG)', color: 'bg-indigo-500', letter: 'I' },
   { ticker: 'NFLX', name: 'Netflix Inc. (NFLX)', color: 'bg-red-700', letter: 'N' },
 
