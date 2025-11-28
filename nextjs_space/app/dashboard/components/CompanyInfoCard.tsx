@@ -108,7 +108,9 @@ export default function CompanyInfoCard({
                   Market Cap
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {currency || '$'}{(marketCapitalization / 1e9).toFixed(2)}B
+                  {marketCapitalization >= 1000e9
+                    ? `${currency || '$'} ${(marketCapitalization / 1e12).toFixed(2)}T`
+                    : `${currency || '$'} ${(marketCapitalization / 1e9).toFixed(2)}B`}
                 </Typography>
               </Box>
             )}
