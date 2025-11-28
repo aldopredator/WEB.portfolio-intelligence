@@ -184,7 +184,7 @@ export default async function Home() {
         </div>
       </div>
 
-      <div className="max-w-[1800px] mx-auto px-6 py-8">
+      <div className="flex overflow-x-auto pb-8 snap-x snap-mandatory gap-8 px-6 py-8 min-h-[calc(100vh-100px)]">
         {STOCK_CONFIG.map((config, index) => {
           const data = stockData?.[config.ticker];
 
@@ -192,7 +192,7 @@ export default async function Home() {
           if (!data || typeof data === 'string' || !('stock_data' in data)) return null;
 
           return (
-            <div key={config.ticker} className={index > 0 ? "mt-16" : ""}>
+            <div key={config.ticker} className="min-w-[90vw] xl:min-w-[1400px] snap-center bg-slate-900/20 rounded-3xl p-6 border border-slate-800/50 backdrop-blur-sm">
               <div className="flex items-center gap-3 mb-6">
                 <div className={`w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center`}>
                   <img src={`/logos/${config.ticker}.svg`} alt={`${config.ticker} logo`} className="w-10 h-10 object-cover" />
@@ -228,7 +228,7 @@ export default async function Home() {
         })}
 
         {Object.keys(stockData || {}).length === 0 && (
-          <div className="text-center py-20">
+          <div className="text-center py-20 min-w-full">
             <p className="text-slate-400 text-lg">No stock data available</p>
           </div>
         )}
