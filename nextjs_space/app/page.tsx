@@ -117,18 +117,14 @@ async function getStockData(): Promise<StockInsightsData> {
     }));
     console.log('[DATA] Enrichment complete for all tickers');
 
-        return {
-          ...mergedData,
-          timestamp: new Date().toISOString()
-        };
-      }
+
     } catch (apiError) {
       console.error('Error fetching real-time prices, using static data:', apiError);
     }
 
-    // Fallback to static data if API fails or returns no data
+    // Always return mergedData (enriched or fallback)
     return {
-      ...staticData,
+      ...mergedData,
       timestamp: new Date().toISOString()
     };
   } catch (error) {
