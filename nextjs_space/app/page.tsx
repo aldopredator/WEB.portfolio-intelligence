@@ -9,7 +9,7 @@ import { ProsConsCard } from '@/components/pros-cons-card';
 import { RecommendationCard } from '@/components/recommendation-card';
 import { BarChart3, RefreshCw } from 'lucide-react';
 import type { StockInsightsData } from '@/lib/types';
-import { fetchMultipleQuotes } from '@/lib/yahoo-finance';
+// import { fetchMultipleQuotes } from '@/lib/yahoo-finance';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
 import { fetchFinnhubMetrics } from '@/lib/finnhub-metrics';
 import { isRecord } from '@/lib/utils';
@@ -53,52 +53,21 @@ async function getStockData(): Promise<StockInsightsData> {
     // Get all stock tickers from the config
     const tickers = STOCK_CONFIG.map(config => config.ticker).join(',');
 
-    // Fetch real-time prices directly (no HTTP call needed for server components)
-    try {
-      const realTimePrices = await fetchMultipleQuotes(tickers.split(','));
+    // Fetch real-time prices from Finnhub metrics only
+    // All real-time fields will be updated in the enrichment loop below
+    const mergedData: StockInsightsData = { ...staticData };
 
-      if (realTimePrices && Object.keys(realTimePrices).length > 0) {
-        // Merge real-time prices with static data
-        const mergedData: StockInsightsData = { ...staticData };
-
-        Object.keys(realTimePrices).forEach((ticker) => {
-          const stockInfo = mergedData[ticker];
-          if (stockInfo && typeof stockInfo === 'object' && 'stock_data' in stockInfo) {
-            // Update price-related fields with real-time data
-            stockInfo.stock_data = {
-              ...stockInfo.stock_data,
-              current_price: realTimePrices[ticker].current_price,
-              change: realTimePrices[ticker].change,
-              change_percent: realTimePrices[ticker].change_percent,
-              '52_week_high': realTimePrices[ticker]['52_week_high'],
-              '52_week_low': realTimePrices[ticker]['52_week_low'],
-              price_movement_30_days: realTimePrices[ticker].price_history,
-              market_cap: realTimePrices[ticker].market_cap ?? stockInfo.stock_data?.market_cap,
-              volume: realTimePrices[ticker].volume ?? stockInfo.stock_data?.volume,
-              currency: realTimePrices[ticker].currency ?? stockInfo.stock_data?.currency,
-            };
-
-            // Update target price if available
-            if (realTimePrices[ticker].target_price > 0) {
-              stockInfo.analyst_recommendations = {
-                ...stockInfo.analyst_recommendations,
-                target_price: realTimePrices[ticker].target_price
-              };
-            }
-          }
-        });
-
-        // Map static emerging_trends to pros (temporary migration)
-        Object.keys(mergedData).forEach((ticker) => {
-          const stockInfo = mergedData[ticker];
-          if (stockInfo && typeof stockInfo === 'object') {
-            // Handle migration from emerging_trends to pros/cons
-            // @ts-ignore - emerging_trends might still exist in the static JSON
-            const trends = stockInfo.emerging_trends || [];
-            stockInfo.pros = trends; // Use existing trends as pros for now
-            stockInfo.cons = []; // Initialize empty cons
-          }
-        });
+    // Map static emerging_trends to pros (temporary migration)
+    Object.keys(mergedData).forEach((ticker) => {
+      const stockInfo = mergedData[ticker];
+      if (stockInfo && typeof stockInfo === 'object') {
+        // Handle migration from emerging_trends to pros/cons
+        // @ts-ignore - emerging_trends might still exist in the static JSON
+        const trends = stockInfo.emerging_trends || [];
+        stockInfo.pros = trends; // Use existing trends as pros for now
+        stockInfo.cons = []; // Initialize empty cons
+      }
+    });
 
         // Attempt to enrich social sentiment and financial metrics
         console.log('[DATA] Starting enrichment for all tickers...');
@@ -119,15 +88,24 @@ async function getStockData(): Promise<StockInsightsData> {
               console.warn(`[DATA] ${ticker} - No sentiment data received`);
             }
 
-            // Fetch financial metrics from Finnhub
+            // Fetch financial metrics and real-time price from Finnhub
             const metrics = await fetchFinnhubMetrics(ticker);
             if (metrics && isRecord(stockEntry) && stockEntry.stock_data) {
-              // Merge metrics into stock_data
+              // Merge all Finnhub fields into stock_data (overwrites Yahoo fields)
               Object.assign(stockEntry.stock_data, metrics);
-              // If Finnhub dp (change_percent) is available, override Yahoo value
-              if (typeof metrics.change_percent === 'number') {
-                (stockEntry.stock_data as any).change_percent = metrics.change_percent;
+              // For absolute price change, use Finnhub d (change)
+              if (typeof metrics.change === 'number') {
+                (stockEntry.stock_data as any).change = metrics.change;
               }
+              // For current price, use Finnhub c
+              if (typeof metrics.current_price === 'number') {
+                (stockEntry.stock_data as any).current_price = metrics.current_price;
+              }
+              // For previous close, use Finnhub pc
+              if (typeof metrics.previous_close === 'number') {
+                (stockEntry.stock_data as any).previous_close = metrics.previous_close;
+              }
+              // For percent change, use Finnhub dp (already handled above)
               console.log(`[DATA] ${ticker} - Finnhub metrics merged`);
             } else {
               console.warn(`[DATA] ${ticker} - No Finnhub metrics received`);

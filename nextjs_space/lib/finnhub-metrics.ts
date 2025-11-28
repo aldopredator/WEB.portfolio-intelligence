@@ -37,6 +37,9 @@ export interface FinnhubMetrics {
 
   // Real-time quote
   change_percent?: number; // Finnhub dp (percent change)
+  change?: number; // Finnhub d (absolute change)
+  current_price?: number; // Finnhub c (current price)
+  previous_close?: number; // Finnhub pc (previous close)
 
   // Per share metrics
   eps?: number;
@@ -154,6 +157,15 @@ async function fetchFinnhubMetricsInternal(ticker: string, apiKey: string): Prom
         if (typeof quoteData.dp === 'number') {
           result.change_percent = Number(quoteData.dp.toFixed(2));
         }
+          if (typeof quoteData.d === 'number') {
+            result.change = Number(quoteData.d.toFixed(2));
+          }
+          if (typeof quoteData.c === 'number') {
+            result.current_price = Number(quoteData.c.toFixed(2));
+          }
+          if (typeof quoteData.pc === 'number') {
+            result.previous_close = Number(quoteData.pc.toFixed(2));
+          }
         console.log(`[FINNHUB] ${ticker} - Fetched quote data`);
       }
     } catch (e) {
