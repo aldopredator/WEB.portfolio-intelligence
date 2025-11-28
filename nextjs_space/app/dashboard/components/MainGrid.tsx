@@ -5,6 +5,7 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import StatCard, { StatCardProps } from './StatCard';
 import PriceHistoryChart from './PriceHistoryChart';
 import StockDetailsCard from './StockDetailsCard';
 import SocialSentimentCard from './SocialSentimentCard';
@@ -30,6 +31,17 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
   if (!stock) {
     return <Typography>Stock data not available</Typography>;
   }
+
+  // Generate stat cards data - only Volume now
+  const statCards: StatCardProps[] = [
+    {
+      title: 'Volume',
+      value: `${((stock.volume || 0) / 1e6).toFixed(2)}M`,
+      interval: 'Today',
+      trend: 'up',
+      data: Array.from({ length: 15 }, (_, i) => (stock.volume || 0) / 1e6 + Math.random() * 5),
+    },
+  ];
 
   // Get company name from stock config
   const companyNameMap: Record<string, string> = {
@@ -82,8 +94,8 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
           gap: 2,
         }}
       >
-        {/* Block 1: Price Chart (full height) */}
-        <Box>
+        {/* Block 1: Price Chart and Volume */}
+        <Stack spacing={2}>
           {/* Price History Chart with 52 Week Range */}
           {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
             <PriceHistoryChart
@@ -96,7 +108,20 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               weekHigh52={stock['52_week_high']}
             />
           )}
-        </Box>
+
+          {/* Volume Card */}
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: '1fr',
+              gap: 2,
+            }}
+          >
+            {statCards.map((card, index) => (
+              <StatCard key={index} {...card} />
+            ))}
+          </Box>
+        </Stack>
 
         {/* Block 2: Stock Details (middle column) */}
         <Box>
