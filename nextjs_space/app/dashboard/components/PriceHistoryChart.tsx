@@ -95,36 +95,105 @@ export default function PriceHistoryChart({
 
         {/* 52 Week Range and Volume Section */}
         {(weekLow52 !== undefined && weekHigh52 !== undefined) || volume !== undefined ? (
-          <Stack
-            direction="row"
-            spacing={2}
-            sx={{
-              mt: 2,
-              mb: 2,
-              p: 2,
-              backgroundColor: 'action.hover',
-              borderRadius: 1,
-              justifyContent: 'space-around',
-            }}
-          >
+          <Stack spacing={2} sx={{ mt: 2, mb: 2 }}>
+            {/* 52 Week Range Spectrum */}
             {weekLow52 !== undefined && weekHigh52 !== undefined && (
-              <Stack alignItems="center">
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              <Stack>
+                <Typography variant="caption" sx={{ color: 'text.secondary', mb: 1, textAlign: 'center' }}>
                   52 Week Range
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  ${weekLow52.toFixed(0)} - ${weekHigh52.toFixed(0)}
-                </Typography>
+                
+                {/* Spectrum Slider */}
+                <Stack direction="row" alignItems="center" spacing={1} sx={{ position: 'relative', px: 2 }}>
+                  {/* Min Value */}
+                  <Typography variant="body2" sx={{ fontWeight: 600, minWidth: '60px', textAlign: 'right' }}>
+                    ${weekLow52.toFixed(0)}
+                  </Typography>
+                  
+                  {/* Slider Track */}
+                  <Stack sx={{ flex: 1, position: 'relative', height: 32 }}>
+                    {/* Background Track */}
+                    <Stack
+                      sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: 0,
+                        right: 0,
+                        height: 6,
+                        transform: 'translateY(-50%)',
+                        borderRadius: 3,
+                        background: `linear-gradient(to right, ${theme.palette.error.main}, ${theme.palette.warning.main}, ${theme.palette.success.main})`,
+                        opacity: 0.3,
+                      }}
+                    />
+                    
+                    {/* Current Price Cursor */}
+                    <Stack
+                      sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: `${((currentPrice - weekLow52) / (weekHigh52 - weekLow52)) * 100}%`,
+                        transform: 'translate(-50%, -50%)',
+                        zIndex: 2,
+                      }}
+                    >
+                      {/* Cursor Circle */}
+                      <Stack
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: '50%',
+                          backgroundColor: theme.palette.primary.main,
+                          border: `3px solid ${theme.palette.background.paper}`,
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                        }}
+                      />
+                      {/* Price Label Above Cursor */}
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          position: 'absolute',
+                          top: -24,
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          fontWeight: 700,
+                          color: theme.palette.primary.main,
+                          whiteSpace: 'nowrap',
+                          fontSize: '0.7rem',
+                        }}
+                      >
+                        ${currentPrice.toFixed(2)}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                  
+                  {/* Max Value */}
+                  <Typography variant="body2" sx={{ fontWeight: 600, minWidth: '60px' }}>
+                    ${weekHigh52.toFixed(0)}
+                  </Typography>
+                </Stack>
               </Stack>
             )}
+            
+            {/* Volume */}
             {volume !== undefined && (
-              <Stack alignItems="center">
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  Volume
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  {(volume / 1e6).toFixed(2)}M
-                </Typography>
+              <Stack
+                direction="row"
+                sx={{
+                  p: 2,
+                  backgroundColor: 'action.hover',
+                  borderRadius: 1,
+                  justifyContent: 'center',
+                }}
+              >
+                <Stack alignItems="center">
+                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                    Volume
+                  </Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    {(volume / 1e6).toFixed(2)}M
+                  </Typography>
+                </Stack>
               </Stack>
             )}
           </Stack>
