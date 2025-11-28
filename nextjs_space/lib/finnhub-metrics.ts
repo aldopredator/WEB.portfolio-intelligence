@@ -58,7 +58,8 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
   }
 
   // Check cache first
-  const cacheKey = `finnhub-metrics-${ticker}`;
+  const CACHE_VERSION = 'v2'; // Increment this to bust cache after deployment
+  const cacheKey = `${CACHE_VERSION}-finnhub-metrics-${ticker}`;
   const cached = await getCached<FinnhubMetrics>(cacheKey, METRICS_CACHE_TTL_MS);
   if (cached) {
     console.log(`[FINNHUB] ${ticker} - Using cached metrics`);
@@ -85,13 +86,22 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
         result.ps_ratio = metrics.psTTM || metrics.psQuarterly ? parseFloat(metrics.psTTM || metrics.psQuarterly) : undefined;
         result.pcf_ratio = metrics.pcfShareQuarterly || metrics.pcfShareAnnual ? parseFloat(metrics.pcfShareQuarterly || metrics.pcfShareAnnual) : undefined;
 
-        // Profitability metrics (convert decimals to percentages)
-        result.roe = metrics.roeTTM || metrics.roeRfy ? parseFloat(((metrics.roeTTM || metrics.roeRfy) * 100).toFixed(2)) : undefined;
-        result.roa = metrics.roaRfy || metrics.roaTTM ? parseFloat(((metrics.roaRfy || metrics.roaTTM) * 100).toFixed(2)) : undefined;
-        result.roi = metrics.roiTTM || metrics.roiRfy ? parseFloat(((metrics.roiTTM || metrics.roiRfy) * 100).toFixed(2)) : undefined;
-        result.gross_margin = metrics.grossMarginTTM || metrics.grossMarginAnnual ? parseFloat(((metrics.grossMarginTTM || metrics.grossMarginAnnual) * 100).toFixed(2)) : undefined;
-        result.operating_margin = metrics.operatingMarginTTM || metrics.operatingMarginAnnual ? parseFloat(((metrics.operatingMarginTTM || metrics.operatingMarginAnnual) * 100).toFixed(2)) : undefined;
-        result.profit_margin = metrics.netProfitMarginTTM || metrics.netProfitMarginAnnual ? parseFloat(((metrics.netProfitMarginTTM || metrics.netProfitMarginAnnual) * 100).toFixed(2)) : undefined;
+        // Profitability metrics (normalize percentages)
+        function toPercent(raw: any): number | undefined {
+          if (raw === null || raw === undefined) return undefined;
+          const n = Number(raw);
+          if (Number.isNaN(n)) return undefined;
+          // Finnhub sometimes returns already-scaled percentages (e.g. 22.24) or decimal fractions (e.g. 0.2224).
+          // If absolute value > 1, assume it's already a percentage (22.24 => 22.24%). Otherwise multiply by 100.
+          return Math.abs(n) > 1 ? parseFloat(n.toFixed(2)) : parseFloat((n * 100).toFixed(2));
+        }
+
+        result.roe = toPercent(metrics.roeTTM ?? metrics.roeRfy);
+        result.roa = toPercent(metrics.roaRfy ?? metrics.roaTTM);
+        result.roi = toPercent(metrics.roiTTM ?? metrics.roiRfy);
+        result.gross_margin = toPercent(metrics.grossMarginTTM ?? metrics.grossMarginAnnual);
+        result.operating_margin = toPercent(metrics.operatingMarginTTM ?? metrics.operatingMarginAnnual);
+        result.profit_margin = toPercent(metrics.netProfitMarginTTM ?? metrics.netProfitMarginAnnual);
 
         // Financial health
         result.debt_to_equity = metrics.totalDebt && metrics.totalEquity
@@ -100,13 +110,13 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
         result.current_ratio = metrics.currentRatioQuarterly || metrics.currentRatioAnnual ? parseFloat(metrics.currentRatioQuarterly || metrics.currentRatioAnnual) : undefined;
         result.quick_ratio = metrics.quickRatioQuarterly || metrics.quickRatioAnnual ? parseFloat(metrics.quickRatioQuarterly || metrics.quickRatioAnnual) : undefined;
 
-        // Growth metrics (convert decimals to percentages)
-        result.revenue_growth = metrics.revenueGrowthTTMYoy || metrics.revenueGrowthQuarterlyYoy ? parseFloat(((metrics.revenueGrowthTTMYoy || metrics.revenueGrowthQuarterlyYoy) * 100).toFixed(2)) : undefined;
-        result.earnings_growth = metrics.epsGrowthTTMYoy || metrics.epsGrowthQuarterlyYoy ? parseFloat(((metrics.epsGrowthTTMYoy || metrics.epsGrowthQuarterlyYoy) * 100).toFixed(2)) : undefined;
+        // Growth metrics (normalize percentages)
+        result.revenue_growth = toPercent(metrics.revenueGrowthTTMYoy ?? metrics.revenueGrowthQuarterlyYoy);
+        result.earnings_growth = toPercent(metrics.epsGrowthTTMYoy ?? metrics.epsGrowthQuarterlyYoy);
 
         // Dividend metrics
-        result.dividend_yield = metrics.dividendYieldIndicatedAnnual || metrics.dividendYieldTTM ? parseFloat(((metrics.dividendYieldIndicatedAnnual || metrics.dividendYieldTTM) * 100).toFixed(2)) : undefined;
-        result.payout_ratio = metrics.payoutRatioTTM || metrics.payoutRatioAnnual ? parseFloat(((metrics.payoutRatioTTM || metrics.payoutRatioAnnual) * 100).toFixed(2)) : undefined;
+        result.dividend_yield = toPercent(metrics.dividendYieldIndicatedAnnual ?? metrics.dividendYieldTTM);
+        result.payout_ratio = toPercent(metrics.payoutRatioTTM ?? metrics.payoutRatioAnnual);
 
         // Market data
         result.beta = metrics.beta ? parseFloat(metrics.beta.toFixed(2)) : undefined;

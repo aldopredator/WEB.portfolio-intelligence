@@ -22,6 +22,7 @@ export async function fetchAndScoreSentiment(
 
   try {
     // Prefer Finnhub if available; cache responses to reduce calls
+    const CACHE_VERSION = 'v2'; // Increment this to bust cache after deployment
     const ttlMs = Number(process.env.SENTIMENT_CACHE_TTL_MS ?? '1800000'); // default 30 minutes
     const finnhubKey = process.env.FINNHUB_API_KEY || process.env.FINNHUB_KEY;
     let articles: Array<{ title?: string; description?: string }> = [];
@@ -29,7 +30,7 @@ export async function fetchAndScoreSentiment(
     let dataTimestamp = new Date().toISOString();
 
     if (finnhubKey) {
-      const cacheKey = `finnhub:${ticker}`;
+      const cacheKey = `${CACHE_VERSION}-finnhub:${ticker}`;
       const cached = await getCached<{ title?: string; description?: string }[]>(cacheKey, ttlMs);
       if (cached) {
         articles = cached;
@@ -69,7 +70,7 @@ export async function fetchAndScoreSentiment(
     if ((!articles || articles.length === 0)) {
       const apiKey = process.env.NEWS_API_KEY || process.env.NEWSAPI_KEY;
       if (apiKey) {
-        const cacheKey = `newsapi:${ticker}`;
+        const cacheKey = `${CACHE_VERSION}-newsapi:${ticker}`;
         const cached = await getCached<{ title?: string; description?: string }[]>(cacheKey, ttlMs);
         if (cached) {
           articles = cached;
