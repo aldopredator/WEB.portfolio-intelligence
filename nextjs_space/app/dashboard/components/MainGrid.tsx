@@ -124,6 +124,7 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               priceChangePercent={stock.change_percent || 0}
               weekLow52={stock['52_week_low']}
               weekHigh52={stock['52_week_high']}
+              volume={stock.volume}
             />
           )}
         </Box>

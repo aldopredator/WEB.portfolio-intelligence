@@ -27,6 +27,7 @@ interface PriceHistoryChartProps {
   priceChangePercent: number;
   weekLow52?: number;
   weekHigh52?: number;
+  volume?: number;
 }
 
 export default function PriceHistoryChart({
@@ -37,6 +38,7 @@ export default function PriceHistoryChart({
   priceChangePercent,
   weekLow52,
   weekHigh52,
+  volume,
 }: PriceHistoryChartProps) {
   const theme = useTheme();
 
@@ -91,8 +93,8 @@ export default function PriceHistoryChart({
           </Stack>
         </Stack>
 
-        {/* 52 Week Range Section */}
-        {weekLow52 !== undefined && weekHigh52 !== undefined && (
+        {/* 52 Week Range and Volume Section */}
+        {(weekLow52 !== undefined && weekHigh52 !== undefined) || volume !== undefined ? (
           <Stack
             direction="row"
             spacing={2}
@@ -102,19 +104,31 @@ export default function PriceHistoryChart({
               p: 2,
               backgroundColor: 'action.hover',
               borderRadius: 1,
-              justifyContent: 'center',
+              justifyContent: 'space-around',
             }}
           >
-            <Stack alignItems="center">
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                52 Week Range
-              </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                ${weekLow52.toFixed(0)} - ${weekHigh52.toFixed(0)}
-              </Typography>
-            </Stack>
+            {weekLow52 !== undefined && weekHigh52 !== undefined && (
+              <Stack alignItems="center">
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                  52 Week Range
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  ${weekLow52.toFixed(0)} - ${weekHigh52.toFixed(0)}
+                </Typography>
+              </Stack>
+            )}
+            {volume !== undefined && (
+              <Stack alignItems="center">
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                  Volume
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  {(volume / 1e6).toFixed(2)}M
+                </Typography>
+              </Stack>
+            )}
           </Stack>
-        )}
+        ) : null}
 
         <LineChart
           colors={colorPalette}
