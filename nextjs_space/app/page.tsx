@@ -10,6 +10,7 @@ import { RecommendationCard } from '@/components/recommendation-card';
 import { BarChart3, RefreshCw } from 'lucide-react';
 import type { StockInsightsData } from '@/lib/types';
 // import { fetchMultipleQuotes } from '@/lib/yahoo-finance';
+import { fetchYahooPriceHistory } from '@/lib/yahoo-finance';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
 import { fetchFinnhubMetrics } from '@/lib/finnhub-metrics';
 import { isRecord } from '@/lib/utils';
@@ -106,10 +107,6 @@ async function getStockData(): Promise<StockInsightsData> {
           if (typeof metrics.previous_close === 'number') {
             (stockEntry.stock_data as any).previous_close = metrics.previous_close;
           }
-          // For price history (30-day chart)
-          if (metrics.price_history && metrics.price_history.length > 0) {
-            (stockEntry.stock_data as any).price_movement_30_days = metrics.price_history;
-          }
           // For 52-week high/low
           if (typeof metrics['52_week_high'] === 'number') {
             (stockEntry.stock_data as any)['52_week_high'] = metrics['52_week_high'];
@@ -121,6 +118,15 @@ async function getStockData(): Promise<StockInsightsData> {
           console.log(`[DATA] ${ticker} - Finnhub metrics merged`);
         } else {
           console.warn(`[DATA] ${ticker} - No Finnhub metrics received`);
+        }
+
+        // Fetch 30-day price history from Yahoo Finance (free, no auth required)
+        const priceHistory = await fetchYahooPriceHistory(ticker);
+        if (priceHistory && priceHistory.length > 0 && isRecord(stockEntry) && stockEntry.stock_data) {
+          (stockEntry.stock_data as any).price_movement_30_days = priceHistory;
+          console.log(`[DATA] ${ticker} - Yahoo price history merged (${priceHistory.length} days)`);
+        } else {
+          console.warn(`[DATA] ${ticker} - No price history received from Yahoo`);
         }
       } catch (e) {
         console.error(`[DATA] ${ticker} - Error during enrichment:`, e);

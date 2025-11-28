@@ -117,3 +117,42 @@ export async function fetchMultipleQuotes(tickers: string[]): Promise<Record<str
 
     return quotes;
 }
+
+/**
+ * Fetch only 30-day price history from Yahoo Finance (for charts)
+ * This is free and doesn't require authentication
+ */
+export async function fetchYahooPriceHistory(ticker: string): Promise<{ Date: string; Close: number }[]> {
+    try {
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=1mo&interval=1d`;
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0',
+            },
+            next: { revalidate: 86400 } // 1 day cache
+        } as any);
+
+        if (!response.ok) {
+            console.error(`Yahoo Finance chart API error for ${ticker}: ${response.status}`);
+            return [];
+        }
+
+        const data = await response.json();
+        const result = data?.chart?.result?.[0];
+        if (!result) {
+            return [];
+        }
+
+        const timestamps = result.timestamp || [];
+        const quotes = result.indicators?.quote?.[0] || {};
+        const closes = quotes.close || [];
+
+        return timestamps.map((timestamp: number, index: number) => ({
+            Date: new Date(timestamp * 1000).toISOString(),
+            Close: Number((closes[index] || 0).toFixed(2))
+        })).filter((item: any) => item.Close > 0);
+    } catch (error) {
+        console.error(`Error fetching price history for ${ticker}:`, error);
+        return [];
+    }
+}
