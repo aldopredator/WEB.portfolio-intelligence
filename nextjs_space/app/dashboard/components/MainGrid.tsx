@@ -63,18 +63,18 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
         {companyNameMap[selectedStock] || selectedStock} ({selectedStock})
       </Typography>
 
-      {/* Two Column Layout: Left wider, Right narrower */}
+      {/* Three Column Layout: Equal widths */}
       <Box
         sx={{
           display: 'grid',
           gridTemplateColumns: {
             xs: '1fr',
-            lg: '2fr 1fr',
+            lg: 'repeat(3, 1fr)',
           },
           gap: 2,
         }}
       >
-        {/* Left Column: Price Chart and Volume */}
+        {/* Block 1: Price Chart and Volume */}
         <Stack spacing={2}>
           {/* Price History Chart with 52 Week Range */}
           {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
@@ -103,15 +103,8 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
           </Box>
         </Stack>
 
-        {/* Right Column: Social Sentiment, Pros & Cons, Stock Details stacked */}
-        <Stack spacing={2}>
-          {/* Social Sentiment */}
-          <SocialSentimentCard
-            ticker={selectedStock}
-            sentiment={stockEntry.social_sentiment}
-          />
-
-          {/* Stock Details with Market Cap */}
+        {/* Block 2: Stock Details (middle column) */}
+        <Box>
           <StockDetailsCard
             ticker={selectedStock}
             marketCap={stock.market_cap}
@@ -121,6 +114,15 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
             pbRatio={(stockEntry as any).pb_ratio}
             debtToEquity={(stockEntry as any).debt_to_equity}
             dividendYield={(stockEntry as any).dividend_yield}
+          />
+        </Box>
+
+        {/* Block 3: Social Sentiment and Pros & Cons */}
+        <Stack spacing={2}>
+          {/* Social Sentiment */}
+          <SocialSentimentCard
+            ticker={selectedStock}
+            sentiment={stockEntry.social_sentiment}
           />
 
           {/* Pros & Cons */}
