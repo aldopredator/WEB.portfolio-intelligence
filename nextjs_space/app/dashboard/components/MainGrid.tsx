@@ -10,6 +10,11 @@ import PriceHistoryChart from './PriceHistoryChart';
 import StockDetailsCard from './StockDetailsCard';
 import ProsConsCard from './ProsConsCard';
 import SocialSentimentCard from './SocialSentimentCard';
+import CompanyInfoCard from './CompanyInfoCard';
+import MarketNewsCard from './MarketNewsCard';
+import RecommendationTrendsCard from './RecommendationTrendsCard';
+import PriceTargetCard from './PriceTargetCard';
+import EarningsCalendarCard from './EarningsCalendarCard';
 import type { StockInsightsData } from '@/lib/types';
 
 interface MainGridProps {
@@ -132,6 +137,75 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
             cons={stockEntry.cons}
           />
         </Stack>
+      </Box>
+
+      {/* Additional Information Section */}
+      <Box sx={{ mt: 3 }}>
+        <Typography component="h3" variant="h6" sx={{ mb: 2 }}>
+          Additional Information
+        </Typography>
+
+        {/* Two Column Layout for Additional Info */}
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              lg: 'repeat(2, 1fr)',
+            },
+            gap: 2,
+          }}
+        >
+          {/* Company Info */}
+          {stockEntry.company_profile && (
+            <CompanyInfoCard
+              ticker={selectedStock}
+              companyName={stockEntry.company_profile.name}
+              logo={stockEntry.company_profile.logo}
+              industry={stockEntry.company_profile.industry}
+              sector={stockEntry.company_profile.sector}
+              subSector={stockEntry.company_profile.subSector}
+            />
+          )}
+
+          {/* Price Target */}
+          {stockEntry.price_target && (
+            <PriceTargetCard
+              ticker={selectedStock}
+              currentPrice={stock.current_price || 0}
+              targetHigh={stockEntry.price_target.targetHigh}
+              targetLow={stockEntry.price_target.targetLow}
+              targetMean={stockEntry.price_target.targetMean}
+              targetMedian={stockEntry.price_target.targetMedian}
+            />
+          )}
+
+          {/* Market News */}
+          {stockEntry.latest_news && stockEntry.latest_news.length > 0 && (
+            <MarketNewsCard
+              ticker={selectedStock}
+              articles={stockEntry.latest_news}
+            />
+          )}
+
+          {/* Earnings Calendar */}
+          {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
+            <EarningsCalendarCard
+              ticker={selectedStock}
+              earnings={stockEntry.earnings_calendar}
+            />
+          )}
+        </Box>
+
+        {/* Full Width for Recommendation Trends */}
+        {stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0 && (
+          <Box sx={{ mt: 2 }}>
+            <RecommendationTrendsCard
+              ticker={selectedStock}
+              trends={stockEntry.recommendation_trends}
+            />
+          </Box>
+        )}
       </Box>
     </Box>
   );

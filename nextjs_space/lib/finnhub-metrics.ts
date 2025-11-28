@@ -1,6 +1,44 @@
 // Server-only module for fetching financial metrics and company data from Finnhub
 // Uses Next.js fetch caching with 30-day revalidation for persistent caching
 
+export interface CompanyProfile {
+  name?: string;
+  logo?: string;
+  industry?: string;
+  sector?: string;
+  subSector?: string;
+  country?: string;
+  marketCapitalization?: number;
+  currency?: string;
+}
+
+export interface NewsArticle {
+  headline: string;
+  source: string;
+  url: string;
+  datetime?: number;
+  summary?: string;
+  image?: string;
+}
+
+export interface PriceTarget {
+  targetHigh?: number;
+  targetLow?: number;
+  targetMean?: number;
+  targetMedian?: number;
+  numberOfAnalysts?: number;
+}
+
+export interface EarningsEvent {
+  date: string;
+  epsEstimate?: number;
+  epsActual?: number;
+  revenueEstimate?: number;
+  revenueActual?: number;
+  quarter?: number;
+  year?: number;
+}
+
 export interface FinnhubMetrics {
   // Valuation metrics
   pe_ratio?: number;
@@ -202,4 +240,183 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
 
   // Fetch with Next.js cache built into fetch() calls
   return fetchFinnhubMetricsInternal(ticker, apiKey);
+}
+
+/**
+ * Fetch company profile data from Finnhub
+ */
+export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfile> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured for profile`);
+    return {};
+  }
+
+  try {
+    const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${apiKey}`;
+    const response = await fetch(url, {
+      next: { revalidate: METRICS_CACHE_TTL_SECONDS }
+    } as any);
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        name: data.name,
+        logo: data.logo,
+        industry: data.finnhubIndustry,
+        sector: data.gsector,
+        subSector: data.naicsSubsector,
+        country: data.country,
+        marketCapitalization: data.marketCapitalization ? data.marketCapitalization * 1000000 : undefined,
+        currency: data.currency,
+      };
+    }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Error fetching profile:`, error);
+  }
+  return {};
+}
+
+/**
+ * Fetch company news from Finnhub
+ */
+export async function fetchCompanyNews(ticker: string, limit: number = 10): Promise<NewsArticle[]> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured for news`);
+    return [];
+  }
+
+  try {
+    // Get news from last 30 days
+    const toDate = new Date();
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - 30);
+
+    const from = fromDate.toISOString().split('T')[0];
+    const to = toDate.toISOString().split('T')[0];
+
+    const url = `https://finnhub.io/api/v1/company-news?symbol=${ticker}&from=${from}&to=${to}&token=${apiKey}`;
+    const response = await fetch(url, {
+      next: { revalidate: 3600 } // Cache for 1 hour (news is time-sensitive)
+    } as any);
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.slice(0, limit).map((article: any) => ({
+        headline: article.headline,
+        source: article.source,
+        url: article.url,
+        datetime: article.datetime,
+        summary: article.summary,
+        image: article.image,
+      }));
+    }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Error fetching news:`, error);
+  }
+  return [];
+}
+
+/**
+ * Fetch price target from Finnhub
+ */
+export async function fetchPriceTarget(ticker: string): Promise<PriceTarget> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured for price target`);
+    return {};
+  }
+
+  try {
+    const url = `https://finnhub.io/api/v1/stock/price-target?symbol=${ticker}&token=${apiKey}`;
+    const response = await fetch(url, {
+      next: { revalidate: 86400 } // Cache for 1 day
+    } as any);
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        targetHigh: data.targetHigh,
+        targetLow: data.targetLow,
+        targetMean: data.targetMean,
+        targetMedian: data.targetMedian,
+        numberOfAnalysts: data.numberOfAnalysts,
+      };
+    }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Error fetching price target:`, error);
+  }
+  return {};
+}
+
+/**
+ * Fetch earnings calendar from Finnhub
+ */
+export async function fetchEarningsCalendar(ticker: string): Promise<EarningsEvent[]> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured for earnings`);
+    return [];
+  }
+
+  try {
+    const url = `https://finnhub.io/api/v1/calendar/earnings?symbol=${ticker}&token=${apiKey}`;
+    const response = await fetch(url, {
+      next: { revalidate: 86400 } // Cache for 1 day
+    } as any);
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.earningsCalendar && Array.isArray(data.earningsCalendar)) {
+        return data.earningsCalendar.map((event: any) => ({
+          date: event.date,
+          epsEstimate: event.epsEstimate,
+          epsActual: event.epsActual,
+          revenueEstimate: event.revenueEstimate,
+          revenueActual: event.revenueActual,
+          quarter: event.quarter,
+          year: event.year,
+        }));
+      }
+    }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Error fetching earnings calendar:`, error);
+  }
+  return [];
+}
+
+/**
+ * Fetch recommendation trends from Finnhub
+ */
+export async function fetchRecommendationTrends(ticker: string): Promise<any[]> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured for recommendations`);
+    return [];
+  }
+
+  try {
+    const url = `https://finnhub.io/api/v1/stock/recommendation?symbol=${ticker}&token=${apiKey}`;
+    const response = await fetch(url, {
+      next: { revalidate: 86400 } // Cache for 1 day
+    } as any);
+
+    if (response.ok) {
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        return data.map((rec: any) => ({
+          period: rec.period,
+          strongBuy: rec.strongBuy || 0,
+          buy: rec.buy || 0,
+          hold: rec.hold || 0,
+          sell: rec.sell || 0,
+          strongSell: rec.strongSell || 0,
+        }));
+      }
+    }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Error fetching recommendation trends:`, error);
+  }
+  return [];
 }

@@ -70,13 +70,55 @@ export interface SocialSentiment {
   lastUpdated?: string;
 }
 
+export interface CompanyProfile {
+  name?: string;
+  logo?: string;
+  industry?: string;
+  sector?: string;
+  subSector?: string;
+  country?: string;
+  marketCapitalization?: number;
+  currency?: string;
+}
+
+export interface NewsArticle {
+  headline: string;
+  source: string;
+  url: string;
+  datetime?: number;
+  summary?: string;
+  image?: string;
+}
+
+export interface PriceTarget {
+  targetHigh?: number;
+  targetLow?: number;
+  targetMean?: number;
+  targetMedian?: number;
+  numberOfAnalysts?: number;
+}
+
+export interface EarningsEvent {
+  date: string;
+  epsEstimate?: number;
+  epsActual?: number;
+  revenueEstimate?: number;
+  revenueActual?: number;
+  quarter?: number;
+  year?: number;
+}
+
 export interface StockInfo {
   stock_data: StockData;
   analyst_recommendations: AnalystData;
-  latest_news: any[];
+  latest_news: NewsArticle[];
   social_sentiment: SocialSentiment;
   pros: string[];
   cons: string[];
+  company_profile?: CompanyProfile;
+  price_target?: PriceTarget;
+  earnings_calendar?: EarningsEvent[];
+  recommendation_trends?: AnalystRecommendation[];
 }
 
 export interface StockInsightsData {

@@ -3,7 +3,14 @@ import path from 'path';
 import type { StockInsightsData } from '@/lib/types';
 import { fetchYahooPriceHistory } from '@/lib/yahoo-finance';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
-import { fetchFinnhubMetrics } from '@/lib/finnhub-metrics';
+import { 
+  fetchFinnhubMetrics, 
+  fetchCompanyProfile, 
+  fetchCompanyNews, 
+  fetchPriceTarget, 
+  fetchEarningsCalendar, 
+  fetchRecommendationTrends 
+} from '@/lib/finnhub-metrics';
 import { isRecord } from '@/lib/utils';
 import DashboardClient from './dashboard/DashboardClient';
 
@@ -48,6 +55,36 @@ async function getStockData(): Promise<StockInsightsData> {
         const metrics = await fetchFinnhubMetrics(ticker);
         if (metrics && isRecord(stockEntry) && stockEntry.stock_data) {
           Object.assign(stockEntry.stock_data, metrics);
+        }
+
+        // Fetch company profile
+        const profile = await fetchCompanyProfile(ticker);
+        if (profile && isRecord(stockEntry)) {
+          stockEntry.company_profile = profile as any;
+        }
+
+        // Fetch company news
+        const news = await fetchCompanyNews(ticker, 5);
+        if (news && isRecord(stockEntry)) {
+          stockEntry.latest_news = news as any;
+        }
+
+        // Fetch price target
+        const priceTarget = await fetchPriceTarget(ticker);
+        if (priceTarget && isRecord(stockEntry)) {
+          stockEntry.price_target = priceTarget as any;
+        }
+
+        // Fetch earnings calendar
+        const earnings = await fetchEarningsCalendar(ticker);
+        if (earnings && isRecord(stockEntry)) {
+          stockEntry.earnings_calendar = earnings as any;
+        }
+
+        // Fetch recommendation trends
+        const recTrends = await fetchRecommendationTrends(ticker);
+        if (recTrends && isRecord(stockEntry)) {
+          stockEntry.recommendation_trends = recTrends as any;
         }
 
         // Fetch price history
