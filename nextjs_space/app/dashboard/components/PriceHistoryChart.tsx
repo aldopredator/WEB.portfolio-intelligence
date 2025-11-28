@@ -40,8 +40,22 @@ export default function PriceHistoryChart({
 }: PriceHistoryChartProps) {
   const theme = useTheme();
 
-  const dates = data.map((d) => new Date(d.Date).getDate().toString());
+  // Format dates as "Day Month" (e.g., "1 Nov", "15 Nov")
+  const dates = data.map((d) => {
+    const date = new Date(d.Date);
+    const day = date.getDate();
+    const month = date.toLocaleDateString('en-US', { month: 'short' });
+    return `${day} ${month}`;
+  });
   const prices = data.map((d) => d.Close);
+
+  // Calculate dynamic Y-axis range to emphasize price movements
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+  const priceRange = maxPrice - minPrice;
+  const padding = priceRange * 0.1; // 10% padding
+  const yMin = Math.floor(minPrice - padding);
+  const yMax = Math.ceil(maxPrice + padding);
 
   const colorPalette = [
     theme.palette.primary.light,
@@ -50,6 +64,9 @@ export default function PriceHistoryChart({
   ];
 
   const isPositive = priceChange >= 0;
+
+  // Determine currency symbol ($ for USD, £ for GBP, € for EUR)
+  const currencySymbol = '$'; // Default to USD, can be made dynamic based on ticker
 
   return (
     <Card variant="outlined" sx={{ width: '100%' }}>
@@ -111,6 +128,13 @@ export default function PriceHistoryChart({
               scaleType: 'point',
               data: dates,
               tickInterval: (index, i) => (i + 1) % 5 === 0,
+            },
+          ]}
+          yAxis={[
+            {
+              min: yMin,
+              max: yMax,
+              valueFormatter: (value) => `${currencySymbol}${value.toFixed(0)}`,
             },
           ]}
           series={[
