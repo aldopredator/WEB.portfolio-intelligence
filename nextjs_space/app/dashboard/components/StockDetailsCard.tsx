@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
+import BarChartIcon from '@mui/icons-material/BarChart';
 
 interface StockDetailsCardProps {
   ticker: string;
@@ -47,9 +48,12 @@ export default function StockDetailsCard({
   return (
     <Card sx={{ height: '100%' }}>
       <CardContent>
-        <Typography component="h2" variant="h6" sx={{ mb: 3, fontSize: '1.25rem', fontWeight: 700 }}>
-          Stock Fundamentals
-        </Typography>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
+          <BarChartIcon sx={{ color: 'primary.main' }} />
+          <Typography component="h2" variant="h6" sx={{ fontSize: '1.25rem', fontWeight: 700 }}>
+            Stock Fundamentals
+          </Typography>
+        </Stack>
 
         {/* Valuation Pillar */}
         <Box sx={{ mb: 3 }}>
