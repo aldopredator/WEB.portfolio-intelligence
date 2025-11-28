@@ -1,4 +1,4 @@
-import { TrendingUp, CheckCircle2, Filter, Info, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, Filter, Info, AlertTriangle } from 'lucide-react';
 import { PageHeader } from '@/components/page-header';
 import { getStockData, STOCK_CONFIG } from '@/lib/stock-data';
 import { parseCriteriaFromParams } from '@/lib/screening-criteria';
@@ -25,42 +25,35 @@ export default async function ScreeningPage({
       return null;
     }
 
-    // Calculate returns
-    let ytdReturnValue = stockInfo.change_percent || 0;
-    let week52ReturnValue = 0;
+    // Apply screening criteria (only check enabled criteria)
+    const passes: Record<string, boolean> = {};
     
-    if (stockInfo['52_week_high'] && stockInfo['52_week_low'] && stockInfo.current_price) {
-      const currentFromLow = stockInfo.current_price - stockInfo['52_week_low'];
-      week52ReturnValue = (currentFromLow / stockInfo['52_week_low']) * 100;
+    if (CRITERIA.peEnabled) {
+      passes.pe = !stockInfo.pe_ratio || stockInfo.pe_ratio < CRITERIA.maxPE;
+    }
+    
+    if (CRITERIA.pbEnabled) {
+      passes.pb = !stockInfo.pb_ratio || stockInfo.pb_ratio < CRITERIA.maxPB;
+    }
+    
+    if (CRITERIA.sectorsEnabled) {
+      passes.sector = !CRITERIA.excludeSectors.includes(config.sector);
     }
 
-    // Apply screening criteria
-    const passes = {
-      pe: !stockInfo.pe_ratio || stockInfo.pe_ratio < CRITERIA.maxPE,
-      pb: !stockInfo.pb_ratio || stockInfo.pb_ratio < CRITERIA.maxPB,
-      ytd: ytdReturnValue > CRITERIA.minYTD,
-      week52: week52ReturnValue > CRITERIA.minWeek52,
-      sector: !CRITERIA.excludeSectors.includes(config.sector),
-    };
-
+    const totalCriteria = Object.keys(passes).length;
     const passCount = Object.values(passes).filter(Boolean).length;
-    const matchScore = Math.round((passCount / Object.keys(passes).length) * 100);
+    const matchScore = totalCriteria > 0 ? Math.round((passCount / totalCriteria) * 100) : 100;
 
-    // Only include stocks that pass all criteria
+    // Only include stocks that pass all enabled criteria
     if (matchScore < 100) {
       return null;
     }
-
-    const ytdReturn = `${ytdReturnValue >= 0 ? '+' : ''}${ytdReturnValue.toFixed(1)}%`;
-    const week52Return = `${week52ReturnValue >= 0 ? '+' : ''}${week52ReturnValue.toFixed(1)}%`;
 
     return {
       ticker: config.ticker,
       name: config.name,
       sector: config.sector,
       pe: stockInfo.pe_ratio?.toFixed(2) || 'N/A',
-      ytd: ytdReturn,
-      week52: week52Return,
       pb: stockInfo.pb_ratio?.toFixed(2) || 'N/A',
       matchScore,
     };
@@ -93,25 +86,44 @@ export default async function ScreeningPage({
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-blue-400 mb-3">Active Screening Criteria</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                <div className="bg-slate-900/50 border border-slate-800/50 rounded-lg p-3">
-                  <p className="text-slate-400 mb-1">P/E Ratio</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div className={`bg-slate-900/50 border rounded-lg p-3 ${
+                  CRITERIA.peEnabled ? 'border-emerald-500/30' : 'border-slate-800/50 opacity-50'
+                }`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-slate-400">P/E Ratio</p>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                      CRITERIA.peEnabled ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-500/10 text-slate-500'
+                    }`}>
+                      {CRITERIA.peEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
                   <p className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPE}</p>
                 </div>
-                <div className="bg-slate-900/50 border border-slate-800/50 rounded-lg p-3">
-                  <p className="text-slate-400 mb-1">P/B Ratio</p>
+                <div className={`bg-slate-900/50 border rounded-lg p-3 ${
+                  CRITERIA.pbEnabled ? 'border-emerald-500/30' : 'border-slate-800/50 opacity-50'
+                }`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-slate-400">P/B Ratio</p>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                      CRITERIA.pbEnabled ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-500/10 text-slate-500'
+                    }`}>
+                      {CRITERIA.pbEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
                   <p className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPB}</p>
                 </div>
-                <div className="bg-slate-900/50 border border-slate-800/50 rounded-lg p-3">
-                  <p className="text-slate-400 mb-1">YTD Return</p>
-                  <p className="text-white font-mono font-semibold">&gt; {CRITERIA.minYTD}%</p>
-                </div>
-                <div className="bg-slate-900/50 border border-slate-800/50 rounded-lg p-3">
-                  <p className="text-slate-400 mb-1">52-Week Return</p>
-                  <p className="text-white font-mono font-semibold">&gt; {CRITERIA.minWeek52}%</p>
-                </div>
-                <div className="bg-slate-900/50 border border-slate-800/50 rounded-lg p-3 col-span-2">
-                  <p className="text-slate-400 mb-1">Excluded Sectors</p>
+                <div className={`bg-slate-900/50 border rounded-lg p-3 col-span-1 md:col-span-2 ${
+                  CRITERIA.sectorsEnabled ? 'border-red-500/30' : 'border-slate-800/50 opacity-50'
+                }`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-slate-400">Excluded Sectors</p>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                      CRITERIA.sectorsEnabled ? 'bg-red-500/10 text-red-400' : 'bg-slate-500/10 text-slate-500'
+                    }`}>
+                      {CRITERIA.sectorsEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
                   <p className="text-white font-mono font-semibold">
                     {CRITERIA.excludeSectors.length > 0 ? CRITERIA.excludeSectors.join(', ') : 'None'}
                   </p>
@@ -151,20 +163,6 @@ export default async function ScreeningPage({
                   <p className="text-slate-400 text-xs mb-1">P/B Ratio</p>
                   <p className="text-emerald-400 font-mono font-bold text-lg">{stock.pb}</p>
                 </div>
-                <div className="p-3 bg-slate-950/50 rounded-lg border border-slate-800/50">
-                  <p className="text-slate-400 text-xs mb-1">YTD Return</p>
-                  <div className="flex items-center gap-1">
-                    <TrendingUp className="w-4 h-4 text-emerald-400" />
-                    <p className="text-emerald-400 font-mono font-bold text-lg">{stock.ytd}</p>
-                  </div>
-                </div>
-                <div className="p-3 bg-slate-950/50 rounded-lg border border-slate-800/50">
-                  <p className="text-slate-400 text-xs mb-1">52W Return</p>
-                  <div className="flex items-center gap-1">
-                    <TrendingUp className="w-4 h-4 text-emerald-400" />
-                    <p className="text-emerald-400 font-mono font-bold text-lg">{stock.week52}</p>
-                  </div>
-                </div>
               </div>
             </div>
           ))}
@@ -187,12 +185,6 @@ export default async function ScreeningPage({
                   </th>
                   <th className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                     P/B Ratio
-                  </th>
-                  <th className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                    YTD Return
-                  </th>
-                  <th className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                    52W Return
                   </th>
                   <th className="px-6 py-4 text-center text-xs font-bold text-slate-300 uppercase tracking-wider">
                     Match Score
@@ -222,22 +214,6 @@ export default async function ScreeningPage({
                     <td className="px-6 py-5 text-right">
                       <span className="text-emerald-400 font-mono font-bold text-lg">{stock.pb}</span>
                     </td>
-                    <td className="px-6 py-5 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-                          <TrendingUp className="w-4 h-4 text-emerald-400" />
-                        </div>
-                        <span className="text-emerald-400 font-mono font-bold text-lg">{stock.ytd}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-                          <TrendingUp className="w-4 h-4 text-emerald-400" />
-                        </div>
-                        <span className="text-emerald-400 font-mono font-bold text-lg">{stock.week52}</span>
-                      </div>
-                    </td>
                     <td className="px-6 py-5">
                       <div className="flex items-center justify-center gap-2">
                         <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/20">
@@ -261,40 +237,49 @@ export default async function ScreeningPage({
                 <Info className="w-6 h-6 text-blue-400" />
               </div>
             </div>
-            <div>
+            <div className="flex-1">
               <h3 className="text-xl font-bold text-blue-400 mb-3">Screening Methodology</h3>
               <p className="text-slate-300 leading-relaxed mb-4">
-                Our multi-factor screening approach identifies high-quality stocks through rigorous quantitative analysis:
+                Your customized screening criteria filter stocks based on the following parameters:
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 bg-slate-950/50 rounded-lg border border-slate-800/50">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {CRITERIA.peEnabled && (
+                  <div className="p-4 bg-slate-950/50 rounded-lg border border-emerald-500/30">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      </div>
+                      <h4 className="text-white font-semibold">P/E Ratio Threshold</h4>
                     </div>
-                    <h4 className="text-white font-semibold">Valuation</h4>
+                    <p className="text-slate-400 text-sm">Filters stocks with P/E ratio less than {CRITERIA.maxPE}</p>
                   </div>
-                  <p className="text-slate-400 text-sm">P/E &lt; 20 and P/B &lt; 3 ensures reasonable valuations</p>
-                </div>
-                <div className="p-4 bg-slate-950/50 rounded-lg border border-slate-800/50">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                )}
+                {CRITERIA.pbEnabled && (
+                  <div className="p-4 bg-slate-950/50 rounded-lg border border-emerald-500/30">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      </div>
+                      <h4 className="text-white font-semibold">P/B Ratio Threshold</h4>
                     </div>
-                    <h4 className="text-white font-semibold">Performance</h4>
+                    <p className="text-slate-400 text-sm">Filters stocks with P/B ratio less than {CRITERIA.maxPB}</p>
                   </div>
-                  <p className="text-slate-400 text-sm">Positive YTD and 52-week returns indicate strong momentum</p>
-                </div>
-                <div className="p-4 bg-slate-950/50 rounded-lg border border-slate-800/50">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                )}
+                {CRITERIA.sectorsEnabled && CRITERIA.excludeSectors.length > 0 && (
+                  <div className="p-4 bg-slate-950/50 rounded-lg border border-red-500/30 col-span-1 md:col-span-2">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center">
+                        <CheckCircle2 className="w-4 h-4 text-red-400" />
+                      </div>
+                      <h4 className="text-white font-semibold">Sector Exclusions</h4>
                     </div>
-                    <h4 className="text-white font-semibold">Sector Filter</h4>
+                    <p className="text-slate-400 text-sm">Excludes stocks in the following sectors: {CRITERIA.excludeSectors.join(', ')}</p>
                   </div>
-                  <p className="text-slate-400 text-sm">Excludes alcohol and gambling sectors for ethical investing</p>
-                </div>
+                )}
               </div>
+              {!CRITERIA.peEnabled && !CRITERIA.pbEnabled && !CRITERIA.sectorsEnabled && (
+                <p className="text-slate-400 text-sm italic">No criteria currently enabled. All stocks will be shown.</p>
+              )}
             </div>
           </div>
         </div>

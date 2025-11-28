@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, XCircle, TrendingUp, DollarSign, Ban, ArrowRight } from 'lucide-react';
+import { CheckCircle2, XCircle, DollarSign, Ban, ArrowRight, Plus, Trash2 } from 'lucide-react';
 import { DEFAULT_CRITERIA, buildCriteriaURL, type ScreeningCriteria } from '@/lib/screening-criteria';
 
 export default function CriteriaForm() {
   const router = useRouter();
   const [criteria, setCriteria] = useState<ScreeningCriteria>(DEFAULT_CRITERIA);
+  const [newSector, setNewSector] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,14 +18,23 @@ export default function CriteriaForm() {
 
   const handleReset = () => {
     setCriteria(DEFAULT_CRITERIA);
+    setNewSector('');
   };
 
-  const toggleSector = (sector: string) => {
+  const addSector = () => {
+    if (newSector.trim() && !criteria.excludeSectors.includes(newSector.trim())) {
+      setCriteria(prev => ({
+        ...prev,
+        excludeSectors: [...prev.excludeSectors, newSector.trim()],
+      }));
+      setNewSector('');
+    }
+  };
+
+  const removeSector = (sector: string) => {
     setCriteria(prev => ({
       ...prev,
-      excludeSectors: prev.excludeSectors.includes(sector)
-        ? prev.excludeSectors.filter(s => s !== sector)
-        : [...prev.excludeSectors, sector],
+      excludeSectors: prev.excludeSectors.filter(s => s !== sector),
     }));
   };
 
@@ -50,9 +60,17 @@ export default function CriteriaForm() {
             <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-1">
-                  <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/20">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setCriteria({ ...criteria, peEnabled: !criteria.peEnabled })}
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors ${
+                      criteria.peEnabled
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
+                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
+                    }`}
+                  >
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.peEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
+                  </button>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-start justify-between gap-4 mb-2">
@@ -60,6 +78,13 @@ export default function CriteriaForm() {
                       <h3 className="text-white font-semibold text-lg">Price-to-Earnings (P/E) Ratio</h3>
                       <p className="text-slate-400 text-sm mt-1">Ensures reasonable valuation relative to earnings</p>
                     </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                      criteria.peEnabled
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                    }`}>
+                      {criteria.peEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 mt-3">
                     <span className="text-slate-400 text-sm">Less Than:</span>
@@ -68,7 +93,10 @@ export default function CriteriaForm() {
                       step="0.1"
                       value={criteria.maxPE}
                       onChange={(e) => setCriteria({ ...criteria, maxPE: parseFloat(e.target.value) || 0 })}
-                      className="px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-white font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/50 w-32"
+                      disabled={!criteria.peEnabled}
+                      className={`px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-white font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/50 w-32 ${
+                        !criteria.peEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                     />
                   </div>
                 </div>
@@ -79,9 +107,17 @@ export default function CriteriaForm() {
             <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-1">
-                  <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/20">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setCriteria({ ...criteria, pbEnabled: !criteria.pbEnabled })}
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors ${
+                      criteria.pbEnabled
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
+                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
+                    }`}
+                  >
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.pbEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
+                  </button>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-start justify-between gap-4 mb-2">
@@ -89,6 +125,13 @@ export default function CriteriaForm() {
                       <h3 className="text-white font-semibold text-lg">Price-to-Book (P/B) Ratio</h3>
                       <p className="text-slate-400 text-sm mt-1">Fair value relative to company assets</p>
                     </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                      criteria.pbEnabled
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                    }`}>
+                      {criteria.pbEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 mt-3">
                     <span className="text-slate-400 text-sm">Less Than:</span>
@@ -97,85 +140,11 @@ export default function CriteriaForm() {
                       step="0.1"
                       value={criteria.maxPB}
                       onChange={(e) => setCriteria({ ...criteria, maxPB: parseFloat(e.target.value) || 0 })}
-                      className="px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-white font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/50 w-32"
+                      disabled={!criteria.pbEnabled}
+                      className={`px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-white font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/50 w-32 ${
+                        !criteria.pbEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                     />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Performance Metrics */}
-        <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-b border-blue-500/30 p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-white">Performance Metrics</h2>
-                <p className="text-slate-300 text-sm mt-1">Growth and momentum indicators for strong performers</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6 space-y-4">
-            {/* YTD Return */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 mt-1">
-                  <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/20">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div>
-                      <h3 className="text-white font-semibold text-lg">Year-to-Date Return</h3>
-                      <p className="text-slate-400 text-sm mt-1">Positive performance in current year</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 mt-3">
-                    <span className="text-slate-400 text-sm">Greater Than:</span>
-                    <input
-                      type="number"
-                      step="1"
-                      value={criteria.minYTD}
-                      onChange={(e) => setCriteria({ ...criteria, minYTD: parseFloat(e.target.value) || 0 })}
-                      className="px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/50 w-32"
-                    />
-                    <span className="text-white font-mono">%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 52-Week Return */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 mt-1">
-                  <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/20">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div>
-                      <h3 className="text-white font-semibold text-lg">52-Week Performance</h3>
-                      <p className="text-slate-400 text-sm mt-1">Strong annual growth trajectory</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 mt-3">
-                    <span className="text-slate-400 text-sm">Greater Than:</span>
-                    <input
-                      type="number"
-                      step="1"
-                      value={criteria.minWeek52}
-                      onChange={(e) => setCriteria({ ...criteria, minWeek52: parseFloat(e.target.value) || 0 })}
-                      className="px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/50 w-32"
-                    />
-                    <span className="text-white font-mono">%</span>
                   </div>
                 </div>
               </div>
@@ -190,46 +159,85 @@ export default function CriteriaForm() {
               <div className="w-12 h-12 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
                 <Ban className="w-6 h-6 text-white" />
               </div>
-              <div>
+              <div className="flex-1">
                 <h2 className="text-2xl font-bold text-white">Sector Exclusions</h2>
                 <p className="text-slate-300 text-sm mt-1">Industries excluded from investment consideration</p>
               </div>
+              <button
+                type="button"
+                onClick={() => setCriteria({ ...criteria, sectorsEnabled: !criteria.sectorsEnabled })}
+                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                  criteria.sectorsEnabled
+                    ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20'
+                    : 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20'
+                }`}
+              >
+                {criteria.sectorsEnabled ? 'Enabled' : 'Disabled'}
+              </button>
             </div>
           </div>
 
           <div className="p-6 space-y-4">
-            {['Alcohol', 'Gambling'].map((sector) => (
-              <div key={sector} className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 mt-1">
+            {/* Add New Sector */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
+              <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  value={newSector}
+                  onChange={(e) => setNewSector(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSector())}
+                  placeholder="Enter sector name (e.g., Tobacco, Weapons)"
+                  disabled={!criteria.sectorsEnabled}
+                  className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500/50 ${
+                    !criteria.sectorsEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={addSector}
+                  disabled={!criteria.sectorsEnabled || !newSector.trim()}
+                  className={`px-4 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg text-red-400 font-medium transition-colors flex items-center gap-2 ${
+                    (!criteria.sectorsEnabled || !newSector.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <Plus className="w-4 h-4" />
+                  Add
+                </button>
+              </div>
+            </div>
+
+            {/* Excluded Sectors List */}
+            {criteria.excludeSectors.length > 0 ? (
+              criteria.excludeSectors.map((sector) => (
+                <div key={sector} className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
+                  <div className="flex items-center gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 bg-red-500/10 rounded-lg flex items-center justify-center border border-red-500/20">
+                        <XCircle className="w-5 h-5 text-red-400" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-white font-semibold text-lg">Sector: {sector}</h3>
+                      <p className="text-slate-400 text-sm mt-1">Excluded from screening results</p>
+                    </div>
                     <button
                       type="button"
-                      onClick={() => toggleSector(sector)}
-                      className="w-10 h-10 bg-red-500/10 rounded-lg flex items-center justify-center border border-red-500/20 hover:bg-red-500/20 transition-colors"
+                      onClick={() => removeSector(sector)}
+                      disabled={!criteria.sectorsEnabled}
+                      className={`p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg text-red-400 transition-colors ${
+                        !criteria.sectorsEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                     >
-                      <XCircle className={`w-5 h-5 ${criteria.excludeSectors.includes(sector) ? 'text-red-400' : 'text-slate-600'}`} />
+                      <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h3 className="text-white font-semibold text-lg">Sector: {sector}</h3>
-                        <p className="text-slate-400 text-sm mt-1">
-                          {sector === 'Alcohol' ? 'Excludes alcohol beverage manufacturers' : 'Excludes gaming and casino operators'}
-                        </p>
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                        criteria.excludeSectors.includes(sector)
-                          ? 'bg-red-500/10 text-red-400 border border-red-500/20'
-                          : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
-                      }`}>
-                        {criteria.excludeSectors.includes(sector) ? 'Excluded' : 'Included'}
-                      </span>
-                    </div>
-                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5 text-center">
+                <p className="text-slate-400 text-sm">No sectors excluded. Add sectors above to filter them out.</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

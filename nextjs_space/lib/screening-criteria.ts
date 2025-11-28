@@ -1,28 +1,31 @@
 // Default screening criteria
 export interface ScreeningCriteria {
   maxPE: number;
+  peEnabled: boolean;
   maxPB: number;
-  minYTD: number;
-  minWeek52: number;
+  pbEnabled: boolean;
   excludeSectors: string[];
+  sectorsEnabled: boolean;
 }
 
 export const DEFAULT_CRITERIA: ScreeningCriteria = {
   maxPE: 20,
+  peEnabled: true,
   maxPB: 3,
-  minYTD: 0,
-  minWeek52: 10,
+  pbEnabled: true,
   excludeSectors: ['Alcohol', 'Gambling'],
+  sectorsEnabled: true,
 };
 
 // Parse criteria from URL search params
 export function parseCriteriaFromParams(searchParams: URLSearchParams): ScreeningCriteria {
   return {
     maxPE: parseFloat(searchParams.get('maxPE') || String(DEFAULT_CRITERIA.maxPE)),
+    peEnabled: searchParams.get('peEnabled') === 'true',
     maxPB: parseFloat(searchParams.get('maxPB') || String(DEFAULT_CRITERIA.maxPB)),
-    minYTD: parseFloat(searchParams.get('minYTD') || String(DEFAULT_CRITERIA.minYTD)),
-    minWeek52: parseFloat(searchParams.get('minWeek52') || String(DEFAULT_CRITERIA.minWeek52)),
-    excludeSectors: searchParams.get('excludeSectors')?.split(',') || DEFAULT_CRITERIA.excludeSectors,
+    pbEnabled: searchParams.get('pbEnabled') === 'true',
+    excludeSectors: searchParams.get('excludeSectors')?.split(',').filter(s => s) || DEFAULT_CRITERIA.excludeSectors,
+    sectorsEnabled: searchParams.get('sectorsEnabled') === 'true',
   };
 }
 
@@ -30,10 +33,11 @@ export function parseCriteriaFromParams(searchParams: URLSearchParams): Screenin
 export function buildCriteriaURL(criteria: ScreeningCriteria): string {
   const params = new URLSearchParams({
     maxPE: String(criteria.maxPE),
+    peEnabled: String(criteria.peEnabled),
     maxPB: String(criteria.maxPB),
-    minYTD: String(criteria.minYTD),
-    minWeek52: String(criteria.minWeek52),
+    pbEnabled: String(criteria.pbEnabled),
     excludeSectors: criteria.excludeSectors.join(','),
+    sectorsEnabled: String(criteria.sectorsEnabled),
   });
   return `/screening?${params.toString()}`;
 }
