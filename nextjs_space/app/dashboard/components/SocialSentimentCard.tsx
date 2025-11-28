@@ -81,21 +81,30 @@ export default function SocialSentimentCard({ ticker, sentiment }: SocialSentime
         </Box>
 
         {/* Pie Chart */}
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
           <PieChart
             series={[
               {
                 data,
                 innerRadius: 80,
-                outerRadius: 120,
+                outerRadius: 140,
                 paddingAngle: 2,
                 cornerRadius: 4,
               },
             ]}
-            width={300}
-            height={250}
+            width={380}
+            height={300}
             slotProps={{
-              legend: { hidden: true },
+              legend: { 
+                hidden: false,
+                direction: 'row',
+                position: { vertical: 'top', horizontal: 'middle' },
+                padding: 0,
+                itemMarkWidth: 14,
+                itemMarkHeight: 14,
+                markGap: 10,
+                itemGap: 20,
+              },
             }}
           />
         </Box>
