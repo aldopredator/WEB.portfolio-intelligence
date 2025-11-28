@@ -56,17 +56,23 @@ export function DashboardLayoutCRUD({
             overflowX: 'auto',
             overflowY: 'auto',
             '&::-webkit-scrollbar': {
-              height: '8px',
+              height: '20px',
+              width: '20px',
             },
             '&::-webkit-scrollbar-track': {
-              backgroundColor: 'rgba(0,0,0,0.1)',
+              backgroundColor: '#f1f1f1',
+              border: '1px solid #ddd',
             },
             '&::-webkit-scrollbar-thumb': {
-              backgroundColor: 'rgba(0,0,0,0.3)',
-              borderRadius: '4px',
+              backgroundColor: '#888',
+              border: '2px solid #f1f1f1',
+              borderRadius: '2px',
               '&:hover': {
-                backgroundColor: 'rgba(0,0,0,0.5)',
+                backgroundColor: '#555',
               },
+            },
+            '&::-webkit-scrollbar-corner': {
+              backgroundColor: '#f1f1f1',
             },
           }}
         >
