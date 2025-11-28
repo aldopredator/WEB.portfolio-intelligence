@@ -141,7 +141,7 @@ export default function EarningsCalendarCard({ ticker, earnings = [] }: Earnings
                               : 'text.primary',
                         }}
                       >
-                        ${(nextEarnings.revenueActual / 1e9).toFixed(2)}B
+                        ${(nextEarnings.revenueActual / 1e9).toFixed(1)}B
                       </Typography>
                     </Box>
                   )}
@@ -151,7 +151,7 @@ export default function EarningsCalendarCard({ ticker, earnings = [] }: Earnings
                         Estimate
                       </Typography>
                       <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                        ${(nextEarnings.revenueEstimate / 1e9).toFixed(2)}B
+                        ${(nextEarnings.revenueEstimate / 1e9).toFixed(1)}B
                       </Typography>
                     </Box>
                   )}
