@@ -108,8 +108,8 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
           gap: 2,
         }}
       >
-        {/* Block 1: Price Chart and Recommendation Trends */}
-        <Stack spacing={2}>
+        {/* Block 1: Price Chart */}
+        <Box>
           {/* Price History Chart with 52 Week Range */}
           {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
             <PriceHistoryChart
@@ -122,15 +122,7 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               weekHigh52={stock['52_week_high']}
             />
           )}
-
-          {/* Recommendation Trends */}
-          {stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0 && (
-            <RecommendationTrendsCard
-              ticker={selectedStock}
-              trends={stockEntry.recommendation_trends}
-            />
-          )}
-        </Stack>
+        </Box>
 
         {/* Block 2: Stock Details (middle column) */}
         <Box>
@@ -166,15 +158,38 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
         </Stack>
       </Box>
 
-      {/* Earnings Surprises Section */}
-      {stockEntry.earnings_surprises && stockEntry.earnings_surprises.length > 0 && (
+      {/* Earnings Surprises and Recommendation Trends Section */}
+      {(stockEntry.earnings_surprises && stockEntry.earnings_surprises.length > 0) ||
+        (stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0) ? (
         <Box sx={{ mt: 3 }}>
-          <EarningsSurprisesCard
-            ticker={selectedStock}
-            surprises={stockEntry.earnings_surprises}
-          />
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                lg: 'repeat(2, 1fr)',
+              },
+              gap: 2,
+            }}
+          >
+            {/* Earnings Surprises */}
+            {stockEntry.earnings_surprises && stockEntry.earnings_surprises.length > 0 && (
+              <EarningsSurprisesCard
+                ticker={selectedStock}
+                surprises={stockEntry.earnings_surprises}
+              />
+            )}
+
+            {/* Recommendation Trends */}
+            {stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0 && (
+              <RecommendationTrendsCard
+                ticker={selectedStock}
+                trends={stockEntry.recommendation_trends}
+              />
+            )}
+          </Box>
         </Box>
-      )}
+      ) : null}
     </Box>
   );
 }
