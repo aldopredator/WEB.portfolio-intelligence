@@ -119,17 +119,17 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
 
         {/* Block 3: Social Sentiment and Pros & Cons */}
         <Stack spacing={2}>
+          {/* Social Sentiment */}
+          <SocialSentimentCard
+            ticker={selectedStock}
+            sentiment={stockEntry.social_sentiment}
+          />
+
           {/* Pros & Cons */}
           <ProsConsCard
             ticker={selectedStock}
             pros={stockEntry.pros}
             cons={stockEntry.cons}
-          />
-
-          {/* Social Sentiment */}
-          <SocialSentimentCard
-            ticker={selectedStock}
-            sentiment={stockEntry.social_sentiment}
           />
         </Stack>
       </Box>
