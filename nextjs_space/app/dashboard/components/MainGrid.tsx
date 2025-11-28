@@ -101,13 +101,13 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
         </Box>
       )}
 
-      {/* Two Column Layout: Price Chart and Social Sentiment */}
+      {/* Two Column Layout: Price Chart (larger) and Social Sentiment (smaller) */}
       <Box
         sx={{
           display: 'grid',
           gridTemplateColumns: {
             xs: '1fr',
-            lg: 'repeat(2, 1fr)',
+            lg: '2fr 1fr',
           },
           gap: 2,
         }}
