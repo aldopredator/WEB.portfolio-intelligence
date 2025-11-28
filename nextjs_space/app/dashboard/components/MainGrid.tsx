@@ -57,12 +57,9 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
         {companyNameMap[selectedStock] || selectedStock} ({selectedStock})
       </Typography>
 
-      {/* Additional Information Section - Company Info + Earnings Calendar */}
+      {/* Top row: Company Info and Earnings Calendar */}
       {(stockEntry.company_profile || (stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0)) && (
         <Box sx={{ mb: 3 }}>
-          <Typography component="h3" variant="h6" sx={{ mb: 2 }}>
-            Additional Information
-          </Typography>
           <Box
             sx={{
               display: 'grid',

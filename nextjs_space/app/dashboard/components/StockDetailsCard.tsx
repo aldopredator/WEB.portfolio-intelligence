@@ -38,7 +38,6 @@ export default function StockDetailsCard({
     { label: 'P/E Ratio', value: peRatio?.toFixed(2) || 'N/A' },
     { label: 'P/B Ratio', value: pbRatio?.toFixed(2) || 'N/A' },
     { label: 'Beta', value: beta?.toFixed(2) || 'N/A' },
-    { label: '10-Day Avg Vol', value: averageVolume10Day ? `${(averageVolume10Day / 1e6).toFixed(2)}M` : 'N/A' },
   ];
 
   const profitabilityMetrics = [
@@ -47,7 +46,6 @@ export default function StockDetailsCard({
   ];
 
   const financialHealthMetrics = [
-    { label: 'D/E Ratio', value: debtToEquity?.toFixed(2) || 'N/A' },
     { label: 'Dividend Yield', value: dividendYield ? `${dividendYield.toFixed(2)}%` : 'N/A%' },
   ];
 
@@ -55,7 +53,7 @@ export default function StockDetailsCard({
     <Card sx={{ height: '100%' }}>
       <CardContent>
         <Typography component="h2" variant="h6" sx={{ mb: 3, fontSize: '1.5rem', fontWeight: 700 }}>
-          Stock Details
+          Stock Fundamentals
         </Typography>
 
         {/* Valuation Pillar */}

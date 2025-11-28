@@ -24,8 +24,8 @@ interface RecommendationTrendsCardProps {
 }
 
 export default function RecommendationTrendsCard({ ticker, trends = [] }: RecommendationTrendsCardProps) {
-  // Show the 3 most recent periods
-  const recentTrends = trends.slice(0, 3);
+  // Show the 3 most recent periods, reversed to show oldest first (chronological)
+  const recentTrends = trends.slice(0, 3).reverse();
 
   const periods = recentTrends.map(t => t.period);
   const strongBuyData = recentTrends.map(t => t.strongBuy);
@@ -46,9 +46,6 @@ export default function RecommendationTrendsCard({ ticker, trends = [] }: Recomm
 
         {recentTrends.length > 0 ? (
           <>
-            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 2 }}>
-              Analyst recommendations over time
-            </Typography>
             <Box sx={{ width: '100%', height: 250 }}>
               <BarChart
                 xAxis={[

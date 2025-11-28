@@ -92,9 +92,6 @@ export default function PriceHistoryChart({
               label={`${isPositive ? '+' : ''}${priceChangePercent.toFixed(2)}%`}
             />
           </Stack>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            Last 30 days price movement
-          </Typography>
         </Stack>
 
         {/* 52 Week Range Section */}
@@ -108,9 +105,10 @@ export default function PriceHistoryChart({
               p: 2,
               backgroundColor: 'action.hover',
               borderRadius: 1,
+              justifyContent: 'center',
             }}
           >
-            <Stack flex={1}>
+            <Stack alignItems="center">
               <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                 52 Week Range
               </Typography>
@@ -149,6 +147,9 @@ export default function PriceHistoryChart({
           ]}
           height={250}
           margin={{ left: 50, right: 20, top: 20, bottom: 20 }}
+          slotProps={{
+            legend: { hidden: true },
+          }}
           sx={{
             '& .MuiAreaElement-series-price': {
               fill: "url('#price-gradient')",
