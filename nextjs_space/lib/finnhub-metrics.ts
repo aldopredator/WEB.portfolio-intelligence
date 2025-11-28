@@ -82,7 +82,7 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
         // Valuation metrics
         result.pe_ratio = metrics.peBasicExclExtraTTM || metrics.peBasic ? parseFloat(metrics.peBasicExclExtraTTM || metrics.peBasic) : undefined;
         result.pb_ratio = metrics.pbQuarterly || metrics.pbAnnual ? parseFloat(metrics.pbQuarterly || metrics.pbAnnual) : undefined;
-        result.ps_ratio = metrics.psQuarterly || metrics.psAnnual ? parseFloat(metrics.psQuarterly || metrics.psAnnual) : undefined;
+        result.ps_ratio = metrics.psTTM || metrics.psQuarterly ? parseFloat(metrics.psTTM || metrics.psQuarterly) : undefined;
         result.pcf_ratio = metrics.pcfShareQuarterly || metrics.pcfShareAnnual ? parseFloat(metrics.pcfShareQuarterly || metrics.pcfShareAnnual) : undefined;
 
         // Profitability metrics (convert decimals to percentages)

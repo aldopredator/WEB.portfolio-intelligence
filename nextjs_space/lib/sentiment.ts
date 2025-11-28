@@ -89,13 +89,7 @@ export async function fetchAndScoreSentiment(ticker: string, companyName?: strin
       }
     }
 
-    // If no articles from API, try fallbackArticles (from static JSON)
-    if ((!articles || articles.length === 0) && Array.isArray(fallbackArticles) && fallbackArticles.length > 0) {
-      // Expect fallback articles to have title/summary fields; adapt if different
-      articles = fallbackArticles.slice(0, 10).map((a: any) => ({ title: a.title || a.headline || a.summary || '', description: a.description || a.summary || '' }));
-      console.log(`[SENTIMENT] ${ticker} - Using ${articles.length} fallback articles from static data`);
-    }
-
+    // No fallback to static data - we only want real-time sentiment
     if (!articles || articles.length === 0) {
       console.warn(`[SENTIMENT] ${ticker} - No articles found for sentiment analysis`);
       return null;
