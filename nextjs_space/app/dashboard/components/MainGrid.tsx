@@ -140,34 +140,26 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
           />
         </Box>
 
-        {/* Block 3: Social Sentiment and Market News */}
-        <Stack spacing={2}>
-          {/* Social Sentiment */}
+        {/* Block 3: Social Sentiment */}
+        <Box>
           <SocialSentimentCard
             ticker={selectedStock}
             sentiment={stockEntry.social_sentiment}
           />
-
-          {/* Market News */}
-          {stockEntry.latest_news && stockEntry.latest_news.length > 0 && (
-            <MarketNewsCard
-              ticker={selectedStock}
-              articles={stockEntry.latest_news}
-            />
-          )}
-        </Stack>
+        </Box>
       </Box>
 
-      {/* Earnings Surprises and Recommendation Trends Section */}
+      {/* Earnings Surprises, Recommendation Trends, and Market News Section */}
       {(stockEntry.earnings_surprises && stockEntry.earnings_surprises.length > 0) ||
-        (stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0) ? (
+        (stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0) ||
+        (stockEntry.latest_news && stockEntry.latest_news.length > 0) ? (
         <Box sx={{ mt: 3 }}>
           <Box
             sx={{
               display: 'grid',
               gridTemplateColumns: {
                 xs: '1fr',
-                lg: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
               },
               gap: 2,
             }}
@@ -185,6 +177,14 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               <RecommendationTrendsCard
                 ticker={selectedStock}
                 trends={stockEntry.recommendation_trends}
+              />
+            )}
+
+            {/* Market News */}
+            {stockEntry.latest_news && stockEntry.latest_news.length > 0 && (
+              <MarketNewsCard
+                ticker={selectedStock}
+                articles={stockEntry.latest_news}
               />
             )}
           </Box>
