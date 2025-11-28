@@ -133,7 +133,6 @@ async function getStockData(): Promise<StockInsightsData> {
   }
 }
 
-
 export default async function Home() {
   const stockData = await getStockData();
 
