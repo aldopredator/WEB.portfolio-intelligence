@@ -145,7 +145,7 @@ export default function PriceHistoryChart({
               data: prices,
             },
           ]}
-          height={250}
+          height={300}
           margin={{ left: 50, right: 20, top: 20, bottom: 20 }}
           slotProps={{
             legend: { hidden: true },
