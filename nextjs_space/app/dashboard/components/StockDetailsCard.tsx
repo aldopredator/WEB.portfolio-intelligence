@@ -47,7 +47,7 @@ export default function StockDetailsCard({
   return (
     <Card sx={{ height: '100%' }}>
       <CardContent>
-        <Typography component="h2" variant="h6" sx={{ mb: 3, fontSize: '1.5rem', fontWeight: 700 }}>
+        <Typography component="h2" variant="h6" sx={{ mb: 3, fontSize: '1.25rem', fontWeight: 700 }}>
           Stock Fundamentals
         </Typography>
 

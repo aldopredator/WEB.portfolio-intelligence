@@ -6,7 +6,7 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import { PieChart } from '@mui/x-charts/PieChart';
 
 interface SocialSentimentCardProps {
@@ -39,11 +39,11 @@ export default function SocialSentimentCard({ ticker, sentiment }: SocialSentime
   return (
     <Card sx={{ height: '100%' }}>
       <CardContent>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
+          <SentimentSatisfiedAltIcon sx={{ color: 'warning.main' }} />
           <Typography component="h2" variant="h6" sx={{ fontSize: '1.25rem', fontWeight: 700 }}>
             Social Sentiment
           </Typography>
-          <FavoriteIcon sx={{ color: 'error.main', cursor: 'pointer' }} />
         </Stack>
 
         {/* Pie Chart */}

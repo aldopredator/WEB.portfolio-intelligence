@@ -39,7 +39,7 @@ export default function RecommendationTrendsCard({ ticker, trends = [] }: Recomm
       <CardContent>
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
           <TrendingUpIcon sx={{ color: 'primary.main' }} />
-          <Typography component="h2" variant="h6" sx={{ fontWeight: 700 }}>
+          <Typography component="h2" variant="h6" sx={{ fontSize: '1.25rem', fontWeight: 700 }}>
             Recommendation Trends
           </Typography>
         </Stack>

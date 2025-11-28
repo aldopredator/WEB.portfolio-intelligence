@@ -9,6 +9,7 @@ import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import CelebrationIcon from '@mui/icons-material/Celebration';
 
 interface EarningsSurprise {
   actual?: number;
@@ -35,9 +36,12 @@ export default function EarningsSurprisesCard({
   return (
     <Card variant="outlined" sx={{ height: '100%' }}>
       <CardContent>
-        <Typography component="h2" variant="h6" sx={{ mb: 3, fontWeight: 700 }}>
-          Earnings Surprises
-        </Typography>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
+          <CelebrationIcon sx={{ color: 'success.main' }} />
+          <Typography component="h2" variant="h6" sx={{ fontSize: '1.25rem', fontWeight: 700 }}>
+            Earnings Surprises
+          </Typography>
+        </Stack>
 
         {recentSurprises.length === 0 ? (
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>

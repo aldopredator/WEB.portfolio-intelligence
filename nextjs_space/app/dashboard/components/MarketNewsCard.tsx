@@ -32,7 +32,7 @@ export default function MarketNewsCard({ ticker, articles = [] }: MarketNewsCard
       <CardContent>
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
           <NewspaperIcon sx={{ color: 'primary.main' }} />
-          <Typography component="h2" variant="h6" sx={{ fontWeight: 700 }}>
+          <Typography component="h2" variant="h6" sx={{ fontSize: '1.25rem', fontWeight: 700 }}>
             Market News
           </Typography>
         </Stack>
