@@ -14,9 +14,10 @@ import { fetchAndScoreSentiment } from '@/lib/sentiment';
 import { fetchFinnhubMetrics } from '@/lib/finnhub-metrics';
 import { isRecord } from '@/lib/utils';
 
-// Force dynamic rendering so prices are fetched at runtime, not build time
-export const dynamic = 'force-dynamic';
-export const revalidate = 1800; // Revalidate every 30 minutes (1800 seconds)
+// Use ISR (Incremental Static Regeneration) with 30-day revalidation
+// This allows Next.js to cache the page and data fetches, respecting individual fetch cache times
+// Financial metrics are cached for 30 days at the fetch level
+export const revalidate = 2592000; // 30 days - aligns with quarterly financial reporting
 
 // Stock configuration - must be defined before getStockData
 const STOCK_CONFIG = [
