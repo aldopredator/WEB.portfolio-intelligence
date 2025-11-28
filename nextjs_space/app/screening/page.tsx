@@ -1,69 +1,48 @@
 import { TrendingUp, CheckCircle2, Filter, Info, AlertTriangle } from 'lucide-react';
 import { PageHeader } from '@/components/page-header';
+import { getStockData, STOCK_CONFIG } from '@/lib/stock-data';
 
-export default function ScreeningPage() {
-  const recommendedStocks = [
-    {
-      ticker: 'GOOG',
-      name: 'Alphabet Inc.',
-      sector: 'Technology',
-      pe: 18.5,
-      ytd: '+28.3%',
-      week52: '+35.2%',
-      pb: 2.8,
-      matchScore: 100,
-    },
-    {
-      ticker: 'NVDA',
-      name: 'Nvidia Corporation',
-      sector: 'Technology',
-      pe: 19.2,
-      ytd: '+156.4%',
-      week52: '+185.7%',
-      pb: 2.5,
-      matchScore: 100,
-    },
-    {
-      ticker: 'TSLA',
-      name: 'Tesla, Inc.',
-      sector: 'Consumer Cyclical',
-      pe: 17.8,
-      ytd: '+42.9%',
-      week52: '+28.5%',
-      pb: 2.9,
-      matchScore: 100,
-    },
-    {
-      ticker: 'AMZN',
-      name: 'Amazon.com Inc.',
-      sector: 'Consumer Cyclical',
-      pe: 16.3,
-      ytd: '+38.7%',
-      week52: '+42.1%',
-      pb: 2.3,
-      matchScore: 100,
-    },
-    {
-      ticker: 'BRKB',
-      name: 'Berkshire Hathaway Inc.',
-      sector: 'Financial Services',
-      pe: 15.7,
-      ytd: '+25.6%',
-      week52: '+31.8%',
-      pb: 1.8,
-      matchScore: 100,
-    },
-    {
-      ticker: 'ISRG',
-      name: 'Intuitive Surgical Inc.',
-      sector: 'Healthcare',
-      pe: 18.9,
-      ytd: '+52.3%',
-      week52: '+68.9%',
-      pb: 2.7,
-      matchScore: 100,
-    },
-  ];
+export const revalidate = 1800; // 30 minutes
+
+export default async function ScreeningPage() {
+  // Fetch real stock data
+  const stockData = await getStockData();
+  
+  // Build screening results from real data
+  const recommendedStocks = STOCK_CONFIG.map((config) => {
+    const data = stockData[config.ticker];
+    const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
+    
+    if (!stockInfo) {
+      return null;
+    }
+
+    // Calculate returns (if price history available)
+    let ytdReturn = 'N/A';
+    let week52Return = 'N/A';
+    
+    if (stockInfo.change_percent !== undefined) {
+      ytdReturn = `${stockInfo.change_percent >= 0 ? '+' : ''}${stockInfo.change_percent.toFixed(1)}%`;
+    }
+    
+    if (stockInfo['52_week_high'] && stockInfo['52_week_low'] && stockInfo.current_price) {
+      const weekRange = stockInfo['52_week_high'] - stockInfo['52_week_low'];
+      const currentFromLow = stockInfo.current_price - stockInfo['52_week_low'];
+      const week52Pct = (currentFromLow / stockInfo['52_week_low']) * 100;
+      week52Return = `${week52Pct >= 0 ? '+' : ''}${week52Pct.toFixed(1)}%`;
+    }
+
+    return {
+      ticker: config.ticker,
+      name: config.name,
+      sector: config.sector,
+      pe: stockInfo.pe_ratio?.toFixed(2) || 'N/A',
+      ytd: ytdReturn,
+      week52: week52Return,
+      pb: stockInfo.pb_ratio?.toFixed(2) || 'N/A',
+      matchScore: 100, // You can implement actual screening logic here
+    };
+  }).filter((stock): stock is NonNullable<typeof stock> => stock !== null); // Remove null entries and fix TypeScript
 
   return (
     <main className="min-h-screen">
