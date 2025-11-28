@@ -111,13 +111,6 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
             sentiment={stockEntry.social_sentiment}
           />
 
-          {/* Pros & Cons */}
-          <ProsConsCard
-            ticker={selectedStock}
-            pros={stockEntry.pros}
-            cons={stockEntry.cons}
-          />
-
           {/* Stock Details with Market Cap */}
           <StockDetailsCard
             ticker={selectedStock}
@@ -128,6 +121,13 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
             pbRatio={(stockEntry as any).pb_ratio}
             debtToEquity={(stockEntry as any).debt_to_equity}
             dividendYield={(stockEntry as any).dividend_yield}
+          />
+
+          {/* Pros & Cons */}
+          <ProsConsCard
+            ticker={selectedStock}
+            pros={stockEntry.pros}
+            cons={stockEntry.cons}
           />
         </Stack>
       </Box>
