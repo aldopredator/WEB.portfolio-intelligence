@@ -8,12 +8,10 @@ import Typography from '@mui/material/Typography';
 import StatCard, { StatCardProps } from './StatCard';
 import PriceHistoryChart from './PriceHistoryChart';
 import StockDetailsCard from './StockDetailsCard';
-import ProsConsCard from './ProsConsCard';
 import SocialSentimentCard from './SocialSentimentCard';
 import CompanyInfoCard from './CompanyInfoCard';
 import MarketNewsCard from './MarketNewsCard';
 import RecommendationTrendsCard from './RecommendationTrendsCard';
-import PriceTargetCard from './PriceTargetCard';
 import EarningsCalendarCard from './EarningsCalendarCard';
 import type { StockInsightsData } from '@/lib/types';
 
@@ -67,6 +65,23 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
         {companyNameMap[selectedStock] || selectedStock} ({selectedStock})
       </Typography>
+
+      {/* Additional Information Section - Company Info */}
+      {stockEntry.company_profile && (
+        <Box sx={{ mb: 3 }}>
+          <Typography component="h3" variant="h6" sx={{ mb: 2 }}>
+            Additional Information
+          </Typography>
+          <CompanyInfoCard
+            ticker={selectedStock}
+            companyName={stockEntry.company_profile.name}
+            logo={stockEntry.company_profile.logo}
+            industry={stockEntry.company_profile.industry}
+            sector={stockEntry.company_profile.sector}
+            subSector={stockEntry.company_profile.subSector}
+          />
+        </Box>
+      )}
 
       {/* Three Column Layout: Equal widths */}
       <Box
@@ -122,63 +137,13 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
           />
         </Box>
 
-        {/* Block 3: Social Sentiment and Pros & Cons */}
+        {/* Block 3: Social Sentiment and Market News */}
         <Stack spacing={2}>
           {/* Social Sentiment */}
           <SocialSentimentCard
             ticker={selectedStock}
             sentiment={stockEntry.social_sentiment}
           />
-
-          {/* Pros & Cons */}
-          <ProsConsCard
-            ticker={selectedStock}
-            pros={stockEntry.pros}
-            cons={stockEntry.cons}
-          />
-        </Stack>
-      </Box>
-
-      {/* Additional Information Section */}
-      <Box sx={{ mt: 3 }}>
-        <Typography component="h3" variant="h6" sx={{ mb: 2 }}>
-          Additional Information
-        </Typography>
-
-        {/* Two Column Layout for Additional Info */}
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              lg: 'repeat(2, 1fr)',
-            },
-            gap: 2,
-          }}
-        >
-          {/* Company Info */}
-          {stockEntry.company_profile && (
-            <CompanyInfoCard
-              ticker={selectedStock}
-              companyName={stockEntry.company_profile.name}
-              logo={stockEntry.company_profile.logo}
-              industry={stockEntry.company_profile.industry}
-              sector={stockEntry.company_profile.sector}
-              subSector={stockEntry.company_profile.subSector}
-            />
-          )}
-
-          {/* Price Target */}
-          {stockEntry.price_target && (
-            <PriceTargetCard
-              ticker={selectedStock}
-              currentPrice={stock.current_price || 0}
-              targetHigh={stockEntry.price_target.targetHigh}
-              targetLow={stockEntry.price_target.targetLow}
-              targetMean={stockEntry.price_target.targetMean}
-              targetMedian={stockEntry.price_target.targetMedian}
-            />
-          )}
 
           {/* Market News */}
           {stockEntry.latest_news && stockEntry.latest_news.length > 0 && (
@@ -187,26 +152,41 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               articles={stockEntry.latest_news}
             />
           )}
-
-          {/* Earnings Calendar */}
-          {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
-            <EarningsCalendarCard
-              ticker={selectedStock}
-              earnings={stockEntry.earnings_calendar}
-            />
-          )}
-        </Box>
-
-        {/* Full Width for Recommendation Trends */}
-        {stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0 && (
-          <Box sx={{ mt: 2 }}>
-            <RecommendationTrendsCard
-              ticker={selectedStock}
-              trends={stockEntry.recommendation_trends}
-            />
-          </Box>
-        )}
+        </Stack>
       </Box>
+
+      {/* Earnings and Recommendation Trends Section */}
+      {((stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0) ||
+        (stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0)) && (
+        <Box sx={{ mt: 3 }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                lg: 'repeat(2, 1fr)',
+              },
+              gap: 2,
+            }}
+          >
+            {/* Earnings Calendar */}
+            {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
+              <EarningsCalendarCard
+                ticker={selectedStock}
+                earnings={stockEntry.earnings_calendar}
+              />
+            )}
+
+            {/* Recommendation Trends */}
+            {stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0 && (
+              <RecommendationTrendsCard
+                ticker={selectedStock}
+                trends={stockEntry.recommendation_trends}
+              />
+            )}
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 }
