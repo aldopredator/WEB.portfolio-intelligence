@@ -34,7 +34,6 @@ export default function StockDetailsCard({
   averageVolume10Day,
 }: StockDetailsCardProps) {
   const valuationMetrics = [
-    { label: 'Market Cap', value: marketCap ? `$${(marketCap / 1e9).toFixed(2)}B` : 'N/A' },
     { label: 'P/E Ratio', value: peRatio?.toFixed(2) || 'N/A' },
     { label: 'P/B Ratio', value: pbRatio?.toFixed(2) || 'N/A' },
     { label: 'Beta', value: beta?.toFixed(2) || 'N/A' },
