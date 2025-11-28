@@ -5,7 +5,6 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import StatCard, { StatCardProps } from './StatCard';
 import PriceHistoryChart from './PriceHistoryChart';
 import StockDetailsCard from './StockDetailsCard';
 import SocialSentimentCard from './SocialSentimentCard';
@@ -32,16 +31,7 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
     return <Typography>Stock data not available</Typography>;
   }
 
-  // Generate stat cards data - only Volume now
-  const statCards: StatCardProps[] = [
-    {
-      title: 'Volume',
-      value: `${((stock.volume || 0) / 1e6).toFixed(2)}M`,
-      interval: 'Today',
-      trend: 'up',
-      data: Array.from({ length: 15 }, (_, i) => (stock.volume || 0) / 1e6 + Math.random() * 5),
-    },
-  ];
+
 
   // Get company name from stock config
   const companyNameMap: Record<string, string> = {
@@ -94,7 +84,7 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
           gap: 2,
         }}
       >
-        {/* Block 1: Price Chart and Volume */}
+        {/* Block 1: Price Chart and Recommendation Trends */}
         <Stack spacing={2}>
           {/* Price History Chart with 52 Week Range */}
           {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
@@ -109,18 +99,13 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
             />
           )}
 
-          {/* Volume Card */}
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: '1fr',
-              gap: 2,
-            }}
-          >
-            {statCards.map((card, index) => (
-              <StatCard key={index} {...card} />
-            ))}
-          </Box>
+          {/* Recommendation Trends */}
+          {stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0 && (
+            <RecommendationTrendsCard
+              ticker={selectedStock}
+              trends={stockEntry.recommendation_trends}
+            />
+          )}
         </Stack>
 
         {/* Block 2: Stock Details (middle column) */}
@@ -155,36 +140,13 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
         </Stack>
       </Box>
 
-      {/* Earnings and Recommendation Trends Section */}
-      {((stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0) ||
-        (stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0)) && (
+      {/* Earnings Calendar Section */}
+      {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
         <Box sx={{ mt: 3 }}>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: '1fr',
-                lg: 'repeat(2, 1fr)',
-              },
-              gap: 2,
-            }}
-          >
-            {/* Earnings Calendar */}
-            {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
-              <EarningsCalendarCard
-                ticker={selectedStock}
-                earnings={stockEntry.earnings_calendar}
-              />
-            )}
-
-            {/* Recommendation Trends */}
-            {stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0 && (
-              <RecommendationTrendsCard
-                ticker={selectedStock}
-                trends={stockEntry.recommendation_trends}
-              />
-            )}
-          </Box>
+          <EarningsCalendarCard
+            ticker={selectedStock}
+            earnings={stockEntry.earnings_calendar}
+          />
         </Box>
       )}
     </Box>
