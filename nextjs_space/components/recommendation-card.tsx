@@ -9,6 +9,11 @@ interface RecommendationCardProps {
 }
 
 export function RecommendationCard({ stock, ticker }: RecommendationCardProps) {
+  const targetPrice = stock?.analyst_recommendations?.target_price ?? 0;
+
+  // If we don't have a real target price, we can't make a valid recommendation
+  if (targetPrice <= 0) return null;
+
   const rec = calculateRecommendation(stock ?? {} as StockInfo);
 
   const config = {

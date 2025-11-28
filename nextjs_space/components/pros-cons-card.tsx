@@ -7,6 +7,11 @@ interface ProsConsCardProps {
 }
 
 export function ProsConsCard({ pros, cons, ticker }: ProsConsCardProps) {
+  const hasPros = (pros ?? [])?.length > 0;
+  const hasCons = (cons ?? [])?.length > 0;
+
+  if (!hasPros && !hasCons) return null;
+
   return (
     <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
       <div className="flex items-start justify-between mb-6">
@@ -14,10 +19,7 @@ export function ProsConsCard({ pros, cons, ticker }: ProsConsCardProps) {
           <h3 className="text-xl font-bold text-white mb-1">Pros & Cons</h3>
           <p className="text-slate-400 text-sm">Key factors for {ticker ?? 'stock'}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded border border-amber-500/30">Not Real-Time</span>
-          <Sparkles className="w-6 h-6 text-purple-400" />
-        </div>
+        <Sparkles className="w-6 h-6 text-purple-400" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -26,7 +28,7 @@ export function ProsConsCard({ pros, cons, ticker }: ProsConsCardProps) {
           <h4 className="text-emerald-400 font-semibold flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4" /> Pros
           </h4>
-          {(pros ?? [])?.length > 0 ? (
+          {hasPros ? (
             pros?.map?.((pro, index) => (
               <div
                 key={`pro-${index}`}
@@ -45,7 +47,7 @@ export function ProsConsCard({ pros, cons, ticker }: ProsConsCardProps) {
           <h4 className="text-rose-400 font-semibold flex items-center gap-2">
             <XCircle className="w-4 h-4" /> Cons
           </h4>
-          {(cons ?? [])?.length > 0 ? (
+          {hasCons ? (
             cons?.map?.((con, index) => (
               <div
                 key={`con-${index}`}

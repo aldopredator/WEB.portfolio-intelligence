@@ -27,7 +27,7 @@ const STOCK_CONFIG = [
   { ticker: 'BRKB', name: 'Berkshire Hathaway Inc. (BRKB)', color: 'bg-slate-600', letter: 'B' },
   { ticker: 'ISRG', name: 'Intuitive Surgical Inc. (ISRG)', color: 'bg-indigo-500', letter: 'I' },
   { ticker: 'NFLX', name: 'Netflix Inc. (NFLX)', color: 'bg-red-700', letter: 'N' },
-  
+
   { ticker: 'IDXX', name: 'IDEXX Laboratories Inc. (IDXX)', color: 'bg-yellow-600', letter: 'I' },
   { ticker: 'III', name: '3i Group plc (III)', color: 'bg-sky-600', letter: '3' },
   { ticker: 'PLTR', name: 'Palantir Technologies Inc. (PLTR)', color: 'bg-stone-500', letter: 'P' },
@@ -64,10 +64,10 @@ async function getStockData(): Promise<StockInsightsData> {
               change_percent: realTimePrices[ticker].change_percent,
               '52_week_high': realTimePrices[ticker]['52_week_high'],
               '52_week_low': realTimePrices[ticker]['52_week_low'],
-                    price_movement_30_days: realTimePrices[ticker].price_history,
-                    market_cap: realTimePrices[ticker].market_cap ?? stockInfo.stock_data?.market_cap,
-                    volume: realTimePrices[ticker].volume ?? stockInfo.stock_data?.volume,
-                    currency: realTimePrices[ticker].currency ?? stockInfo.stock_data?.currency,
+              price_movement_30_days: realTimePrices[ticker].price_history,
+              market_cap: realTimePrices[ticker].market_cap ?? stockInfo.stock_data?.market_cap,
+              volume: realTimePrices[ticker].volume ?? stockInfo.stock_data?.volume,
+              currency: realTimePrices[ticker].currency ?? stockInfo.stock_data?.currency,
             };
 
             // Update target price if available
@@ -98,10 +98,10 @@ async function getStockData(): Promise<StockInsightsData> {
             const cfg = STOCK_CONFIG.find(c => c.ticker === ticker);
             const companyName = cfg?.name;
             const stockEntry = mergedData[ticker];
-            
+
             // Fetch sentiment
-            const fallbackArticles = isRecord(stockEntry) && 'latest_news' in stockEntry ? (stockEntry as any).latest_news : [];
-            const sentiment = await fetchAndScoreSentiment(ticker, companyName, fallbackArticles as any[]);
+            // We pass empty array for fallback to ensure we only use real-time news
+            const sentiment = await fetchAndScoreSentiment(ticker, companyName, []);
             if (sentiment && isRecord(stockEntry)) {
               stockEntry.social_sentiment = sentiment as any;
             }
@@ -188,8 +188,8 @@ export default async function Home() {
             <div key={config.ticker} className={index > 0 ? "mt-16" : ""}>
               <div className="flex items-center gap-3 mb-6">
                 <div className={`w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center`}>
-                        <img src={`/logos/${config.ticker}.svg`} alt={`${config.ticker} logo`} className="w-10 h-10 object-cover" />
-                      </div>
+                  <img src={`/logos/${config.ticker}.svg`} alt={`${config.ticker} logo`} className="w-10 h-10 object-cover" />
+                </div>
                 <h2 className="text-3xl font-bold text-white">{config.name}</h2>
               </div>
 

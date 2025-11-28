@@ -20,6 +20,11 @@ export function SentimentCard({ sentiment, ticker }: SentimentCardProps) {
 
   const overall = getOverallSentiment(sentiment ?? { positive: 0, neutral: 0, negative: 0 });
 
+  // If no sentiment data (all zeros), don't show the card
+  if (!sentiment || (sentiment.positive === 0 && sentiment.neutral === 0 && sentiment.negative === 0)) {
+    return null;
+  }
+
   return (
     <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
       <div className="flex items-start justify-between mb-4">
@@ -33,8 +38,8 @@ export function SentimentCard({ sentiment, ticker }: SentimentCardProps) {
       <div className="bg-slate-800/50 rounded-lg p-4 mb-6 border border-slate-700">
         <p className="text-slate-400 text-sm mb-2">Overall Sentiment</p>
         <div className="flex items-center gap-3">
-          <div 
-            className="w-4 h-4 rounded-full" 
+          <div
+            className="w-4 h-4 rounded-full"
             style={{ backgroundColor: overall?.color ?? '#6b7280' }}
           />
           <p className="text-white font-bold text-2xl">{overall?.label ?? 'Unknown'}</p>
@@ -57,16 +62,16 @@ export function SentimentCard({ sentiment, ticker }: SentimentCardProps) {
                 <Cell key={`cell-${index}`} fill={entry?.color ?? '#6b7280'} />
               )) ?? null}
             </Pie>
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#1e293b', 
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1e293b',
                 border: '1px solid #334155',
                 borderRadius: '8px',
                 fontSize: 11
               }}
               formatter={(value: any) => `${value?.toFixed?.(1) ?? '0'}%`}
             />
-            <Legend 
+            <Legend
               verticalAlign="top"
               align="center"
               wrapperStyle={{ fontSize: 11 }}

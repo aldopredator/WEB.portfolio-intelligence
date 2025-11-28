@@ -13,7 +13,7 @@ interface AnalystCardProps {
 
 export function AnalystCard({ data, currentPrice }: AnalystCardProps) {
   const latestRec = data?.recommendations?.[0];
-  
+
   const chartData = [
     { name: 'Strong Buy', value: latestRec?.strongBuy ?? 0, color: '#10b981' },
     { name: 'Buy', value: latestRec?.buy ?? 0, color: '#34d399' },
@@ -22,8 +22,8 @@ export function AnalystCard({ data, currentPrice }: AnalystCardProps) {
     { name: 'Strong Sell', value: latestRec?.strongSell ?? 0, color: '#ef4444' },
   ]?.filter?.((item) => (item?.value ?? 0) > 0) ?? [];
 
-  const upside = currentPrice > 0 && data?.target_price 
-    ? (((data?.target_price ?? 0) - currentPrice) / currentPrice) * 100 
+  const upside = currentPrice > 0 && data?.target_price
+    ? (((data?.target_price ?? 0) - currentPrice) / currentPrice) * 100
     : 0;
 
   return (
@@ -46,34 +46,38 @@ export function AnalystCard({ data, currentPrice }: AnalystCardProps) {
             {data?.consensus?.replace?.('_', ' ') ?? 'N/A'}
           </p>
         </div>
-        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-          <p className="text-slate-400 text-sm mb-1">Price Target</p>
-          <p className="text-white font-bold text-lg">
-            {formatPrice(data?.target_price ?? 0)}
-          </p>
-        </div>
-      </div>
-
-      <div className="bg-slate-800/50 rounded-lg p-4 mb-6 border border-slate-700">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-slate-400 text-sm mb-1">Upside Potential</p>
-            <p className={`font-bold text-2xl ${upside > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {upside?.toFixed?.(1) ?? '0.0'}%
+        {(data?.target_price ?? 0) > 0 && (
+          <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+            <p className="text-slate-400 text-sm mb-1">Price Target</p>
+            <p className="text-white font-bold text-lg">
+              {formatPrice(data?.target_price ?? 0)}
             </p>
           </div>
-          <TrendingUp className={`w-8 h-8 ${upside > 0 ? 'text-emerald-400' : 'text-rose-400'}`} />
-        </div>
+        )}
       </div>
+
+      {(data?.target_price ?? 0) > 0 && (
+        <div className="bg-slate-800/50 rounded-lg p-4 mb-6 border border-slate-700">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-slate-400 text-sm mb-1">Upside Potential</p>
+              <p className={`font-bold text-2xl ${upside > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {upside?.toFixed?.(1) ?? '0.0'}%
+              </p>
+            </div>
+            <TrendingUp className={`w-8 h-8 ${upside > 0 ? 'text-emerald-400' : 'text-rose-400'}`} />
+          </div>
+        </div>
+      )}
 
       <div className="h-[200px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart 
+          <BarChart
             data={chartData}
             margin={{ top: 10, right: 10, left: 0, bottom: 40 }}
           >
-            <XAxis 
-              dataKey="name" 
+            <XAxis
+              dataKey="name"
               tickLine={false}
               tick={{ fontSize: 10, fill: '#94a3b8' }}
               angle={-45}
@@ -81,14 +85,14 @@ export function AnalystCard({ data, currentPrice }: AnalystCardProps) {
               height={60}
               stroke="#334155"
             />
-            <YAxis 
+            <YAxis
               tickLine={false}
               tick={{ fontSize: 10, fill: '#94a3b8' }}
               stroke="#334155"
             />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#1e293b', 
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1e293b',
                 border: '1px solid #334155',
                 borderRadius: '8px',
                 fontSize: 11

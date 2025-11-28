@@ -33,12 +33,33 @@ export interface StockData {
   market_cap?: number;
   volume?: number;
   currency?: string;
-  // Finnhub metrics
+  // Finnhub valuation metrics
   pe_ratio?: number;
   pb_ratio?: number;
-  debt_to_equity?: number;
+  ps_ratio?: number;
+  pcf_ratio?: number;
+  // Finnhub profitability metrics
   roe?: number;
+  roa?: number;
+  roi?: number;
+  gross_margin?: number;
+  operating_margin?: number;
+  profit_margin?: number;
+  // Finnhub financial health
+  debt_to_equity?: number;
+  current_ratio?: number;
+  quick_ratio?: number;
+  // Finnhub growth metrics
+  revenue_growth?: number;
+  earnings_growth?: number;
+  // Finnhub dividend metrics
   dividend_yield?: number;
+  payout_ratio?: number;
+  // Finnhub market data
+  beta?: number;
+  // Finnhub per share metrics
+  eps?: number;
+  book_value_per_share?: number;
 }
 
 export interface SocialSentiment {
