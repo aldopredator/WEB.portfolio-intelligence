@@ -8,6 +8,9 @@ import Typography from '@mui/material/Typography';
 import StatCard, { StatCardProps } from './StatCard';
 import PriceHistoryChart from './PriceHistoryChart';
 import MetricsBarChart from './MetricsBarChart';
+import StockDetailsCard from './StockDetailsCard';
+import ProsConsCard from './ProsConsCard';
+import SocialSentimentCard from './SocialSentimentCard';
 import type { StockInsightsData } from '@/lib/types';
 
 interface MainGridProps {
@@ -83,73 +86,70 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
         ))}
       </Box>
 
-      {/* Charts Row */}
+      {/* Two Column Layout: Charts on Left, Details on Right */}
       <Box
         sx={{
           display: 'grid',
           gridTemplateColumns: {
             xs: '1fr',
-            md: 'repeat(2, 1fr)',
+            lg: '1fr 500px',
           },
           gap: 2,
-          mb: 2,
         }}
       >
-        {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
-          <PriceHistoryChart
-            data={stock.price_movement_30_days}
-            ticker={selectedStock}
-            currentPrice={stock.current_price || 0}
-            priceChange={stock.change || 0}
-            priceChangePercent={stock.change_percent || 0}
-          />
-        )}
-        <MetricsBarChart
-          ticker={selectedStock}
-          metrics={{
-            pe_ratio: (stockEntry as any).pe_ratio,
-            pb_ratio: (stockEntry as any).pb_ratio,
-            roe: (stockEntry as any).roe,
-            profit_margin: (stockEntry as any).profit_margin,
-            debt_to_equity: (stockEntry as any).debt_to_equity,
-            dividend_yield: (stockEntry as any).dividend_yield,
-          }}
-        />
-      </Box>
+        {/* Left Column: Charts */}
+        <Stack spacing={2}>
+          {/* Price History Chart */}
+          {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
+            <PriceHistoryChart
+              data={stock.price_movement_30_days}
+              ticker={selectedStock}
+              currentPrice={stock.current_price || 0}
+              priceChange={stock.change || 0}
+              priceChangePercent={stock.change_percent || 0}
+            />
+          )}
 
-      {/* Details Section */}
-      <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-        Stock Details
-      </Typography>
-      <Box>
-        <Box sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-          <Stack spacing={2}>
-            <Stack direction="row" justifyContent="space-between">
-              <Typography variant="body2" color="text.secondary">
-                P/E Ratio
-              </Typography>
-              <Typography variant="body1" fontWeight={600}>
-                {(stockEntry as any).pe_ratio?.toFixed(2) || 'N/A'}
-              </Typography>
-            </Stack>
-            <Stack direction="row" justifyContent="space-between">
-              <Typography variant="body2" color="text.secondary">
-                ROE
-              </Typography>
-              <Typography variant="body1" fontWeight={600}>
-                {(stockEntry as any).roe?.toFixed(2) || 'N/A'}%
-              </Typography>
-            </Stack>
-            <Stack direction="row" justifyContent="space-between">
-              <Typography variant="body2" color="text.secondary">
-                Profit Margin
-              </Typography>
-              <Typography variant="body1" fontWeight={600}>
-                {(stockEntry as any).profit_margin?.toFixed(2) || 'N/A'}%
-              </Typography>
-            </Stack>
-          </Stack>
-        </Box>
+          {/* Financial Metrics Bar Chart */}
+          <MetricsBarChart
+            ticker={selectedStock}
+            metrics={{
+              pe_ratio: (stockEntry as any).pe_ratio,
+              pb_ratio: (stockEntry as any).pb_ratio,
+              roe: (stockEntry as any).roe,
+              profit_margin: (stockEntry as any).profit_margin,
+              debt_to_equity: (stockEntry as any).debt_to_equity,
+              dividend_yield: (stockEntry as any).dividend_yield,
+            }}
+          />
+        </Stack>
+
+        {/* Right Column: Stock Details, Pros & Cons, Sentiment */}
+        <Stack spacing={2}>
+          {/* Stock Details */}
+          <StockDetailsCard
+            ticker={selectedStock}
+            peRatio={(stockEntry as any).pe_ratio}
+            roe={(stockEntry as any).roe}
+            profitMargin={(stockEntry as any).profit_margin}
+            pbRatio={(stockEntry as any).pb_ratio}
+            debtToEquity={(stockEntry as any).debt_to_equity}
+            dividendYield={(stockEntry as any).dividend_yield}
+          />
+
+          {/* Pros & Cons */}
+          <ProsConsCard
+            ticker={selectedStock}
+            pros={stockEntry.pros}
+            cons={stockEntry.cons}
+          />
+
+          {/* Social Sentiment */}
+          <SocialSentimentCard
+            ticker={selectedStock}
+            sentiment={stockEntry.social_sentiment}
+          />
+        </Stack>
       </Box>
     </Box>
   );
