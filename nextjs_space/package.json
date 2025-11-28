@@ -7,13 +7,20 @@
     "start": "next start",
     "lint": "next lint",
     "diagnose": "powershell -ExecutionPolicy Bypass -File ./scripts/diagnose.ps1",
-    "clear-cache": "powershell -ExecutionPolicy Bypass -File ./scripts/clear-cache.ps1"
+    "clear-cache": "powershell -ExecutionPolicy Bypass -File ./scripts/clear-cache.ps1",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
+    "test:codegen": "playwright codegen http://localhost:3000"
   },
   "prisma": {
     "seed": "tsx --require dotenv/config scripts/seed.ts"
   },
   "devDependencies": {
     "@next/swc-wasm-nodejs": "13.5.1",
+    "@playwright/test": "^1.57.0",
     "@types/node": "20.6.2",
     "@types/react": "18.2.22",
     "@types/react-dom": "18.2.7",
@@ -23,6 +30,7 @@
     "eslint-config-next": "14.2.3",
     "eslint-plugin-prettier": "5.1.3",
     "eslint-plugin-react-hooks": "4.6.0",
+    "playwright": "^1.57.0",
     "postcss": "8.4.30",
     "prisma": "6.7.0",
     "tailwind-merge": "2.5.2",
