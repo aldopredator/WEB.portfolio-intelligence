@@ -52,7 +52,7 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
 
   return (
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
-      {/* Top row: Company Info and Earnings Calendar */}
+      {/* Top row: Additional Information, Stock Fundamentals, and Earnings Calendar */}
       {(stockEntry.company_profile || (stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0)) && (
         <Box sx={{ mb: 3 }}>
           <Box
@@ -60,7 +60,7 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               display: 'grid',
               gridTemplateColumns: {
                 xs: '1fr',
-                lg: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
               },
               gap: 2,
             }}
@@ -79,6 +79,18 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
                 weburl={stockEntry.company_profile.weburl}
               />
             )}
+            <StockDetailsCard
+              ticker={selectedStock}
+              marketCap={stock.market_cap}
+              peRatio={stock.pe_ratio}
+              roe={stock.roe}
+              profitMargin={stock.profit_margin}
+              pbRatio={stock.pb_ratio}
+              debtToEquity={stock.debt_to_equity}
+              dividendYield={stock.dividend_yield}
+              beta={stock.beta}
+              averageVolume10Day={stock.averageVolume10Day}
+            />
             {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
               <EarningsCalendarCard
                 ticker={selectedStock}
@@ -89,13 +101,13 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
         </Box>
       )}
 
-      {/* Three Column Layout: Equal widths */}
+      {/* Two Column Layout: Price Chart and Social Sentiment */}
       <Box
         sx={{
           display: 'grid',
           gridTemplateColumns: {
             xs: '1fr',
-            lg: 'repeat(3, 1fr)',
+            lg: 'repeat(2, 1fr)',
           },
           gap: 2,
         }}
@@ -116,23 +128,7 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
           )}
         </Box>
 
-        {/* Block 2: Stock Details (middle column) */}
-        <Box>
-          <StockDetailsCard
-            ticker={selectedStock}
-            marketCap={stock.market_cap}
-            peRatio={stock.pe_ratio}
-            roe={stock.roe}
-            profitMargin={stock.profit_margin}
-            pbRatio={stock.pb_ratio}
-            debtToEquity={stock.debt_to_equity}
-            dividendYield={stock.dividend_yield}
-            beta={stock.beta}
-            averageVolume10Day={stock.averageVolume10Day}
-          />
-        </Box>
-
-        {/* Block 3: Social Sentiment */}
+        {/* Block 2: Social Sentiment */}
         <Box>
           <SocialSentimentCard
             ticker={selectedStock}
