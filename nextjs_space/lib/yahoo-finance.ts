@@ -120,7 +120,16 @@ export async function fetchMultipleQuotes(tickers: string[]): Promise<Record<str
 
 /**
  * Fetch only 30-day price history from Yahoo Finance (for charts)
- * This is free and doesn't require authentication
+ * 
+ * DATA SOURCE POLICY:
+ * - Primary source: Finnhub API (use when available)
+ * - Fallback source: Yahoo Finance (use only when Finnhub data not provided or subject to paid subscription)
+ * 
+ * This function implements the fallback for 30-day price history because:
+ * - Finnhub /stock/candle returns 403 errors (requires paid subscription on free tier)
+ * - Yahoo Finance provides free, reliable historical chart data without authentication
+ * 
+ * All other data (real-time quotes, financial metrics) uses Finnhub as primary source.
  */
 export async function fetchYahooPriceHistory(ticker: string): Promise<{ Date: string; Close: number }[]> {
     try {
