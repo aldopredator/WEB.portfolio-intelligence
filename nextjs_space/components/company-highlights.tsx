@@ -118,42 +118,42 @@ export function CompanyHighlights({ data, ticker }: CompanyHighlightsProps) {
             {stock?.roe ? (
               <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
                 <p className="text-slate-400 text-sm mb-1">ROE</p>
-                <p className="text-white font-bold text-lg">{stock.roe.toFixed(2)}%</p>
+                <p className={`font-bold text-lg ${stock.roe < 0 ? 'text-rose-400' : 'text-white'}`}>{stock.roe.toFixed(2)}%</p>
               </div>
             ) : null}
 
             {stock?.roa ? (
               <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
                 <p className="text-slate-400 text-sm mb-1">ROA</p>
-                <p className="text-white font-bold text-lg">{stock.roa.toFixed(2)}%</p>
+                <p className={`font-bold text-lg ${stock.roa < 0 ? 'text-rose-400' : 'text-white'}`}>{stock.roa.toFixed(2)}%</p>
               </div>
             ) : null}
 
             {stock?.roi ? (
               <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
                 <p className="text-slate-400 text-sm mb-1">ROI</p>
-                <p className="text-white font-bold text-lg">{stock.roi.toFixed(2)}%</p>
+                <p className={`font-bold text-lg ${stock.roi < 0 ? 'text-rose-400' : 'text-white'}`}>{stock.roi.toFixed(2)}%</p>
               </div>
             ) : null}
 
             {stock?.gross_margin ? (
               <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
                 <p className="text-slate-400 text-sm mb-1">Gross Margin</p>
-                <p className="text-white font-bold text-lg">{stock.gross_margin.toFixed(2)}%</p>
+                <p className={`font-bold text-lg ${stock.gross_margin < 0 ? 'text-rose-400' : 'text-white'}`}>{stock.gross_margin.toFixed(2)}%</p>
               </div>
             ) : null}
 
             {stock?.operating_margin ? (
               <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
                 <p className="text-slate-400 text-sm mb-1">Operating Margin</p>
-                <p className="text-white font-bold text-lg">{stock.operating_margin.toFixed(2)}%</p>
+                <p className={`font-bold text-lg ${stock.operating_margin < 0 ? 'text-rose-400' : 'text-white'}`}>{stock.operating_margin.toFixed(2)}%</p>
               </div>
             ) : null}
 
             {stock?.profit_margin ? (
               <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
                 <p className="text-slate-400 text-sm mb-1">Profit Margin</p>
-                <p className="text-white font-bold text-lg">{stock.profit_margin.toFixed(2)}%</p>
+                <p className={`font-bold text-lg ${stock.profit_margin < 0 ? 'text-rose-400' : 'text-white'}`}>{stock.profit_margin.toFixed(2)}%</p>
               </div>
             ) : null}
           </div>
@@ -223,14 +223,14 @@ export function CompanyHighlights({ data, ticker }: CompanyHighlightsProps) {
             {stock?.dividend_yield ? (
               <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
                 <p className="text-slate-400 text-sm mb-1">Dividend Yield</p>
-                <p className="text-white font-bold text-lg">{stock.dividend_yield.toFixed(2)}%</p>
+                <p className={`font-bold text-lg ${stock.dividend_yield < 0 ? 'text-rose-400' : 'text-white'}`}>{stock.dividend_yield.toFixed(2)}%</p>
               </div>
             ) : null}
 
             {stock?.payout_ratio ? (
               <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
                 <p className="text-slate-400 text-sm mb-1">Payout Ratio</p>
-                <p className="text-white font-bold text-lg">{stock.payout_ratio.toFixed(2)}%</p>
+                <p className={`font-bold text-lg ${stock.payout_ratio < 0 ? 'text-rose-400' : 'text-white'}`}>{stock.payout_ratio.toFixed(2)}%</p>
               </div>
             ) : null}
           </div>
