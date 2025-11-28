@@ -1,14 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, XCircle, DollarSign, Ban, ArrowRight, Plus, Trash2 } from 'lucide-react';
+import { CheckCircle2, XCircle, DollarSign, Ban, ArrowRight, Plus, Trash2, Save } from 'lucide-react';
 import { DEFAULT_CRITERIA, buildCriteriaURL, type ScreeningCriteria } from '@/lib/screening-criteria';
+
+const STORAGE_KEY = 'portfolio_screening_criteria';
 
 export default function CriteriaForm() {
   const router = useRouter();
   const [criteria, setCriteria] = useState<ScreeningCriteria>(DEFAULT_CRITERIA);
   const [newSector, setNewSector] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Load saved criteria from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setCriteria(parsed);
+      } catch (e) {
+        console.error('Failed to parse saved criteria:', e);
+      }
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,9 +32,16 @@ export default function CriteriaForm() {
     router.push(url);
   };
 
+  const handleSave = () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(criteria));
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 2000);
+  };
+
   const handleReset = () => {
     setCriteria(DEFAULT_CRITERIA);
     setNewSector('');
+    localStorage.removeItem(STORAGE_KEY);
   };
 
   const addSector = () => {
@@ -75,7 +98,7 @@ export default function CriteriaForm() {
                 <div className="flex-1">
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
-                      <h3 className="text-white font-semibold text-lg">Price-to-Earnings (P/E) Ratio</h3>
+                      <h3 className="text-white font-semibold text-lg">P/E Ratio</h3>
                       <p className="text-slate-400 text-sm mt-1">Ensures reasonable valuation relative to earnings</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
@@ -86,18 +109,65 @@ export default function CriteriaForm() {
                       {criteria.peEnabled ? 'Enabled' : 'Disabled'}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 mt-3">
-                    <span className="text-slate-400 text-sm">Less Than:</span>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={criteria.maxPE}
-                      onChange={(e) => setCriteria({ ...criteria, maxPE: parseFloat(e.target.value) || 0 })}
-                      disabled={!criteria.peEnabled}
-                      className={`px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-white font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/50 w-32 ${
-                        !criteria.peEnabled ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
-                    />
+                  
+                  {/* Spectrum Slider for P/E */}
+                  <div className="mt-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-slate-400 text-sm">Maximum P/E Ratio</span>
+                      <span className="text-white font-mono font-bold text-lg">{criteria.maxPE.toFixed(1)}</span>
+                    </div>
+                    
+                    <div className="relative px-2">
+                      {/* Spectrum Track */}
+                      <div className="relative h-12 flex items-center">
+                        {/* Background gradient track */}
+                        <div
+                          className="absolute left-0 right-0 h-3 rounded-full"
+                          style={{
+                            background: 'linear-gradient(to right, #10b981, #fbbf24, #ef4444)',
+                            opacity: criteria.peEnabled ? 0.4 : 0.2,
+                          }}
+                        />
+                        
+                        {/* Current value cursor */}
+                        <div
+                          className="absolute"
+                          style={{
+                            left: `${(criteria.maxPE / 50) * 100}%`,
+                            transform: 'translateX(-50%)',
+                            zIndex: 10,
+                          }}
+                        >
+                          <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                            criteria.peEnabled
+                              ? 'bg-blue-500 border-white'
+                              : 'bg-slate-600 border-slate-400'
+                          }`} />
+                        </div>
+                      </div>
+                      
+                      {/* Slider input */}
+                      <input
+                        type="range"
+                        min="5"
+                        max="50"
+                        step="0.5"
+                        value={criteria.maxPE}
+                        onChange={(e) => setCriteria({ ...criteria, maxPE: parseFloat(e.target.value) })}
+                        disabled={!criteria.peEnabled}
+                        className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                        style={{ zIndex: 20 }}
+                      />
+                      
+                      {/* Scale markers */}
+                      <div className="flex justify-between mt-2 text-xs text-slate-500">
+                        <span>5</span>
+                        <span>15</span>
+                        <span>25</span>
+                        <span>35</span>
+                        <span>50</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -122,7 +192,7 @@ export default function CriteriaForm() {
                 <div className="flex-1">
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
-                      <h3 className="text-white font-semibold text-lg">Price-to-Book (P/B) Ratio</h3>
+                      <h3 className="text-white font-semibold text-lg">P/B Ratio</h3>
                       <p className="text-slate-400 text-sm mt-1">Fair value relative to company assets</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
@@ -133,18 +203,65 @@ export default function CriteriaForm() {
                       {criteria.pbEnabled ? 'Enabled' : 'Disabled'}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 mt-3">
-                    <span className="text-slate-400 text-sm">Less Than:</span>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={criteria.maxPB}
-                      onChange={(e) => setCriteria({ ...criteria, maxPB: parseFloat(e.target.value) || 0 })}
-                      disabled={!criteria.pbEnabled}
-                      className={`px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-white font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/50 w-32 ${
-                        !criteria.pbEnabled ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
-                    />
+                  
+                  {/* Spectrum Slider for P/B */}
+                  <div className="mt-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-slate-400 text-sm">Maximum P/B Ratio</span>
+                      <span className="text-white font-mono font-bold text-lg">{criteria.maxPB.toFixed(1)}</span>
+                    </div>
+                    
+                    <div className="relative px-2">
+                      {/* Spectrum Track */}
+                      <div className="relative h-12 flex items-center">
+                        {/* Background gradient track */}
+                        <div
+                          className="absolute left-0 right-0 h-3 rounded-full"
+                          style={{
+                            background: 'linear-gradient(to right, #10b981, #fbbf24, #ef4444)',
+                            opacity: criteria.pbEnabled ? 0.4 : 0.2,
+                          }}
+                        />
+                        
+                        {/* Current value cursor */}
+                        <div
+                          className="absolute"
+                          style={{
+                            left: `${(criteria.maxPB / 10) * 100}%`,
+                            transform: 'translateX(-50%)',
+                            zIndex: 10,
+                          }}
+                        >
+                          <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                            criteria.pbEnabled
+                              ? 'bg-blue-500 border-white'
+                              : 'bg-slate-600 border-slate-400'
+                          }`} />
+                        </div>
+                      </div>
+                      
+                      {/* Slider input */}
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="10"
+                        step="0.1"
+                        value={criteria.maxPB}
+                        onChange={(e) => setCriteria({ ...criteria, maxPB: parseFloat(e.target.value) })}
+                        disabled={!criteria.pbEnabled}
+                        className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                        style={{ zIndex: 20 }}
+                      />
+                      
+                      {/* Scale markers */}
+                      <div className="flex justify-between mt-2 text-xs text-slate-500">
+                        <span>0.5</span>
+                        <span>2.5</span>
+                        <span>5</span>
+                        <span>7.5</span>
+                        <span>10</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -250,6 +367,14 @@ export default function CriteriaForm() {
           className="flex-1 px-6 py-4 bg-slate-800/50 hover:bg-slate-800/70 border border-slate-700 rounded-xl text-white font-semibold transition-all"
         >
           Reset to Defaults
+        </button>
+        <button
+          type="button"
+          onClick={handleSave}
+          className="flex-1 px-6 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-xl text-white font-semibold transition-all flex items-center justify-center gap-2"
+        >
+          <Save className="w-5 h-5" />
+          {saveSuccess ? 'Saved!' : 'Save Criteria'}
         </button>
         <button
           type="submit"
