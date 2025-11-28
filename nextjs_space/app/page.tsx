@@ -124,6 +124,10 @@ async function getStockData(): Promise<StockInsightsData> {
             if (metrics && isRecord(stockEntry) && stockEntry.stock_data) {
               // Merge metrics into stock_data
               Object.assign(stockEntry.stock_data, metrics);
+              // If Finnhub dp (change_percent) is available, override Yahoo value
+              if (typeof metrics.change_percent === 'number') {
+                stockEntry.stock_data.change_percent = metrics.change_percent;
+              }
               console.log(`[DATA] ${ticker} - Finnhub metrics merged`);
             } else {
               console.warn(`[DATA] ${ticker} - No Finnhub metrics received`);

@@ -35,6 +35,9 @@ export interface FinnhubMetrics {
   currency?: string;
   beta?: number;
 
+  // Real-time quote
+  change_percent?: number; // Finnhub dp (percent change)
+
   // Per share metrics
   eps?: number;
   book_value_per_share?: number;
@@ -147,6 +150,9 @@ async function fetchFinnhubMetricsInternal(ticker: string, apiKey: string): Prom
         const quoteData = await quoteResponse.json();
         if (quoteData.v) {
           result.volume = quoteData.v; // Daily volume
+        }
+        if (typeof quoteData.dp === 'number') {
+          result.change_percent = Number(quoteData.dp.toFixed(2));
         }
         console.log(`[FINNHUB] ${ticker} - Fetched quote data`);
       }
