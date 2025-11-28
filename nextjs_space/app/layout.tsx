@@ -2,20 +2,20 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { SiteNavigation } from "@/components/site-navigation";
+import { SidebarNavigation } from "@/components/sidebar-navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Stock Insights Dashboard | Stocks, Funds & ETF Analysis",
-  description: "Comprehensive stock analysis dashboard for stocks and ETFs with real-time data, analyst recommendations, and social sentiment.",
+  title: "Portfolio Intelligence | Professional Stock Analysis & Insights",
+  description: "Advanced stock analysis platform with real-time data, comprehensive metrics, analyst recommendations, and market sentiment analysis for informed investment decisions.",
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
   },
   openGraph: {
-    title: "Stock Insights Dashboard | Stocks, Funds & ETF Analysis",
-    description: "Comprehensive stock analysis dashboard for stocks and ETFs with real-time data, analyst recommendations, and social sentiment.",
+    title: "Portfolio Intelligence | Professional Stock Analysis & Insights",
+    description: "Advanced stock analysis platform with real-time data, comprehensive metrics, analyst recommendations, and market sentiment analysis.",
     images: ['/og-image.png'],
   },
 };
@@ -28,8 +28,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={inter.className}>
-        <SiteNavigation />
-        {children}
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+          <SidebarNavigation />
+          <div className="lg:pl-0 pt-16 lg:pt-0">
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );
