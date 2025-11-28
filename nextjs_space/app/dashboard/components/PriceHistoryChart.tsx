@@ -83,7 +83,7 @@ export default function PriceHistoryChart({
             }}
           >
             <Typography variant="h4" component="p">
-              ${currentPrice.toFixed(2)}
+              ${currentPrice.toFixed(0)}
             </Typography>
             <Chip
               size="small"
@@ -99,7 +99,7 @@ export default function PriceHistoryChart({
             {/* 52 Week Range Spectrum */}
             {weekLow52 !== undefined && weekHigh52 !== undefined && (
               <Stack>
-                <Typography variant="caption" sx={{ color: 'text.secondary', mb: 1, textAlign: 'center' }}>
+                <Typography variant="body1" sx={{ color: 'text.primary', mb: 1, textAlign: 'center', fontWeight: 700 }}>
                   52 Week Range
                 </Typography>
                 
@@ -119,11 +119,11 @@ export default function PriceHistoryChart({
                         top: '50%',
                         left: 0,
                         right: 0,
-                        height: 6,
+                        height: 12,
                         transform: 'translateY(-50%)',
-                        borderRadius: 3,
+                        borderRadius: 6,
                         background: `linear-gradient(to right, ${theme.palette.error.main}, ${theme.palette.warning.main}, ${theme.palette.success.main})`,
-                        opacity: 0.3,
+                        opacity: 0.4,
                       }}
                     />
                     
