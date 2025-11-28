@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Grid, Container, Typography, Stack, Chip } from '@mui/material';
-import { MUIThemeProvider } from '@/theme/MUIThemeProvider';
-import { DashboardLayout } from '@/components/DashboardLayout';
-import { StockOverviewCard } from '@/components/StockOverviewCard';
-import { FinancialMetricsGrid } from '@/components/FinancialMetricsGrid';
-import { PriceChartMUI } from '@/components/PriceChartMUI';
+import { Box, Container, Typography, Stack, Chip } from '@mui/material';
+import { MUIThemeProvider } from '@/app/theme/MUIThemeProvider';
+import { DashboardLayout } from '@/app/components/DashboardLayout';
+import { StockOverviewCard } from '@/app/components/StockOverviewCard';
+import { FinancialMetricsGrid } from '@/app/components/FinancialMetricsGrid';
+import { PriceChartMUI } from '@/app/components/PriceChartMUI';
 
 // Mock data for demonstration (replace with real data fetch)
 const MOCK_STOCKS = [
@@ -97,28 +97,29 @@ export default function DashboardPage() {
           </Stack>
 
           {/* Top Row: Price Overview & Chart */}
-          <Grid container spacing={3} mb={3}>
-            <Grid item xs={12} md={4}>
-              <StockOverviewCard
-                ticker={selectedStock}
-                company={stockInfo.company}
-                {...currentStock}
-              />
-            </Grid>
-            <Grid item xs={12} md={8}>
-              <PriceChartMUI
-                data={MOCK_PRICE_HISTORY}
-                ticker={selectedStock}
-              />
-            </Grid>
-          </Grid>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' },
+              gap: 3,
+              mb: 3,
+            }}
+          >
+            <StockOverviewCard
+              ticker={selectedStock}
+              company={stockInfo.company}
+              {...currentStock}
+            />
+            <PriceChartMUI
+              data={MOCK_PRICE_HISTORY}
+              ticker={selectedStock}
+            />
+          </Box>
 
           {/* Financial Metrics Grid */}
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <FinancialMetricsGrid metrics={MOCK_METRICS} />
-            </Grid>
-          </Grid>
+          <Box>
+            <FinancialMetricsGrid metrics={MOCK_METRICS} />
+          </Box>
         </Container>
       </DashboardLayout>
     </MUIThemeProvider>

@@ -6,7 +6,6 @@ import {
   Typography,
   Box,
   Chip,
-  Grid,
   Stack,
   Divider,
 } from '@mui/material';
@@ -90,40 +89,46 @@ export function StockOverviewCard({
         <Divider sx={{ my: 2 }} />
 
         {/* Key Metrics */}
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: 2,
+          }}
+        >
+          <Box>
             <Typography variant="caption" color="text.secondary" display="block">
               Market Cap
             </Typography>
             <Typography variant="body1" fontWeight={600}>
               {formatNumber(market_cap)}
             </Typography>
-          </Grid>
-          <Grid item xs={6}>
+          </Box>
+          <Box>
             <Typography variant="caption" color="text.secondary" display="block">
               Volume
             </Typography>
             <Typography variant="body1" fontWeight={600}>
               {volume.toLocaleString()}
             </Typography>
-          </Grid>
-          <Grid item xs={6}>
+          </Box>
+          <Box>
             <Typography variant="caption" color="text.secondary" display="block">
               52W High
             </Typography>
             <Typography variant="body1" fontWeight={600}>
               {formatPrice(high_52_week)}
             </Typography>
-          </Grid>
-          <Grid item xs={6}>
+          </Box>
+          <Box>
             <Typography variant="caption" color="text.secondary" display="block">
               52W Low
             </Typography>
             <Typography variant="body1" fontWeight={600}>
               {formatPrice(low_52_week)}
             </Typography>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </CardContent>
     </Card>
   );
