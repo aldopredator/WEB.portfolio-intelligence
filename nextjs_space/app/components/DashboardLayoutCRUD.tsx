@@ -49,12 +49,25 @@ export function DashboardLayoutCRUD({
           sx={{
             flexGrow: 1,
             p: { xs: 2, sm: 3 },
-            width: { sm: `calc(100% - ${drawerWidth}px)` },
+            width: { xs: '100%', sm: `calc(100% - ${drawerWidth}px)` },
             mt: 8,
             backgroundColor: 'background.default',
             minHeight: '100vh',
             overflowX: 'auto',
             overflowY: 'auto',
+            '&::-webkit-scrollbar': {
+              height: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              backgroundColor: 'rgba(0,0,0,0.1)',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: 'rgba(0,0,0,0.3)',
+              borderRadius: '4px',
+              '&:hover': {
+                backgroundColor: 'rgba(0,0,0,0.5)',
+              },
+            },
           }}
         >
           {children}

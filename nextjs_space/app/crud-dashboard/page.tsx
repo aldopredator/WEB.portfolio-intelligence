@@ -112,17 +112,14 @@ export default function CRUDDashboard() {
     >
       <Box>
         {/* Header Section */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
-          <Box>
-            <Typography variant="h4" fontWeight={700} gutterBottom>
-              {stockInfo.company}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Real-time market data and financial analysis
-            </Typography>
-          </Box>
-          <Chip label="Live Data" color="success" variant="outlined" size="small" />
-        </Stack>
+        <Box mb={3}>
+          <Typography variant="h4" fontWeight={700} gutterBottom>
+            {stockInfo.company}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Market data and financial analysis (updated every 30 minutes)
+          </Typography>
+        </Box>
 
         {/* Overview and Chart Row */}
         <Box
