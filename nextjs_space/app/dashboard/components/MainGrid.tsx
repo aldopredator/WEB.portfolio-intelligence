@@ -58,40 +58,23 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
 
   return (
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
-      {/* Stat Cards */}
+      {/* Header */}
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
         {companyNameMap[selectedStock] || selectedStock} ({selectedStock})
       </Typography>
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: {
-            xs: 'repeat(1, 1fr)',
-            sm: 'repeat(1, 1fr)',
-            lg: 'repeat(1, 1fr)',
-          },
-          gap: 2,
-          mb: 2,
-          maxWidth: '300px',
-        }}
-      >
-        {statCards.map((card, index) => (
-          <StatCard key={index} {...card} />
-        ))}
-      </Box>
 
-      {/* Two Column Layout: Charts on Left, Details on Right */}
+      {/* Two Column Layout: Left wider, Right narrower */}
       <Box
         sx={{
           display: 'grid',
           gridTemplateColumns: {
             xs: '1fr',
-            lg: '1fr 500px',
+            lg: '2fr 1fr',
           },
           gap: 2,
         }}
       >
-        {/* Left Column: Charts */}
+        {/* Left Column: Price Chart and Volume */}
         <Stack spacing={2}>
           {/* Price History Chart with 52 Week Range */}
           {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
@@ -105,14 +88,34 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               weekHigh52={stock['52_week_high']}
             />
           )}
+
+          {/* Volume Card */}
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: '1fr',
+              gap: 2,
+            }}
+          >
+            {statCards.map((card, index) => (
+              <StatCard key={index} {...card} />
+            ))}
+          </Box>
         </Stack>
 
-        {/* Right Column: Social Sentiment, Stock Details, Pros & Cons */}
+        {/* Right Column: Social Sentiment, Pros & Cons, Stock Details stacked */}
         <Stack spacing={2}>
-          {/* Social Sentiment - moved higher */}
+          {/* Social Sentiment */}
           <SocialSentimentCard
             ticker={selectedStock}
             sentiment={stockEntry.social_sentiment}
+          />
+
+          {/* Pros & Cons */}
+          <ProsConsCard
+            ticker={selectedStock}
+            pros={stockEntry.pros}
+            cons={stockEntry.cons}
           />
 
           {/* Stock Details with Market Cap */}
@@ -125,13 +128,6 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
             pbRatio={(stockEntry as any).pb_ratio}
             debtToEquity={(stockEntry as any).debt_to_equity}
             dividendYield={(stockEntry as any).dividend_yield}
-          />
-
-          {/* Pros & Cons */}
-          <ProsConsCard
-            ticker={selectedStock}
-            pros={stockEntry.pros}
-            cons={stockEntry.cons}
           />
         </Stack>
       </Box>
