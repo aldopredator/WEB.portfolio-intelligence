@@ -41,14 +41,18 @@ export default function CRUDDashboard() {
   }, []);
 
   // Prepare stocks list for sidebar
-  const stocks = Object.entries(stocksData).map(([ticker, data]) => ({
-    ticker,
-    company: data.company || ticker,
-    change_percent: data.change_percent,
-  }));
+  const stocks = Object.entries(stocksData).map(([ticker, data]) => {
+    const stockData = data.stock_data || data;
+    return {
+      ticker,
+      company: stockData.company || data.company || ticker,
+      change_percent: stockData.change_percent,
+    };
+  });
 
   // Get current stock data
-  const currentStockData = stocksData[selectedStock] || {};
+  const stockEntry = stocksData[selectedStock] || {};
+  const currentStockData = stockEntry.stock_data || stockEntry;
   const stockInfo = stocks.find((s) => s.ticker === selectedStock) || {
     ticker: selectedStock,
     company: selectedStock,
@@ -56,27 +60,29 @@ export default function CRUDDashboard() {
 
   // Extract metrics for FinancialMetricsGrid
   const metrics = {
-    pe_ratio: currentStockData.pe_ratio,
-    pb_ratio: currentStockData.pb_ratio,
-    ps_ratio: currentStockData.ps_ratio,
-    pcf_ratio: currentStockData.pcf_ratio,
-    roe: currentStockData.roe,
-    roa: currentStockData.roa,
-    roi: currentStockData.roi,
-    gross_margin: currentStockData.gross_margin,
-    operating_margin: currentStockData.operating_margin,
-    profit_margin: currentStockData.profit_margin,
-    debt_to_equity: currentStockData.debt_to_equity,
-    current_ratio: currentStockData.current_ratio,
-    quick_ratio: currentStockData.quick_ratio,
-    revenue_growth: currentStockData.revenue_growth,
-    earnings_growth: currentStockData.earnings_growth,
-    dividend_yield: currentStockData.dividend_yield,
-    payout_ratio: currentStockData.payout_ratio,
-    beta: currentStockData.beta,
-    eps: currentStockData.eps,
-    book_value: currentStockData.book_value,
+    pe_ratio: stockEntry.pe_ratio || currentStockData.pe_ratio,
+    pb_ratio: stockEntry.pb_ratio || currentStockData.pb_ratio,
+    ps_ratio: stockEntry.ps_ratio || currentStockData.ps_ratio,
+    pcf_ratio: stockEntry.pcf_ratio || currentStockData.pcf_ratio,
+    roe: stockEntry.roe || currentStockData.roe,
+    roa: stockEntry.roa || currentStockData.roa,
+    roi: stockEntry.roi || currentStockData.roi,
+    gross_margin: stockEntry.gross_margin || currentStockData.gross_margin,
+    operating_margin: stockEntry.operating_margin || currentStockData.operating_margin,
+    profit_margin: stockEntry.profit_margin || currentStockData.profit_margin,
+    debt_to_equity: stockEntry.debt_to_equity || currentStockData.debt_to_equity,
+    current_ratio: stockEntry.current_ratio || currentStockData.current_ratio,
+    quick_ratio: stockEntry.quick_ratio || currentStockData.quick_ratio,
+    revenue_growth: stockEntry.revenue_growth || currentStockData.revenue_growth,
+    earnings_growth: stockEntry.earnings_growth || currentStockData.earnings_growth,
+    dividend_yield: stockEntry.dividend_yield || currentStockData.dividend_yield,
+    payout_ratio: stockEntry.payout_ratio || currentStockData.payout_ratio,
+    beta: stockEntry.beta || currentStockData.beta,
+    eps: stockEntry.eps || currentStockData.eps,
+    book_value: stockEntry.book_value || currentStockData.book_value,
   };
+
+  const priceHistory = stockEntry.price_movement_30_days || [];
 
   if (loading) {
     return (
@@ -139,9 +145,8 @@ export default function CRUDDashboard() {
             low_52_week={currentStockData.low_52_week || currentStockData['52_week_low']}
           />
           
-          {currentStockData.price_movement_30_days &&
-          currentStockData.price_movement_30_days.length > 0 ? (
-            <PriceChartMUI data={currentStockData.price_movement_30_days} ticker={selectedStock} />
+          {priceHistory && priceHistory.length > 0 ? (
+            <PriceChartMUI data={priceHistory} ticker={selectedStock} />
           ) : (
             <Card elevation={0} sx={{ height: '100%' }}>
               <CardContent>
