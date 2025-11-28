@@ -78,29 +78,19 @@ export default function EarningsCalendarCard({ ticker, earnings = [] }: Earnings
             {/* EPS Information */}
             {(nextEarnings.epsEstimate !== undefined || nextEarnings.epsActual !== undefined) && (
               <Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>
                   Earnings Per Share (EPS)
                 </Typography>
                 <Stack direction="row" spacing={2}>
-                  {nextEarnings.epsEstimate !== undefined && (
-                    <Box>
-                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                        Estimate
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                        ${nextEarnings.epsEstimate.toFixed(2)}
-                      </Typography>
-                    </Box>
-                  )}
                   {nextEarnings.epsActual !== undefined && (
                     <Box>
-                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                         Actual
                       </Typography>
                       <Typography
-                        variant="body1"
+                        variant="h6"
                         sx={{
-                          fontWeight: 600,
+                          fontWeight: 700,
                           color:
                             nextEarnings.epsEstimate && nextEarnings.epsActual >= nextEarnings.epsEstimate
                               ? 'success.main'
@@ -113,6 +103,16 @@ export default function EarningsCalendarCard({ ticker, earnings = [] }: Earnings
                       </Typography>
                     </Box>
                   )}
+                  {nextEarnings.epsEstimate !== undefined && (
+                    <Box>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        Estimate
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                        ${nextEarnings.epsEstimate.toFixed(2)}
+                      </Typography>
+                    </Box>
+                  )}
                 </Stack>
               </Box>
             )}
@@ -120,29 +120,19 @@ export default function EarningsCalendarCard({ ticker, earnings = [] }: Earnings
             {/* Revenue Information */}
             {(nextEarnings.revenueEstimate !== undefined || nextEarnings.revenueActual !== undefined) && (
               <Box>
-                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>
                   Revenue
                 </Typography>
                 <Stack direction="row" spacing={2}>
-                  {nextEarnings.revenueEstimate !== undefined && (
-                    <Box>
-                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                        Estimate
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                        ${(nextEarnings.revenueEstimate / 1e9).toFixed(2)}B
-                      </Typography>
-                    </Box>
-                  )}
                   {nextEarnings.revenueActual !== undefined && (
                     <Box>
-                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                         Actual
                       </Typography>
                       <Typography
-                        variant="body1"
+                        variant="h6"
                         sx={{
-                          fontWeight: 600,
+                          fontWeight: 700,
                           color:
                             nextEarnings.revenueEstimate && nextEarnings.revenueActual >= nextEarnings.revenueEstimate
                               ? 'success.main'
@@ -152,6 +142,16 @@ export default function EarningsCalendarCard({ ticker, earnings = [] }: Earnings
                         }}
                       >
                         ${(nextEarnings.revenueActual / 1e9).toFixed(2)}B
+                      </Typography>
+                    </Box>
+                  )}
+                  {nextEarnings.revenueEstimate !== undefined && (
+                    <Box>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        Estimate
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                        ${(nextEarnings.revenueEstimate / 1e9).toFixed(2)}B
                       </Typography>
                     </Box>
                   )}

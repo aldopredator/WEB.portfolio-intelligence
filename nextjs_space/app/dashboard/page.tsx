@@ -3,7 +3,7 @@ import path from 'path';
 import type { StockInsightsData } from '@/lib/types';
 import { fetchYahooPriceHistory } from '@/lib/yahoo-finance';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
-import { fetchFinnhubMetrics } from '@/lib/finnhub-metrics';
+import { fetchFinnhubMetrics, fetchBalanceSheet } from '@/lib/finnhub-metrics';
 import { isRecord } from '@/lib/utils';
 import DashboardClient from './DashboardClient';
 
@@ -48,6 +48,12 @@ async function getStockData(): Promise<StockInsightsData> {
         const metrics = await fetchFinnhubMetrics(ticker);
         if (metrics && isRecord(stockEntry) && stockEntry.stock_data) {
           Object.assign(stockEntry.stock_data, metrics);
+        }
+
+        // Fetch balance sheet
+        const balanceSheet = await fetchBalanceSheet(ticker);
+        if (balanceSheet && isRecord(stockEntry) && stockEntry.company_profile) {
+          Object.assign(stockEntry.company_profile, balanceSheet);
         }
 
         // Fetch price history

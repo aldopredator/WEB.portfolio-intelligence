@@ -47,7 +47,7 @@ export default function SocialSentimentCard({ ticker, sentiment }: SocialSentime
         </Stack>
 
         {/* Pie Chart */}
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3 }}>
           <PieChart
             series={[
               {
@@ -56,6 +56,7 @@ export default function SocialSentimentCard({ ticker, sentiment }: SocialSentime
                 outerRadius: 140,
                 paddingAngle: 2,
                 cornerRadius: 4,
+                cx: 190,
               },
             ]}
             width={380}

@@ -81,6 +81,8 @@ export interface CompanyProfile {
   marketCapitalization?: number;
   currency?: string;
   weburl?: string;
+  assets?: number;
+  liabilities?: number;
 }
 
 export interface NewsArticle {

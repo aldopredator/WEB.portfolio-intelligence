@@ -77,6 +77,8 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
                 marketCapitalization={stockEntry.company_profile.marketCapitalization}
                 currency={stockEntry.company_profile.currency}
                 weburl={stockEntry.company_profile.weburl}
+                assets={stockEntry.company_profile.assets}
+                liabilities={stockEntry.company_profile.liabilities}
               />
             )}
             <StockDetailsCard

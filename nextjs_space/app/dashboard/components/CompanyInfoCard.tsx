@@ -20,6 +20,8 @@ interface CompanyInfoCardProps {
   marketCapitalization?: number;
   currency?: string;
   weburl?: string;
+  assets?: number;
+  liabilities?: number;
 }
 
 export default function CompanyInfoCard({
@@ -33,6 +35,8 @@ export default function CompanyInfoCard({
   marketCapitalization,
   currency,
   weburl,
+  assets,
+  liabilities,
 }: CompanyInfoCardProps) {
   return (
     <Card variant="outlined" sx={{ height: '100%' }}>
@@ -60,7 +64,7 @@ export default function CompanyInfoCard({
           </Box>
         </Stack>
 
-        {(industry || sector || subSector || country || marketCapitalization || weburl) && (
+        {(industry || sector || subSector || country || marketCapitalization || assets || liabilities || weburl) && (
           <Stack spacing={2}>
             {industry && (
               <Box>
@@ -111,6 +115,30 @@ export default function CompanyInfoCard({
                   {marketCapitalization >= 1000e9
                     ? `${currency || '$'} ${(marketCapitalization / 1e12).toFixed(1)}T`
                     : `${currency || '$'} ${(marketCapitalization / 1e9).toFixed(1)}B`}
+                </Typography>
+              </Box>
+            )}
+            {assets && (
+              <Box>
+                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+                  Assets
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {assets >= 1000e9
+                    ? `${currency || '$'} ${(assets / 1e12).toFixed(1)}T`
+                    : `${currency || '$'} ${(assets / 1e9).toFixed(1)}B`}
+                </Typography>
+              </Box>
+            )}
+            {liabilities && (
+              <Box>
+                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+                  Liabilities
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {liabilities >= 1000e9
+                    ? `${currency || '$'} ${(liabilities / 1e12).toFixed(1)}T`
+                    : `${currency || '$'} ${(liabilities / 1e9).toFixed(1)}B`}
                 </Typography>
               </Box>
             )}

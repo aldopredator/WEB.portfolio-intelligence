@@ -15,6 +15,13 @@ export interface CompanyProfile {
   weburl?: string;
 }
 
+export interface BalanceSheet {
+  assets?: number;
+  liabilities?: number;
+  equity?: number;
+  currency?: string;
+}
+
 export interface NewsArticle {
   headline: string;
   source: string;
@@ -467,7 +474,56 @@ export async function fetchRecommendationTrends(ticker: string): Promise<Analyst
       }
     }
   } catch (error) {
-    console.error(`[FINNHUB] ${ticker} - Error fetching recommendation trends:`, error);
+    console.error(`[FINNHUB] ${ticker} - Error fetching recommendations:`, error);
   }
   return [];
+}
+
+/**
+ * Fetch balance sheet data from Finnhub
+ */
+export async function fetchBalanceSheet(ticker: string): Promise<BalanceSheet> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured for balance sheet`);
+    return {};
+  }
+
+  try {
+    const url = `https://finnhub.io/api/v1/stock/financials-reported?symbol=${ticker}&token=${apiKey}`;
+    const response = await fetch(url, {
+      next: { revalidate: METRICS_CACHE_TTL_SECONDS }
+    } as any);
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.data && data.data.length > 0) {
+        // Get most recent annual report
+        const report = data.data.find((r: any) => r.form === '10-K') || data.data[0];
+        if (report && report.report && report.report.bs) {
+          const bs = report.report.bs;
+          // Find assets and liabilities in the balance sheet
+          const assetsItem = bs.find((item: any) => 
+            item.label && (item.label.toLowerCase().includes('total assets') || item.label.toLowerCase() === 'assets')
+          );
+          const liabilitiesItem = bs.find((item: any) => 
+            item.label && (item.label.toLowerCase().includes('total liabilities') || item.label.toLowerCase() === 'liabilities')
+          );
+          const equityItem = bs.find((item: any) => 
+            item.label && item.label.toLowerCase().includes('equity')
+          );
+
+          return {
+            assets: assetsItem?.value,
+            liabilities: liabilitiesItem?.value,
+            equity: equityItem?.value,
+            currency: report.report.currency || 'USD',
+          };
+        }
+      }
+    }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Error fetching balance sheet:`, error);
+  }
+  return {};
 }
