@@ -148,22 +148,6 @@ export default function PriceHistoryChart({
                           boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
                         }}
                       />
-                      {/* Price Label Above Cursor */}
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          position: 'absolute',
-                          top: -24,
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          fontWeight: 700,
-                          color: theme.palette.primary.main,
-                          whiteSpace: 'nowrap',
-                          fontSize: '0.7rem',
-                        }}
-                      >
-                        ${currentPrice.toFixed(2)}
-                      </Typography>
                     </Stack>
                   </Stack>
                   
