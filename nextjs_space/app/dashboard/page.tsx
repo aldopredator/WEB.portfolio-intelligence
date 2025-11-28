@@ -3,7 +3,7 @@ import path from 'path';
 import type { StockInsightsData } from '@/lib/types';
 import { fetchYahooPriceHistory } from '@/lib/yahoo-finance';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
-import { fetchFinnhubMetrics, fetchCompanyProfile } from '@/lib/finnhub-metrics';
+import { fetchFinnhubMetrics } from '@/lib/finnhub-metrics';
 import { isRecord } from '@/lib/utils';
 import DashboardClient from './DashboardClient';
 
@@ -37,12 +37,6 @@ async function getStockData(): Promise<StockInsightsData> {
         const cfg = STOCK_CONFIG.find(c => c.ticker === ticker);
         const companyName = cfg?.name;
         const stockEntry = mergedData[ticker];
-
-        // Fetch company profile
-        const profile = await fetchCompanyProfile(ticker);
-        if (profile && isRecord(stockEntry)) {
-          stockEntry.company_profile = profile as any;
-        }
 
         // Fetch sentiment
         const sentiment = await fetchAndScoreSentiment(ticker, companyName, []);

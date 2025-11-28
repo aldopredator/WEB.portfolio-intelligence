@@ -13,7 +13,6 @@ interface CompanyInfoCardProps {
   ticker: string;
   companyName?: string;
   logo?: string;
-  finnhubIndustry?: string;
   industry?: string;
   sector?: string;
   subSector?: string;
@@ -27,7 +26,6 @@ export default function CompanyInfoCard({
   ticker,
   companyName,
   logo,
-  finnhubIndustry,
   industry,
   sector,
   subSector,
@@ -62,18 +60,8 @@ export default function CompanyInfoCard({
           </Box>
         </Stack>
 
-        {(finnhubIndustry || industry || sector || subSector || country || marketCapitalization || weburl) && (
+        {(industry || sector || subSector || country || marketCapitalization || weburl) && (
           <Stack spacing={2}>
-            {finnhubIndustry && (
-              <Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
-                  Finnhub Industry
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {finnhubIndustry}
-                </Typography>
-              </Box>
-            )}
             {industry && (
               <Box>
                 <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
