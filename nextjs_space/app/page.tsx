@@ -57,6 +57,7 @@ async function getStockData(): Promise<StockInsightsData> {
     // All real-time fields will be updated in the enrichment loop below
     const mergedData: StockInsightsData = { ...staticData };
 
+
     // Map static emerging_trends to pros (temporary migration)
     Object.keys(mergedData).forEach((ticker) => {
       const stockInfo = mergedData[ticker];
@@ -69,52 +70,52 @@ async function getStockData(): Promise<StockInsightsData> {
       }
     });
 
-        // Attempt to enrich social sentiment and financial metrics
-        console.log('[DATA] Starting enrichment for all tickers...');
-        await Promise.allSettled(Object.keys(mergedData).map(async (ticker) => {
-          try {
-            console.log(`[DATA] Enriching ${ticker}...`);
-            const cfg = STOCK_CONFIG.find(c => c.ticker === ticker);
-            const companyName = cfg?.name;
-            const stockEntry = mergedData[ticker];
+    // Attempt to enrich social sentiment and financial metrics
+    console.log('[DATA] Starting enrichment for all tickers...');
+    await Promise.allSettled(Object.keys(mergedData).map(async (ticker) => {
+      try {
+        console.log(`[DATA] Enriching ${ticker}...`);
+        const cfg = STOCK_CONFIG.find(c => c.ticker === ticker);
+        const companyName = cfg?.name;
+        const stockEntry = mergedData[ticker];
 
-            // Fetch sentiment
-            // We pass empty array for fallback to ensure we only use real-time news
-            const sentiment = await fetchAndScoreSentiment(ticker, companyName, []);
-            if (sentiment && isRecord(stockEntry)) {
-              stockEntry.social_sentiment = sentiment as any;
-              console.log(`[DATA] ${ticker} - Sentiment updated`);
-            } else {
-              console.warn(`[DATA] ${ticker} - No sentiment data received`);
-            }
+        // Fetch sentiment
+        // We pass empty array for fallback to ensure we only use real-time news
+        const sentiment = await fetchAndScoreSentiment(ticker, companyName, []);
+        if (sentiment && isRecord(stockEntry)) {
+          stockEntry.social_sentiment = sentiment as any;
+          console.log(`[DATA] ${ticker} - Sentiment updated`);
+        } else {
+          console.warn(`[DATA] ${ticker} - No sentiment data received`);
+        }
 
-            // Fetch financial metrics and real-time price from Finnhub
-            const metrics = await fetchFinnhubMetrics(ticker);
-            if (metrics && isRecord(stockEntry) && stockEntry.stock_data) {
-              // Merge all Finnhub fields into stock_data (overwrites Yahoo fields)
-              Object.assign(stockEntry.stock_data, metrics);
-              // For absolute price change, use Finnhub d (change)
-              if (typeof metrics.change === 'number') {
-                (stockEntry.stock_data as any).change = metrics.change;
-              }
-              // For current price, use Finnhub c
-              if (typeof metrics.current_price === 'number') {
-                (stockEntry.stock_data as any).current_price = metrics.current_price;
-              }
-              // For previous close, use Finnhub pc
-              if (typeof metrics.previous_close === 'number') {
-                (stockEntry.stock_data as any).previous_close = metrics.previous_close;
-              }
-              // For percent change, use Finnhub dp (already handled above)
-              console.log(`[DATA] ${ticker} - Finnhub metrics merged`);
-            } else {
-              console.warn(`[DATA] ${ticker} - No Finnhub metrics received`);
-            }
-          } catch (e) {
-            console.error(`[DATA] ${ticker} - Error during enrichment:`, e);
+        // Fetch financial metrics and real-time price from Finnhub
+        const metrics = await fetchFinnhubMetrics(ticker);
+        if (metrics && isRecord(stockEntry) && stockEntry.stock_data) {
+          // Merge all Finnhub fields into stock_data (overwrites Yahoo fields)
+          Object.assign(stockEntry.stock_data, metrics);
+          // For absolute price change, use Finnhub d (change)
+          if (typeof metrics.change === 'number') {
+            (stockEntry.stock_data as any).change = metrics.change;
           }
-        }));
-        console.log('[DATA] Enrichment complete for all tickers');
+          // For current price, use Finnhub c
+          if (typeof metrics.current_price === 'number') {
+            (stockEntry.stock_data as any).current_price = metrics.current_price;
+          }
+          // For previous close, use Finnhub pc
+          if (typeof metrics.previous_close === 'number') {
+            (stockEntry.stock_data as any).previous_close = metrics.previous_close;
+          }
+          // For percent change, use Finnhub dp (already handled above)
+          console.log(`[DATA] ${ticker} - Finnhub metrics merged`);
+        } else {
+          console.warn(`[DATA] ${ticker} - No Finnhub metrics received`);
+        }
+      } catch (e) {
+        console.error(`[DATA] ${ticker} - Error during enrichment:`, e);
+      }
+    }));
+    console.log('[DATA] Enrichment complete for all tickers');
 
         return {
           ...mergedData,
