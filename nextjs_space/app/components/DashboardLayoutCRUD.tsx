@@ -53,6 +53,8 @@ export function DashboardLayoutCRUD({
             mt: 8,
             backgroundColor: 'background.default',
             minHeight: '100vh',
+            overflowX: 'auto',
+            overflowY: 'auto',
           }}
         >
           {children}

@@ -14,6 +14,7 @@ import {
   Chip,
   Avatar,
   Stack,
+  IconButton,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -38,61 +39,57 @@ export function MenuContent({ selectedStock, onStockSelect, stocks = [] }: MenuC
   return (
     <Box sx={{ overflow: 'auto' }}>
       {/* Brand Header */}
-      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <TrendingUpIcon color="primary" />
-        <Typography variant="h6" fontWeight={700}>
-          Portfolio Intel
+      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+        <TrendingUpIcon color="primary" sx={{ fontSize: '2rem' }} />
+        <Typography variant="h5" fontWeight={700} sx={{ fontSize: '1.1rem', textAlign: 'center', lineHeight: 1.2 }}>
+          Portfolio Intelligence
         </Typography>
       </Box>
       
       <Divider />
 
-      {/* Main Navigation */}
-      <List sx={{ px: 2, py: 1 }}>
-        <ListItem disablePadding>
-          <ListItemButton selected sx={{ borderRadius: 1, mb: 0.5 }}>
-            <ListItemIcon>
-              <DashboardIcon />
-            </ListItemIcon>
-            <ListItemText primary="Dashboard" />
-          </ListItemButton>
-        </ListItem>
-        
-        <ListItem disablePadding>
-          <ListItemButton
-            component={Link}
-            href="/screening"
-            sx={{ borderRadius: 1, mb: 0.5 }}
-          >
-            <ListItemIcon>
-              <SearchIcon />
-            </ListItemIcon>
-            <ListItemText primary="Screening" />
-          </ListItemButton>
-        </ListItem>
-
-        <ListItem disablePadding>
-          <ListItemButton
-            component={Link}
-            href="/criteria"
-            sx={{ borderRadius: 1, mb: 0.5 }}
-          >
-            <ListItemIcon>
-              <FilterListIcon />
-            </ListItemIcon>
-            <ListItemText primary="Criteria" />
-          </ListItemButton>
-        </ListItem>
-
-        <ListItem disablePadding>
-          <ListItemButton sx={{ borderRadius: 1, mb: 0.5 }}>
-            <ListItemIcon>
-              <AssessmentIcon />
-            </ListItemIcon>
-            <ListItemText primary="Analytics" />
-          </ListItemButton>
-        </ListItem>
-      </List>
+      {/* Main Navigation - Horizontal Icons */}
+      <Box sx={{ px: 2, py: 2, display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <IconButton
+          component={Link}
+          href="/"
+          sx={{
+            bgcolor: 'action.selected',
+            '&:hover': { bgcolor: 'action.hover' },
+          }}
+          title="Dashboard"
+        >
+          <DashboardIcon />
+        </IconButton>
+        <IconButton
+          component={Link}
+          href="/criteria"
+          sx={{
+            '&:hover': { bgcolor: 'action.hover' },
+          }}
+          title="Criteria"
+        >
+          <FilterListIcon />
+        </IconButton>
+        <IconButton
+          component={Link}
+          href="/screening"
+          sx={{
+            '&:hover': { bgcolor: 'action.hover' },
+          }}
+          title="Screening"
+        >
+          <SearchIcon />
+        </IconButton>
+        <IconButton
+          sx={{
+            '&:hover': { bgcolor: 'action.hover' },
+          }}
+          title="Analytics"
+        >
+          <AssessmentIcon />
+        </IconButton>
+      </Box>
 
       <Divider sx={{ my: 1 }} />
 
