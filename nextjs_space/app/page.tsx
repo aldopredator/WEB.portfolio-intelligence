@@ -106,6 +106,10 @@ async function getStockData(): Promise<StockInsightsData> {
           if (typeof metrics.previous_close === 'number') {
             (stockEntry.stock_data as any).previous_close = metrics.previous_close;
           }
+          // For price history (30-day chart)
+          if (metrics.price_history && metrics.price_history.length > 0) {
+            (stockEntry.stock_data as any).price_movement_30_days = metrics.price_history;
+          }
           // For percent change, use Finnhub dp (already handled above)
           console.log(`[DATA] ${ticker} - Finnhub metrics merged`);
         } else {

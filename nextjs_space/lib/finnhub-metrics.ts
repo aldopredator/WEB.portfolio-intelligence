@@ -41,6 +41,9 @@ export interface FinnhubMetrics {
   current_price?: number; // Finnhub c (current price)
   previous_close?: number; // Finnhub pc (previous close)
 
+  // Historical data
+  price_history?: Array<{ Date: string; Close: number }>;
+
   // Per share metrics
   eps?: number;
   book_value_per_share?: number;
@@ -170,6 +173,29 @@ async function fetchFinnhubMetricsInternal(ticker: string, apiKey: string): Prom
       }
     } catch (e) {
       console.error(`[FINNHUB] ${ticker} - Error fetching quote:`, e);
+    }
+
+    // Fetch 30-day historical price data (candles)
+    try {
+      const toTimestamp = Math.floor(Date.now() / 1000);
+      const fromTimestamp = toTimestamp - (30 * 24 * 60 * 60); // 30 days ago
+      const candleUrl = `https://finnhub.io/api/v1/stock/candle?symbol=${ticker}&resolution=D&from=${fromTimestamp}&to=${toTimestamp}&token=${apiKey}`;
+      const candleResponse = await fetch(candleUrl, {
+        next: { revalidate: METRICS_CACHE_TTL_SECONDS }
+      } as any);
+
+      if (candleResponse.ok) {
+        const candleData = await candleResponse.json();
+        if (candleData.s === 'ok' && candleData.t && candleData.c) {
+          result.price_history = candleData.t.map((timestamp: number, index: number) => ({
+            Date: new Date(timestamp * 1000).toISOString(),
+            Close: Number(candleData.c[index].toFixed(2))
+          })).filter((item: any) => item.Close > 0);
+          console.log(`[FINNHUB] ${ticker} - Fetched ${result.price_history?.length || 0} days of price history`);
+        }
+      }
+    } catch (e) {
+      console.error(`[FINNHUB] ${ticker} - Error fetching candle data:`, e);
     }
 
     return result;
