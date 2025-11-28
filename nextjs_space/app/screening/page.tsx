@@ -1,21 +1,20 @@
 import { TrendingUp, CheckCircle2, Filter, Info, AlertTriangle } from 'lucide-react';
 import { PageHeader } from '@/components/page-header';
 import { getStockData, STOCK_CONFIG } from '@/lib/stock-data';
+import { parseCriteriaFromParams } from '@/lib/screening-criteria';
 
 export const revalidate = 1800; // 30 minutes
 
-export default async function ScreeningPage() {
+export default async function ScreeningPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  // Parse criteria from URL parameters (or use defaults)
+  const CRITERIA = parseCriteriaFromParams(new URLSearchParams(searchParams as Record<string, string>));
+  
   // Fetch real stock data
   const stockData = await getStockData();
-  
-  // Define screening criteria (matching criteria page)
-  const CRITERIA = {
-    maxPE: 20,
-    maxPB: 3,
-    minYTD: 0,
-    minWeek52: 10,
-    excludeSectors: ['Alcohol', 'Gambling'],
-  };
   
   // Build screening results from real data with actual filtering
   const recommendedStocks = STOCK_CONFIG.map((config) => {
@@ -84,6 +83,44 @@ export default async function ScreeningPage() {
       />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        {/* Active Criteria Display */}
+        <div className="mb-6 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-800/30 rounded-xl p-6 backdrop-blur-sm">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0">
+              <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center border border-blue-500/20">
+                <Info className="w-5 h-5 text-blue-400" />
+              </div>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-blue-400 mb-3">Active Screening Criteria</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                <div className="bg-slate-900/50 border border-slate-800/50 rounded-lg p-3">
+                  <p className="text-slate-400 mb-1">P/E Ratio</p>
+                  <p className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPE}</p>
+                </div>
+                <div className="bg-slate-900/50 border border-slate-800/50 rounded-lg p-3">
+                  <p className="text-slate-400 mb-1">P/B Ratio</p>
+                  <p className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPB}</p>
+                </div>
+                <div className="bg-slate-900/50 border border-slate-800/50 rounded-lg p-3">
+                  <p className="text-slate-400 mb-1">YTD Return</p>
+                  <p className="text-white font-mono font-semibold">&gt; {CRITERIA.minYTD}%</p>
+                </div>
+                <div className="bg-slate-900/50 border border-slate-800/50 rounded-lg p-3">
+                  <p className="text-slate-400 mb-1">52-Week Return</p>
+                  <p className="text-white font-mono font-semibold">&gt; {CRITERIA.minWeek52}%</p>
+                </div>
+                <div className="bg-slate-900/50 border border-slate-800/50 rounded-lg p-3 col-span-2">
+                  <p className="text-slate-400 mb-1">Excluded Sectors</p>
+                  <p className="text-white font-mono font-semibold">
+                    {CRITERIA.excludeSectors.length > 0 ? CRITERIA.excludeSectors.join(', ') : 'None'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Stock Cards Grid (Mobile-friendly alternative to table) */}
         <div className="lg:hidden space-y-4 mb-8">
           {recommendedStocks.map((stock) => (
