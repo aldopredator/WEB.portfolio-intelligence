@@ -1,6 +1,8 @@
 // Server-only module for fetching financial metrics and company data from Finnhub
 // Uses Next.js fetch caching with 30-day revalidation for persistent caching
 
+import type { AnalystRecommendation } from './types';
+
 export interface CompanyProfile {
   name?: string;
   logo?: string;
@@ -40,6 +42,16 @@ export interface EarningsEvent {
   year?: number;
 }
 
+export interface EarningsSurprise {
+  actual?: number;
+  estimate?: number;
+  period: string;
+  quarter?: number;
+  year?: number;
+  surprise?: number;
+  surprisePercent?: number;
+}
+
 export interface FinnhubMetrics {
   // Valuation metrics
   pe_ratio?: number;
@@ -71,6 +83,7 @@ export interface FinnhubMetrics {
   // Market data
   market_cap?: number;
   volume?: number;
+  averageVolume10Day?: number;
   currency?: string;
   beta?: number;
 
@@ -389,9 +402,45 @@ export async function fetchEarningsCalendar(ticker: string): Promise<EarningsEve
 }
 
 /**
+ * Fetch earnings surprises from Finnhub
+ */
+export async function fetchEarningsSurprises(ticker: string): Promise<EarningsSurprise[]> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured for earnings surprises`);
+    return [];
+  }
+
+  try {
+    const url = `https://finnhub.io/api/v1/stock/earnings?symbol=${ticker}&token=${apiKey}`;
+    const response = await fetch(url, {
+      next: { revalidate: 86400 } // Cache for 1 day
+    } as any);
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data && Array.isArray(data)) {
+        return data.map((item: any) => ({
+          actual: item.actual,
+          estimate: item.estimate,
+          period: item.period,
+          quarter: item.quarter,
+          year: item.year,
+          surprise: item.surprise,
+          surprisePercent: item.surprisePercent,
+        }));
+      }
+    }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Error fetching earnings surprises:`, error);
+  }
+  return [];
+}
+
+/**
  * Fetch recommendation trends from Finnhub
  */
-export async function fetchRecommendationTrends(ticker: string): Promise<any[]> {
+export async function fetchRecommendationTrends(ticker: string): Promise<AnalystRecommendation[]> {
   const apiKey = process.env.FINNHUB_API_KEY;
   if (!apiKey) {
     console.warn(`[FINNHUB] ${ticker} - API key not configured for recommendations`);

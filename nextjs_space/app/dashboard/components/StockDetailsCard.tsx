@@ -17,6 +17,8 @@ interface StockDetailsCardProps {
   debtToEquity?: number;
   dividendYield?: number;
   pbRatio?: number;
+  beta?: number;
+  averageVolume10Day?: number;
 }
 
 export default function StockDetailsCard({
@@ -28,11 +30,15 @@ export default function StockDetailsCard({
   debtToEquity,
   dividendYield,
   pbRatio,
+  beta,
+  averageVolume10Day,
 }: StockDetailsCardProps) {
   const valuationMetrics = [
     { label: 'Market Cap', value: marketCap ? `$${(marketCap / 1e9).toFixed(2)}B` : 'N/A' },
     { label: 'P/E Ratio', value: peRatio?.toFixed(2) || 'N/A' },
     { label: 'P/B Ratio', value: pbRatio?.toFixed(2) || 'N/A' },
+    { label: 'Beta', value: beta?.toFixed(2) || 'N/A' },
+    { label: '10-Day Avg Vol', value: averageVolume10Day ? `${(averageVolume10Day / 1e6).toFixed(2)}M` : 'N/A' },
   ];
 
   const profitabilityMetrics = [

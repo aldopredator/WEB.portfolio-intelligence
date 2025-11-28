@@ -12,6 +12,7 @@ import CompanyInfoCard from './CompanyInfoCard';
 import MarketNewsCard from './MarketNewsCard';
 import RecommendationTrendsCard from './RecommendationTrendsCard';
 import EarningsCalendarCard from './EarningsCalendarCard';
+import EarningsSurprisesCard from './EarningsSurprisesCard';
 import type { StockInsightsData } from '@/lib/types';
 
 interface MainGridProps {
@@ -56,24 +57,43 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
         {companyNameMap[selectedStock] || selectedStock} ({selectedStock})
       </Typography>
 
-      {/* Additional Information Section - Company Info */}
-      {stockEntry.company_profile && (
+      {/* Additional Information Section - Company Info + Earnings Calendar */}
+      {(stockEntry.company_profile || (stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0)) && (
         <Box sx={{ mb: 3 }}>
           <Typography component="h3" variant="h6" sx={{ mb: 2 }}>
             Additional Information
           </Typography>
-          <CompanyInfoCard
-            ticker={selectedStock}
-            companyName={stockEntry.company_profile.name}
-            logo={stockEntry.company_profile.logo}
-            industry={stockEntry.company_profile.industry}
-            sector={stockEntry.company_profile.sector}
-            subSector={stockEntry.company_profile.subSector}
-            country={stockEntry.company_profile.country}
-            marketCapitalization={stockEntry.company_profile.marketCapitalization}
-            currency={stockEntry.company_profile.currency}
-            weburl={stockEntry.company_profile.weburl}
-          />
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                lg: 'repeat(2, 1fr)',
+              },
+              gap: 2,
+            }}
+          >
+            {stockEntry.company_profile && (
+              <CompanyInfoCard
+                ticker={selectedStock}
+                companyName={stockEntry.company_profile.name}
+                logo={stockEntry.company_profile.logo}
+                industry={stockEntry.company_profile.industry}
+                sector={stockEntry.company_profile.sector}
+                subSector={stockEntry.company_profile.subSector}
+                country={stockEntry.company_profile.country}
+                marketCapitalization={stockEntry.company_profile.marketCapitalization}
+                currency={stockEntry.company_profile.currency}
+                weburl={stockEntry.company_profile.weburl}
+              />
+            )}
+            {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
+              <EarningsCalendarCard
+                ticker={selectedStock}
+                earnings={stockEntry.earnings_calendar}
+              />
+            )}
+          </Box>
         </Box>
       )}
 
@@ -117,12 +137,14 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
           <StockDetailsCard
             ticker={selectedStock}
             marketCap={stock.market_cap}
-            peRatio={(stockEntry as any).pe_ratio}
-            roe={(stockEntry as any).roe}
-            profitMargin={(stockEntry as any).profit_margin}
-            pbRatio={(stockEntry as any).pb_ratio}
-            debtToEquity={(stockEntry as any).debt_to_equity}
-            dividendYield={(stockEntry as any).dividend_yield}
+            peRatio={stock.pe_ratio}
+            roe={stock.roe}
+            profitMargin={stock.profit_margin}
+            pbRatio={stock.pb_ratio}
+            debtToEquity={stock.debt_to_equity}
+            dividendYield={stock.dividend_yield}
+            beta={stock.beta}
+            averageVolume10Day={stock.averageVolume10Day}
           />
         </Box>
 
@@ -144,12 +166,12 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
         </Stack>
       </Box>
 
-      {/* Earnings Calendar Section */}
-      {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
+      {/* Earnings Surprises Section */}
+      {stockEntry.earnings_surprises && stockEntry.earnings_surprises.length > 0 && (
         <Box sx={{ mt: 3 }}>
-          <EarningsCalendarCard
+          <EarningsSurprisesCard
             ticker={selectedStock}
-            earnings={stockEntry.earnings_calendar}
+            surprises={stockEntry.earnings_surprises}
           />
         </Box>
       )}

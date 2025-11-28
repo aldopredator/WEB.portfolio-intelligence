@@ -9,6 +9,7 @@ import {
   fetchCompanyNews, 
   fetchPriceTarget, 
   fetchEarningsCalendar, 
+  fetchEarningsSurprises,
   fetchRecommendationTrends 
 } from '@/lib/finnhub-metrics';
 import { isRecord } from '@/lib/utils';
@@ -79,6 +80,12 @@ async function getStockData(): Promise<StockInsightsData> {
         const earnings = await fetchEarningsCalendar(ticker);
         if (earnings && isRecord(stockEntry)) {
           stockEntry.earnings_calendar = earnings as any;
+        }
+
+        // Fetch earnings surprises
+        const earningSurprises = await fetchEarningsSurprises(ticker);
+        if (earningSurprises && isRecord(stockEntry)) {
+          stockEntry.earnings_surprises = earningSurprises as any;
         }
 
         // Fetch recommendation trends

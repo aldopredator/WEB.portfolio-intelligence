@@ -32,6 +32,7 @@ export interface StockData {
   previous_close?: number;
   market_cap?: number;
   volume?: number;
+  averageVolume10Day?: number;
   currency?: string;
   // Finnhub valuation metrics
   pe_ratio?: number;
@@ -109,6 +110,16 @@ export interface EarningsEvent {
   year?: number;
 }
 
+export interface EarningsSurprise {
+  actual?: number;
+  estimate?: number;
+  period: string;
+  quarter?: number;
+  year?: number;
+  surprise?: number;
+  surprisePercent?: number;
+}
+
 export interface StockInfo {
   stock_data: StockData;
   analyst_recommendations: AnalystData;
@@ -119,6 +130,7 @@ export interface StockInfo {
   company_profile?: CompanyProfile;
   price_target?: PriceTarget;
   earnings_calendar?: EarningsEvent[];
+  earnings_surprises?: EarningsSurprise[];
   recommendation_trends?: AnalystRecommendation[];
 }
 
