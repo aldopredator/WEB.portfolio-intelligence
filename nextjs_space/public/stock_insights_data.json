@@ -178,10 +178,10 @@
             "🚗 EV Competition"
         ]
     },
-    "BRKB": {
+    "BRK-B": {
         "stock_data": {
-            "ticker": "BRKB",
-            "company": "Berkshire Hathaway Inc. (BRKB)",
+            "ticker": "BRK-B",
+            "company": "Berkshire Hathaway Inc. (BRK-B)",
             "current_price": 465.50,
             "change": 2.10,
             "change_percent": 0.45,
