@@ -28,7 +28,7 @@ export default function CRUDDashboard() {
 
   // Fetch stock data on mount
   useEffect(() => {
-    fetch('/api/stock')
+    fetch('/api/stocks')
       .then((res) => res.json())
       .then((data) => {
         setStocksData(data);
