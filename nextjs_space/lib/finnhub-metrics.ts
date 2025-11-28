@@ -1,6 +1,5 @@
 // Server-only module for fetching financial metrics and company data from Finnhub
-// @ts-ignore - process is available in Node.js server context
-import { getCached, setCached } from './cache';
+// Uses Next.js fetch caching with 30-day revalidation for persistent caching
 
 export interface FinnhubMetrics {
   // Valuation metrics
@@ -41,32 +40,13 @@ export interface FinnhubMetrics {
   book_value_per_share?: number;
 }
 
-const METRICS_CACHE_TTL_MS = 2592000000; // 30 days (aligns with quarterly financial reporting) (extended TTL for serverless stability; stale data better than no data)
+const METRICS_CACHE_TTL_SECONDS = 2592000; // 30 days in seconds (aligns with quarterly financial reporting)
 
 /**
- * Fetch comprehensive financial data from Finnhub including metrics and company info
+ * Internal function that does the actual API fetching
  */
-export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetrics> {
-  console.log(`[FINNHUB] Starting metrics fetch for ${ticker}`);
-
-  // @ts-ignore - process is available in Node.js server context
-  const apiKey = process.env.FINNHUB_API_KEY;
-
-  if (!apiKey) {
-    console.warn(`[FINNHUB] ${ticker} - API key not configured, skipping metrics fetch`);
-    return {};
-  }
-
-  // Check cache first
-  const CACHE_VERSION = 'v2'; // Increment this to bust cache after deployment
-  const cacheKey = `${CACHE_VERSION}-finnhub-metrics-${ticker}`;
-  const cached = await getCached<FinnhubMetrics>(cacheKey, METRICS_CACHE_TTL_MS);
-  if (cached) {
-    console.log(`[FINNHUB] ${ticker} - Using cached metrics`);
-    return cached;
-  }
-
-  console.log(`[FINNHUB] ${ticker} - Fetching fresh metrics from API`);
+async function fetchFinnhubMetricsInternal(ticker: string, apiKey: string): Promise<FinnhubMetrics> {
+  console.log(`[FINNHUB] Fetching fresh metrics from API for ${ticker}`);
 
   try {
     const result: FinnhubMetrics = {};
@@ -74,7 +54,9 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
     // Fetch basic financial metrics
     try {
       const url = `https://finnhub.io/api/v1/stock/metric?symbol=${ticker}&metric=all&token=${apiKey}`;
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        next: { revalidate: METRICS_CACHE_TTL_SECONDS } // Next.js cache for 30 days
+      } as any);
 
       if (response.ok) {
         const data = await response.json();
@@ -136,7 +118,9 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
     // Fetch company profile for market cap and currency
     try {
       const profileUrl = `https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${apiKey}`;
-      const profileResponse = await fetch(profileUrl);
+      const profileResponse = await fetch(profileUrl, {
+        next: { revalidate: METRICS_CACHE_TTL_SECONDS }
+      } as any);
 
       if (profileResponse.ok) {
         const profileData = await profileResponse.json();
@@ -155,7 +139,9 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
     // Fetch quote for volume and additional data
     try {
       const quoteUrl = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`;
-      const quoteResponse = await fetch(quoteUrl);
+      const quoteResponse = await fetch(quoteUrl, {
+        next: { revalidate: METRICS_CACHE_TTL_SECONDS }
+      } as any);
 
       if (quoteResponse.ok) {
         const quoteData = await quoteResponse.json();
@@ -168,13 +154,26 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
       console.error(`[FINNHUB] ${ticker} - Error fetching quote:`, e);
     }
 
-    // Cache the result
-    await setCached(cacheKey, result);
-    console.log(`[FINNHUB] ${ticker} - Metrics cached successfully`);
-
     return result;
   } catch (error) {
     console.error(`[FINNHUB] ${ticker} - Unexpected error:`, error);
     return {};
   }
+}
+
+/**
+ * Fetch comprehensive financial data from Finnhub with Next.js persistent caching
+ * Cache persists across deployments via Next.js fetch cache (30 days revalidation)
+ */
+export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetrics> {
+  // @ts-ignore - process is available in Node.js server context
+  const apiKey = process.env.FINNHUB_API_KEY;
+
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured, skipping metrics fetch`);
+    return {};
+  }
+
+  // Fetch with Next.js cache built into fetch() calls
+  return fetchFinnhubMetricsInternal(ticker, apiKey);
 }
