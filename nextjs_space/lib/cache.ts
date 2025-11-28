@@ -35,11 +35,19 @@ export async function getCached<T = any>(key: string, ttlMs: number): Promise<T 
   try {
     const cache = await readCacheFile();
     const entry = cache[key];
-    if (!entry) return null;
+    if (!entry) {
+      console.log(`[CACHE] MISS - Key: ${key}`);
+      return null;
+    }
     const age = Date.now() - (entry.ts || 0);
-    if (age > ttlMs) return null;
+    if (age > ttlMs) {
+      console.log(`[CACHE] EXPIRED - Key: ${key}, Age: ${Math.round(age / 1000)}s, TTL: ${Math.round(ttlMs / 1000)}s`);
+      return null;
+    }
+    console.log(`[CACHE] HIT - Key: ${key}, Age: ${Math.round(age / 1000)}s`);
     return entry.data as T;
   } catch (e) {
+    console.error(`[CACHE] ERROR - Key: ${key}`, e);
     return null;
   }
 }

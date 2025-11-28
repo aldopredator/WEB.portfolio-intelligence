@@ -47,11 +47,13 @@ const METRICS_CACHE_TTL_MS = 3600000; // 1 hour default
  * Fetch comprehensive financial data from Finnhub including metrics and company info
  */
 export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetrics> {
+  console.log(`[FINNHUB] Starting metrics fetch for ${ticker}`);
+
   // @ts-ignore - process is available in Node.js server context
   const apiKey = process.env.FINNHUB_API_KEY;
 
   if (!apiKey) {
-    console.warn('FINNHUB_API_KEY not set; skipping Finnhub metrics fetch');
+    console.warn(`[FINNHUB] ${ticker} - API key not configured, skipping metrics fetch`);
     return {};
   }
 
@@ -59,8 +61,11 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
   const cacheKey = `finnhub-metrics-${ticker}`;
   const cached = await getCached<FinnhubMetrics>(cacheKey, METRICS_CACHE_TTL_MS);
   if (cached) {
+    console.log(`[FINNHUB] ${ticker} - Using cached metrics`);
     return cached;
   }
+
+  console.log(`[FINNHUB] ${ticker} - Fetching fresh metrics from API`);
 
   try {
     const result: FinnhubMetrics = {};
@@ -109,9 +114,13 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
         // Per share metrics
         result.eps = metrics.epsBasicExclExtraItemsTTM || metrics.epsExclExtraItemsAnnual ? parseFloat(metrics.epsBasicExclExtraItemsTTM || metrics.epsExclExtraItemsAnnual) : undefined;
         result.book_value_per_share = metrics.bookValuePerShareQuarterly || metrics.bookValuePerShareAnnual ? parseFloat(metrics.bookValuePerShareQuarterly || metrics.bookValuePerShareAnnual) : undefined;
+
+        console.log(`[FINNHUB] ${ticker} - Successfully fetched ${Object.keys(result).filter(k => result[k as keyof FinnhubMetrics] !== undefined).length} metrics`);
+      } else {
+        console.warn(`[FINNHUB] ${ticker} - Metrics API returned status ${response.status}`);
       }
     } catch (e) {
-      console.warn(`Failed to fetch Finnhub metrics for ${ticker}:`, e);
+      console.error(`[FINNHUB] ${ticker} - Error fetching metrics:`, e);
     }
 
     // Fetch company profile for market cap and currency
@@ -127,9 +136,10 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
         if (profileData.currency) {
           result.currency = profileData.currency;
         }
+        console.log(`[FINNHUB] ${ticker} - Fetched company profile`);
       }
     } catch (e) {
-      console.warn(`Failed to fetch Finnhub profile for ${ticker}:`, e);
+      console.error(`[FINNHUB] ${ticker} - Error fetching profile:`, e);
     }
 
     // Fetch quote for volume and additional data
@@ -142,17 +152,19 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
         if (quoteData.v) {
           result.volume = quoteData.v; // Daily volume
         }
+        console.log(`[FINNHUB] ${ticker} - Fetched quote data`);
       }
     } catch (e) {
-      console.warn(`Failed to fetch Finnhub quote for ${ticker}:`, e);
+      console.error(`[FINNHUB] ${ticker} - Error fetching quote:`, e);
     }
 
     // Cache the result
     await setCached(cacheKey, result);
+    console.log(`[FINNHUB] ${ticker} - Metrics cached successfully`);
 
     return result;
   } catch (error) {
-    console.error(`Error fetching Finnhub data for ${ticker}:`, error);
+    console.error(`[FINNHUB] ${ticker} - Unexpected error:`, error);
     return {};
   }
 }
