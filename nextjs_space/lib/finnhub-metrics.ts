@@ -6,6 +6,7 @@ import type { AnalystRecommendation } from './types';
 export interface CompanyProfile {
   name?: string;
   logo?: string;
+  finnhubIndustry?: string;
   industry?: string;
   sector?: string;
   subSector?: string;
@@ -277,6 +278,7 @@ export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfil
       return {
         name: data.name,
         logo: data.logo,
+        finnhubIndustry: data.finnhubIndustry,
         industry: data.finnhubIndustry,
         sector: data.gsector,
         subSector: data.naicsSubsector,

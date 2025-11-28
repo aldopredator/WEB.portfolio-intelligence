@@ -70,6 +70,7 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
                 ticker={selectedStock}
                 companyName={stockEntry.company_profile.name}
                 logo={stockEntry.company_profile.logo}
+                finnhubIndustry={stockEntry.company_profile.finnhubIndustry}
                 industry={stockEntry.company_profile.industry}
                 sector={stockEntry.company_profile.sector}
                 subSector={stockEntry.company_profile.subSector}

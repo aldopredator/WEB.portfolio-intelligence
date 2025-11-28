@@ -74,6 +74,7 @@ export interface SocialSentiment {
 export interface CompanyProfile {
   name?: string;
   logo?: string;
+  finnhubIndustry?: string;
   industry?: string;
   sector?: string;
   subSector?: string;
