@@ -30,6 +30,12 @@ export interface StockQuote {
  * Uses the unofficial Yahoo Finance API endpoint
  */
 export async function fetchYahooQuote(ticker: string): Promise<StockQuote | null> {
+    // Check if Yahoo Finance is enabled
+    if (process.env.ENABLE_YAHOO_FINANCE === 'false') {
+        console.log(`[YAHOO] Yahoo Finance is disabled via ENABLE_YAHOO_FINANCE env var`);
+        return null;
+    }
+    
     try {
         // Yahoo Finance query API endpoint with historical data
         const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=1mo&interval=1d`;
@@ -132,6 +138,12 @@ export async function fetchMultipleQuotes(tickers: string[]): Promise<Record<str
  * All other data (real-time quotes, financial metrics) uses Finnhub as primary source.
  */
 export async function fetchYahooPriceHistory(ticker: string): Promise<{ Date: string; Close: number }[]> {
+    // Check if Yahoo Finance is enabled
+    if (process.env.ENABLE_YAHOO_FINANCE === 'false') {
+        console.log(`[YAHOO] Yahoo Finance is disabled via ENABLE_YAHOO_FINANCE env var`);
+        return [];
+    }
+    
     try {
         const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=1mo&interval=1d`;
         const response = await fetch(url, {

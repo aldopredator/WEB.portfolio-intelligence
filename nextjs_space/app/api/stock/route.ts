@@ -32,6 +32,16 @@ export async function GET(request: NextRequest) {
             );
         }
 
+        // Check if Yahoo Finance is enabled
+        if (process.env.ENABLE_YAHOO_FINANCE === 'false') {
+            return NextResponse.json({
+                success: false,
+                error: 'Yahoo Finance is disabled',
+                message: 'Yahoo Finance API is disabled via ENABLE_YAHOO_FINANCE environment variable',
+                timestamp: new Date().toISOString(),
+            }, { status: 503 });
+        }
+
         // Fetch quotes from Yahoo Finance
         const quotes = await fetchMultipleQuotes(tickers);
 
