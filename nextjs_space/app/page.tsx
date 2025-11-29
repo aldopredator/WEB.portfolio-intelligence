@@ -1,7 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import type { StockInsightsData } from '@/lib/types';
-import { fetchYahooPriceHistory } from '@/lib/yahoo-finance';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
 import { 
   fetchFinnhubMetrics, 
@@ -98,11 +97,8 @@ async function getStockData(): Promise<StockInsightsData> {
           stockEntry.recommendation_trends = recTrends as any;
         }
 
-        // Fetch price history
-        const priceHistory = await fetchYahooPriceHistory(ticker);
-        if (priceHistory && priceHistory.length > 0 && isRecord(stockEntry) && stockEntry.stock_data) {
-          (stockEntry.stock_data as any).price_movement_30_days = priceHistory;
-        }
+        // Note: Price history is already in the JSON file (updates once per day)
+        // No need to fetch from Yahoo Finance on every request
       } catch (error) {
         console.error(`Error enriching ${ticker}:`, error);
       }
