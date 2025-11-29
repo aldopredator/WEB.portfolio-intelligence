@@ -126,7 +126,6 @@ export default function CriteriaForm() {
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
                       <h3 className="text-white font-semibold text-lg">P/E Ratio</h3>
-                      <p className="text-slate-400 text-sm mt-1">Ensures reasonable valuation relative to earnings</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.peEnabled
@@ -140,7 +139,6 @@ export default function CriteriaForm() {
                   {/* Spectrum Slider for P/E */}
                   <div className="mt-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-slate-400 text-sm">Maximum P/E Ratio</span>
                       <span className="text-white font-mono font-bold text-lg">{criteria.maxPE.toFixed(1)}</span>
                     </div>
                     
@@ -234,7 +232,6 @@ export default function CriteriaForm() {
                   {/* Spectrum Slider for P/B */}
                   <div className="mt-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-slate-400 text-sm">Maximum P/B Ratio</span>
                       <span className="text-white font-mono font-bold text-lg">{criteria.maxPB.toFixed(1)}</span>
                     </div>
                     
@@ -314,7 +311,6 @@ export default function CriteriaForm() {
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
                       <h3 className="text-white font-semibold text-lg">Market Cap</h3>
-                      <p className="text-slate-400 text-sm mt-1">Company size and market value range</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.marketCapEnabled
@@ -378,7 +374,6 @@ export default function CriteriaForm() {
                     {/* Max Market Cap */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-slate-400 text-sm">Maximum Market Cap (B)</span>
                         <span className="text-white font-mono font-bold text-lg">${criteria.maxMarketCap.toFixed(0)}B</span>
                       </div>
                       <div className="relative px-2">
