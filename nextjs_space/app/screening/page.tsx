@@ -2,6 +2,7 @@ import { CheckCircle2, Filter, Info, AlertTriangle } from 'lucide-react';
 import { PageHeader } from '@/components/page-header';
 import { getStockData, STOCK_CONFIG } from '@/lib/stock-data';
 import { parseCriteriaFromParams } from '@/lib/screening-criteria';
+import ScreeningClient from './ScreeningClient';
 
 export const revalidate = 1800; // 30 minutes
 
@@ -97,15 +98,16 @@ export default async function ScreeningPage({
   }).filter((stock): stock is NonNullable<typeof stock> => stock !== null);
 
   return (
-    <main className="min-h-screen">
-      <PageHeader
-        title="Stock Screening Results"
-        description="Stocks that meet all investment criteria and filtering requirements"
-        action={
-          <div className="flex items-center gap-3 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 rounded-xl px-6 py-3">
-            <Filter className="w-5 h-5 text-emerald-400" />
-            <div>
-              <p className="text-emerald-400 text-xs font-medium">Stocks Found</p>
+    <ScreeningClient>
+      <main className="min-h-screen">
+        <PageHeader
+          title="Stock Screening Results"
+          description="Stocks that meet all investment criteria and filtering requirements"
+          action={
+            <div className="flex items-center gap-3 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 rounded-xl px-6 py-3">
+              <Filter className="w-5 h-5 text-emerald-400" />
+              <div>
+                <p className="text-emerald-400 text-xs font-medium">Stocks Found</p>
               <p className="text-white text-2xl font-bold">{recommendedStocks.length}</p>
             </div>
           </div>
@@ -592,5 +594,6 @@ export default async function ScreeningPage({
         </div>
       </div>
     </main>
+    </ScreeningClient>
   );
 }
