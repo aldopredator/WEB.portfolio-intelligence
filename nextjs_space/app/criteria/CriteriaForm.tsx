@@ -218,7 +218,6 @@ export default function CriteriaForm() {
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
                       <h3 className="text-white font-semibold text-lg">P/B Ratio</h3>
-                      <p className="text-slate-400 text-sm mt-1">Fair value relative to company assets</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.pbEnabled
@@ -443,7 +442,6 @@ export default function CriteriaForm() {
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
                       <h3 className="text-white font-semibold text-lg">Beta</h3>
-                      <p className="text-slate-400 text-sm mt-1">Stock volatility relative to market (lower = less risky)</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.betaEnabled
@@ -581,7 +579,6 @@ export default function CriteriaForm() {
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
                       <h3 className="text-white font-semibold text-lg">ROE (Return on Equity)</h3>
-                      <p className="text-slate-400 text-sm mt-1">Profitability efficiency - higher is better</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.roeEnabled
@@ -663,7 +660,6 @@ export default function CriteriaForm() {
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
                       <h3 className="text-white font-semibold text-lg">Profit Margin</h3>
-                      <p className="text-slate-400 text-sm mt-1">Percentage of revenue kept as profit</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.profitMarginEnabled
@@ -745,7 +741,6 @@ export default function CriteriaForm() {
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
                       <h3 className="text-white font-semibold text-lg">Social Sentiment</h3>
-                      <p className="text-slate-400 text-sm mt-1">Filter by news and social media sentiment</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.sentimentEnabled
@@ -794,7 +789,6 @@ export default function CriteriaForm() {
               </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-white">Sector Exclusions</h2>
-                <p className="text-slate-300 text-sm mt-1">Industries excluded from investment consideration</p>
               </div>
               <button
                 type="button"
@@ -851,7 +845,6 @@ export default function CriteriaForm() {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-white font-semibold text-lg">Sector: {sector}</h3>
-                      <p className="text-slate-400 text-sm mt-1">Excluded from screening results</p>
                     </div>
                     <button
                       type="button"
@@ -866,11 +859,7 @@ export default function CriteriaForm() {
                   </div>
                 </div>
               ))
-            ) : (
-              <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5 text-center">
-                <p className="text-slate-400 text-sm">No sectors excluded. Add sectors above to filter them out.</p>
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -883,7 +872,6 @@ export default function CriteriaForm() {
               </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-white">Country Exclusions</h2>
-                <p className="text-slate-300 text-sm mt-1">Countries excluded from investment consideration</p>
               </div>
               <button
                 type="button"
@@ -940,7 +928,6 @@ export default function CriteriaForm() {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-white font-semibold text-lg">Country: {country}</h3>
-                      <p className="text-slate-400 text-sm mt-1">Excluded from screening results</p>
                     </div>
                     <button
                       type="button"
@@ -955,11 +942,7 @@ export default function CriteriaForm() {
                   </div>
                 </div>
               ))
-            ) : (
-              <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5 text-center">
-                <p className="text-slate-400 text-sm">No countries excluded. Add countries above to filter them out.</p>
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
