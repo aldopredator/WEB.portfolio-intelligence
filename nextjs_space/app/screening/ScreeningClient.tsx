@@ -30,7 +30,9 @@ export default function ScreeningClient({ children }: ScreeningClientProps) {
         {/* Toggle Button */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="absolute -left-10 top-20 z-50 w-10 h-16 bg-slate-900 hover:bg-slate-800 border-l border-t border-b border-slate-700 rounded-l-lg flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+          className={`absolute -left-10 top-20 z-50 w-10 h-16 bg-slate-900 hover:bg-slate-800 border-l border-t border-b border-slate-700 rounded-l-lg flex items-center justify-center text-slate-400 hover:text-white transition-colors ${
+            !sidebarOpen ? 'flex' : 'hidden'
+          }`}
         >
           {sidebarOpen ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
         </button>
@@ -44,11 +46,20 @@ export default function ScreeningClient({ children }: ScreeningClientProps) {
                 <p className="text-slate-400 text-sm mt-1">Adjust filters and apply to see results</p>
               </div>
               <button
-                onClick={() => setSidebarOpen(false)}
+                onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="px-4 py-2 bg-slate-800/50 hover:bg-slate-800/70 border border-slate-700 rounded-lg text-slate-400 hover:text-white transition-colors flex items-center gap-2"
               >
-                <ChevronRight className="w-4 h-4" />
-                <span className="text-sm font-medium">Collapse</span>
+                {sidebarOpen ? (
+                  <>
+                    <ChevronRight className="w-4 h-4" />
+                    <span className="text-sm font-medium">Collapse</span>
+                  </>
+                ) : (
+                  <>
+                    <ChevronLeft className="w-4 h-4" />
+                    <span className="text-sm font-medium">Expand</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

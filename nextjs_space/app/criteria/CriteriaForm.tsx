@@ -123,28 +123,25 @@ export default function CriteriaForm() {
                   </button>
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-start justify-between gap-4 mb-1.5">
-                    <div>
-                      <h3 className="text-white font-semibold text-base">P/E Ratio</h3>
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">P/E Ratio</h3>
+                    <div className="flex items-center gap-3">
+                      <span className="text-white font-mono font-bold text-base">{criteria.maxPE.toFixed(1)}</span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                        criteria.peEnabled
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                          : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                      }`}>
+                        {criteria.peEnabled ? 'Enabled' : 'Disabled'}
+                      </span>
                     </div>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
-                      criteria.peEnabled
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
-                    }`}>
-                      {criteria.peEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
                   </div>
                   
                   {/* Spectrum Slider for P/E */}
-                  <div className="mt-2.5">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-white font-mono font-bold text-base">{criteria.maxPE.toFixed(1)}</span>
-                    </div>
-                    
+                  <div className="mt-1">
                     <div className="relative px-2">
                       {/* Spectrum Track */}
-                      <div className="relative h-12 flex items-center">
+                      <div className="relative h-8 flex items-center">
                         {/* Background gradient track */}
                         <div
                           className="absolute left-0 right-0 h-3 rounded-full"
@@ -201,7 +198,7 @@ export default function CriteriaForm() {
             {/* P/B Ratio */}
             <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-1">
+                <div className="flex-shrink-0 mt-0">
                   <button
                     type="button"
                     onClick={() => setCriteria({ ...criteria, pbEnabled: !criteria.pbEnabled })}
@@ -215,28 +212,25 @@ export default function CriteriaForm() {
                   </button>
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div>
-                      <h3 className="text-white font-semibold text-base">P/B Ratio</h3>
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">P/B Ratio</h3>
+                    <div className="flex items-center gap-3">
+                      <span className="text-white font-mono font-bold text-base">{criteria.maxPB.toFixed(1)}</span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                        criteria.pbEnabled
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                          : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                      }`}>
+                        {criteria.pbEnabled ? 'Enabled' : 'Disabled'}
+                      </span>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                      criteria.pbEnabled
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
-                    }`}>
-                      {criteria.pbEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
                   </div>
                   
                   {/* Spectrum Slider for P/B */}
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-white font-mono font-bold text-base">{criteria.maxPB.toFixed(1)}</span>
-                    </div>
-                    
+                  <div className="mt-1">
                     <div className="relative px-2">
                       {/* Spectrum Track */}
-                      <div className="relative h-12 flex items-center">
+                      <div className="relative h-8 flex items-center">
                         {/* Background gradient track */}
                         <div
                           className="absolute left-0 right-0 h-3 rounded-full"
@@ -293,7 +287,7 @@ export default function CriteriaForm() {
             {/* Market Cap */}
             <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-1">
+                <div className="flex-shrink-0 mt-0">
                   <button
                     type="button"
                     onClick={() => setCriteria({ ...criteria, marketCapEnabled: !criteria.marketCapEnabled })}
@@ -307,11 +301,9 @@ export default function CriteriaForm() {
                   </button>
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div>
-                      <h3 className="text-white font-semibold text-base">Market Cap</h3>
-                    </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">Market Cap</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.marketCapEnabled
                         ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
                         : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
@@ -320,14 +312,15 @@ export default function CriteriaForm() {
                     </span>
                   </div>
                   
-                  <div className="mt-4 space-y-4">
+                  <div className="mt-1 space-y-4">
                     {/* Min Market Cap */}
                     <div>
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <span className="text-sm text-slate-400">Minimum</span>
                         <span className="text-white font-mono font-bold text-base">${criteria.minMarketCap.toFixed(0)}B</span>
                       </div>
                       <div className="relative px-2">
-                        <div className="relative h-12 flex items-center">
+                        <div className="relative h-8 flex items-center">
                           <div
                             className="absolute left-0 right-0 h-3 rounded-full"
                             style={{
@@ -371,11 +364,12 @@ export default function CriteriaForm() {
 
                     {/* Max Market Cap */}
                     <div>
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <span className="text-sm text-slate-400">Maximum</span>
                         <span className="text-white font-mono font-bold text-base">${criteria.maxMarketCap.toFixed(0)}B</span>
                       </div>
                       <div className="relative px-2">
-                        <div className="relative h-12 flex items-center">
+                        <div className="relative h-8 flex items-center">
                           <div
                             className="absolute left-0 right-0 h-3 rounded-full"
                             style={{
@@ -424,7 +418,7 @@ export default function CriteriaForm() {
             {/* Beta */}
             <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-1">
+                <div className="flex-shrink-0 mt-0">
                   <button
                     type="button"
                     onClick={() => setCriteria({ ...criteria, betaEnabled: !criteria.betaEnabled })}
@@ -438,11 +432,9 @@ export default function CriteriaForm() {
                   </button>
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div>
-                      <h3 className="text-white font-semibold text-base">Beta</h3>
-                    </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">Beta</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.betaEnabled
                         ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
                         : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
@@ -451,14 +443,15 @@ export default function CriteriaForm() {
                     </span>
                   </div>
                   
-                  <div className="mt-4 space-y-4">
+                  <div className="mt-1 space-y-4">
                     {/* Min Beta */}
                     <div>
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <span className="text-sm text-slate-400">Minimum</span>
                         <span className="text-white font-mono font-bold text-base">{criteria.minBeta.toFixed(2)}</span>
                       </div>
                       <div className="relative px-2">
-                        <div className="relative h-12 flex items-center">
+                        <div className="relative h-8 flex items-center">
                           <div
                             className="absolute left-0 right-0 h-3 rounded-full"
                             style={{
@@ -502,11 +495,12 @@ export default function CriteriaForm() {
 
                     {/* Max Beta */}
                     <div>
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <span className="text-sm text-slate-400">Maximum</span>
                         <span className="text-white font-mono font-bold text-base">{criteria.maxBeta.toFixed(2)}</span>
                       </div>
                       <div className="relative px-2">
-                        <div className="relative h-12 flex items-center">
+                        <div className="relative h-8 flex items-center">
                           <div
                             className="absolute left-0 right-0 h-3 rounded-full"
                             style={{
@@ -555,7 +549,7 @@ export default function CriteriaForm() {
             {/* ROE */}
             <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-1">
+                <div className="flex-shrink-0 mt-0">
                   <button
                     type="button"
                     onClick={() => setCriteria({ ...criteria, roeEnabled: !criteria.roeEnabled })}
@@ -569,25 +563,23 @@ export default function CriteriaForm() {
                   </button>
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div>
-                      <h3 className="text-white font-semibold text-base">ROE (Return on Equity)</h3>
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">ROE (Return on Equity)</h3>
+                    <div className="flex items-center gap-3">
+                      <span className="text-white font-mono font-bold text-base">{criteria.minROE.toFixed(1)}%</span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                        criteria.roeEnabled
+                          ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
+                          : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                      }`}>
+                        {criteria.roeEnabled ? 'Enabled' : 'Disabled'}
+                      </span>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                      criteria.roeEnabled
-                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
-                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
-                    }`}>
-                      {criteria.roeEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
                   </div>
                   
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-white font-mono font-bold text-base">{criteria.minROE.toFixed(1)}%</span>
-                    </div>
+                  <div className="mt-1">
                     <div className="relative px-2">
-                      <div className="relative h-12 flex items-center">
+                      <div className="relative h-8 flex items-center">
                         <div
                           className="absolute left-0 right-0 h-3 rounded-full"
                           style={{
@@ -635,7 +627,7 @@ export default function CriteriaForm() {
             {/* Profit Margin */}
             <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-1">
+                <div className="flex-shrink-0 mt-0">
                   <button
                     type="button"
                     onClick={() => setCriteria({ ...criteria, profitMarginEnabled: !criteria.profitMarginEnabled })}
@@ -649,25 +641,23 @@ export default function CriteriaForm() {
                   </button>
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div>
-                      <h3 className="text-white font-semibold text-base">Profit Margin</h3>
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">Profit Margin</h3>
+                    <div className="flex items-center gap-3">
+                      <span className="text-white font-mono font-bold text-base">{criteria.minProfitMargin.toFixed(1)}%</span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                        criteria.profitMarginEnabled
+                          ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
+                          : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                      }`}>
+                        {criteria.profitMarginEnabled ? 'Enabled' : 'Disabled'}
+                      </span>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                      criteria.profitMarginEnabled
-                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
-                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
-                    }`}>
-                      {criteria.profitMarginEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
                   </div>
                   
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-white font-mono font-bold text-base">{criteria.minProfitMargin.toFixed(1)}%</span>
-                    </div>
+                  <div className="mt-1">
                     <div className="relative px-2">
-                      <div className="relative h-12 flex items-center">
+                      <div className="relative h-8 flex items-center">
                         <div
                           className="absolute left-0 right-0 h-3 rounded-full"
                           style={{
@@ -715,7 +705,7 @@ export default function CriteriaForm() {
             {/* Social Sentiment */}
             <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-1">
+                <div className="flex-shrink-0 mt-0">
                   <button
                     type="button"
                     onClick={() => setCriteria({ ...criteria, sentimentEnabled: !criteria.sentimentEnabled })}
@@ -729,11 +719,9 @@ export default function CriteriaForm() {
                   </button>
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div>
-                      <h3 className="text-white font-semibold text-base">Social Sentiment</h3>
-                    </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">Social Sentiment</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.sentimentEnabled
                         ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
                         : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
@@ -742,7 +730,7 @@ export default function CriteriaForm() {
                     </span>
                   </div>
                   
-                  <div className="mt-4 grid grid-cols-2 gap-3">
+                  <div className="mt-1 grid grid-cols-2 gap-3">
                     {(['all', 'positive', 'neutral', 'negative'] as const).map((sentiment) => (
                       <button
                         key={sentiment}
