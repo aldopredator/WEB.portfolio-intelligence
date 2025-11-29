@@ -20,7 +20,7 @@ function AreaGradient({ color, id }: { color: string; id: string }) {
 }
 
 interface PriceHistoryChartProps {
-  data: Array<{ Date: string; Close: number }>;
+  data: Array<{ date: string; price: number } | { Date: string; Close: number }>;
   ticker: string;
   currentPrice: number;
   priceChange: number;
@@ -42,14 +42,20 @@ export default function PriceHistoryChart({
 }: PriceHistoryChartProps) {
   const theme = useTheme();
 
+  // Normalize data format (support both lowercase and uppercase field names)
+  const normalizedData = data.map(d => ({
+    date: 'date' in d ? d.date : d.Date,
+    price: 'price' in d ? d.price : d.Close,
+  }));
+
   // Format dates as "Day Month" (e.g., "1 Nov", "15 Nov")
-  const dates = data.map((d) => {
-    const date = new Date(d.Date);
+  const dates = normalizedData.map((d) => {
+    const date = new Date(d.date);
     const day = date.getDate();
     const month = date.toLocaleDateString('en-US', { month: 'short' });
     return `${day} ${month}`;
   });
-  const prices = data.map((d) => d.Close);
+  const prices = normalizedData.map((d) => d.price);
 
   // Calculate dynamic Y-axis range to emphasize price movements
   const minPrice = Math.min(...prices);
