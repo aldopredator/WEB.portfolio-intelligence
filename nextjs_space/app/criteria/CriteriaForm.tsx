@@ -91,29 +91,29 @@ export default function CriteriaForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 gap-6 mb-6">
+      <div className="grid grid-cols-1 gap-4 mb-4">
         {/* Financial Metrics - Merged Valuation and Additional Metrics */}
         <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border-b border-emerald-500/30 p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
-                <TrendingUp className="w-6 h-6 text-white" />
+          <div className="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border-b border-emerald-500/30 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
+                <TrendingUp className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white">Financial Metrics</h2>
+                <h2 className="text-xl font-bold text-white">Financial Metrics</h2>
               </div>
             </div>
           </div>
 
-          <div className="p-6 space-y-4">
+          <div className="p-4 space-y-3">
             {/* P/E Ratio */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 mt-1">
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-0.5">
                   <button
                     type="button"
                     onClick={() => setCriteria({ ...criteria, peEnabled: !criteria.peEnabled })}
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors ${
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
                       criteria.peEnabled
                         ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
                         : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
@@ -123,11 +123,11 @@ export default function CriteriaForm() {
                   </button>
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-start justify-between gap-4 mb-2">
+                  <div className="flex items-start justify-between gap-4 mb-1.5">
                     <div>
-                      <h3 className="text-white font-semibold text-lg">P/E Ratio</h3>
+                      <h3 className="text-white font-semibold text-base">P/E Ratio</h3>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.peEnabled
                         ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                         : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
@@ -137,9 +137,9 @@ export default function CriteriaForm() {
                   </div>
                   
                   {/* Spectrum Slider for P/E */}
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-white font-mono font-bold text-lg">{criteria.maxPE.toFixed(1)}</span>
+                  <div className="mt-2.5">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-white font-mono font-bold text-base">{criteria.maxPE.toFixed(1)}</span>
                     </div>
                     
                     <div className="relative px-2">
@@ -199,13 +199,13 @@ export default function CriteriaForm() {
             </div>
 
             {/* P/B Ratio */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
-              <div className="flex items-start gap-4">
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 mt-1">
                   <button
                     type="button"
                     onClick={() => setCriteria({ ...criteria, pbEnabled: !criteria.pbEnabled })}
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors ${
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
                       criteria.pbEnabled
                         ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
                         : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
@@ -217,7 +217,7 @@ export default function CriteriaForm() {
                 <div className="flex-1">
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
-                      <h3 className="text-white font-semibold text-lg">P/B Ratio</h3>
+                      <h3 className="text-white font-semibold text-base">P/B Ratio</h3>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.pbEnabled
@@ -231,7 +231,7 @@ export default function CriteriaForm() {
                   {/* Spectrum Slider for P/B */}
                   <div className="mt-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-white font-mono font-bold text-lg">{criteria.maxPB.toFixed(1)}</span>
+                      <span className="text-white font-mono font-bold text-base">{criteria.maxPB.toFixed(1)}</span>
                     </div>
                     
                     <div className="relative px-2">
@@ -291,13 +291,13 @@ export default function CriteriaForm() {
             </div>
 
             {/* Market Cap */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
-              <div className="flex items-start gap-4">
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 mt-1">
                   <button
                     type="button"
                     onClick={() => setCriteria({ ...criteria, marketCapEnabled: !criteria.marketCapEnabled })}
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors ${
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
                       criteria.marketCapEnabled
                         ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
                         : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
@@ -309,7 +309,7 @@ export default function CriteriaForm() {
                 <div className="flex-1">
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
-                      <h3 className="text-white font-semibold text-lg">Market Cap</h3>
+                      <h3 className="text-white font-semibold text-base">Market Cap</h3>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.marketCapEnabled
@@ -324,7 +324,7 @@ export default function CriteriaForm() {
                     {/* Min Market Cap */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-white font-mono font-bold text-lg">${criteria.minMarketCap.toFixed(0)}B</span>
+                        <span className="text-white font-mono font-bold text-base">${criteria.minMarketCap.toFixed(0)}B</span>
                       </div>
                       <div className="relative px-2">
                         <div className="relative h-12 flex items-center">
@@ -372,7 +372,7 @@ export default function CriteriaForm() {
                     {/* Max Market Cap */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-white font-mono font-bold text-lg">${criteria.maxMarketCap.toFixed(0)}B</span>
+                        <span className="text-white font-mono font-bold text-base">${criteria.maxMarketCap.toFixed(0)}B</span>
                       </div>
                       <div className="relative px-2">
                         <div className="relative h-12 flex items-center">
@@ -422,13 +422,13 @@ export default function CriteriaForm() {
             </div>
 
             {/* Beta */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
-              <div className="flex items-start gap-4">
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 mt-1">
                   <button
                     type="button"
                     onClick={() => setCriteria({ ...criteria, betaEnabled: !criteria.betaEnabled })}
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors ${
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
                       criteria.betaEnabled
                         ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
                         : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
@@ -440,7 +440,7 @@ export default function CriteriaForm() {
                 <div className="flex-1">
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
-                      <h3 className="text-white font-semibold text-lg">Beta</h3>
+                      <h3 className="text-white font-semibold text-base">Beta</h3>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.betaEnabled
@@ -455,7 +455,7 @@ export default function CriteriaForm() {
                     {/* Min Beta */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-white font-mono font-bold text-lg">{criteria.minBeta.toFixed(2)}</span>
+                        <span className="text-white font-mono font-bold text-base">{criteria.minBeta.toFixed(2)}</span>
                       </div>
                       <div className="relative px-2">
                         <div className="relative h-12 flex items-center">
@@ -503,7 +503,7 @@ export default function CriteriaForm() {
                     {/* Max Beta */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-white font-mono font-bold text-lg">{criteria.maxBeta.toFixed(2)}</span>
+                        <span className="text-white font-mono font-bold text-base">{criteria.maxBeta.toFixed(2)}</span>
                       </div>
                       <div className="relative px-2">
                         <div className="relative h-12 flex items-center">
@@ -553,13 +553,13 @@ export default function CriteriaForm() {
             </div>
 
             {/* ROE */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
-              <div className="flex items-start gap-4">
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 mt-1">
                   <button
                     type="button"
                     onClick={() => setCriteria({ ...criteria, roeEnabled: !criteria.roeEnabled })}
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors ${
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
                       criteria.roeEnabled
                         ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
                         : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
@@ -571,7 +571,7 @@ export default function CriteriaForm() {
                 <div className="flex-1">
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
-                      <h3 className="text-white font-semibold text-lg">ROE (Return on Equity)</h3>
+                      <h3 className="text-white font-semibold text-base">ROE (Return on Equity)</h3>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.roeEnabled
@@ -584,7 +584,7 @@ export default function CriteriaForm() {
                   
                   <div className="mt-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-white font-mono font-bold text-lg">{criteria.minROE.toFixed(1)}%</span>
+                      <span className="text-white font-mono font-bold text-base">{criteria.minROE.toFixed(1)}%</span>
                     </div>
                     <div className="relative px-2">
                       <div className="relative h-12 flex items-center">
@@ -633,13 +633,13 @@ export default function CriteriaForm() {
             </div>
 
             {/* Profit Margin */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
-              <div className="flex items-start gap-4">
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 mt-1">
                   <button
                     type="button"
                     onClick={() => setCriteria({ ...criteria, profitMarginEnabled: !criteria.profitMarginEnabled })}
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors ${
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
                       criteria.profitMarginEnabled
                         ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
                         : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
@@ -651,7 +651,7 @@ export default function CriteriaForm() {
                 <div className="flex-1">
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
-                      <h3 className="text-white font-semibold text-lg">Profit Margin</h3>
+                      <h3 className="text-white font-semibold text-base">Profit Margin</h3>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.profitMarginEnabled
@@ -664,7 +664,7 @@ export default function CriteriaForm() {
                   
                   <div className="mt-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-white font-mono font-bold text-lg">{criteria.minProfitMargin.toFixed(1)}%</span>
+                      <span className="text-white font-mono font-bold text-base">{criteria.minProfitMargin.toFixed(1)}%</span>
                     </div>
                     <div className="relative px-2">
                       <div className="relative h-12 flex items-center">
@@ -713,13 +713,13 @@ export default function CriteriaForm() {
             </div>
 
             {/* Social Sentiment */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
-              <div className="flex items-start gap-4">
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 mt-1">
                   <button
                     type="button"
                     onClick={() => setCriteria({ ...criteria, sentimentEnabled: !criteria.sentimentEnabled })}
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors ${
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
                       criteria.sentimentEnabled
                         ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
                         : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
@@ -731,7 +731,7 @@ export default function CriteriaForm() {
                 <div className="flex-1">
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div>
-                      <h3 className="text-white font-semibold text-lg">Social Sentiment</h3>
+                      <h3 className="text-white font-semibold text-base">Social Sentiment</h3>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.sentimentEnabled
@@ -773,13 +773,13 @@ export default function CriteriaForm() {
 
         {/* Sector Exclusions */}
         <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 border-b border-red-500/30 p-6">
-            <div className="flex items-center gap-4">
+          <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 border-b border-red-500/30 p-4">
+            <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
                 <Ban className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-white">Sector Exclusions</h2>
+                <h2 className="text-xl font-bold text-white">Sector Exclusions</h2>
               </div>
               <button
                 type="button"
@@ -797,7 +797,7 @@ export default function CriteriaForm() {
 
           <div className="p-6 space-y-4">
             {/* Add New Sector */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
               <div className="flex items-center gap-3">
                 <input
                   type="text"
@@ -827,15 +827,15 @@ export default function CriteriaForm() {
             {/* Excluded Sectors List */}
             {criteria.excludeSectors.length > 0 ? (
               criteria.excludeSectors.map((sector) => (
-                <div key={sector} className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
-                  <div className="flex items-center gap-4">
+                <div key={sector} className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+                  <div className="flex items-center gap-3">
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 bg-red-500/10 rounded-lg flex items-center justify-center border border-red-500/20">
+                      <div className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center border border-red-500/20">
                         <XCircle className="w-5 h-5 text-red-400" />
                       </div>
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-white font-semibold text-lg">Sector: {sector}</h3>
+                      <h3 className="text-white font-semibold text-base">Sector: {sector}</h3>
                     </div>
                     <button
                       type="button"
@@ -856,13 +856,13 @@ export default function CriteriaForm() {
 
         {/* Country Exclusions */}
         <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-orange-500/20 to-amber-500/20 border-b border-orange-500/30 p-6">
-            <div className="flex items-center gap-4">
+          <div className="bg-gradient-to-r from-orange-500/20 to-amber-500/20 border-b border-orange-500/30 p-4">
+            <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
                 <Ban className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-white">Country Exclusions</h2>
+                <h2 className="text-xl font-bold text-white">Country Exclusions</h2>
               </div>
               <button
                 type="button"
@@ -880,7 +880,7 @@ export default function CriteriaForm() {
 
           <div className="p-6 space-y-4">
             {/* Add New Country */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
               <div className="flex items-center gap-3">
                 <input
                   type="text"
@@ -910,15 +910,15 @@ export default function CriteriaForm() {
             {/* Excluded Countries List */}
             {criteria.excludeCountries.length > 0 ? (
               criteria.excludeCountries.map((country) => (
-                <div key={country} className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
-                  <div className="flex items-center gap-4">
+                <div key={country} className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+                  <div className="flex items-center gap-3">
                     <div className="flex-shrink-0">
-                      <div className="w-10 h-10 bg-orange-500/10 rounded-lg flex items-center justify-center border border-orange-500/20">
+                      <div className="w-8 h-8 bg-orange-500/10 rounded-lg flex items-center justify-center border border-orange-500/20">
                         <XCircle className="w-5 h-5 text-orange-400" />
                       </div>
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-white font-semibold text-lg">Country: {country}</h3>
+                      <h3 className="text-white font-semibold text-base">Country: {country}</h3>
                     </div>
                     <button
                       type="button"
