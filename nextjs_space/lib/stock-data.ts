@@ -33,8 +33,12 @@ export async function getStockData(): Promise<StockInsightsData> {
     const staticData = JSON.parse(fileContents);
     const mergedData: StockInsightsData = { ...staticData };
 
-    // Enrich with real-time data
-    await Promise.allSettled(Object.keys(mergedData).map(async (ticker) => {
+    // Enrich with real-time data (skip non-ticker keys like 'timestamp')
+    const validTickers = Object.keys(mergedData).filter(key => 
+      key !== 'timestamp' && isRecord(mergedData[key]) && 'stock_data' in (mergedData[key] as any)
+    );
+    
+    await Promise.allSettled(validTickers.map(async (ticker) => {
       try {
         const cfg = STOCK_CONFIG.find(c => c.ticker === ticker);
         const companyName = cfg?.name;
