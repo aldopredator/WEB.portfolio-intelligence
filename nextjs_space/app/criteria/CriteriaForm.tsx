@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, XCircle, DollarSign, Ban, ArrowRight, Plus, Trash2, Save } from 'lucide-react';
+import { CheckCircle2, XCircle, TrendingUp, Ban, ArrowRight, Plus, Trash2, Save } from 'lucide-react';
 import { DEFAULT_CRITERIA, buildCriteriaURL, type ScreeningCriteria } from '@/lib/screening-criteria';
 
 const STORAGE_KEY = 'portfolio_screening_criteria';
@@ -97,7 +97,7 @@ export default function CriteriaForm() {
           <div className="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border-b border-emerald-500/30 p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
-                <DollarSign className="w-6 h-6 text-white" />
+                <TrendingUp className="w-6 h-6 text-white" />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-white">Financial Metrics</h2>

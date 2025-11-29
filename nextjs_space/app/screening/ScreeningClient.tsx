@@ -17,14 +17,14 @@ export default function ScreeningClient({ children }: ScreeningClientProps) {
   return (
     <div className="flex min-h-screen">
       {/* Main Content Area */}
-      <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'mr-[480px]' : 'mr-0'}`}>
+      <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'mr-[420px]' : 'mr-0'}`}>
         {children}
       </div>
 
       {/* Right Sidebar - Criteria Form */}
       <div
         className={`fixed top-0 right-0 h-screen bg-slate-950 border-l border-slate-800 transition-all duration-300 overflow-y-auto ${
-          sidebarOpen ? 'w-[480px]' : 'w-0'
+          sidebarOpen ? 'w-[420px]' : 'w-0'
         }`}
       >
         {/* Toggle Button */}
