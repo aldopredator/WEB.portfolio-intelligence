@@ -324,7 +324,6 @@ export default function CriteriaForm() {
                     {/* Min Market Cap */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-slate-400 text-sm">Minimum Market Cap (B)</span>
                         <span className="text-white font-mono font-bold text-lg">${criteria.minMarketCap.toFixed(0)}B</span>
                       </div>
                       <div className="relative px-2">
@@ -453,14 +452,9 @@ export default function CriteriaForm() {
                   </div>
                   
                   <div className="mt-4 space-y-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-slate-400 text-sm">Beta Range: {criteria.minBeta.toFixed(2)} - {criteria.maxBeta.toFixed(2)}</span>
-                    </div>
-                    
                     {/* Min Beta */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-slate-400 text-sm">Minimum Beta</span>
                         <span className="text-white font-mono font-bold text-lg">{criteria.minBeta.toFixed(2)}</span>
                       </div>
                       <div className="relative px-2">
@@ -509,7 +503,6 @@ export default function CriteriaForm() {
                     {/* Max Beta */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-slate-400 text-sm">Maximum Beta</span>
                         <span className="text-white font-mono font-bold text-lg">{criteria.maxBeta.toFixed(2)}</span>
                       </div>
                       <div className="relative px-2">
@@ -591,7 +584,6 @@ export default function CriteriaForm() {
                   
                   <div className="mt-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-slate-400 text-sm">Minimum ROE (%)</span>
                       <span className="text-white font-mono font-bold text-lg">{criteria.minROE.toFixed(1)}%</span>
                     </div>
                     <div className="relative px-2">
@@ -672,7 +664,6 @@ export default function CriteriaForm() {
                   
                   <div className="mt-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-slate-400 text-sm">Minimum Profit Margin (%)</span>
                       <span className="text-white font-mono font-bold text-lg">{criteria.minProfitMargin.toFixed(1)}%</span>
                     </div>
                     <div className="relative px-2">
