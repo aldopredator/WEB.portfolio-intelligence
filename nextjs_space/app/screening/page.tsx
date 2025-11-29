@@ -101,20 +101,6 @@ export default async function ScreeningPage({
   return (
     <ScreeningClient>
       <main className="min-h-screen">
-        <PageHeader
-          title="Stock Screening Results"
-          description="Stocks that meet all investment criteria and filtering requirements"
-          action={
-            <div className="flex items-center gap-3 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 rounded-xl px-6 py-3">
-              <Filter className="w-5 h-5 text-emerald-400" />
-              <div>
-                <p className="text-emerald-400 text-xs font-medium">Stocks Found</p>
-              <p className="text-white text-2xl font-bold">{recommendedStocks.length}</p>
-            </div>
-          </div>
-        }
-      />
-
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         {/* Active Criteria Display */}
         <div className="mb-6 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-800/30 rounded-xl p-6 backdrop-blur-sm">

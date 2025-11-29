@@ -40,9 +40,6 @@ export function SiteNavigation() {
               );
             })}
           </div>
-          <div className="text-sm text-slate-400">
-            Read-Only View
-          </div>
         </div>
       </div>
     </nav>

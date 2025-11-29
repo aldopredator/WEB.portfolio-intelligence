@@ -320,7 +320,7 @@ export default function CriteriaForm() {
                         <div
                           className="absolute"
                           style={{
-                            left: `${(criteria.maxPB / 10) * 100}%`,
+                            left: `${(criteria.maxPB / 100) * 100}%`,
                             transform: 'translateX(-50%)',
                             zIndex: 10,
                           }}
@@ -337,8 +337,8 @@ export default function CriteriaForm() {
                       <input
                         type="range"
                         min="0.5"
-                        max="10"
-                        step="0.1"
+                        max="100"
+                        step="0.5"
                         value={criteria.maxPB}
                         onChange={(e) => setCriteria({ ...criteria, maxPB: parseFloat(e.target.value) })}
                         disabled={!criteria.pbEnabled}
@@ -349,10 +349,10 @@ export default function CriteriaForm() {
                       {/* Scale markers */}
                       <div className="flex justify-between mt-2 text-xs text-slate-500">
                         <span>0.5</span>
-                        <span>2.5</span>
-                        <span>5</span>
-                        <span>7.5</span>
-                        <span>10</span>
+                        <span>25</span>
+                        <span>50</span>
+                        <span>75</span>
+                        <span>100</span>
                       </div>
                     </div>
                   </div>
