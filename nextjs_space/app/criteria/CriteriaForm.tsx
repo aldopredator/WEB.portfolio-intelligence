@@ -20,9 +20,18 @@ export default function CriteriaForm() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setCriteria(parsed);
+        // Merge with defaults to ensure all fields exist (handles schema updates)
+        setCriteria({
+          ...DEFAULT_CRITERIA,
+          ...parsed,
+          // Ensure arrays exist
+          excludeSectors: Array.isArray(parsed.excludeSectors) ? parsed.excludeSectors : DEFAULT_CRITERIA.excludeSectors,
+          excludeCountries: Array.isArray(parsed.excludeCountries) ? parsed.excludeCountries : DEFAULT_CRITERIA.excludeCountries,
+        });
       } catch (e) {
         console.error('Failed to parse saved criteria:', e);
+        // If parsing fails, use defaults
+        setCriteria(DEFAULT_CRITERIA);
       }
     }
   }, []);
