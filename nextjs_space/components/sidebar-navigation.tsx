@@ -27,15 +27,6 @@ export function SidebarNavigation() {
 
   const SidebarContent = () => (
     <>
-      {/* Logo / Brand - Simplified */}
-      <div className="p-4 border-b border-slate-800/50">
-        <div className="flex items-center justify-center">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-            <TrendingUp className="w-6 h-6 text-white" />
-          </div>
-        </div>
-      </div>
-
       {/* Navigation Links */}
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {navigation.map((item) => {

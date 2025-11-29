@@ -451,24 +451,6 @@ export default async function ScreeningPage({
             </div>
           </div>
         </div>
-
-        {/* Disclaimer */}
-        <div className="bg-gradient-to-r from-orange-900/20 to-red-900/20 border border-orange-800/30 rounded-xl p-6 backdrop-blur-sm">
-          <div className="flex gap-4">
-            <div className="flex-shrink-0">
-              <div className="w-10 h-10 bg-orange-500/10 rounded-lg flex items-center justify-center border border-orange-500/20">
-                <AlertTriangle className="w-5 h-5 text-orange-400" />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-orange-400 mb-2">Investment Disclaimer</h3>
-              <p className="text-slate-300 text-sm leading-relaxed">
-                This information is for educational and informational purposes only and should not be considered as financial advice, investment recommendations, or an offer to buy or sell securities. 
-                Past performance does not guarantee future results. Always conduct thorough due diligence and consult with a qualified financial advisor before making any investment decisions.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </main>
     </ScreeningClient>
