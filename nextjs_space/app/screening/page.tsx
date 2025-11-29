@@ -85,6 +85,13 @@ export default async function ScreeningPage({
       sector: config.sector,
       pe: stockInfo.pe_ratio?.toFixed(2) || 'N/A',
       pb: stockInfo.pb_ratio?.toFixed(2) || 'N/A',
+      marketCap: stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(2)}B` : 'N/A',
+      beta: stockInfo.beta?.toFixed(2) || 'N/A',
+      roe: stockInfo.roe ? `${stockInfo.roe.toFixed(2)}%` : 'N/A',
+      profitMargin: stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(2)}%` : 'N/A',
+      sentiment: data && typeof data === 'object' && 'sentiment_data' in data 
+        ? (data.sentiment_data as any)?.overall_sentiment || 'N/A'
+        : 'N/A',
       matchScore,
     };
   }).filter((stock): stock is NonNullable<typeof stock> => stock !== null);
@@ -262,14 +269,55 @@ export default async function ScreeningPage({
               </div>
               
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-slate-950/50 rounded-lg border border-slate-800/50">
-                  <p className="text-slate-400 text-xs mb-1">P/E Ratio</p>
-                  <p className="text-emerald-400 font-mono font-bold text-lg">{stock.pe}</p>
-                </div>
-                <div className="p-3 bg-slate-950/50 rounded-lg border border-slate-800/50">
-                  <p className="text-slate-400 text-xs mb-1">P/B Ratio</p>
-                  <p className="text-emerald-400 font-mono font-bold text-lg">{stock.pb}</p>
-                </div>
+                {CRITERIA.peEnabled && (
+                  <div className="p-3 bg-slate-950/50 rounded-lg border border-slate-800/50">
+                    <p className="text-slate-400 text-xs mb-1">P/E Ratio</p>
+                    <p className="text-emerald-400 font-mono font-bold text-lg">{stock.pe}</p>
+                  </div>
+                )}
+                {CRITERIA.pbEnabled && (
+                  <div className="p-3 bg-slate-950/50 rounded-lg border border-slate-800/50">
+                    <p className="text-slate-400 text-xs mb-1">P/B Ratio</p>
+                    <p className="text-emerald-400 font-mono font-bold text-lg">{stock.pb}</p>
+                  </div>
+                )}
+                {CRITERIA.marketCapEnabled && (
+                  <div className="p-3 bg-slate-950/50 rounded-lg border border-slate-800/50">
+                    <p className="text-slate-400 text-xs mb-1">Market Cap</p>
+                    <p className="text-purple-400 font-mono font-bold text-lg">{stock.marketCap}</p>
+                  </div>
+                )}
+                {CRITERIA.betaEnabled && (
+                  <div className="p-3 bg-slate-950/50 rounded-lg border border-slate-800/50">
+                    <p className="text-slate-400 text-xs mb-1">Beta</p>
+                    <p className="text-purple-400 font-mono font-bold text-lg">{stock.beta}</p>
+                  </div>
+                )}
+                {CRITERIA.roeEnabled && (
+                  <div className="p-3 bg-slate-950/50 rounded-lg border border-slate-800/50">
+                    <p className="text-slate-400 text-xs mb-1">ROE</p>
+                    <p className="text-purple-400 font-mono font-bold text-lg">{stock.roe}</p>
+                  </div>
+                )}
+                {CRITERIA.profitMarginEnabled && (
+                  <div className="p-3 bg-slate-950/50 rounded-lg border border-slate-800/50">
+                    <p className="text-slate-400 text-xs mb-1">Profit Margin</p>
+                    <p className="text-purple-400 font-mono font-bold text-lg">{stock.profitMargin}</p>
+                  </div>
+                )}
+                {CRITERIA.sentimentEnabled && (
+                  <div className="p-3 bg-slate-950/50 rounded-lg border border-slate-800/50">
+                    <p className="text-slate-400 text-xs mb-1">Sentiment</p>
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                      stock.sentiment === 'positive' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                      stock.sentiment === 'negative' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
+                      stock.sentiment === 'neutral' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' :
+                      'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                    }`}>
+                      {stock.sentiment}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -287,12 +335,41 @@ export default async function ScreeningPage({
                   <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
                     Sector
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                    P/E Ratio
-                  </th>
-                  <th className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                    P/B Ratio
-                  </th>
+                  {CRITERIA.peEnabled && (
+                    <th className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      P/E Ratio
+                    </th>
+                  )}
+                  {CRITERIA.pbEnabled && (
+                    <th className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      P/B Ratio
+                    </th>
+                  )}
+                  {CRITERIA.marketCapEnabled && (
+                    <th className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      Market Cap
+                    </th>
+                  )}
+                  {CRITERIA.betaEnabled && (
+                    <th className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      Beta
+                    </th>
+                  )}
+                  {CRITERIA.roeEnabled && (
+                    <th className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      ROE
+                    </th>
+                  )}
+                  {CRITERIA.profitMarginEnabled && (
+                    <th className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      Profit Margin
+                    </th>
+                  )}
+                  {CRITERIA.sentimentEnabled && (
+                    <th className="px-6 py-4 text-center text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      Sentiment
+                    </th>
+                  )}
                   <th className="px-6 py-4 text-center text-xs font-bold text-slate-300 uppercase tracking-wider">
                     Match Score
                   </th>
@@ -315,12 +392,48 @@ export default async function ScreeningPage({
                         {stock.sector}
                       </span>
                     </td>
-                    <td className="px-6 py-5 text-right">
-                      <span className="text-emerald-400 font-mono font-bold text-lg">{stock.pe}</span>
-                    </td>
-                    <td className="px-6 py-5 text-right">
-                      <span className="text-emerald-400 font-mono font-bold text-lg">{stock.pb}</span>
-                    </td>
+                    {CRITERIA.peEnabled && (
+                      <td className="px-6 py-5 text-right">
+                        <span className="text-emerald-400 font-mono font-bold text-lg">{stock.pe}</span>
+                      </td>
+                    )}
+                    {CRITERIA.pbEnabled && (
+                      <td className="px-6 py-5 text-right">
+                        <span className="text-emerald-400 font-mono font-bold text-lg">{stock.pb}</span>
+                      </td>
+                    )}
+                    {CRITERIA.marketCapEnabled && (
+                      <td className="px-6 py-5 text-right">
+                        <span className="text-purple-400 font-mono font-bold text-lg">{stock.marketCap}</span>
+                      </td>
+                    )}
+                    {CRITERIA.betaEnabled && (
+                      <td className="px-6 py-5 text-right">
+                        <span className="text-purple-400 font-mono font-bold text-lg">{stock.beta}</span>
+                      </td>
+                    )}
+                    {CRITERIA.roeEnabled && (
+                      <td className="px-6 py-5 text-right">
+                        <span className="text-purple-400 font-mono font-bold text-lg">{stock.roe}</span>
+                      </td>
+                    )}
+                    {CRITERIA.profitMarginEnabled && (
+                      <td className="px-6 py-5 text-right">
+                        <span className="text-purple-400 font-mono font-bold text-lg">{stock.profitMargin}</span>
+                      </td>
+                    )}
+                    {CRITERIA.sentimentEnabled && (
+                      <td className="px-6 py-5 text-center">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                          stock.sentiment === 'positive' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                          stock.sentiment === 'negative' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
+                          stock.sentiment === 'neutral' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' :
+                          'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                        }`}>
+                          {stock.sentiment}
+                        </span>
+                      </td>
+                    )}
                     <td className="px-6 py-5">
                       <div className="flex items-center justify-center gap-2">
                         <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/20">
