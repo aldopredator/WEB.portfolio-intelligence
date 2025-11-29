@@ -7,6 +7,49 @@ import { DEFAULT_CRITERIA, buildCriteriaURL, type ScreeningCriteria } from '@/li
 
 const STORAGE_KEY = 'portfolio_screening_criteria';
 
+// Common sectors for dropdown
+const COMMON_SECTORS = [
+  'Technology',
+  'Healthcare',
+  'Financial Services',
+  'Consumer Cyclical',
+  'Consumer Defensive',
+  'Communication Services',
+  'Energy',
+  'Utilities',
+  'Real Estate',
+  'Industrials',
+  'Basic Materials',
+  'Tobacco',
+  'Weapons',
+  'Gambling',
+  'Alcohol'
+].sort();
+
+// Common countries for dropdown
+const COMMON_COUNTRIES = [
+  'United States',
+  'China',
+  'Japan',
+  'Germany',
+  'United Kingdom',
+  'France',
+  'India',
+  'Canada',
+  'South Korea',
+  'Australia',
+  'Russia',
+  'Brazil',
+  'Mexico',
+  'Spain',
+  'Italy',
+  'Netherlands',
+  'Switzerland',
+  'Saudi Arabia',
+  'Turkey',
+  'Indonesia'
+].sort();
+
 export default function CriteriaForm() {
   const router = useRouter();
   const [criteria, setCriteria] = useState<ScreeningCriteria>(DEFAULT_CRITERIA);
@@ -14,27 +57,32 @@ export default function CriteriaForm() {
   const [newCountry, setNewCountry] = useState('');
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Load saved criteria from localStorage on mount
+  // Load saved criteria from localStorage on mount and auto-apply
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         // Merge with defaults to ensure all fields exist (handles schema updates)
-        setCriteria({
+        const loadedCriteria = {
           ...DEFAULT_CRITERIA,
           ...parsed,
           // Ensure arrays exist
           excludeSectors: Array.isArray(parsed.excludeSectors) ? parsed.excludeSectors : DEFAULT_CRITERIA.excludeSectors,
           excludeCountries: Array.isArray(parsed.excludeCountries) ? parsed.excludeCountries : DEFAULT_CRITERIA.excludeCountries,
-        });
+        };
+        setCriteria(loadedCriteria);
+        
+        // Auto-apply the loaded criteria
+        const url = buildCriteriaURL(loadedCriteria);
+        router.push(url);
       } catch (e) {
         console.error('Failed to parse saved criteria:', e);
         // If parsing fails, use defaults
         setCriteria(DEFAULT_CRITERIA);
       }
     }
-  }, []);
+  }, [router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,7 +231,7 @@ export default function CriteriaForm() {
                         <div
                           className="absolute"
                           style={{
-                            left: `${(criteria.maxPE / 50) * 100}%`,
+                            left: `${(criteria.maxPE / 500) * 100}%`,
                             transform: 'translateX(-50%)',
                             zIndex: 10,
                           }}
@@ -200,8 +248,8 @@ export default function CriteriaForm() {
                       <input
                         type="range"
                         min="5"
-                        max="50"
-                        step="0.5"
+                        max="500"
+                        step="1"
                         value={criteria.maxPE}
                         onChange={(e) => setCriteria({ ...criteria, maxPE: parseFloat(e.target.value) })}
                         disabled={!criteria.peEnabled}
@@ -212,10 +260,10 @@ export default function CriteriaForm() {
                       {/* Scale markers */}
                       <div className="flex justify-between mt-2 text-xs text-slate-500">
                         <span>5</span>
-                        <span>15</span>
-                        <span>25</span>
-                        <span>35</span>
-                        <span>50</span>
+                        <span>125</span>
+                        <span>250</span>
+                        <span>375</span>
+                        <span>500</span>
                       </div>
                     </div>
                   </div>
@@ -815,17 +863,21 @@ export default function CriteriaForm() {
             {/* Add New Sector */}
             <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
               <div className="flex items-center gap-3">
-                <input
-                  type="text"
+                <select
                   value={newSector}
                   onChange={(e) => setNewSector(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSector())}
-                  placeholder="Enter sector name (e.g., Tobacco, Weapons)"
                   disabled={!criteria.sectorsEnabled}
-                  className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500/50 ${
+                  className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500/50 ${
                     !criteria.sectorsEnabled ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
-                />
+                >
+                  <option value="">Select a sector to exclude...</option>
+                  {COMMON_SECTORS.map((sector) => (
+                    <option key={sector} value={sector} disabled={criteria.excludeSectors.includes(sector)}>
+                      {sector}
+                    </option>
+                  ))}
+                </select>
                 <button
                   type="button"
                   onClick={addSector}
@@ -898,17 +950,21 @@ export default function CriteriaForm() {
             {/* Add New Country */}
             <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
               <div className="flex items-center gap-3">
-                <input
-                  type="text"
+                <select
                   value={newCountry}
                   onChange={(e) => setNewCountry(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCountry())}
-                  placeholder="Enter country name (e.g., Russia, China)"
                   disabled={!criteria.countriesEnabled}
-                  className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 ${
+                  className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 ${
                     !criteria.countriesEnabled ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
-                />
+                >
+                  <option value="">Select a country to exclude...</option>
+                  {COMMON_COUNTRIES.map((country) => (
+                    <option key={country} value={country} disabled={criteria.excludeCountries.includes(country)}>
+                      {country}
+                    </option>
+                  ))}
+                </select>
                 <button
                   type="button"
                   onClick={addCountry}

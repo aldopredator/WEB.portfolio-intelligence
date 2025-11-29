@@ -10,7 +10,7 @@ interface ScreeningClientProps {
 }
 
 export default function ScreeningClient({ children }: ScreeningClientProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true); // Always open by default
   const router = useRouter();
   const searchParams = useSearchParams();
 

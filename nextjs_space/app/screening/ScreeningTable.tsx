@@ -88,6 +88,9 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
         <table className="w-full">
           <thead>
             <tr className="bg-gradient-to-r from-slate-950/50 to-slate-900/50 border-b border-slate-800/50">
+              <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
+                Logo
+              </th>
               <th 
                 className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
                 onClick={() => handleSort('ticker')}
@@ -200,6 +203,20 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                 key={stock.ticker}
                 className="hover:bg-slate-800/30 transition-all group"
               >
+                <td className="px-6 py-5">
+                  <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img 
+                      src={`/logos/${stock.ticker}.svg`} 
+                      alt={stock.ticker}
+                      className="w-8 h-8 object-contain"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        target.parentElement!.innerHTML = `<span class="text-slate-400 font-bold text-sm">${stock.ticker.substring(0, 3)}</span>`;
+                      }}
+                    />
+                  </div>
+                </td>
                 <td className="px-6 py-5">
                   <div>
                     <div className="text-white font-bold text-lg">{stock.ticker}</div>

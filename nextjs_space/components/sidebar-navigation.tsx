@@ -21,7 +21,7 @@ export function SidebarNavigation() {
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: BarChart3, description: 'Stock insights & analytics' },
-    { name: 'Criteria', href: '/criteria', icon: ListChecks, description: 'Screening criteria' },
+
     { name: 'Screening', href: '/screening', icon: Filter, description: 'Stock screening results' },
   ];
 

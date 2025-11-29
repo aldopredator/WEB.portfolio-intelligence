@@ -9,7 +9,7 @@ export function SiteNavigation() {
 
   const links = [
     { href: '/', label: 'Dashboard', icon: BarChart3 },
-    { href: '/criteria', label: 'Criteria', icon: ListChecks },
+
     { href: '/screening', label: 'Screening', icon: Filter },
   ];
 
