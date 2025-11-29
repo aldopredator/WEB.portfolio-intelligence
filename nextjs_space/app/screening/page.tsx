@@ -65,6 +65,10 @@ export default async function ScreeningPage({
     if (CRITERIA.sectorsEnabled) {
       passes.sector = !CRITERIA.excludeSectors.includes(config.sector);
     }
+    
+    if (CRITERIA.countriesEnabled && stockInfo.country) {
+      passes.country = !CRITERIA.excludeCountries.includes(stockInfo.country);
+    }
 
     const totalCriteria = Object.keys(passes).length;
     const passCount = Object.values(passes).filter(Boolean).length;
@@ -213,6 +217,22 @@ export default async function ScreeningPage({
                   </div>
                   <p className="text-white font-mono font-semibold">
                     {CRITERIA.excludeSectors.length > 0 ? CRITERIA.excludeSectors.join(', ') : 'None'}
+                  </p>
+                </div>
+                
+                <div className={`bg-slate-900/50 border rounded-lg p-3 col-span-1 md:col-span-2 ${
+                  CRITERIA.countriesEnabled ? 'border-orange-500/30' : 'border-slate-800/50 opacity-50'
+                }`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-slate-400">Excluded Countries</p>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                      CRITERIA.countriesEnabled ? 'bg-orange-500/10 text-orange-400' : 'bg-slate-500/10 text-slate-500'
+                    }`}>
+                      {CRITERIA.countriesEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
+                  <p className="text-white font-mono font-semibold">
+                    {CRITERIA.excludeCountries.length > 0 ? CRITERIA.excludeCountries.join(', ') : 'None'}
                   </p>
                 </div>
               </div>
@@ -418,9 +438,22 @@ export default async function ScreeningPage({
                     <p className="text-slate-400 text-sm">Excludes stocks in the following sectors: {CRITERIA.excludeSectors.join(', ')}</p>
                   </div>
                 )}
+                
+                {CRITERIA.countriesEnabled && CRITERIA.excludeCountries.length > 0 && (
+                  <div className="p-4 bg-slate-950/50 rounded-lg border border-orange-500/30 col-span-1 md:col-span-2">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-8 h-8 bg-orange-500/10 rounded-lg flex items-center justify-center">
+                        <CheckCircle2 className="w-4 h-4 text-orange-400" />
+                      </div>
+                      <h4 className="text-white font-semibold">Country Exclusions</h4>
+                    </div>
+                    <p className="text-slate-400 text-sm">Excludes stocks from the following countries: {CRITERIA.excludeCountries.join(', ')}</p>
+                  </div>
+                )}
               </div>
               {!CRITERIA.peEnabled && !CRITERIA.pbEnabled && !CRITERIA.marketCapEnabled && !CRITERIA.betaEnabled && 
-               !CRITERIA.roeEnabled && !CRITERIA.profitMarginEnabled && !CRITERIA.sentimentEnabled && !CRITERIA.sectorsEnabled && (
+               !CRITERIA.roeEnabled && !CRITERIA.profitMarginEnabled && !CRITERIA.sentimentEnabled && 
+               !CRITERIA.sectorsEnabled && !CRITERIA.countriesEnabled && (
                 <p className="text-slate-400 text-sm italic">No criteria currently enabled. All stocks will be shown.</p>
               )}
             </div>

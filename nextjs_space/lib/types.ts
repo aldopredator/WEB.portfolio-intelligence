@@ -34,6 +34,7 @@ export interface StockData {
   volume?: number;
   averageVolume10Day?: number;
   currency?: string;
+  country?: string;
   // Finnhub valuation metrics
   pe_ratio?: number;
   pb_ratio?: number;

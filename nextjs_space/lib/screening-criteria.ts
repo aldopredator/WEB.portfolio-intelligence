@@ -18,6 +18,8 @@ export interface ScreeningCriteria {
   sentimentEnabled: boolean;
   excludeSectors: string[];
   sectorsEnabled: boolean;
+  excludeCountries: string[];
+  countriesEnabled: boolean;
 }
 
 export const DEFAULT_CRITERIA: ScreeningCriteria = {
@@ -39,6 +41,8 @@ export const DEFAULT_CRITERIA: ScreeningCriteria = {
   sentimentEnabled: false,
   excludeSectors: ['Alcohol', 'Gambling'],
   sectorsEnabled: true,
+  excludeCountries: [],
+  countriesEnabled: false,
 };
 
 // Parse criteria from URL search params
@@ -62,6 +66,8 @@ export function parseCriteriaFromParams(searchParams: URLSearchParams): Screenin
     sentimentEnabled: searchParams.get('sentimentEnabled') === 'true',
     excludeSectors: searchParams.get('excludeSectors')?.split(',').filter(s => s) || DEFAULT_CRITERIA.excludeSectors,
     sectorsEnabled: searchParams.get('sectorsEnabled') === 'true',
+    excludeCountries: searchParams.get('excludeCountries')?.split(',').filter(s => s) || DEFAULT_CRITERIA.excludeCountries,
+    countriesEnabled: searchParams.get('countriesEnabled') === 'true',
   };
 }
 
@@ -86,6 +92,8 @@ export function buildCriteriaURL(criteria: ScreeningCriteria): string {
     sentimentEnabled: String(criteria.sentimentEnabled),
     excludeSectors: criteria.excludeSectors.join(','),
     sectorsEnabled: String(criteria.sectorsEnabled),
+    excludeCountries: criteria.excludeCountries.join(','),
+    countriesEnabled: String(criteria.countriesEnabled),
   });
   return `/screening?${params.toString()}`;
 }

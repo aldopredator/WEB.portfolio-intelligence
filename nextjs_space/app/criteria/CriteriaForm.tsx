@@ -11,6 +11,7 @@ export default function CriteriaForm() {
   const router = useRouter();
   const [criteria, setCriteria] = useState<ScreeningCriteria>(DEFAULT_CRITERIA);
   const [newSector, setNewSector] = useState('');
+  const [newCountry, setNewCountry] = useState('');
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Load saved criteria from localStorage on mount
@@ -41,6 +42,7 @@ export default function CriteriaForm() {
   const handleReset = () => {
     setCriteria(DEFAULT_CRITERIA);
     setNewSector('');
+    setNewCountry('');
     localStorage.removeItem(STORAGE_KEY);
   };
 
@@ -61,10 +63,27 @@ export default function CriteriaForm() {
     }));
   };
 
+  const addCountry = () => {
+    if (newCountry.trim() && !criteria.excludeCountries.includes(newCountry.trim())) {
+      setCriteria(prev => ({
+        ...prev,
+        excludeCountries: [...prev.excludeCountries, newCountry.trim()],
+      }));
+      setNewCountry('');
+    }
+  };
+
+  const removeCountry = (country: string) => {
+    setCriteria(prev => ({
+      ...prev,
+      excludeCountries: prev.excludeCountries.filter(c => c !== country),
+    }));
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 gap-6 mb-6">
-        {/* Valuation Metrics */}
+        {/* Financial Metrics - Merged Valuation and Additional Metrics */}
         <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
           <div className="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border-b border-emerald-500/30 p-6">
             <div className="flex items-center gap-4">
@@ -72,8 +91,7 @@ export default function CriteriaForm() {
                 <DollarSign className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white">Valuation Metrics</h2>
-                <p className="text-slate-300 text-sm mt-1">Financial ratios to identify reasonably valued stocks</p>
+                <h2 className="text-2xl font-bold text-white">Financial Metrics</h2>
               </div>
             </div>
           </div>
@@ -266,24 +284,7 @@ export default function CriteriaForm() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Additional Financial Metrics */}
-        <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-b border-purple-500/30 p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
-                <DollarSign className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-white">Additional Financial Metrics</h2>
-                <p className="text-slate-300 text-sm mt-1">Growth, risk, and profitability indicators</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6 space-y-4">
             {/* Market Cap */}
             <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
               <div className="flex items-start gap-4">
@@ -293,11 +294,11 @@ export default function CriteriaForm() {
                     onClick={() => setCriteria({ ...criteria, marketCapEnabled: !criteria.marketCapEnabled })}
                     className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors ${
                       criteria.marketCapEnabled
-                        ? 'bg-purple-500/10 border-purple-500/20 hover:bg-purple-500/20'
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
                         : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
                     }`}
                   >
-                    <CheckCircle2 className={`w-5 h-5 ${criteria.marketCapEnabled ? 'text-purple-400' : 'text-slate-600'}`} />
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.marketCapEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
                   </button>
                 </div>
                 <div className="flex-1">
@@ -308,7 +309,7 @@ export default function CriteriaForm() {
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.marketCapEnabled
-                        ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
                         : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
                     }`}>
                       {criteria.marketCapEnabled ? 'Enabled' : 'Disabled'}
@@ -340,7 +341,7 @@ export default function CriteriaForm() {
                             }}
                           >
                             <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
-                              criteria.marketCapEnabled ? 'bg-purple-500 border-white' : 'bg-slate-600 border-slate-400'
+                              criteria.marketCapEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
                             }`} />
                           </div>
                         </div>
@@ -389,7 +390,7 @@ export default function CriteriaForm() {
                             }}
                           >
                             <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
-                              criteria.marketCapEnabled ? 'bg-purple-500 border-white' : 'bg-slate-600 border-slate-400'
+                              criteria.marketCapEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
                             }`} />
                           </div>
                         </div>
@@ -427,11 +428,11 @@ export default function CriteriaForm() {
                     onClick={() => setCriteria({ ...criteria, betaEnabled: !criteria.betaEnabled })}
                     className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors ${
                       criteria.betaEnabled
-                        ? 'bg-purple-500/10 border-purple-500/20 hover:bg-purple-500/20'
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
                         : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
                     }`}
                   >
-                    <CheckCircle2 className={`w-5 h-5 ${criteria.betaEnabled ? 'text-purple-400' : 'text-slate-600'}`} />
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.betaEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
                   </button>
                 </div>
                 <div className="flex-1">
@@ -442,7 +443,7 @@ export default function CriteriaForm() {
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.betaEnabled
-                        ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
                         : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
                     }`}>
                       {criteria.betaEnabled ? 'Enabled' : 'Disabled'}
@@ -478,7 +479,7 @@ export default function CriteriaForm() {
                             }}
                           >
                             <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
-                              criteria.betaEnabled ? 'bg-purple-500 border-white' : 'bg-slate-600 border-slate-400'
+                              criteria.betaEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
                             }`} />
                           </div>
                         </div>
@@ -527,7 +528,7 @@ export default function CriteriaForm() {
                             }}
                           >
                             <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
-                              criteria.betaEnabled ? 'bg-purple-500 border-white' : 'bg-slate-600 border-slate-400'
+                              criteria.betaEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
                             }`} />
                           </div>
                         </div>
@@ -565,11 +566,11 @@ export default function CriteriaForm() {
                     onClick={() => setCriteria({ ...criteria, roeEnabled: !criteria.roeEnabled })}
                     className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors ${
                       criteria.roeEnabled
-                        ? 'bg-purple-500/10 border-purple-500/20 hover:bg-purple-500/20'
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
                         : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
                     }`}
                   >
-                    <CheckCircle2 className={`w-5 h-5 ${criteria.roeEnabled ? 'text-purple-400' : 'text-slate-600'}`} />
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.roeEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
                   </button>
                 </div>
                 <div className="flex-1">
@@ -580,7 +581,7 @@ export default function CriteriaForm() {
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.roeEnabled
-                        ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
                         : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
                     }`}>
                       {criteria.roeEnabled ? 'Enabled' : 'Disabled'}
@@ -610,7 +611,7 @@ export default function CriteriaForm() {
                           }}
                         >
                           <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
-                            criteria.roeEnabled ? 'bg-purple-500 border-white' : 'bg-slate-600 border-slate-400'
+                            criteria.roeEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
                           }`} />
                         </div>
                       </div>
@@ -647,11 +648,11 @@ export default function CriteriaForm() {
                     onClick={() => setCriteria({ ...criteria, profitMarginEnabled: !criteria.profitMarginEnabled })}
                     className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors ${
                       criteria.profitMarginEnabled
-                        ? 'bg-purple-500/10 border-purple-500/20 hover:bg-purple-500/20'
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
                         : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
                     }`}
                   >
-                    <CheckCircle2 className={`w-5 h-5 ${criteria.profitMarginEnabled ? 'text-purple-400' : 'text-slate-600'}`} />
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.profitMarginEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
                   </button>
                 </div>
                 <div className="flex-1">
@@ -662,7 +663,7 @@ export default function CriteriaForm() {
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.profitMarginEnabled
-                        ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
                         : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
                     }`}>
                       {criteria.profitMarginEnabled ? 'Enabled' : 'Disabled'}
@@ -692,7 +693,7 @@ export default function CriteriaForm() {
                           }}
                         >
                           <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
-                            criteria.profitMarginEnabled ? 'bg-purple-500 border-white' : 'bg-slate-600 border-slate-400'
+                            criteria.profitMarginEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
                           }`} />
                         </div>
                       </div>
@@ -729,11 +730,11 @@ export default function CriteriaForm() {
                     onClick={() => setCriteria({ ...criteria, sentimentEnabled: !criteria.sentimentEnabled })}
                     className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-colors ${
                       criteria.sentimentEnabled
-                        ? 'bg-purple-500/10 border-purple-500/20 hover:bg-purple-500/20'
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
                         : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
                     }`}
                   >
-                    <CheckCircle2 className={`w-5 h-5 ${criteria.sentimentEnabled ? 'text-purple-400' : 'text-slate-600'}`} />
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.sentimentEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
                   </button>
                 </div>
                 <div className="flex-1">
@@ -744,7 +745,7 @@ export default function CriteriaForm() {
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                       criteria.sentimentEnabled
-                        ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
                         : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
                     }`}>
                       {criteria.sentimentEnabled ? 'Enabled' : 'Disabled'}
@@ -864,6 +865,95 @@ export default function CriteriaForm() {
             ) : (
               <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5 text-center">
                 <p className="text-slate-400 text-sm">No sectors excluded. Add sectors above to filter them out.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Country Exclusions */}
+        <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
+          <div className="bg-gradient-to-r from-orange-500/20 to-amber-500/20 border-b border-orange-500/30 p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
+                <Ban className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-white">Country Exclusions</h2>
+                <p className="text-slate-300 text-sm mt-1">Countries excluded from investment consideration</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCriteria({ ...criteria, countriesEnabled: !criteria.countriesEnabled })}
+                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                  criteria.countriesEnabled
+                    ? 'bg-orange-500/10 text-orange-400 border-orange-500/20 hover:bg-orange-500/20'
+                    : 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20'
+                }`}
+              >
+                {criteria.countriesEnabled ? 'Enabled' : 'Disabled'}
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-4">
+            {/* Add New Country */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
+              <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  value={newCountry}
+                  onChange={(e) => setNewCountry(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCountry())}
+                  placeholder="Enter country name (e.g., Russia, China)"
+                  disabled={!criteria.countriesEnabled}
+                  className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 ${
+                    !criteria.countriesEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={addCountry}
+                  disabled={!criteria.countriesEnabled || !newCountry.trim()}
+                  className={`px-4 py-3 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 rounded-lg text-orange-400 font-medium transition-colors flex items-center gap-2 ${
+                    (!criteria.countriesEnabled || !newCountry.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <Plus className="w-4 h-4" />
+                  Add
+                </button>
+              </div>
+            </div>
+
+            {/* Excluded Countries List */}
+            {criteria.excludeCountries.length > 0 ? (
+              criteria.excludeCountries.map((country) => (
+                <div key={country} className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5">
+                  <div className="flex items-center gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 bg-orange-500/10 rounded-lg flex items-center justify-center border border-orange-500/20">
+                        <XCircle className="w-5 h-5 text-orange-400" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-white font-semibold text-lg">Country: {country}</h3>
+                      <p className="text-slate-400 text-sm mt-1">Excluded from screening results</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeCountry(country)}
+                      disabled={!criteria.countriesEnabled}
+                      className={`p-2 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 rounded-lg text-orange-400 transition-colors ${
+                        !criteria.countriesEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-5 text-center">
+                <p className="text-slate-400 text-sm">No countries excluded. Add countries above to filter them out.</p>
               </div>
             )}
           </div>
