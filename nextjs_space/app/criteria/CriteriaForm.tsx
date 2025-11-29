@@ -91,6 +91,34 @@ export default function CriteriaForm() {
 
   return (
     <form onSubmit={handleSubmit}>
+      {/* Action Buttons - Sticky at top */}
+      <div className="sticky top-0 z-20 bg-slate-950/95 backdrop-blur-sm pb-4 mb-4 border-b border-slate-800/50">
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={handleReset}
+            className="flex-1 px-4 py-2.5 bg-slate-800/50 hover:bg-slate-800/70 border border-slate-700 rounded-lg text-white font-medium text-sm transition-all"
+          >
+            Reset
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            className="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-lg text-white font-medium text-sm transition-all flex items-center justify-center gap-2"
+          >
+            <Save className="w-4 h-4" />
+            {saveSuccess ? 'Saved!' : 'Save'}
+          </button>
+          <button
+            type="submit"
+            className="flex-1 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 rounded-lg text-white font-medium text-sm transition-all flex items-center justify-center gap-2"
+          >
+            Apply
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 gap-4 mb-4">
         {/* Financial Metrics - Merged Valuation and Additional Metrics */}
         <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
@@ -926,31 +954,7 @@ export default function CriteriaForm() {
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex gap-4 sticky bottom-6 z-10">
-        <button
-          type="button"
-          onClick={handleReset}
-          className="flex-1 px-6 py-4 bg-slate-800/50 hover:bg-slate-800/70 border border-slate-700 rounded-xl text-white font-semibold transition-all"
-        >
-          Reset to Defaults
-        </button>
-        <button
-          type="button"
-          onClick={handleSave}
-          className="flex-1 px-6 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-xl text-white font-semibold transition-all flex items-center justify-center gap-2"
-        >
-          <Save className="w-5 h-5" />
-          {saveSuccess ? 'Saved!' : 'Save Criteria'}
-        </button>
-        <button
-          type="submit"
-          className="flex-1 px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 rounded-xl text-white font-semibold transition-all flex items-center justify-center gap-2"
-        >
-          Apply Criteria & Screen
-          <ArrowRight className="w-5 h-5" />
-        </button>
-      </div>
+
     </form>
   );
 }
