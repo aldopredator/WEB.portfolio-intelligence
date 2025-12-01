@@ -27,28 +27,33 @@ const COMMON_SECTORS = [
 ].sort();
 
 // Common countries for dropdown
+// Country codes matching Finnhub API format (e.g., "US", "GB", "CN")
 const COMMON_COUNTRIES = [
-  'United States',
-  'China',
-  'Japan',
-  'Germany',
-  'United Kingdom',
-  'France',
-  'India',
-  'Canada',
-  'South Korea',
-  'Australia',
-  'Russia',
-  'Brazil',
-  'Mexico',
-  'Spain',
-  'Italy',
-  'Netherlands',
-  'Switzerland',
-  'Saudi Arabia',
-  'Turkey',
-  'Indonesia'
-].sort();
+  { code: 'US', name: 'United States' },
+  { code: 'CN', name: 'China' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'GB', name: 'United Kingdom' },
+  { code: 'FR', name: 'France' },
+  { code: 'IN', name: 'India' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'KR', name: 'South Korea' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'RU', name: 'Russia' },
+  { code: 'BR', name: 'Brazil' },
+  { code: 'MX', name: 'Mexico' },
+  { code: 'ES', name: 'Spain' },
+  { code: 'IT', name: 'Italy' },
+  { code: 'NL', name: 'Netherlands' },
+  { code: 'CH', name: 'Switzerland' },
+  { code: 'SA', name: 'Saudi Arabia' },
+  { code: 'TR', name: 'Turkey' },
+  { code: 'ID', name: 'Indonesia' },
+  { code: 'SE', name: 'Sweden' },
+  { code: 'NO', name: 'Norway' },
+  { code: 'DK', name: 'Denmark' },
+  { code: 'FI', name: 'Finland' },
+].sort((a, b) => a.name.localeCompare(b.name));
 
 export default function CriteriaForm() {
   const router = useRouter();
@@ -954,8 +959,8 @@ export default function CriteriaForm() {
                 >
                   <option value="">Select a country to exclude...</option>
                   {COMMON_COUNTRIES.map((country) => (
-                    <option key={country} value={country} disabled={criteria.excludeCountries.includes(country)}>
-                      {country}
+                    <option key={country.code} value={country.code} disabled={criteria.excludeCountries.includes(country.code)}>
+                      {country.name}
                     </option>
                   ))}
                 </select>
@@ -976,22 +981,26 @@ export default function CriteriaForm() {
             {/* Excluded Countries List */}
             {criteria.excludeCountries.length > 0 ? (
               <div className="flex flex-wrap gap-2">
-                {criteria.excludeCountries.map((country) => (
-                  <div key={country} className="bg-slate-950/50 border border-slate-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
-                    <XCircle className="w-4 h-4 text-orange-400" />
-                    <span className="text-white text-sm font-medium">Country: {country}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeCountry(country)}
-                      disabled={!criteria.countriesEnabled}
-                      className={`p-1 hover:bg-orange-500/20 rounded text-orange-400 transition-colors ${
-                        !criteria.countriesEnabled ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
+                {criteria.excludeCountries.map((countryCode) => {
+                  const country = COMMON_COUNTRIES.find(c => c.code === countryCode);
+                  const displayName = country ? country.name : countryCode;
+                  return (
+                    <div key={countryCode} className="bg-slate-950/50 border border-slate-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
+                      <XCircle className="w-4 h-4 text-orange-400" />
+                      <span className="text-white text-sm font-medium">{displayName}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeCountry(countryCode)}
+                        disabled={!criteria.countriesEnabled}
+                        className={`p-1 hover:bg-orange-500/20 rounded text-orange-400 transition-colors ${
+                          !criteria.countriesEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             ) : null}
           </div>

@@ -7,6 +7,36 @@ import ScreeningTable from './ScreeningTable';
 
 export const revalidate = 1800; // 30 minutes
 
+// Country code to name mapping (matches Finnhub API format)
+const COUNTRY_NAMES: Record<string, string> = {
+  'US': 'United States',
+  'CN': 'China',
+  'JP': 'Japan',
+  'DE': 'Germany',
+  'GB': 'United Kingdom',
+  'FR': 'France',
+  'IN': 'India',
+  'CA': 'Canada',
+  'KR': 'South Korea',
+  'AU': 'Australia',
+  'RU': 'Russia',
+  'BR': 'Brazil',
+  'MX': 'Mexico',
+  'ES': 'Spain',
+  'IT': 'Italy',
+  'NL': 'Netherlands',
+  'CH': 'Switzerland',
+  'SA': 'Saudi Arabia',
+  'TR': 'Turkey',
+  'ID': 'Indonesia',
+  'SE': 'Sweden',
+  'NO': 'Norway',
+  'DK': 'Denmark',
+  'FI': 'Finland',
+};
+
+const getCountryName = (code: string): string => COUNTRY_NAMES[code] || code;
+
 export default async function ScreeningPage({
   searchParams,
 }: {
@@ -228,7 +258,7 @@ export default async function ScreeningPage({
                     </span>
                   </div>
                   <p className="text-white font-mono font-semibold">
-                    {CRITERIA.excludeCountries.length > 0 ? CRITERIA.excludeCountries.join(', ') : 'None'}
+                    {CRITERIA.excludeCountries.length > 0 ? CRITERIA.excludeCountries.map(getCountryName).join(', ') : 'None'}
                   </p>
                 </div>
               </div>
@@ -439,7 +469,7 @@ export default async function ScreeningPage({
                       </div>
                       <h4 className="text-white font-semibold">Country Exclusions</h4>
                     </div>
-                    <p className="text-slate-400 text-sm">Excludes stocks from the following countries: {CRITERIA.excludeCountries.join(', ')}</p>
+                    <p className="text-slate-400 text-sm">Excludes stocks from the following countries: {CRITERIA.excludeCountries.map(getCountryName).join(', ')}</p>
                   </div>
                 )}
               </div>
