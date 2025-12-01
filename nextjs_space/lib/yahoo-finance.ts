@@ -188,9 +188,15 @@ export async function fetchYahooPriceHistory(ticker: string): Promise<{ Date: st
 /**
  * Fetch stock statistics including free-float and average volume from Yahoo Finance
  * 
- * This provides key statistics not available in Finnhub free tier:
+ * NOTE: Yahoo Finance has restricted access to the quoteSummary endpoint (requires crumb authentication).
+ * This function currently returns null for these fields. To get this data, you would need to:
+ * 1. Use a paid financial data API (Alpha Vantage, Financial Modeling Prep, Polygon.io)
+ * 2. Implement Yahoo Finance crumb authentication (complex and may break)
+ * 3. Manually populate data in your JSON files
+ * 
+ * Fields that would be returned (when using a proper API):
  * - floatShares: Number of shares available for public trading (free float)
- * - averageDailyVolume10Day: 10-day average trading volume
+ * - averageVolume10Day: 10-day average trading volume
  * - averageVolume: Longer-term average volume
  * - sharesOutstanding: Total number of shares issued
  */
@@ -201,41 +207,14 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
         return null;
     }
     
-    try {
-        const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=defaultKeyStatistics`;
-        
-        const response = await fetch(url, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0',
-            },
-            cache: 'no-store'
-        });
-        
-        if (!response.ok) {
-            console.error(`Yahoo Finance statistics API error for ${ticker}: ${response.status}`);
-            return null;
-        }
-        
-        const data = await response.json();
-        const stats = data?.quoteSummary?.result?.[0]?.defaultKeyStatistics;
-        
-        if (!stats) {
-            console.error(`No statistics data found for ticker: ${ticker}`);
-            return null;
-        }
-        
-        const result = {
-            floatShares: stats?.floatShares?.raw || stats?.floatShares || null,
-            averageVolume10Day: stats?.averageDailyVolume10Day?.raw || stats?.averageDailyVolume10Day || null,
-            averageVolume: stats?.averageVolume?.raw || stats?.averageVolume || null,
-            sharesOutstanding: stats?.sharesOutstanding?.raw || stats?.sharesOutstanding || null
-        };
-        
-        console.log(`[YAHOO] Statistics for ${ticker}:`, result);
-        
-        return result;
-    } catch (error) {
-        console.error(`Error fetching statistics for ${ticker}:`, error);
-        return null;
-    }
+    console.log(`[YAHOO] Statistics API currently unavailable for ${ticker} - Yahoo Finance requires authentication for quoteSummary endpoint`);
+    
+    // Return null for now - this data requires a paid API or crumb authentication
+    // You can manually populate these values in your JSON files if needed
+    return {
+        floatShares: null,
+        averageVolume10Day: null,
+        averageVolume: null,
+        sharesOutstanding: null
+    };
 }
