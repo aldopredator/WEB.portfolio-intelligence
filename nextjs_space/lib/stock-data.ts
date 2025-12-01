@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import type { StockInsightsData } from '@/lib/types';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
-import { fetchFinnhubMetrics, fetchBalanceSheet } from '@/lib/finnhub-metrics';
+import { fetchFinnhubMetrics, fetchBalanceSheet, fetchCompanyProfile } from '@/lib/finnhub-metrics';
 import { fetchPolygonStockStats } from '@/lib/polygon';
 import { isRecord } from '@/lib/utils';
 
@@ -49,6 +49,12 @@ export async function getStockData(): Promise<StockInsightsData> {
         const sentiment = await fetchAndScoreSentiment(ticker, companyName, []);
         if (sentiment && isRecord(stockEntry)) {
           stockEntry.social_sentiment = sentiment as any;
+        }
+
+        // Fetch company profile (includes country, industry, etc.)
+        const profile = await fetchCompanyProfile(ticker);
+        if (profile && isRecord(stockEntry)) {
+          stockEntry.company_profile = profile as any;
         }
 
         // Fetch financial metrics

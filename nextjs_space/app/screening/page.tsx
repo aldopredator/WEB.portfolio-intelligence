@@ -52,6 +52,7 @@ export default async function ScreeningPage({
   const recommendedStocks = STOCK_CONFIG.map((config) => {
     const data = stockData[config.ticker];
     const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
+    const companyProfile = data && typeof data === 'object' && 'company_profile' in data ? data.company_profile : null;
     
     if (!stockInfo) {
       return null;
@@ -98,8 +99,8 @@ export default async function ScreeningPage({
       passes.sector = !CRITERIA.excludeSectors.includes(config.sector);
     }
     
-    if (CRITERIA.countriesEnabled && stockInfo.country) {
-      passes.country = !CRITERIA.excludeCountries.includes(stockInfo.country);
+    if (CRITERIA.countriesEnabled && companyProfile?.country) {
+      passes.country = !CRITERIA.excludeCountries.includes(companyProfile.country);
     }
 
     const totalCriteria = Object.keys(passes).length;
