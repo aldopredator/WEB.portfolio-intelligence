@@ -41,7 +41,7 @@ export default function DashboardClient({ initialData, stocks }: DashboardClient
         <Box
           sx={{
             position: 'sticky',
-            top: 0,
+            top: '88px', // Account for the fixed header height (28 padding top from layout.tsx)
             zIndex: 1100,
             backgroundColor: 'background.paper',
             borderBottom: 1,
