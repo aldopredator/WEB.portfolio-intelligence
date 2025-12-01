@@ -111,16 +111,27 @@ export async function fetchPolygonAggregates(ticker: string): Promise<PolygonAgg
 }
 
 /**
+ * Helper to add delay between API calls
+ */
+function delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
  * Fetch comprehensive stock statistics from Polygon.io
  * Combines ticker details and aggregates data
+ * NOTE: Free tier limit is 5 calls/minute, so we add delays
  */
 export async function fetchPolygonStockStats(ticker: string): Promise<PolygonStockStats | null> {
     try {
-        // Fetch both endpoints in parallel
-        const [details, aggregates] = await Promise.all([
-            fetchPolygonTickerDetails(ticker),
-            fetchPolygonAggregates(ticker)
-        ]);
+        // Fetch ticker details first
+        const details = await fetchPolygonTickerDetails(ticker);
+        
+        // Add 250ms delay between calls to respect rate limits (5 calls/min = 12 sec/call, but we batch them)
+        await delay(250);
+        
+        // Fetch aggregates
+        const aggregates = await fetchPolygonAggregates(ticker);
         
         if (!details && !aggregates) {
             console.log(`[POLYGON] No data available for ${ticker}`);

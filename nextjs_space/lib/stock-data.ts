@@ -38,6 +38,7 @@ export async function getStockData(): Promise<StockInsightsData> {
       key !== 'timestamp' && isRecord(mergedData[key]) && 'stock_data' in (mergedData[key] as any)
     );
     
+    // Process other APIs in parallel (Finnhub, sentiment, balance sheet)
     await Promise.allSettled(validTickers.map(async (ticker) => {
       try {
         const cfg = STOCK_CONFIG.find(c => c.ticker === ticker);
@@ -61,7 +62,18 @@ export async function getStockData(): Promise<StockInsightsData> {
         if (balanceSheet && isRecord(stockEntry) && stockEntry.company_profile) {
           Object.assign(stockEntry.company_profile, balanceSheet);
         }
+      } catch (error) {
+        console.error(`Error enriching ${ticker}:`, error);
+      }
+    }));
 
+    // Process Polygon.io stats SEQUENTIALLY due to rate limits (5 calls/min on free tier)
+    // With 2 calls per ticker + 250ms delay = ~0.5 sec per stock = 6 seconds for 12 stocks
+    console.log('[STOCK-DATA] Starting sequential Polygon.io data fetch...');
+    for (const ticker of validTickers) {
+      try {
+        const stockEntry = mergedData[ticker];
+        
         // Fetch Polygon.io statistics (shares outstanding, volume, float estimate)
         const polygonStats = await fetchPolygonStockStats(ticker);
         if (polygonStats && isRecord(stockEntry) && stockEntry.stock_data) {
@@ -70,13 +82,14 @@ export async function getStockData(): Promise<StockInsightsData> {
         } else {
           console.log(`[STOCK-DATA] No Polygon stats returned for ${ticker}`);
         }
-
-        // Note: Price history is already in the JSON file (updates once per day)
-        // No need to fetch from Yahoo Finance on every request
       } catch (error) {
-        console.error(`Error enriching ${ticker}:`, error);
+        console.error(`Error fetching Polygon stats for ${ticker}:`, error);
       }
-    }));
+    }
+    console.log('[STOCK-DATA] Completed Polygon.io data fetch');
+
+    // Note: Price history is already in the JSON file (updates once per day)
+    // No need to fetch from Yahoo Finance on every request
 
     return mergedData;
   } catch (error) {
