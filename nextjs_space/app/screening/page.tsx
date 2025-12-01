@@ -87,9 +87,23 @@ export default async function ScreeningPage({
     }
     
     if (CRITERIA.sentimentEnabled && CRITERIA.sentimentFilter !== 'all') {
-      const sentiment = data && typeof data === 'object' && 'sentiment_data' in data ? data.sentiment_data : null;
-      if (sentiment && typeof sentiment === 'object' && 'overall_sentiment' in sentiment) {
-        passes.sentiment = sentiment.overall_sentiment === CRITERIA.sentimentFilter;
+      const sentiment = data && typeof data === 'object' && 'social_sentiment' in data ? data.social_sentiment : null;
+      if (sentiment && typeof sentiment === 'object' && 'positive' in sentiment && 'neutral' in sentiment && 'negative' in sentiment) {
+        // Determine overall sentiment based on which percentage is highest
+        const positive = sentiment.positive || 0;
+        const neutral = sentiment.neutral || 0;
+        const negative = sentiment.negative || 0;
+        
+        let overallSentiment: string;
+        if (positive > neutral && positive > negative) {
+          overallSentiment = 'positive';
+        } else if (negative > neutral && negative > positive) {
+          overallSentiment = 'negative';
+        } else {
+          overallSentiment = 'neutral';
+        }
+        
+        passes.sentiment = overallSentiment === CRITERIA.sentimentFilter;
       } else {
         passes.sentiment = false; // Fail if no sentiment data
       }
