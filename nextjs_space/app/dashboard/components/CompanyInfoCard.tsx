@@ -22,10 +22,10 @@ interface CompanyInfoCardProps {
   weburl?: string;
   assets?: number;
   liabilities?: number;
-  floatShares?: number;
-  averageVolume?: number;
-  averageVolume10Day?: number;
-  sharesOutstanding?: number;
+  floatShares?: number | null;
+  averageVolume?: number | null;
+  averageVolume10Day?: number | null;
+  sharesOutstanding?: number | null;
 }
 
 export default function CompanyInfoCard({
