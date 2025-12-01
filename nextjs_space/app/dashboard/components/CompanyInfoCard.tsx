@@ -26,6 +26,7 @@ interface CompanyInfoCardProps {
   averageVolume?: number | null;
   averageVolume10Day?: number | null;
   sharesOutstanding?: number | null;
+  totalEmployees?: number | null;
 }
 
 export default function CompanyInfoCard({
@@ -45,6 +46,7 @@ export default function CompanyInfoCard({
   averageVolume,
   averageVolume10Day,
   sharesOutstanding,
+  totalEmployees,
 }: CompanyInfoCardProps) {
   // Debug logging
   React.useEffect(() => {
@@ -52,9 +54,10 @@ export default function CompanyInfoCard({
       floatShares,
       averageVolume,
       averageVolume10Day,
-      sharesOutstanding
+      sharesOutstanding,
+      totalEmployees
     });
-  }, [floatShares, averageVolume, averageVolume10Day, sharesOutstanding]);
+  }, [floatShares, averageVolume, averageVolume10Day, sharesOutstanding, totalEmployees]);
 
   return (
     <Card variant="outlined" sx={{ height: '100%' }}>
@@ -176,6 +179,14 @@ export default function CompanyInfoCard({
                     ? `${(sharesOutstanding / 1e6).toFixed(2)}M`
                     : sharesOutstanding.toLocaleString()
                   : 'Loading...'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Total Employees
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: totalEmployees ? 'text.primary' : 'text.disabled' }}>
+                {totalEmployees ? totalEmployees.toLocaleString() : 'Loading...'}
               </Typography>
             </Box>
             {assets && (

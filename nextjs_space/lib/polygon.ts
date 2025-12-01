@@ -6,6 +6,7 @@ export interface PolygonTickerDetails {
     market_cap?: number;
     share_class_shares_outstanding?: number;
     weighted_shares_outstanding?: number;
+    total_employees?: number;
 }
 
 export interface PolygonAggregates {
@@ -22,6 +23,7 @@ export interface PolygonStockStats {
     averageVolume?: number | null;
     sharesOutstanding?: number | null;
     dailyVolume?: number | null;
+    totalEmployees?: number | null;
 }
 
 /**
@@ -160,6 +162,7 @@ export async function fetchPolygonStockStats(ticker: string): Promise<PolygonSto
             floatShares: details?.weighted_shares_outstanding || null,
             sharesOutstanding: details?.share_class_shares_outstanding || null,
             dailyVolume: aggregates?.volume || null,
+            totalEmployees: details?.total_employees || null,
             // Polygon.io free tier doesn't provide average volume calculations
             // These would need to be calculated from historical data
             averageVolume10Day: null,
