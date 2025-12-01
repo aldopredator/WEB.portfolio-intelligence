@@ -894,30 +894,24 @@ export default function CriteriaForm() {
 
             {/* Excluded Sectors List */}
             {criteria.excludeSectors.length > 0 ? (
-              criteria.excludeSectors.map((sector) => (
-                <div key={sector} className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0">
-                      <div className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center border border-red-500/20">
-                        <XCircle className="w-5 h-5 text-red-400" />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-white font-semibold text-base">Sector: {sector}</h3>
-                    </div>
+              <div className="flex flex-wrap gap-2">
+                {criteria.excludeSectors.map((sector) => (
+                  <div key={sector} className="bg-slate-950/50 border border-slate-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
+                    <XCircle className="w-4 h-4 text-red-400" />
+                    <span className="text-white text-sm font-medium">Sector: {sector}</span>
                     <button
                       type="button"
                       onClick={() => removeSector(sector)}
                       disabled={!criteria.sectorsEnabled}
-                      className={`p-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg text-red-400 transition-colors ${
+                      className={`p-1 hover:bg-red-500/20 rounded text-red-400 transition-colors ${
                         !criteria.sectorsEnabled ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
                     >
-                      <Trash2 className="w-5 h-5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             ) : null}
           </div>
         </div>
@@ -981,30 +975,24 @@ export default function CriteriaForm() {
 
             {/* Excluded Countries List */}
             {criteria.excludeCountries.length > 0 ? (
-              criteria.excludeCountries.map((country) => (
-                <div key={country} className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0">
-                      <div className="w-8 h-8 bg-orange-500/10 rounded-lg flex items-center justify-center border border-orange-500/20">
-                        <XCircle className="w-5 h-5 text-orange-400" />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-white font-semibold text-base">Country: {country}</h3>
-                    </div>
+              <div className="flex flex-wrap gap-2">
+                {criteria.excludeCountries.map((country) => (
+                  <div key={country} className="bg-slate-950/50 border border-slate-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
+                    <XCircle className="w-4 h-4 text-orange-400" />
+                    <span className="text-white text-sm font-medium">Country: {country}</span>
                     <button
                       type="button"
                       onClick={() => removeCountry(country)}
                       disabled={!criteria.countriesEnabled}
-                      className={`p-2 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 rounded-lg text-orange-400 transition-colors ${
+                      className={`p-1 hover:bg-orange-500/20 rounded text-orange-400 transition-colors ${
                         !criteria.countriesEnabled ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
                     >
-                      <Trash2 className="w-5 h-5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             ) : null}
           </div>
         </div>

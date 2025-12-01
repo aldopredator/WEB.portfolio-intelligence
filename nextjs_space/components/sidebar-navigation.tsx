@@ -61,22 +61,22 @@ export function SidebarNavigation() {
             </Link>
           );
         })}
+        
+        {/* Desktop Collapse Toggle - moved to top */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="hidden lg:flex items-center justify-center w-full px-4 py-3 mt-2 rounded-xl border border-slate-800/50 text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors"
+        >
+          {collapsed ? (
+            <ChevronRight className="w-5 h-5" />
+          ) : (
+            <>
+              <ChevronLeft className="w-5 h-5" />
+              <span className="ml-2 text-sm">Collapse</span>
+            </>
+          )}
+        </button>
       </nav>
-
-      {/* Desktop Collapse Toggle */}
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="hidden lg:flex items-center justify-center w-full p-4 border-t border-slate-800/50 text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors"
-      >
-        {collapsed ? (
-          <ChevronRight className="w-5 h-5" />
-        ) : (
-          <>
-            <ChevronLeft className="w-5 h-5" />
-            <span className="ml-2 text-sm">Collapse</span>
-          </>
-        )}
-      </button>
     </>
   );
 
