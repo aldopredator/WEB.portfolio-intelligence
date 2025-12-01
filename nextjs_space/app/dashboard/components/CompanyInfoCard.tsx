@@ -24,7 +24,7 @@ interface CompanyInfoCardProps {
   liabilities?: number;
   floatShares?: number;
   averageVolume?: number;
-  averageDailyVolume10Day?: number;
+  averageVolume10Day?: number;
   sharesOutstanding?: number;
 }
 
@@ -43,7 +43,7 @@ export default function CompanyInfoCard({
   liabilities,
   floatShares,
   averageVolume,
-  averageDailyVolume10Day,
+  averageVolume10Day,
   sharesOutstanding,
 }: CompanyInfoCardProps) {
   return (
@@ -72,7 +72,7 @@ export default function CompanyInfoCard({
           </Box>
         </Stack>
 
-        {(industry || sector || subSector || country || marketCapitalization || floatShares || averageVolume || averageDailyVolume10Day || sharesOutstanding || assets || liabilities || weburl) && (
+        {(industry || sector || subSector || country || marketCapitalization || floatShares || averageVolume || averageVolume10Day || sharesOutstanding || assets || liabilities || weburl) && (
           <Stack spacing={2}>
             {industry && (
               <Box>
@@ -140,17 +140,17 @@ export default function CompanyInfoCard({
                 </Typography>
               </Box>
             )}
-            {averageDailyVolume10Day && (
+            {averageVolume10Day && (
               <Box>
                 <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
                   Avg Daily Volume (10D)
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {averageDailyVolume10Day >= 1e9
-                    ? `${(averageDailyVolume10Day / 1e9).toFixed(2)}B`
-                    : averageDailyVolume10Day >= 1e6
-                    ? `${(averageDailyVolume10Day / 1e6).toFixed(2)}M`
-                    : averageDailyVolume10Day.toLocaleString()}
+                  {averageVolume10Day >= 1e9
+                    ? `${(averageVolume10Day / 1e9).toFixed(2)}B`
+                    : averageVolume10Day >= 1e6
+                    ? `${(averageVolume10Day / 1e6).toFixed(2)}M`
+                    : averageVolume10Day.toLocaleString()}
                 </Typography>
               </Box>
             )}

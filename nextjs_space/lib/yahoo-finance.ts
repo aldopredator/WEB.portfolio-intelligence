@@ -27,7 +27,7 @@ export interface StockQuote {
 
 export interface YahooStockStatistics {
     floatShares?: number;              // Free float shares
-    averageDailyVolume10Day?: number;  // 10-day average volume
+    averageVolume10Day?: number;       // 10-day average volume
     averageVolume?: number;            // Average volume (longer period)
     sharesOutstanding?: number;        // Total shares outstanding
 }
@@ -226,7 +226,7 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
         
         return {
             floatShares: stats?.floatShares?.raw || 0,
-            averageDailyVolume10Day: stats?.averageDailyVolume10Day?.raw || 0,
+            averageVolume10Day: stats?.averageDailyVolume10Day?.raw || 0,
             averageVolume: stats?.averageVolume?.raw || 0,
             sharesOutstanding: stats?.sharesOutstanding?.raw || 0
         };

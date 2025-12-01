@@ -81,7 +81,7 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
                 liabilities={stockEntry.company_profile.liabilities}
                 floatShares={stock.floatShares}
                 averageVolume={stock.averageVolume}
-                averageDailyVolume10Day={stock.averageDailyVolume10Day}
+                averageVolume10Day={stock.averageVolume10Day}
                 sharesOutstanding={stock.sharesOutstanding}
               />
             )}
