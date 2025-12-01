@@ -136,8 +136,8 @@ export default function CompanyInfoCard({
                 </Typography>
               </Box>
             )}
-            <Box>
-              <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 Float Shares
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 700, color: floatShares ? 'text.primary' : 'text.disabled' }}>
@@ -150,8 +150,8 @@ export default function CompanyInfoCard({
                   : 'Loading...'}
               </Typography>
             </Box>
-            <Box>
-              <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 Avg Daily Volume (10D)
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 700, color: averageVolume10Day ? 'text.primary' : 'text.disabled' }}>
@@ -164,8 +164,8 @@ export default function CompanyInfoCard({
                   : 'N/A'}
               </Typography>
             </Box>
-            <Box>
-              <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 Shares Outstanding
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 700, color: sharesOutstanding ? 'text.primary' : 'text.disabled' }}>
