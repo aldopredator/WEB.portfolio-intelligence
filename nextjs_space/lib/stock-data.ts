@@ -65,7 +65,10 @@ export async function getStockData(): Promise<StockInsightsData> {
         // Fetch Yahoo Finance statistics (free-float, average volume)
         const yahooStats = await fetchYahooStatistics(ticker);
         if (yahooStats && isRecord(stockEntry) && stockEntry.stock_data) {
+          console.log(`[STOCK-DATA] Merging Yahoo stats for ${ticker}:`, yahooStats);
           Object.assign(stockEntry.stock_data, yahooStats);
+        } else {
+          console.log(`[STOCK-DATA] No Yahoo stats returned for ${ticker}`);
         }
 
         // Note: Price history is already in the JSON file (updates once per day)

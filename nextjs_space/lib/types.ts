@@ -32,10 +32,10 @@ export interface StockData {
   previous_close?: number;
   market_cap?: number;
   volume?: number;
-  averageVolume10Day?: number;
-  averageVolume?: number;
-  floatShares?: number;
-  sharesOutstanding?: number;
+  averageVolume10Day?: number | null;
+  averageVolume?: number | null;
+  floatShares?: number | null;
+  sharesOutstanding?: number | null;
   currency?: string;
   country?: string;
   // Finnhub valuation metrics

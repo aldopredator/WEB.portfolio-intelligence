@@ -26,10 +26,10 @@ export interface StockQuote {
 }
 
 export interface YahooStockStatistics {
-    floatShares?: number;              // Free float shares
-    averageVolume10Day?: number;       // 10-day average volume
-    averageVolume?: number;            // Average volume (longer period)
-    sharesOutstanding?: number;        // Total shares outstanding
+    floatShares?: number | null;              // Free float shares
+    averageVolume10Day?: number | null;       // 10-day average volume
+    averageVolume?: number | null;            // Average volume (longer period)
+    sharesOutstanding?: number | null;        // Total shares outstanding
 }
 
 /**
@@ -224,12 +224,16 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
             return null;
         }
         
-        return {
-            floatShares: stats?.floatShares?.raw || 0,
-            averageVolume10Day: stats?.averageDailyVolume10Day?.raw || 0,
-            averageVolume: stats?.averageVolume?.raw || 0,
-            sharesOutstanding: stats?.sharesOutstanding?.raw || 0
+        const result = {
+            floatShares: stats?.floatShares?.raw || stats?.floatShares || null,
+            averageVolume10Day: stats?.averageDailyVolume10Day?.raw || stats?.averageDailyVolume10Day || null,
+            averageVolume: stats?.averageVolume?.raw || stats?.averageVolume || null,
+            sharesOutstanding: stats?.sharesOutstanding?.raw || stats?.sharesOutstanding || null
         };
+        
+        console.log(`[YAHOO] Statistics for ${ticker}:`, result);
+        
+        return result;
     } catch (error) {
         console.error(`Error fetching statistics for ${ticker}:`, error);
         return null;
