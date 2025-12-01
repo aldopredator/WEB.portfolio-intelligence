@@ -1008,7 +1008,7 @@ export default function CriteriaForm() {
       </div>
 
       {/* Action Buttons - Sticky at bottom for easy access while scrolling */}
-      <div className="sticky bottom-0 z-20 bg-slate-950/95 backdrop-blur-sm pt-4 mt-6 border-t border-slate-800/50">
+      <div className="sticky bottom-0 z-20 bg-slate-950/95 backdrop-blur-sm pt-4 mt-6 mb-24 border-t border-slate-800/50">
         <div className="flex gap-3">
           <button
             type="button"

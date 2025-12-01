@@ -55,7 +55,7 @@ export default function ScreeningClient({ children }: ScreeningClientProps) {
             </div>
           </div>
           
-          <div className="p-6">
+          <div className="p-6 pb-32">
             <CriteriaForm />
           </div>
         </div>
