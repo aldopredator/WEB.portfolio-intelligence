@@ -36,6 +36,7 @@ export interface StockData {
   averageVolume?: number | null;
   floatShares?: number | null;
   sharesOutstanding?: number | null;
+  dailyVolume?: number | null;
   currency?: string;
   country?: string;
   // Finnhub valuation metrics
