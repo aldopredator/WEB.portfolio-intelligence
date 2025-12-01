@@ -85,8 +85,8 @@ export default function CompanyInfoCard({
         {(industry || sector || subSector || country || marketCapitalization || floatShares || averageVolume || averageVolume10Day || sharesOutstanding || assets || liabilities || weburl) && (
           <Stack spacing={2}>
             {industry && (
-              <Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Industry
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
@@ -115,8 +115,8 @@ export default function CompanyInfoCard({
               </Box>
             )}
             {country && (
-              <Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Country
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
@@ -125,8 +125,8 @@ export default function CompanyInfoCard({
               </Box>
             )}
             {marketCapitalization && (
-              <Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Market Cap
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
@@ -203,8 +203,8 @@ export default function CompanyInfoCard({
               </Box>
             )}
             {weburl && (
-              <Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Website
                 </Typography>
                 <Typography
