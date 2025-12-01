@@ -24,7 +24,7 @@ export function GlobalHeader() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-sm border-b border-slate-800/50 lg:left-72 lg:right-[540px]">
-      <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="w-full px-4 py-4">
         <div className="flex items-center gap-4 mb-3">
           <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
             <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
