@@ -4,7 +4,7 @@ import path from 'path';
 import type { StockInsightsData } from '@/lib/types';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
 import { fetchFinnhubMetrics, fetchBalanceSheet } from '@/lib/finnhub-metrics';
-import { fetchYahooStatistics } from '@/lib/yahoo-finance';
+import { fetchPolygonStockStats } from '@/lib/polygon';
 import { isRecord } from '@/lib/utils';
 
 export const STOCK_CONFIG = [
@@ -62,13 +62,13 @@ export async function getStockData(): Promise<StockInsightsData> {
           Object.assign(stockEntry.company_profile, balanceSheet);
         }
 
-        // Fetch Yahoo Finance statistics (free-float, average volume)
-        const yahooStats = await fetchYahooStatistics(ticker);
-        if (yahooStats && isRecord(stockEntry) && stockEntry.stock_data) {
-          console.log(`[STOCK-DATA] Merging Yahoo stats for ${ticker}:`, yahooStats);
-          Object.assign(stockEntry.stock_data, yahooStats);
+        // Fetch Polygon.io statistics (shares outstanding, volume, float estimate)
+        const polygonStats = await fetchPolygonStockStats(ticker);
+        if (polygonStats && isRecord(stockEntry) && stockEntry.stock_data) {
+          console.log(`[STOCK-DATA] Merging Polygon stats for ${ticker}:`, polygonStats);
+          Object.assign(stockEntry.stock_data, polygonStats);
         } else {
-          console.log(`[STOCK-DATA] No Yahoo stats returned for ${ticker}`);
+          console.log(`[STOCK-DATA] No Polygon stats returned for ${ticker}`);
         }
 
         // Note: Price history is already in the JSON file (updates once per day)
