@@ -8,11 +8,14 @@ export default async function DashboardPage() {
   const stockData = await getStockData();
 
   // Debug: Check if Polygon data exists
-  console.log('[DashboardPage] Sample stock data for GOOG:', {
-    floatShares: stockData.GOOG?.stock_data?.floatShares,
-    sharesOutstanding: stockData.GOOG?.stock_data?.sharesOutstanding,
-    dailyVolume: stockData.GOOG?.stock_data?.dailyVolume,
-  });
+  const googData = stockData.GOOG;
+  if (googData && typeof googData === 'object' && 'stock_data' in googData) {
+    console.log('[DashboardPage] Sample stock data for GOOG:', {
+      floatShares: googData.stock_data?.floatShares,
+      sharesOutstanding: googData.stock_data?.sharesOutstanding,
+      dailyVolume: googData.stock_data?.dailyVolume,
+    });
+  }
 
   const stocks = STOCK_CONFIG.map((config) => {
     const data = stockData[config.ticker];
