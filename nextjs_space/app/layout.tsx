@@ -30,11 +30,11 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={inter.className}>
         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-          {/* Top Header Bar with Tickers - Always visible */}
+          {/* Top Header Bar with Tickers - Fixed, Always visible */}
           <GlobalHeader />
           
           <SidebarNavigation />
-          <div className="lg:pl-0 pt-40 pb-32">
+          <div className="lg:pl-0 pt-44 pb-32">
             {children}
           </div>
           
