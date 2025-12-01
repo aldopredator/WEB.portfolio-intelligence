@@ -36,6 +36,8 @@ export async function fetchPolygonTickerDetails(ticker: string): Promise<Polygon
         return null;
     }
     
+    console.log(`[POLYGON] Fetching ticker details for ${ticker} (API key exists: ${!!apiKey})`);
+    
     try {
         const url = `https://api.polygon.io/v3/reference/tickers/${ticker}?apiKey=${apiKey}`;
         
@@ -150,7 +152,7 @@ export async function fetchPolygonStockStats(ticker: string): Promise<PolygonSto
             averageVolume: null
         };
         
-        console.log(`[POLYGON] Stats for ${ticker}:`, stats);
+        console.log(`[POLYGON] ✅ Stats fetched for ${ticker}:`, JSON.stringify(stats));
         
         return stats;
     } catch (error) {
