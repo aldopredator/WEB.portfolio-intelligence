@@ -1,7 +1,9 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-const CACHE_DIR = path.join(process.cwd(), '.cache');
+// Use /tmp for serverless environments (Vercel, AWS Lambda, etc.)
+// Local dev will use project directory's .cache
+const CACHE_DIR = process.env.VERCEL ? '/tmp/.cache' : path.join(process.cwd(), '.cache');
 const POLYGON_CACHE_FILE = path.join(CACHE_DIR, 'polygon-cache.json');
 const POLYGON_ROTATION_FILE = path.join(CACHE_DIR, 'polygon-rotation.json');
 
