@@ -74,53 +74,26 @@ export async function getStockData(): Promise<StockInsightsData> {
       }
     }));
 
-    // Process Polygon.io stats with smart caching (24-hour TTL, one ticker every 5 minutes)
-    // This respects the free tier limit of 5 calls/minute while keeping data fresh
-    console.log('[STOCK-DATA] 🚀 Starting Polygon.io data fetch with smart caching...');
-    console.log('[STOCK-DATA] 📋 Valid tickers:', validTickers);
+    // POC: Fetch Polygon.io data for GOOG only
+    console.log('[STOCK-DATA] 🎯 POC: Fetching Polygon.io data for GOOG only...');
     
-    // First, load all cached data
-    for (const ticker of validTickers) {
-      const stockEntry = mergedData[ticker];
-      if (!isRecord(stockEntry) || !stockEntry.stock_data) continue;
-      
-      const cachedStats = await getPolygonCached(ticker);
-      if (cachedStats) {
-        Object.assign(stockEntry.stock_data, cachedStats);
-        console.log(`[STOCK-DATA] ✅ Using cached Polygon data for ${ticker}`);
-      }
-    }
-    
-    // Determine if we should fetch fresh data for any ticker (max one per request)
-    const nextTicker = await getNextTickerToFetch(validTickers);
-    
-    if (nextTicker) {
+    const googEntry = mergedData['GOOG'];
+    if (googEntry && isRecord(googEntry) && googEntry.stock_data) {
       try {
-        console.log(`[STOCK-DATA] 🔄 Fetching fresh Polygon data for ${nextTicker}...`);
-        const stockEntry = mergedData[nextTicker];
+        const polygonStats = await fetchPolygonStockStats('GOOG');
         
-        if (isRecord(stockEntry) && stockEntry.stock_data) {
-          const polygonStats = await fetchPolygonStockStats(nextTicker);
-          
-          if (polygonStats) {
-            // Save to cache
-            await setPolygonCached(nextTicker, polygonStats);
-            
-            // Merge into stock data
-            Object.assign(stockEntry.stock_data, polygonStats);
-            console.log(`[STOCK-DATA] ✅ Updated ${nextTicker} with fresh Polygon data:`, JSON.stringify(polygonStats));
-          } else {
-            console.log(`[STOCK-DATA] ⚠️ No Polygon stats returned for ${nextTicker}`);
-          }
+        if (polygonStats) {
+          Object.assign(googEntry.stock_data, polygonStats);
+          console.log(`[STOCK-DATA] ✅ GOOG Polygon data:`, JSON.stringify(polygonStats, null, 2));
+        } else {
+          console.log(`[STOCK-DATA] ⚠️ No Polygon data returned for GOOG`);
         }
       } catch (error) {
-        console.error(`[STOCK-DATA] ❌ Error fetching Polygon stats for ${nextTicker}:`, error);
+        console.error(`[STOCK-DATA] ❌ Error fetching Polygon data for GOOG:`, error);
       }
-    } else {
-      console.log('[STOCK-DATA] ⏭️  Skipping Polygon fetch (rate limit or all data fresh)');
     }
     
-    console.log('[STOCK-DATA] 🏁 Completed Polygon.io data processing');
+    console.log('[STOCK-DATA] 🏁 Completed data enrichment');
 
     // Note: Price history is already in the JSON file (updates once per day)
     // No need to fetch from Yahoo Finance on every request
