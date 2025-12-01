@@ -46,7 +46,7 @@ export async function fetchPolygonTickerDetails(ticker: string): Promise<Polygon
         console.log(`[POLYGON] 📡 Fetching: ${url.replace(apiKey, 'API_KEY_HIDDEN')}`);
         
         const response = await fetch(url, {
-            cache: 'no-store'
+            next: { revalidate: 86400 } // Cache for 24 hours
         });
         
         console.log(`[POLYGON] 📊 Response status for ${ticker}: ${response.status}`);
@@ -89,7 +89,7 @@ export async function fetchPolygonAggregates(ticker: string): Promise<PolygonAgg
         const url = `https://api.polygon.io/v2/aggs/ticker/${ticker}/prev?adjusted=true&apiKey=${apiKey}`;
         
         const response = await fetch(url, {
-            cache: 'no-store'
+            next: { revalidate: 86400 } // Cache for 24 hours
         });
         
         if (!response.ok) {

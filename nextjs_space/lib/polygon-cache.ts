@@ -129,8 +129,11 @@ export async function getNextTickerToFetch(tickers: string[]): Promise<string | 
     const now = Date.now();
     const timeSinceLastFetch = now - rotation.lastFetchTime;
     
-    // Don't fetch if less than 5 minutes since last fetch
-    if (timeSinceLastFetch < MIN_FETCH_INTERVAL) {
+    console.log(`[POLYGON-CACHE] 🔄 Rotation state: lastTicker=${rotation.lastTicker}, lastFetchTime=${rotation.lastFetchTime}, timeSince=${Math.round(timeSinceLastFetch/1000)}s`);
+    
+    // Allow immediate fetch on first run (lastFetchTime === 0)
+    // Otherwise, don't fetch if less than 5 minutes since last fetch
+    if (rotation.lastFetchTime > 0 && timeSinceLastFetch < MIN_FETCH_INTERVAL) {
       const waitMinutes = Math.ceil((MIN_FETCH_INTERVAL - timeSinceLastFetch) / (60 * 1000));
       console.log(`[POLYGON-CACHE] ⏸️  Rate limit protection: wait ${waitMinutes} more minute(s)`);
       return null;

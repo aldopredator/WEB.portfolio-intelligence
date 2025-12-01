@@ -1,133 +1,4 @@
 {
-  "META": {
-    "stock_data": {
-      "ticker": "META",
-      "company": "Meta Platforms (META)",
-      "current_price": 595,
-      "change": 12.5,
-      "change_percent": 2.15,
-      "52_week_high": 714,
-      "52_week_low": 476,
-      "price_movement_30_days": [
-        {
-          "date": "2025-10-29T13:30:00.000Z",
-          "price": 751.67
-        },
-        {
-          "date": "2025-10-30T13:30:00.000Z",
-          "price": 666.47
-        },
-        {
-          "date": "2025-10-31T13:30:00.000Z",
-          "price": 648.35
-        },
-        {
-          "date": "2025-11-03T14:30:00.000Z",
-          "price": 637.71
-        },
-        {
-          "date": "2025-11-04T14:30:00.000Z",
-          "price": 627.32
-        },
-        {
-          "date": "2025-11-05T14:30:00.000Z",
-          "price": 635.95
-        },
-        {
-          "date": "2025-11-06T14:30:00.000Z",
-          "price": 618.94
-        },
-        {
-          "date": "2025-11-07T14:30:00.000Z",
-          "price": 621.71
-        },
-        {
-          "date": "2025-11-10T14:30:00.000Z",
-          "price": 631.76
-        },
-        {
-          "date": "2025-11-11T14:30:00.000Z",
-          "price": 627.08
-        },
-        {
-          "date": "2025-11-12T14:30:00.000Z",
-          "price": 609.01
-        },
-        {
-          "date": "2025-11-13T14:30:00.000Z",
-          "price": 609.89
-        },
-        {
-          "date": "2025-11-14T14:30:00.000Z",
-          "price": 609.46
-        },
-        {
-          "date": "2025-11-17T14:30:00.000Z",
-          "price": 602.01
-        },
-        {
-          "date": "2025-11-18T14:30:00.000Z",
-          "price": 597.69
-        },
-        {
-          "date": "2025-11-19T14:30:00.000Z",
-          "price": 590.32
-        },
-        {
-          "date": "2025-11-20T14:30:00.000Z",
-          "price": 589.15
-        },
-        {
-          "date": "2025-11-21T14:30:00.000Z",
-          "price": 594.25
-        },
-        {
-          "date": "2025-11-24T14:30:00.000Z",
-          "price": 613.05
-        },
-        {
-          "date": "2025-11-25T14:30:00.000Z",
-          "price": 636.22
-        },
-        {
-          "date": "2025-11-26T14:30:00.000Z",
-          "price": 633.61
-        },
-        {
-          "date": "2025-11-28T21:00:00.000Z",
-          "price": 647.95
-        }
-      ]
-    },
-    "analyst_recommendations": {
-      "strong_buy": 28,
-      "buy": 15,
-      "hold": 5,
-      "sell": 1,
-      "strong_sell": 0,
-      "consensus": "Strong Buy",
-      "price_target": 685
-    },
-    "social_sentiment": {
-      "positive": 75,
-      "neutral": 20,
-      "negative": 5,
-      "overall": "Bullish"
-    },
-    "latest_news": [
-      {
-        "title": "Meta Reports Strong Ad Revenue",
-        "summary": "Quarterly results exceed analyst expectations driven by AI investments.",
-        "source": "Financial Times",
-        "date": "2025-11-27",
-        "url": "https://ft.com"
-      }
-    ],
-    "emerging_trends": [
-      "🤖 AI Integration",
-      "💰 Strong Cash Flow"
-    ]
-  },
   "NVDA": {
     "stock_data": {
       "ticker": "NVDA",
@@ -245,7 +116,7 @@
     },
     "latest_news": [],
     "emerging_trends": [
-      "📈 AI Chip Demand"
+      "\ud83d\udcc8 AI Chip Demand"
     ]
   },
   "GOOG": {
@@ -365,7 +236,7 @@
     },
     "latest_news": [],
     "emerging_trends": [
-      "☁️ Cloud Growth"
+      "\u2601\ufe0f Cloud Growth"
     ]
   },
   "TSLA": {
@@ -485,7 +356,7 @@
     },
     "latest_news": [],
     "emerging_trends": [
-      "🚗 EV Competition"
+      "\ud83d\ude97 EV Competition"
     ]
   },
   "BRK-B": {
@@ -605,7 +476,7 @@
     },
     "latest_news": [],
     "emerging_trends": [
-      "🛡️ Defensive Play"
+      "\ud83d\udee1\ufe0f Defensive Play"
     ]
   },
   "ISRG": {
@@ -725,7 +596,7 @@
     },
     "latest_news": [],
     "emerging_trends": [
-      "🏥 MedTech Growth"
+      "\ud83c\udfe5 MedTech Growth"
     ]
   },
   "NFLX": {
@@ -845,7 +716,7 @@
     },
     "latest_news": [],
     "emerging_trends": [
-      "📺 Streaming Wars"
+      "\ud83d\udcfa Streaming Wars"
     ]
   },
   "GOOGL": {
@@ -965,7 +836,7 @@
     },
     "latest_news": [],
     "emerging_trends": [
-      "🤖 Gemini AI"
+      "\ud83e\udd16 Gemini AI"
     ]
   },
   "AMZN": {
@@ -1085,7 +956,7 @@
     },
     "latest_news": [],
     "emerging_trends": [
-      "📦 E-commerce Dominance"
+      "\ud83d\udce6 E-commerce Dominance"
     ]
   },
   "IDXX": {
@@ -1205,7 +1076,7 @@
     },
     "latest_news": [],
     "emerging_trends": [
-      "🐶 Pet Healthcare"
+      "\ud83d\udc36 Pet Healthcare"
     ]
   },
   "III": {
@@ -1325,7 +1196,7 @@
     },
     "latest_news": [],
     "emerging_trends": [
-      "💼 Private Equity"
+      "\ud83d\udcbc Private Equity"
     ]
   },
   "PLTR": {
@@ -1445,7 +1316,7 @@
     },
     "latest_news": [],
     "emerging_trends": [
-      "🛡️ Defense Tech"
+      "\ud83d\udee1\ufe0f Defense Tech"
     ]
   },
   "QBTS": {
@@ -1565,7 +1436,7 @@
     },
     "latest_news": [],
     "emerging_trends": [
-      "⚛️ Quantum Computing"
+      "\u269b\ufe0f Quantum Computing"
     ]
   },
   "RGTI": {
@@ -1685,7 +1556,7 @@
     },
     "latest_news": [],
     "emerging_trends": [
-      "⚛️ Quantum Hardware"
+      "\u269b\ufe0f Quantum Hardware"
     ]
   },
   "timestamp": "2025-11-27T12:00:00.000Z"
