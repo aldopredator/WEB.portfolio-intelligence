@@ -136,48 +136,48 @@ export default function CompanyInfoCard({
                 </Typography>
               </Box>
             )}
-            {floatShares && (
-              <Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
-                  Float Shares
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {floatShares >= 1e9
+            <Box>
+              <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+                Float Shares
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: floatShares ? 'text.primary' : 'text.disabled' }}>
+                {floatShares
+                  ? floatShares >= 1e9
                     ? `${(floatShares / 1e9).toFixed(2)}B`
                     : floatShares >= 1e6
                     ? `${(floatShares / 1e6).toFixed(2)}M`
-                    : floatShares.toLocaleString()}
-                </Typography>
-              </Box>
-            )}
-            {averageVolume10Day && (
-              <Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
-                  Avg Daily Volume (10D)
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {averageVolume10Day >= 1e9
+                    : floatShares.toLocaleString()
+                  : 'Loading...'}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+                Avg Daily Volume (10D)
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: averageVolume10Day ? 'text.primary' : 'text.disabled' }}>
+                {averageVolume10Day
+                  ? averageVolume10Day >= 1e9
                     ? `${(averageVolume10Day / 1e9).toFixed(2)}B`
                     : averageVolume10Day >= 1e6
                     ? `${(averageVolume10Day / 1e6).toFixed(2)}M`
-                    : averageVolume10Day.toLocaleString()}
-                </Typography>
-              </Box>
-            )}
-            {sharesOutstanding && (
-              <Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
-                  Shares Outstanding
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {sharesOutstanding >= 1e9
+                    : averageVolume10Day.toLocaleString()
+                  : 'N/A'}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+                Shares Outstanding
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: sharesOutstanding ? 'text.primary' : 'text.disabled' }}>
+                {sharesOutstanding
+                  ? sharesOutstanding >= 1e9
                     ? `${(sharesOutstanding / 1e9).toFixed(2)}B`
                     : sharesOutstanding >= 1e6
                     ? `${(sharesOutstanding / 1e6).toFixed(2)}M`
-                    : sharesOutstanding.toLocaleString()}
-                </Typography>
-              </Box>
-            )}
+                    : sharesOutstanding.toLocaleString()
+                  : 'Loading...'}
+              </Typography>
+            </Box>
             {assets && (
               <Box>
                 <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
