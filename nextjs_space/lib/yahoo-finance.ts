@@ -202,7 +202,7 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
     }
     
     try {
-        const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=defaultKeyStatistics`;
+        const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=defaultKeyStatistics`;
         
         const response = await fetch(url, {
             headers: {

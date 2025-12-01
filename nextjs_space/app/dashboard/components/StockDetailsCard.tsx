@@ -19,7 +19,7 @@ interface StockDetailsCardProps {
   dividendYield?: number;
   pbRatio?: number;
   beta?: number;
-  averageVolume10Day?: number;
+  averageVolume10Day?: number | null;
 }
 
 export default function StockDetailsCard({
