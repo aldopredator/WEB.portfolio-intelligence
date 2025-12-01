@@ -46,6 +46,16 @@ export default function CompanyInfoCard({
   averageVolume10Day,
   sharesOutstanding,
 }: CompanyInfoCardProps) {
+  // Debug logging
+  React.useEffect(() => {
+    console.log('[CompanyInfoCard] Polygon data received:', {
+      floatShares,
+      averageVolume,
+      averageVolume10Day,
+      sharesOutstanding
+    });
+  }, [floatShares, averageVolume, averageVolume10Day, sharesOutstanding]);
+
   return (
     <Card variant="outlined" sx={{ height: '100%' }}>
       <CardContent>
