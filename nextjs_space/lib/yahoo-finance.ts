@@ -25,6 +25,13 @@ export interface StockQuote {
     currency?: string;
 }
 
+export interface YahooStockStatistics {
+    floatShares?: number;              // Free float shares
+    averageDailyVolume10Day?: number;  // 10-day average volume
+    averageVolume?: number;            // Average volume (longer period)
+    sharesOutstanding?: number;        // Total shares outstanding
+}
+
 /**
  * Fetch real-time stock quote from Yahoo Finance
  * Uses the unofficial Yahoo Finance API endpoint
@@ -175,5 +182,56 @@ export async function fetchYahooPriceHistory(ticker: string): Promise<{ Date: st
     } catch (error) {
         console.error(`Error fetching price history for ${ticker}:`, error);
         return [];
+    }
+}
+
+/**
+ * Fetch stock statistics including free-float and average volume from Yahoo Finance
+ * 
+ * This provides key statistics not available in Finnhub free tier:
+ * - floatShares: Number of shares available for public trading (free float)
+ * - averageDailyVolume10Day: 10-day average trading volume
+ * - averageVolume: Longer-term average volume
+ * - sharesOutstanding: Total number of shares issued
+ */
+export async function fetchYahooStatistics(ticker: string): Promise<YahooStockStatistics | null> {
+    // Check if Yahoo Finance is enabled
+    if (process.env.ENABLE_YAHOO_FINANCE === 'false') {
+        console.log(`[YAHOO] Yahoo Finance is disabled via ENABLE_YAHOO_FINANCE env var`);
+        return null;
+    }
+    
+    try {
+        const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=defaultKeyStatistics`;
+        
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0',
+            },
+            cache: 'no-store'
+        });
+        
+        if (!response.ok) {
+            console.error(`Yahoo Finance statistics API error for ${ticker}: ${response.status}`);
+            return null;
+        }
+        
+        const data = await response.json();
+        const stats = data?.quoteSummary?.result?.[0]?.defaultKeyStatistics;
+        
+        if (!stats) {
+            console.error(`No statistics data found for ticker: ${ticker}`);
+            return null;
+        }
+        
+        return {
+            floatShares: stats?.floatShares?.raw || 0,
+            averageDailyVolume10Day: stats?.averageDailyVolume10Day?.raw || 0,
+            averageVolume: stats?.averageVolume?.raw || 0,
+            sharesOutstanding: stats?.sharesOutstanding?.raw || 0
+        };
+    } catch (error) {
+        console.error(`Error fetching statistics for ${ticker}:`, error);
+        return null;
     }
 }

@@ -4,6 +4,7 @@ import path from 'path';
 import type { StockInsightsData } from '@/lib/types';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
 import { fetchFinnhubMetrics, fetchBalanceSheet } from '@/lib/finnhub-metrics';
+import { fetchYahooStatistics } from '@/lib/yahoo-finance';
 import { isRecord } from '@/lib/utils';
 
 export const STOCK_CONFIG = [
@@ -59,6 +60,12 @@ export async function getStockData(): Promise<StockInsightsData> {
         const balanceSheet = await fetchBalanceSheet(ticker);
         if (balanceSheet && isRecord(stockEntry) && stockEntry.company_profile) {
           Object.assign(stockEntry.company_profile, balanceSheet);
+        }
+
+        // Fetch Yahoo Finance statistics (free-float, average volume)
+        const yahooStats = await fetchYahooStatistics(ticker);
+        if (yahooStats && isRecord(stockEntry) && stockEntry.stock_data) {
+          Object.assign(stockEntry.stock_data, yahooStats);
         }
 
         // Note: Price history is already in the JSON file (updates once per day)
