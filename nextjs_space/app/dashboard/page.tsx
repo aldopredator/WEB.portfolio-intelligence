@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { StockInsightsData } from '@/lib/types';
 import { getStockData, STOCK_CONFIG } from '@/lib/stock-data';
 import DashboardClient from './DashboardClient';
@@ -27,5 +28,9 @@ export default async function DashboardPage() {
     };
   });
 
-  return <DashboardClient initialData={stockData} stocks={stocks} />;
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+      <DashboardClient initialData={stockData} stocks={stocks} />
+    </Suspense>
+  );
 }

@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import { Suspense } from 'react';
 import type { StockInsightsData } from '@/lib/types';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
 import { 
@@ -124,5 +125,9 @@ export default async function HomePage() {
     };
   });
 
-  return <DashboardClient initialData={stockData} stocks={stocks} />;
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+      <DashboardClient initialData={stockData} stocks={stocks} />
+    </Suspense>
+  );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useSearchParams } from 'next/navigation';
 import { alpha } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
@@ -29,9 +30,17 @@ const theme = createTheme({
     fontFamily: 'var(--font-geist-sans)',
   },
 });
-
 export default function DashboardClient({ initialData, stocks }: DashboardClientProps) {
+  const searchParams = useSearchParams();
+  const stockParam = searchParams.get('stock');
   const [selectedStock, setSelectedStock] = React.useState(stocks[0]?.ticker || 'GOOG');
+
+  // Update selected stock when URL param changes
+  React.useEffect(() => {
+    if (stockParam) {
+      setSelectedStock(stockParam);
+    }
+  }, [stockParam]);
 
   return (
     <ThemeProvider theme={theme}>
