@@ -75,7 +75,8 @@ export async function getStockData(): Promise<StockInsightsData> {
     }));
 
     // POC: Fetch Polygon.io data for GOOG only
-    console.log('[STOCK-DATA] 🎯 POC: Fetching Polygon.io data for GOOG only...');
+    const timestamp = new Date().toISOString();
+    console.log(`[STOCK-DATA] 🎯 POC: Fetching Polygon.io data for GOOG at ${timestamp}...`);
     
     const googEntry = mergedData['GOOG'];
     if (googEntry && isRecord(googEntry) && googEntry.stock_data) {
@@ -84,12 +85,12 @@ export async function getStockData(): Promise<StockInsightsData> {
         
         if (polygonStats) {
           Object.assign(googEntry.stock_data, polygonStats);
-          console.log(`[STOCK-DATA] ✅ GOOG Polygon data:`, JSON.stringify(polygonStats, null, 2));
+          console.log(`[STOCK-DATA] ✅ GOOG Polygon data at ${timestamp}:`, JSON.stringify(polygonStats, null, 2));
         } else {
-          console.log(`[STOCK-DATA] ⚠️ No Polygon data returned for GOOG`);
+          console.log(`[STOCK-DATA] ⚠️ No Polygon data returned for GOOG at ${timestamp}`);
         }
       } catch (error) {
-        console.error(`[STOCK-DATA] ❌ Error fetching Polygon data for GOOG:`, error);
+        console.error(`[STOCK-DATA] ❌ Error fetching Polygon data for GOOG at ${timestamp}:`, error);
       }
     }
     

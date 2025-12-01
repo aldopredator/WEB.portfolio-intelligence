@@ -3,7 +3,9 @@ import type { StockInsightsData } from '@/lib/types';
 import { getStockData, STOCK_CONFIG } from '@/lib/stock-data';
 import DashboardClient from './DashboardClient';
 
-export const revalidate = 1800; // 30 minutes
+// Force dynamic rendering - runs on every request for Polygon POC testing
+export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Disable caching for POC
 
 export default async function DashboardPage() {
   const stockData = await getStockData();

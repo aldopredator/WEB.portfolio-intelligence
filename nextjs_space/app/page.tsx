@@ -15,7 +15,9 @@ import {
 import { isRecord } from '@/lib/utils';
 import DashboardClient from './dashboard/DashboardClient';
 
-export const revalidate = 1800; // 30 minutes
+// Force dynamic rendering - runs on every request for Polygon POC testing
+export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Disable caching for POC
 
 const STOCK_CONFIG = [
   { ticker: 'GOOG', name: 'Alphabet Inc. (GOOG)' },
