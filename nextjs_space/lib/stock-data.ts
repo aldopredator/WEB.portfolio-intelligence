@@ -5,6 +5,7 @@ import type { StockInsightsData } from '@/lib/types';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
 import { fetchFinnhubMetrics, fetchBalanceSheet, fetchCompanyProfile } from '@/lib/finnhub-metrics';
 import { fetchPolygonStockStats } from '@/lib/polygon';
+import { getPolygonCached, setPolygonCached, getNextTickerToFetch } from '@/lib/polygon-cache';
 import { isRecord } from '@/lib/utils';
 
 export const STOCK_CONFIG = [
@@ -73,45 +74,53 @@ export async function getStockData(): Promise<StockInsightsData> {
       }
     }));
 
-    // Process Polygon.io stats SEQUENTIALLY due to rate limits (5 calls/min on free tier)
-    // With 2 calls per ticker + 250ms delay = ~0.5 sec per stock = 6 seconds for 12 stocks
-    console.log('[STOCK-DATA] 🚀 Starting sequential Polygon.io data fetch...');
-    console.log('[STOCK-DATA] 📋 Valid tickers to process:', validTickers);
+    // Process Polygon.io stats with smart caching (24-hour TTL, one ticker every 5 minutes)
+    // This respects the free tier limit of 5 calls/minute while keeping data fresh
+    console.log('[STOCK-DATA] 🚀 Starting Polygon.io data fetch with smart caching...');
+    console.log('[STOCK-DATA] 📋 Valid tickers:', validTickers);
     
+    // First, load all cached data
     for (const ticker of validTickers) {
-      try {
-        console.log(`[STOCK-DATA] 🔄 Processing ${ticker}...`);
-        const stockEntry = mergedData[ticker];
-        console.log(`[STOCK-DATA] 📦 Stock entry exists for ${ticker}:`, !!stockEntry);
-        console.log(`[STOCK-DATA] 📦 Stock entry has stock_data:`, !!(stockEntry && isRecord(stockEntry) && stockEntry.stock_data));
-        
-        // Fetch Polygon.io statistics (shares outstanding, volume, float estimate)
-        const polygonStats = await fetchPolygonStockStats(ticker);
-        console.log(`[STOCK-DATA] 📊 Polygon stats returned for ${ticker}:`, polygonStats ? JSON.stringify(polygonStats) : 'null');
-        
-        if (polygonStats && isRecord(stockEntry) && stockEntry.stock_data) {
-          console.log(`[STOCK-DATA] ✅ Merging Polygon stats for ${ticker}`);
-          console.log(`[STOCK-DATA] 📝 Before merge:`, JSON.stringify({
-            floatShares: (stockEntry.stock_data as any).floatShares,
-            sharesOutstanding: (stockEntry.stock_data as any).sharesOutstanding,
-            dailyVolume: (stockEntry.stock_data as any).dailyVolume
-          }));
-          
-          Object.assign(stockEntry.stock_data, polygonStats);
-          
-          console.log(`[STOCK-DATA] 📝 After merge:`, JSON.stringify({
-            floatShares: (stockEntry.stock_data as any).floatShares,
-            sharesOutstanding: (stockEntry.stock_data as any).sharesOutstanding,
-            dailyVolume: (stockEntry.stock_data as any).dailyVolume
-          }));
-        } else {
-          console.log(`[STOCK-DATA] ⚠️ No Polygon stats returned or invalid stock entry for ${ticker}`);
-        }
-      } catch (error) {
-        console.error(`[STOCK-DATA] ❌ Error fetching Polygon stats for ${ticker}:`, error);
+      const stockEntry = mergedData[ticker];
+      if (!isRecord(stockEntry) || !stockEntry.stock_data) continue;
+      
+      const cachedStats = await getPolygonCached(ticker);
+      if (cachedStats) {
+        Object.assign(stockEntry.stock_data, cachedStats);
+        console.log(`[STOCK-DATA] ✅ Using cached Polygon data for ${ticker}`);
       }
     }
-    console.log('[STOCK-DATA] 🏁 Completed Polygon.io data fetch');
+    
+    // Determine if we should fetch fresh data for any ticker (max one per request)
+    const nextTicker = await getNextTickerToFetch(validTickers);
+    
+    if (nextTicker) {
+      try {
+        console.log(`[STOCK-DATA] 🔄 Fetching fresh Polygon data for ${nextTicker}...`);
+        const stockEntry = mergedData[nextTicker];
+        
+        if (isRecord(stockEntry) && stockEntry.stock_data) {
+          const polygonStats = await fetchPolygonStockStats(nextTicker);
+          
+          if (polygonStats) {
+            // Save to cache
+            await setPolygonCached(nextTicker, polygonStats);
+            
+            // Merge into stock data
+            Object.assign(stockEntry.stock_data, polygonStats);
+            console.log(`[STOCK-DATA] ✅ Updated ${nextTicker} with fresh Polygon data:`, JSON.stringify(polygonStats));
+          } else {
+            console.log(`[STOCK-DATA] ⚠️ No Polygon stats returned for ${nextTicker}`);
+          }
+        }
+      } catch (error) {
+        console.error(`[STOCK-DATA] ❌ Error fetching Polygon stats for ${nextTicker}:`, error);
+      }
+    } else {
+      console.log('[STOCK-DATA] ⏭️  Skipping Polygon fetch (rate limit or all data fresh)');
+    }
+    
+    console.log('[STOCK-DATA] 🏁 Completed Polygon.io data processing');
 
     // Note: Price history is already in the JSON file (updates once per day)
     // No need to fetch from Yahoo Finance on every request
