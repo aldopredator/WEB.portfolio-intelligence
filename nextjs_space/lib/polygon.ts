@@ -31,35 +31,43 @@ export interface PolygonStockStats {
 export async function fetchPolygonTickerDetails(ticker: string): Promise<PolygonTickerDetails | null> {
     const apiKey = process.env.POLYGON_API_KEY;
     
+    console.log(`[POLYGON] 🔍 fetchPolygonTickerDetails called for ${ticker}`);
+    console.log(`[POLYGON] 🔑 API key exists: ${!!apiKey}, length: ${apiKey?.length || 0}`);
+    
     if (!apiKey) {
-        console.error('[POLYGON] API key not found in environment variables');
+        console.error('[POLYGON] ❌ API key not found in environment variables');
         return null;
     }
     
-    console.log(`[POLYGON] Fetching ticker details for ${ticker} (API key exists: ${!!apiKey})`);
-    
     try {
         const url = `https://api.polygon.io/v3/reference/tickers/${ticker}?apiKey=${apiKey}`;
+        console.log(`[POLYGON] 📡 Fetching: ${url.replace(apiKey, 'API_KEY_HIDDEN')}`);
         
         const response = await fetch(url, {
             cache: 'no-store'
         });
         
+        console.log(`[POLYGON] 📊 Response status for ${ticker}: ${response.status}`);
+        
         if (!response.ok) {
-            console.error(`[POLYGON] Ticker details API error for ${ticker}: ${response.status}`);
+            const errorText = await response.text();
+            console.error(`[POLYGON] ❌ Ticker details API error for ${ticker}: ${response.status}`, errorText);
             return null;
         }
         
         const data = await response.json();
+        console.log(`[POLYGON] 📦 Data received for ${ticker}:`, JSON.stringify(data).substring(0, 200));
         
         if (data.status === 'ERROR') {
-            console.error(`[POLYGON] API error for ${ticker}:`, data.error);
+            console.error(`[POLYGON] ❌ API error for ${ticker}:`, data.error);
             return null;
         }
         
-        return data.results || null;
+        const results = data.results || null;
+        console.log(`[POLYGON] ✅ Returning results for ${ticker}:`, results ? 'data exists' : 'null');
+        return results;
     } catch (error) {
-        console.error(`[POLYGON] Error fetching ticker details for ${ticker}:`, error);
+        console.error(`[POLYGON] ❌ Exception fetching ticker details for ${ticker}:`, error);
         return null;
     }
 }
@@ -125,18 +133,24 @@ function delay(ms: number): Promise<void> {
  * NOTE: Free tier limit is 5 calls/minute, so we add delays
  */
 export async function fetchPolygonStockStats(ticker: string): Promise<PolygonStockStats | null> {
+    console.log(`[POLYGON] 🚀 fetchPolygonStockStats START for ${ticker}`);
+    
     try {
         // Fetch ticker details first
+        console.log(`[POLYGON] ⏳ Calling fetchPolygonTickerDetails for ${ticker}...`);
         const details = await fetchPolygonTickerDetails(ticker);
+        console.log(`[POLYGON] 📋 Details result for ${ticker}:`, details ? JSON.stringify(details) : 'null');
         
         // Add 250ms delay between calls to respect rate limits (5 calls/min = 12 sec/call, but we batch them)
         await delay(250);
         
         // Fetch aggregates
+        console.log(`[POLYGON] ⏳ Calling fetchPolygonAggregates for ${ticker}...`);
         const aggregates = await fetchPolygonAggregates(ticker);
+        console.log(`[POLYGON] 📊 Aggregates result for ${ticker}:`, aggregates ? JSON.stringify(aggregates) : 'null');
         
         if (!details && !aggregates) {
-            console.log(`[POLYGON] No data available for ${ticker}`);
+            console.log(`[POLYGON] ⚠️ No data available for ${ticker}`);
             return null;
         }
         
@@ -152,7 +166,8 @@ export async function fetchPolygonStockStats(ticker: string): Promise<PolygonSto
             averageVolume: null
         };
         
-        console.log(`[POLYGON] ✅ Stats fetched for ${ticker}:`, JSON.stringify(stats));
+        console.log(`[POLYGON] ✅ Stats constructed for ${ticker}:`, JSON.stringify(stats));
+        console.log(`[POLYGON] 🏁 fetchPolygonStockStats END for ${ticker}`);
         
         return stats;
     } catch (error) {
