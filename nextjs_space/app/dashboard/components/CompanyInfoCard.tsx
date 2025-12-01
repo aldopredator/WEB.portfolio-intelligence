@@ -22,6 +22,10 @@ interface CompanyInfoCardProps {
   weburl?: string;
   assets?: number;
   liabilities?: number;
+  floatShares?: number;
+  averageVolume?: number;
+  averageDailyVolume10Day?: number;
+  sharesOutstanding?: number;
 }
 
 export default function CompanyInfoCard({
@@ -37,6 +41,10 @@ export default function CompanyInfoCard({
   weburl,
   assets,
   liabilities,
+  floatShares,
+  averageVolume,
+  averageDailyVolume10Day,
+  sharesOutstanding,
 }: CompanyInfoCardProps) {
   return (
     <Card variant="outlined" sx={{ height: '100%' }}>
@@ -64,7 +72,7 @@ export default function CompanyInfoCard({
           </Box>
         </Stack>
 
-        {(industry || sector || subSector || country || marketCapitalization || assets || liabilities || weburl) && (
+        {(industry || sector || subSector || country || marketCapitalization || floatShares || averageVolume || averageDailyVolume10Day || sharesOutstanding || assets || liabilities || weburl) && (
           <Stack spacing={2}>
             {industry && (
               <Box>
@@ -115,6 +123,48 @@ export default function CompanyInfoCard({
                   {marketCapitalization >= 1000e9
                     ? `${currency || '$'} ${(marketCapitalization / 1e12).toFixed(1)}T`
                     : `${currency || '$'} ${(marketCapitalization / 1e9).toFixed(1)}B`}
+                </Typography>
+              </Box>
+            )}
+            {floatShares && (
+              <Box>
+                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+                  Float Shares
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {floatShares >= 1e9
+                    ? `${(floatShares / 1e9).toFixed(2)}B`
+                    : floatShares >= 1e6
+                    ? `${(floatShares / 1e6).toFixed(2)}M`
+                    : floatShares.toLocaleString()}
+                </Typography>
+              </Box>
+            )}
+            {averageDailyVolume10Day && (
+              <Box>
+                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+                  Avg Daily Volume (10D)
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {averageDailyVolume10Day >= 1e9
+                    ? `${(averageDailyVolume10Day / 1e9).toFixed(2)}B`
+                    : averageDailyVolume10Day >= 1e6
+                    ? `${(averageDailyVolume10Day / 1e6).toFixed(2)}M`
+                    : averageDailyVolume10Day.toLocaleString()}
+                </Typography>
+              </Box>
+            )}
+            {sharesOutstanding && (
+              <Box>
+                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
+                  Shares Outstanding
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {sharesOutstanding >= 1e9
+                    ? `${(sharesOutstanding / 1e9).toFixed(2)}B`
+                    : sharesOutstanding >= 1e6
+                    ? `${(sharesOutstanding / 1e6).toFixed(2)}M`
+                    : sharesOutstanding.toLocaleString()}
                 </Typography>
               </Box>
             )}
