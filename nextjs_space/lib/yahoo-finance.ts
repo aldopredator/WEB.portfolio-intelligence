@@ -46,6 +46,13 @@ export interface YahooStockStatistics {
     quarterlyRevenueGrowth?: number | null;   // Quarterly Revenue Growth (yoy)
     quarterlyEarningsGrowth?: number | null;  // Quarterly Earnings Growth (yoy)
     priceToSales?: number | null;             // Price/Sales (ttm)
+    enterpriseValue?: number | null;          // Enterprise Value
+    enterpriseToRevenue?: number | null;      // Enterprise Value/Revenue
+    enterpriseToEbitda?: number | null;       // Enterprise Value/EBITDA
+    trailingPE?: number | null;               // Trailing P/E
+    forwardPE?: number | null;                // Forward P/E
+    pegRatio?: number | null;                 // PEG Ratio (5yr expected)
+    priceToBook?: number | null;              // Price/Book
 }
 
 /**
@@ -269,6 +276,15 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
         // Extract price ratios from summaryDetail or defaultKeyStatistics
         const priceToSales = summary?.priceToSalesTrailing12Months || null;
         
+        // Extract valuation metrics from defaultKeyStatistics
+        const enterpriseValue = stats?.enterpriseValue || null;
+        const enterpriseToRevenue = stats?.enterpriseToRevenue || null;
+        const enterpriseToEbitda = stats?.enterpriseToEbitda || null;
+        const trailingPE = summary?.trailingPE || null;
+        const forwardPE = stats?.forwardPE || null;
+        const pegRatio = stats?.pegRatio || null;
+        const priceToBook = stats?.priceToBook || null;
+        
         console.log(`[YAHOO] ✅ ${ticker} - Float: ${floatShares}, Outstanding: ${sharesOutstanding}, ROA: ${returnOnAssets}%, D/E: ${debtToEquity}, P/S: ${priceToSales}`);
         
         return {
@@ -286,7 +302,14 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
             debtToEquity,
             quarterlyRevenueGrowth,
             quarterlyEarningsGrowth,
-            priceToSales
+            priceToSales,
+            enterpriseValue,
+            enterpriseToRevenue,
+            enterpriseToEbitda,
+            trailingPE,
+            forwardPE,
+            pegRatio,
+            priceToBook
         };
     } catch (error) {
         console.error(`[YAHOO] ❌ Error fetching statistics for ${ticker}:`, error);

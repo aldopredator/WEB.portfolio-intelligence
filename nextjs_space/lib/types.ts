@@ -55,6 +55,14 @@ export interface StockData {
   quarterlyRevenueGrowth?: number | null;
   quarterlyEarningsGrowth?: number | null;
   priceToSales?: number | null;
+  // Yahoo Finance valuation metrics
+  enterpriseValue?: number | null;
+  enterpriseToRevenue?: number | null;
+  enterpriseToEbitda?: number | null;
+  trailingPE?: number | null;
+  forwardPE?: number | null;
+  pegRatio?: number | null;
+  priceToBook?: number | null;
   // Finnhub valuation metrics
   pe_ratio?: number;
   pb_ratio?: number;

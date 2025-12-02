@@ -37,6 +37,13 @@ export interface PolygonStockStats {
     quarterlyRevenueGrowth?: number | null;
     quarterlyEarningsGrowth?: number | null;
     priceToSales?: number | null;
+    enterpriseValue?: number | null;
+    enterpriseToRevenue?: number | null;
+    enterpriseToEbitda?: number | null;
+    trailingPE?: number | null;
+    forwardPE?: number | null;
+    pegRatio?: number | null;
+    priceToBook?: number | null;
 }
 
 /**
@@ -202,7 +209,15 @@ export async function fetchPolygonStockStats(ticker: string): Promise<PolygonSto
             debtToEquity: yahooStats?.debtToEquity || null,
             quarterlyRevenueGrowth: yahooStats?.quarterlyRevenueGrowth || null,
             quarterlyEarningsGrowth: yahooStats?.quarterlyEarningsGrowth || null,
-            priceToSales: yahooStats?.priceToSales || null
+            priceToSales: yahooStats?.priceToSales || null,
+            // Use Yahoo Finance for valuation metrics
+            enterpriseValue: yahooStats?.enterpriseValue || null,
+            enterpriseToRevenue: yahooStats?.enterpriseToRevenue || null,
+            enterpriseToEbitda: yahooStats?.enterpriseToEbitda || null,
+            trailingPE: yahooStats?.trailingPE || null,
+            forwardPE: yahooStats?.forwardPE || null,
+            pegRatio: yahooStats?.pegRatio || null,
+            priceToBook: yahooStats?.priceToBook || null
         };
         
         console.log(`[POLYGON+YAHOO] ✅ Stats constructed for ${ticker}:`, JSON.stringify(stats));

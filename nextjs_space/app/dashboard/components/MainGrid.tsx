@@ -113,6 +113,13 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               quarterlyRevenueGrowth={stock.quarterlyRevenueGrowth}
               quarterlyEarningsGrowth={stock.quarterlyEarningsGrowth}
               priceToSales={stock.priceToSales}
+              enterpriseValue={stock.enterpriseValue}
+              enterpriseToRevenue={stock.enterpriseToRevenue}
+              enterpriseToEbitda={stock.enterpriseToEbitda}
+              trailingPE={stock.trailingPE}
+              forwardPE={stock.forwardPE}
+              pegRatio={stock.pegRatio}
+              priceToBook={stock.priceToBook}
             />
             {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
               <EarningsCalendarCard
