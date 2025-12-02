@@ -62,6 +62,7 @@ async function getStockData(): Promise<StockInsightsData> {
         const metrics = await fetchFinnhubMetrics(ticker);
         if (metrics && isRecord(stockEntry) && stockEntry.stock_data) {
           Object.assign(stockEntry.stock_data, metrics);
+          console.log(`[PAGE] ${ticker} - Finnhub 52-week: ${metrics['52_week_low']} - ${metrics['52_week_high']}`);
         }
 
         // Fetch company profile
