@@ -1,5 +1,7 @@
 // Yahoo Finance API utility functions for fetching real-time stock data
 
+import yahooFinance from 'yahoo-finance2';
+
 export interface YahooQuoteResponse {
     regularMarketPrice: number;
     regularMarketChange: number;
@@ -187,12 +189,12 @@ export async function fetchYahooPriceHistory(ticker: string): Promise<{ Date: st
 
 /**
  * Fetch stock statistics including free-float and average volume from Yahoo Finance
- * Uses the quoteSummary API endpoint to get defaultKeyStatistics
+ * Uses the yahoo-finance2 package which handles authentication automatically
  * 
  * Fields returned:
  * - floatShares: Number of shares available for public trading (free float)
  * - averageVolume10Day: 10-day average trading volume
- * - averageVolume: Longer-term average volume
+ * - averageVolume: Longer-term average volume (3 months)
  * - sharesOutstanding: Total number of shares issued
  */
 export async function fetchYahooStatistics(ticker: string): Promise<YahooStockStatistics | null> {
@@ -203,36 +205,25 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
     }
     
     try {
-        console.log(`[YAHOO] 🔍 Fetching statistics for ${ticker}...`);
+        console.log(`[YAHOO] 🔍 Fetching statistics for ${ticker} using yahoo-finance2...`);
         
-        // Yahoo Finance quoteSummary endpoint for key statistics
-        const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=defaultKeyStatistics`;
-        
-        const response = await fetch(url, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-            },
-            next: { revalidate: 86400 } // Cache for 24 hours
+        // Fetch quoteSummary with defaultKeyStatistics module
+        const result: any = await yahooFinance.quoteSummary(ticker, {
+            modules: ['defaultKeyStatistics']
         });
         
-        if (!response.ok) {
-            console.error(`[YAHOO] ❌ Statistics API error for ${ticker}: ${response.status}`);
-            return null;
-        }
-        
-        const data = await response.json();
-        const stats = data?.quoteSummary?.result?.[0]?.defaultKeyStatistics;
+        const stats = result?.defaultKeyStatistics;
         
         if (!stats) {
             console.error(`[YAHOO] ❌ No statistics data found for ${ticker}`);
             return null;
         }
         
-        // Extract raw values (Yahoo returns objects with {raw, fmt} structure)
-        const floatShares = stats.floatShares?.raw || null;
-        const averageVolume10Day = stats.averageDailyVolume10Day?.raw || null;
-        const averageVolume = stats.averageVolume?.raw || null;
-        const sharesOutstanding = stats.sharesOutstanding?.raw || null;
+        // Extract values (already in raw format from yahoo-finance2)
+        const floatShares = stats.floatShares || null;
+        const averageVolume10Day = stats.averageDailyVolume10Day || null;
+        const averageVolume = stats.averageVolume || null;
+        const sharesOutstanding = stats.sharesOutstanding || null;
         
         console.log(`[YAHOO] ✅ ${ticker} - Float: ${floatShares}, Outstanding: ${sharesOutstanding}, Avg Vol 10d: ${averageVolume10Day}`);
         
