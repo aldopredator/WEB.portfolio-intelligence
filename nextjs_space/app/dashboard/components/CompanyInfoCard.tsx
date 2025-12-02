@@ -109,138 +109,6 @@ export default function CompanyInfoCard({
                 </Typography>
               </Box>
             )}
-            {sector && (
-              <Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
-                  Sector
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {sector}
-                </Typography>
-              </Box>
-            )}
-            {subSector && (
-              <Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
-                  Sub-Sector
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {subSector}
-                </Typography>
-              </Box>
-            )}
-            {country && (
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Country
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {country}
-                </Typography>
-              </Box>
-            )}
-            {marketCapitalization && (
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Market Cap
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {marketCapitalization >= 1000e9
-                    ? `${currency || '$'} ${(marketCapitalization / 1e12).toFixed(1)}T`
-                    : `${currency || '$'} ${(marketCapitalization / 1e9).toFixed(1)}B`}
-                </Typography>
-              </Box>
-            )}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Float Shares
-              </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: floatShares ? 'text.primary' : 'text.disabled' }}>
-                {floatShares
-                  ? floatShares >= 1e9
-                    ? `${(floatShares / 1e9).toFixed(2)}B`
-                    : floatShares >= 1e6
-                    ? `${(floatShares / 1e6).toFixed(2)}M`
-                    : floatShares.toLocaleString()
-                  : 'Loading...'}
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Avg Daily Volume (10D)
-              </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: averageVolume10Day ? 'text.primary' : 'text.disabled' }}>
-                {averageVolume10Day
-                  ? averageVolume10Day >= 1e9
-                    ? `${(averageVolume10Day / 1e9).toFixed(2)}B`
-                    : averageVolume10Day >= 1e6
-                    ? `${(averageVolume10Day / 1e6).toFixed(2)}M`
-                    : averageVolume10Day.toLocaleString()
-                  : 'N/A'}
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Shares Outstanding
-              </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: sharesOutstanding ? 'text.primary' : 'text.disabled' }}>
-                {sharesOutstanding
-                  ? sharesOutstanding >= 1e9
-                    ? `${(sharesOutstanding / 1e9).toFixed(2)}B`
-                    : sharesOutstanding >= 1e6
-                    ? `${(sharesOutstanding / 1e6).toFixed(2)}M`
-                    : sharesOutstanding.toLocaleString()
-                  : 'Loading...'}
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Total Employees
-              </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: totalEmployees ? 'text.primary' : 'text.disabled' }}>
-                {totalEmployees ? totalEmployees.toLocaleString() : 'Loading...'}
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                % Held by Insiders
-              </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: heldPercentInsiders ? 'text.primary' : 'text.disabled' }}>
-                {heldPercentInsiders ? `${heldPercentInsiders.toFixed(2)}%` : 'Loading...'}
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                % Held by Institutions
-              </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: heldPercentInstitutions ? 'text.primary' : 'text.disabled' }}>
-                {heldPercentInstitutions ? `${heldPercentInstitutions.toFixed(2)}%` : 'Loading...'}
-              </Typography>
-            </Box>
-            {assets && (
-              <Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
-                  Assets
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {assets >= 1000e9
-                    ? `${currency || '$'} ${(assets / 1e12).toFixed(1)}T`
-                    : `${currency || '$'} ${(assets / 1e9).toFixed(1)}B`}
-                </Typography>
-              </Box>
-            )}
-            {liabilities && (
-              <Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block' }}>
-                  Liabilities
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {liabilities >= 1000e9
-                    ? `${currency || '$'} ${(liabilities / 1e12).toFixed(1)}T`
-                    : `${currency || '$'} ${(liabilities / 1e9).toFixed(1)}B`}
-                </Typography>
-              </Box>
-            )}
             {weburl && (
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
@@ -263,6 +131,104 @@ export default function CompanyInfoCard({
                 </Typography>
               </Box>
             )}
+            {country && (
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  Country
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {country}
+                </Typography>
+              </Box>
+            )}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Total Employees
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: totalEmployees ? 'text.primary' : 'text.disabled' }}>
+                {totalEmployees ? totalEmployees.toLocaleString() : 'Loading...'}
+              </Typography>
+            </Box>
+            {marketCapitalization && (
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  Market Cap
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {marketCapitalization >= 1000e9
+                    ? `${currency || '$'} ${(marketCapitalization / 1e12).toFixed(1)}T`
+                    : `${currency || '$'} ${(marketCapitalization / 1e9).toFixed(1)}B`}
+                </Typography>
+              </Box>
+            )}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Shares Outstanding
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: sharesOutstanding ? 'text.primary' : 'text.disabled' }}>
+                {sharesOutstanding
+                  ? sharesOutstanding >= 1e9
+                    ? `${(sharesOutstanding / 1e9).toFixed(2)}B`
+                    : sharesOutstanding >= 1e6
+                    ? `${(sharesOutstanding / 1e6).toFixed(2)}M`
+                    : sharesOutstanding.toLocaleString()
+                  : 'Loading...'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Float Shares
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: floatShares ? 'text.primary' : 'text.disabled' }}>
+                {floatShares
+                  ? floatShares >= 1e9
+                    ? `${(floatShares / 1e9).toFixed(2)}B`
+                    : floatShares >= 1e6
+                    ? `${(floatShares / 1e6).toFixed(2)}M`
+                    : floatShares.toLocaleString()
+                  : 'Loading...'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Float %
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: (floatShares && sharesOutstanding) ? 'text.primary' : 'text.disabled' }}>
+                {(floatShares && sharesOutstanding)
+                  ? `${((floatShares / sharesOutstanding) * 100).toFixed(2)}%`
+                  : 'Loading...'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Avg Daily Volume (10D)
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: averageVolume10Day ? 'text.primary' : 'text.disabled' }}>
+                {averageVolume10Day
+                  ? averageVolume10Day >= 1e9
+                    ? `${(averageVolume10Day / 1e9).toFixed(2)}B`
+                    : averageVolume10Day >= 1e6
+                    ? `${(averageVolume10Day / 1e6).toFixed(2)}M`
+                    : averageVolume10Day.toLocaleString()
+                  : 'N/A'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                % Held by Insiders
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: heldPercentInsiders ? 'text.primary' : 'text.disabled' }}>
+                {heldPercentInsiders ? `${heldPercentInsiders.toFixed(2)}%` : 'Loading...'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                % Held by Institutions
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: heldPercentInstitutions ? 'text.primary' : 'text.disabled' }}>
+                {heldPercentInstitutions ? `${heldPercentInstitutions.toFixed(2)}%` : 'Loading...'}
+              </Typography>
+            </Box>
           </Stack>
         )}
       </CardContent>

@@ -43,25 +43,25 @@ export default function StockDetailsCard({
   priceToSales,
 }: StockDetailsCardProps) {
   const valuationMetrics = [
-    { label: 'P/E Ratio', value: peRatio?.toFixed(2) || 'N/A' },
-    { label: 'P/B Ratio', value: pbRatio?.toFixed(2) || 'N/A' },
-    { label: 'Price/Sales (ttm)', value: priceToSales?.toFixed(2) || 'N/A' },
-    { label: 'Beta', value: beta?.toFixed(2) || 'N/A' },
+    { label: 'P/E Ratio', value: peRatio ? peRatio.toFixed(0) : 'N/A' },
+    { label: 'P/B Ratio', value: pbRatio ? pbRatio.toFixed(0) : 'N/A' },
+    { label: 'Price/Sales (ttm)', value: priceToSales ? priceToSales.toFixed(0) : 'N/A' },
+    { label: 'Beta', value: beta ? beta.toFixed(0) : 'N/A' },
   ];
 
   const profitabilityMetrics = [
-    { label: 'ROE', value: roe ? `${roe.toFixed(2)}%` : 'N/A' },
-    { label: 'Return on Assets (ttm)', value: returnOnAssets ? `${returnOnAssets.toFixed(2)}%` : 'N/A' },
-    { label: 'Profit Margin', value: profitMargin ? `${profitMargin.toFixed(2)}%` : 'N/A' },
+    { label: 'ROE', value: roe ? `${roe.toFixed(0)}%` : 'N/A' },
+    { label: 'Return on Assets (ttm)', value: returnOnAssets ? `${returnOnAssets.toFixed(0)}%` : 'N/A' },
+    { label: 'Profit Margin', value: profitMargin ? `${profitMargin.toFixed(0)}%` : 'N/A' },
   ];
 
   const growthMetrics = [
-    { label: 'Quarterly Revenue Growth (yoy)', value: quarterlyRevenueGrowth ? `${quarterlyRevenueGrowth.toFixed(2)}%` : 'N/A' },
-    { label: 'Quarterly Earnings Growth (yoy)', value: quarterlyEarningsGrowth ? `${quarterlyEarningsGrowth.toFixed(2)}%` : 'N/A' },
+    { label: 'Quarterly Revenue Growth (yoy)', value: quarterlyRevenueGrowth ? `${quarterlyRevenueGrowth.toFixed(0)}%` : 'N/A' },
+    { label: 'Quarterly Earnings Growth (yoy)', value: quarterlyEarningsGrowth ? `${quarterlyEarningsGrowth.toFixed(0)}%` : 'N/A' },
   ];
 
   const financialHealthMetrics = [
-    { label: 'Total Debt/Equity (mrq)', value: debtToEquity?.toFixed(2) || 'N/A' },
+    { label: 'Total Debt/Equity (mrq)', value: debtToEquity ? debtToEquity.toFixed(0) : 'N/A' },
   ];
 
   return (
