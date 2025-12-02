@@ -59,8 +59,8 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
 
   return (
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
-      {/* Top row: Additional Information, Stock Fundamentals, and Earnings Calendar */}
-      {(stockEntry.company_profile || (stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0)) && (
+      {/* Top row: Company Info, Stock Fundamentals, and Stock Statistics */}
+      {stockEntry.company_profile && (
         <Box sx={{ mb: 3 }}>
           <Box
             sx={{
@@ -119,12 +119,6 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               quarterlyEarningsGrowth={stock.quarterlyEarningsGrowth}
               debtToEquity={stock.debtToEquity || stock.debt_to_equity}
             />
-            {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
-              <EarningsCalendarCard
-                ticker={selectedStock}
-                earnings={stockEntry.earnings_calendar}
-              />
-            )}
           </Box>
         </Box>
       )}
@@ -196,6 +190,14 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               <RecommendationTrendsCard
                 ticker={selectedStock}
                 trends={stockEntry.recommendation_trends}
+              />
+            )}
+
+            {/* Earnings Calendar */}
+            {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
+              <EarningsCalendarCard
+                ticker={selectedStock}
+                earnings={stockEntry.earnings_calendar}
               />
             )}
 
