@@ -7,6 +7,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import PriceHistoryChart from './PriceHistoryChart';
 import StockDetailsCard from './StockDetailsCard';
+import StockStatisticsCard from './StockStatisticsCard';
 import SocialSentimentCard from './SocialSentimentCard';
 import CompanyInfoCard from './CompanyInfoCard';
 import MarketNewsCard from './MarketNewsCard';
@@ -100,18 +101,6 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
             )}
             <StockDetailsCard
               ticker={selectedStock}
-              marketCap={stock.market_cap}
-              peRatio={stock.pe_ratio}
-              roe={stock.roe}
-              profitMargin={stock.profit_margin}
-              pbRatio={stock.pb_ratio}
-              debtToEquity={stock.debtToEquity || stock.debt_to_equity}
-              dividendYield={stock.dividend_yield}
-              beta={stock.beta}
-              averageVolume10Day={stock.averageVolume10Day}
-              returnOnAssets={stock.returnOnAssets}
-              quarterlyRevenueGrowth={stock.quarterlyRevenueGrowth}
-              quarterlyEarningsGrowth={stock.quarterlyEarningsGrowth}
               priceToSales={stock.priceToSales}
               enterpriseValue={stock.enterpriseValue}
               enterpriseToRevenue={stock.enterpriseToRevenue}
@@ -120,6 +109,15 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               forwardPE={stock.forwardPE}
               pegRatio={stock.pegRatio}
               priceToBook={stock.priceToBook}
+            />
+            <StockStatisticsCard
+              ticker={selectedStock}
+              roe={stock.roe}
+              returnOnAssets={stock.returnOnAssets}
+              profitMargin={stock.profit_margin}
+              quarterlyRevenueGrowth={stock.quarterlyRevenueGrowth}
+              quarterlyEarningsGrowth={stock.quarterlyEarningsGrowth}
+              debtToEquity={stock.debtToEquity || stock.debt_to_equity}
             />
             {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
               <EarningsCalendarCard
