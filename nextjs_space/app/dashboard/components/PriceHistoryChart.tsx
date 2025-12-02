@@ -28,6 +28,8 @@ interface PriceHistoryChartProps {
   weekLow52?: number;
   weekHigh52?: number;
   volume?: number;
+  fiftyDayAverage?: number | null;
+  twoHundredDayAverage?: number | null;
 }
 
 export default function PriceHistoryChart({
@@ -39,6 +41,8 @@ export default function PriceHistoryChart({
   weekLow52,
   weekHigh52,
   volume,
+  fiftyDayAverage,
+  twoHundredDayAverage,
 }: PriceHistoryChartProps) {
   const theme = useTheme();
 
