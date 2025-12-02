@@ -27,6 +27,12 @@ interface CompanyInfoCardProps {
   averageVolume10Day?: number | null;
   sharesOutstanding?: number | null;
   totalEmployees?: number | null;
+  heldPercentInsiders?: number | null;
+  heldPercentInstitutions?: number | null;
+  fiftyTwoWeekHigh?: number | null;
+  fiftyTwoWeekLow?: number | null;
+  fiftyDayAverage?: number | null;
+  twoHundredDayAverage?: number | null;
 }
 
 export default function CompanyInfoCard({
@@ -47,6 +53,12 @@ export default function CompanyInfoCard({
   averageVolume10Day,
   sharesOutstanding,
   totalEmployees,
+  heldPercentInsiders,
+  heldPercentInstitutions,
+  fiftyTwoWeekHigh,
+  fiftyTwoWeekLow,
+  fiftyDayAverage,
+  twoHundredDayAverage,
 }: CompanyInfoCardProps) {
   // Debug logging
   React.useEffect(() => {
@@ -187,6 +199,54 @@ export default function CompanyInfoCard({
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 700, color: totalEmployees ? 'text.primary' : 'text.disabled' }}>
                 {totalEmployees ? totalEmployees.toLocaleString() : 'Loading...'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                % Held by Insiders
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: heldPercentInsiders ? 'text.primary' : 'text.disabled' }}>
+                {heldPercentInsiders ? `${heldPercentInsiders.toFixed(2)}%` : 'Loading...'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                % Held by Institutions
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: heldPercentInstitutions ? 'text.primary' : 'text.disabled' }}>
+                {heldPercentInstitutions ? `${heldPercentInstitutions.toFixed(2)}%` : 'Loading...'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                52 Week High
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: fiftyTwoWeekHigh ? 'text.primary' : 'text.disabled' }}>
+                {fiftyTwoWeekHigh ? `${currency || '$'}${fiftyTwoWeekHigh.toFixed(2)}` : 'Loading...'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                52 Week Low
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: fiftyTwoWeekLow ? 'text.primary' : 'text.disabled' }}>
+                {fiftyTwoWeekLow ? `${currency || '$'}${fiftyTwoWeekLow.toFixed(2)}` : 'Loading...'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                50-Day Moving Average
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: fiftyDayAverage ? 'text.primary' : 'text.disabled' }}>
+                {fiftyDayAverage ? `${currency || '$'}${fiftyDayAverage.toFixed(2)}` : 'Loading...'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                200-Day Moving Average
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: twoHundredDayAverage ? 'text.primary' : 'text.disabled' }}>
+                {twoHundredDayAverage ? `${currency || '$'}${twoHundredDayAverage.toFixed(2)}` : 'Loading...'}
               </Typography>
             </Box>
             {assets && (

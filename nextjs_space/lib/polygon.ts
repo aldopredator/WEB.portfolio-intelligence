@@ -26,6 +26,12 @@ export interface PolygonStockStats {
     sharesOutstanding?: number | null;
     dailyVolume?: number | null;
     totalEmployees?: number | null;
+    heldPercentInsiders?: number | null;
+    heldPercentInstitutions?: number | null;
+    fiftyTwoWeekHigh?: number | null;
+    fiftyTwoWeekLow?: number | null;
+    fiftyDayAverage?: number | null;
+    twoHundredDayAverage?: number | null;
 }
 
 /**
@@ -177,7 +183,15 @@ export async function fetchPolygonStockStats(ticker: string): Promise<PolygonSto
             totalEmployees: details?.total_employees || null,
             // Use Yahoo Finance for average volume metrics
             averageVolume10Day: yahooStats?.averageVolume10Day || null,
-            averageVolume: yahooStats?.averageVolume || null
+            averageVolume: yahooStats?.averageVolume || null,
+            // Use Yahoo Finance for ownership metrics
+            heldPercentInsiders: yahooStats?.heldPercentInsiders || null,
+            heldPercentInstitutions: yahooStats?.heldPercentInstitutions || null,
+            // Use Yahoo Finance for price ranges and moving averages
+            fiftyTwoWeekHigh: yahooStats?.fiftyTwoWeekHigh || null,
+            fiftyTwoWeekLow: yahooStats?.fiftyTwoWeekLow || null,
+            fiftyDayAverage: yahooStats?.fiftyDayAverage || null,
+            twoHundredDayAverage: yahooStats?.twoHundredDayAverage || null
         };
         
         console.log(`[POLYGON+YAHOO] ✅ Stats constructed for ${ticker}:`, JSON.stringify(stats));

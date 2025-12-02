@@ -90,6 +90,12 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
                 averageVolume10Day={stock.averageVolume10Day}
                 sharesOutstanding={stock.sharesOutstanding}
                 totalEmployees={stock.totalEmployees}
+                heldPercentInsiders={stock.heldPercentInsiders}
+                heldPercentInstitutions={stock.heldPercentInstitutions}
+                fiftyTwoWeekHigh={stock.fiftyTwoWeekHigh}
+                fiftyTwoWeekLow={stock.fiftyTwoWeekLow}
+                fiftyDayAverage={stock.fiftyDayAverage}
+                twoHundredDayAverage={stock.twoHundredDayAverage}
               />
             )}
             <StockDetailsCard

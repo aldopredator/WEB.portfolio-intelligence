@@ -40,6 +40,12 @@ export interface StockData {
   totalEmployees?: number | null;
   currency?: string;
   country?: string;
+  // Yahoo Finance ownership metrics
+  heldPercentInsiders?: number | null;
+  heldPercentInstitutions?: number | null;
+  // Yahoo Finance moving averages
+  fiftyDayAverage?: number | null;
+  twoHundredDayAverage?: number | null;
   // Finnhub valuation metrics
   pe_ratio?: number;
   pb_ratio?: number;

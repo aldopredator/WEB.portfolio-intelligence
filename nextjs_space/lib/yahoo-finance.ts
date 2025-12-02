@@ -33,8 +33,14 @@ export interface StockQuote {
 export interface YahooStockStatistics {
     floatShares?: number | null;              // Free float shares
     averageVolume10Day?: number | null;       // 10-day average volume
-    averageVolume?: number | null;            // Average volume (longer period)
+    averageVolume?: number | null;            // Average volume (3 months)
     sharesOutstanding?: number | null;        // Total shares outstanding
+    heldPercentInsiders?: number | null;      // % held by insiders
+    heldPercentInstitutions?: number | null;  // % held by institutions
+    fiftyTwoWeekHigh?: number | null;         // 52-week high price
+    fiftyTwoWeekLow?: number | null;          // 52-week low price
+    fiftyDayAverage?: number | null;          // 50-day moving average
+    twoHundredDayAverage?: number | null;     // 200-day moving average
 }
 
 /**
@@ -197,8 +203,14 @@ export async function fetchYahooPriceHistory(ticker: string): Promise<{ Date: st
  * Fields returned:
  * - floatShares: Number of shares available for public trading (free float)
  * - averageVolume10Day: 10-day average trading volume
- * - averageVolume: Longer-term average volume (3 months)
+ * - averageVolume: Average volume (3 months)
  * - sharesOutstanding: Total number of shares issued
+ * - heldPercentInsiders: % held by insiders
+ * - heldPercentInstitutions: % held by institutions
+ * - fiftyTwoWeekHigh: 52-week high price
+ * - fiftyTwoWeekLow: 52-week low price
+ * - fiftyDayAverage: 50-day moving average
+ * - twoHundredDayAverage: 200-day moving average
  */
 export async function fetchYahooStatistics(ticker: string): Promise<YahooStockStatistics | null> {
     // Check if Yahoo Finance is enabled
@@ -210,31 +222,46 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
     try {
         console.log(`[YAHOO] 🔍 Fetching statistics for ${ticker} using yahoo-finance2...`);
         
-        // Fetch quoteSummary with defaultKeyStatistics module
+        // Fetch quoteSummary with defaultKeyStatistics and summaryDetail modules
         const result: any = await yahooFinance.quoteSummary(ticker, {
-            modules: ['defaultKeyStatistics']
+            modules: ['defaultKeyStatistics', 'summaryDetail']
         });
         
         const stats = result?.defaultKeyStatistics;
+        const summary = result?.summaryDetail;
         
-        if (!stats) {
+        if (!stats && !summary) {
             console.error(`[YAHOO] ❌ No statistics data found for ${ticker}`);
             return null;
         }
         
-        // Extract values (already in raw format from yahoo-finance2)
-        const floatShares = stats.floatShares || null;
-        const averageVolume10Day = stats.averageDailyVolume10Day || null;
-        const averageVolume = stats.averageVolume || null;
-        const sharesOutstanding = stats.sharesOutstanding || null;
+        // Extract values from defaultKeyStatistics
+        const floatShares = stats?.floatShares || null;
+        const averageVolume10Day = summary?.averageDailyVolume10Day || null;
+        const averageVolume = summary?.averageVolume || null;
+        const sharesOutstanding = stats?.sharesOutstanding || null;
+        const heldPercentInsiders = stats?.heldPercentInsiders ? stats.heldPercentInsiders * 100 : null;
+        const heldPercentInstitutions = stats?.heldPercentInstitutions ? stats.heldPercentInstitutions * 100 : null;
         
-        console.log(`[YAHOO] ✅ ${ticker} - Float: ${floatShares}, Outstanding: ${sharesOutstanding}, Avg Vol 10d: ${averageVolume10Day}`);
+        // Extract values from summaryDetail
+        const fiftyTwoWeekHigh = summary?.fiftyTwoWeekHigh || null;
+        const fiftyTwoWeekLow = summary?.fiftyTwoWeekLow || null;
+        const fiftyDayAverage = summary?.fiftyDayAverage || null;
+        const twoHundredDayAverage = summary?.twoHundredDayAverage || null;
+        
+        console.log(`[YAHOO] ✅ ${ticker} - Float: ${floatShares}, Outstanding: ${sharesOutstanding}, Avg Vol 10d: ${averageVolume10Day}, Insiders: ${heldPercentInsiders}%, Institutions: ${heldPercentInstitutions}%`);
         
         return {
             floatShares,
             averageVolume10Day,
             averageVolume,
-            sharesOutstanding
+            sharesOutstanding,
+            heldPercentInsiders,
+            heldPercentInstitutions,
+            fiftyTwoWeekHigh,
+            fiftyTwoWeekLow,
+            fiftyDayAverage,
+            twoHundredDayAverage
         };
     } catch (error) {
         console.error(`[YAHOO] ❌ Error fetching statistics for ${ticker}:`, error);
