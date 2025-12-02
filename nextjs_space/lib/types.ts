@@ -46,6 +46,9 @@ export interface StockData {
   // Yahoo Finance moving averages
   fiftyDayAverage?: number | null;
   twoHundredDayAverage?: number | null;
+  // Yahoo Finance 52-week price range
+  fiftyTwoWeekHigh?: number | null;
+  fiftyTwoWeekLow?: number | null;
   // Finnhub valuation metrics
   pe_ratio?: number;
   pb_ratio?: number;
