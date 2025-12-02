@@ -168,9 +168,9 @@ export default function CompanyInfoCard({
               <Typography variant="h6" sx={{ fontWeight: 700, color: sharesOutstanding ? 'text.primary' : 'text.disabled' }}>
                 {sharesOutstanding
                   ? sharesOutstanding >= 1e9
-                    ? `${(sharesOutstanding / 1e9).toFixed(2)}B`
+                    ? `${(sharesOutstanding / 1e9).toFixed(0)}B`
                     : sharesOutstanding >= 1e6
-                    ? `${(sharesOutstanding / 1e6).toFixed(2)}M`
+                    ? `${(sharesOutstanding / 1e6).toFixed(0)}M`
                     : sharesOutstanding.toLocaleString()
                   : 'Loading...'}
               </Typography>
@@ -182,9 +182,9 @@ export default function CompanyInfoCard({
               <Typography variant="h6" sx={{ fontWeight: 700, color: floatShares ? 'text.primary' : 'text.disabled' }}>
                 {floatShares
                   ? floatShares >= 1e9
-                    ? `${(floatShares / 1e9).toFixed(2)}B`
+                    ? `${(floatShares / 1e9).toFixed(0)}B`
                     : floatShares >= 1e6
-                    ? `${(floatShares / 1e6).toFixed(2)}M`
+                    ? `${(floatShares / 1e6).toFixed(0)}M`
                     : floatShares.toLocaleString()
                   : 'Loading...'}
               </Typography>
@@ -195,7 +195,7 @@ export default function CompanyInfoCard({
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 700, color: (floatShares && sharesOutstanding) ? 'text.primary' : 'text.disabled' }}>
                 {(floatShares && sharesOutstanding)
-                  ? `${((floatShares / sharesOutstanding) * 100).toFixed(2)}%`
+                  ? `${((floatShares / sharesOutstanding) * 100).toFixed(0)}%`
                   : 'Loading...'}
               </Typography>
             </Box>
@@ -206,9 +206,9 @@ export default function CompanyInfoCard({
               <Typography variant="h6" sx={{ fontWeight: 700, color: averageVolume10Day ? 'text.primary' : 'text.disabled' }}>
                 {averageVolume10Day
                   ? averageVolume10Day >= 1e9
-                    ? `${(averageVolume10Day / 1e9).toFixed(2)}B`
+                    ? `${(averageVolume10Day / 1e9).toFixed(0)}B`
                     : averageVolume10Day >= 1e6
-                    ? `${(averageVolume10Day / 1e6).toFixed(2)}M`
+                    ? `${(averageVolume10Day / 1e6).toFixed(0)}M`
                     : averageVolume10Day.toLocaleString()
                   : 'N/A'}
               </Typography>
@@ -218,7 +218,7 @@ export default function CompanyInfoCard({
                 % Held by Insiders
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 700, color: heldPercentInsiders ? 'text.primary' : 'text.disabled' }}>
-                {heldPercentInsiders ? `${heldPercentInsiders.toFixed(2)}%` : 'Loading...'}
+                {heldPercentInsiders ? `${heldPercentInsiders.toFixed(0)}%` : 'Loading...'}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -226,7 +226,7 @@ export default function CompanyInfoCard({
                 % Held by Institutions
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 700, color: heldPercentInstitutions ? 'text.primary' : 'text.disabled' }}>
-                {heldPercentInstitutions ? `${heldPercentInstitutions.toFixed(2)}%` : 'Loading...'}
+                {heldPercentInstitutions ? `${heldPercentInstitutions.toFixed(0)}%` : 'Loading...'}
               </Typography>
             </Box>
           </Stack>
