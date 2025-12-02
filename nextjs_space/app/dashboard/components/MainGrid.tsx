@@ -105,10 +105,14 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               roe={stock.roe}
               profitMargin={stock.profit_margin}
               pbRatio={stock.pb_ratio}
-              debtToEquity={stock.debt_to_equity}
+              debtToEquity={stock.debtToEquity || stock.debt_to_equity}
               dividendYield={stock.dividend_yield}
               beta={stock.beta}
               averageVolume10Day={stock.averageVolume10Day}
+              returnOnAssets={stock.returnOnAssets}
+              quarterlyRevenueGrowth={stock.quarterlyRevenueGrowth}
+              quarterlyEarningsGrowth={stock.quarterlyEarningsGrowth}
+              priceToSales={stock.priceToSales}
             />
             {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
               <EarningsCalendarCard

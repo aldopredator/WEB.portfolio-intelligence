@@ -20,6 +20,10 @@ interface StockDetailsCardProps {
   pbRatio?: number;
   beta?: number;
   averageVolume10Day?: number | null;
+  returnOnAssets?: number | null;
+  quarterlyRevenueGrowth?: number | null;
+  quarterlyEarningsGrowth?: number | null;
+  priceToSales?: number | null;
 }
 
 export default function StockDetailsCard({
@@ -33,16 +37,31 @@ export default function StockDetailsCard({
   pbRatio,
   beta,
   averageVolume10Day,
+  returnOnAssets,
+  quarterlyRevenueGrowth,
+  quarterlyEarningsGrowth,
+  priceToSales,
 }: StockDetailsCardProps) {
   const valuationMetrics = [
     { label: 'P/E Ratio', value: peRatio?.toFixed(2) || 'N/A' },
     { label: 'P/B Ratio', value: pbRatio?.toFixed(2) || 'N/A' },
+    { label: 'Price/Sales (ttm)', value: priceToSales?.toFixed(2) || 'N/A' },
     { label: 'Beta', value: beta?.toFixed(2) || 'N/A' },
   ];
 
   const profitabilityMetrics = [
-    { label: 'ROE', value: roe ? `${roe.toFixed(2)}%` : 'N/A%' },
-    { label: 'Profit Margin', value: profitMargin ? `${profitMargin.toFixed(2)}%` : 'N/A%' },
+    { label: 'ROE', value: roe ? `${roe.toFixed(2)}%` : 'N/A' },
+    { label: 'Return on Assets (ttm)', value: returnOnAssets ? `${returnOnAssets.toFixed(2)}%` : 'N/A' },
+    { label: 'Profit Margin', value: profitMargin ? `${profitMargin.toFixed(2)}%` : 'N/A' },
+  ];
+
+  const growthMetrics = [
+    { label: 'Quarterly Revenue Growth (yoy)', value: quarterlyRevenueGrowth ? `${quarterlyRevenueGrowth.toFixed(2)}%` : 'N/A' },
+    { label: 'Quarterly Earnings Growth (yoy)', value: quarterlyEarningsGrowth ? `${quarterlyEarningsGrowth.toFixed(2)}%` : 'N/A' },
+  ];
+
+  const financialHealthMetrics = [
+    { label: 'Total Debt/Equity (mrq)', value: debtToEquity?.toFixed(2) || 'N/A' },
   ];
 
   return (
@@ -123,6 +142,83 @@ export default function StockDetailsCard({
                   borderBottom: index < profitabilityMetrics.length - 1 ? '1px solid' : 'none',
                   borderColor: 'divider',
                 }}
+              >
+                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                  {detail.label}
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {detail.value}
+                </Typography>
+              </Stack>
+            ))}
+          </Stack>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Growth Pillar */}
+        <Box sx={{ mb: 3 }}>
+          <Typography
+            variant="overline"
+            sx={{
+              color: 'info.main',
+              fontWeight: 700,
+              fontSize: '0.75rem',
+              letterSpacing: 1,
+              mb: 2,
+              display: 'block',
+            }}
+          >
+            GROWTH
+          </Typography>
+          <Stack spacing={2}>
+            {growthMetrics.map((detail, index) => (
+              <Stack
+                key={index}
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{
+                  pb: index < growthMetrics.length - 1 ? 1.5 : 0,
+                  borderBottom: index < growthMetrics.length - 1 ? '1px solid' : 'none',
+                  borderColor: 'divider',
+                }}
+              >
+                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                  {detail.label}
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {detail.value}
+                </Typography>
+              </Stack>
+            ))}
+          </Stack>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Financial Health Pillar */}
+        <Box>
+          <Typography
+            variant="overline"
+            sx={{
+              color: 'warning.main',
+              fontWeight: 700,
+              fontSize: '0.75rem',
+              letterSpacing: 1,
+              mb: 2,
+              display: 'block',
+            }}
+          >
+            FINANCIAL HEALTH
+          </Typography>
+          <Stack spacing={2}>
+            {financialHealthMetrics.map((detail, index) => (
+              <Stack
+                key={index}
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
               >
                 <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                   {detail.label}

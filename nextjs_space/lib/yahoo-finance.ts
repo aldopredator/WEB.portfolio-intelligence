@@ -41,6 +41,11 @@ export interface YahooStockStatistics {
     fiftyTwoWeekLow?: number | null;          // 52-week low price
     fiftyDayAverage?: number | null;          // 50-day moving average
     twoHundredDayAverage?: number | null;     // 200-day moving average
+    returnOnAssets?: number | null;           // Return on Assets (ttm)
+    debtToEquity?: number | null;             // Total Debt/Equity (mrq)
+    quarterlyRevenueGrowth?: number | null;   // Quarterly Revenue Growth (yoy)
+    quarterlyEarningsGrowth?: number | null;  // Quarterly Earnings Growth (yoy)
+    priceToSales?: number | null;             // Price/Sales (ttm)
 }
 
 /**
@@ -211,6 +216,11 @@ export async function fetchYahooPriceHistory(ticker: string): Promise<{ Date: st
  * - fiftyTwoWeekLow: 52-week low price
  * - fiftyDayAverage: 50-day moving average
  * - twoHundredDayAverage: 200-day moving average
+ * - returnOnAssets: Return on Assets (ttm)
+ * - debtToEquity: Total Debt/Equity (mrq)
+ * - quarterlyRevenueGrowth: Quarterly Revenue Growth (yoy)
+ * - quarterlyEarningsGrowth: Quarterly Earnings Growth (yoy)
+ * - priceToSales: Price/Sales (ttm)
  */
 export async function fetchYahooStatistics(ticker: string): Promise<YahooStockStatistics | null> {
     // Check if Yahoo Finance is enabled
@@ -222,15 +232,16 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
     try {
         console.log(`[YAHOO] 🔍 Fetching statistics for ${ticker} using yahoo-finance2...`);
         
-        // Fetch quoteSummary with defaultKeyStatistics and summaryDetail modules
+        // Fetch quoteSummary with multiple modules for comprehensive data
         const result: any = await yahooFinance.quoteSummary(ticker, {
-            modules: ['defaultKeyStatistics', 'summaryDetail']
+            modules: ['defaultKeyStatistics', 'summaryDetail', 'financialData']
         });
         
         const stats = result?.defaultKeyStatistics;
         const summary = result?.summaryDetail;
+        const financial = result?.financialData;
         
-        if (!stats && !summary) {
+        if (!stats && !summary && !financial) {
             console.error(`[YAHOO] ❌ No statistics data found for ${ticker}`);
             return null;
         }
@@ -249,7 +260,16 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
         const fiftyDayAverage = summary?.fiftyDayAverage || null;
         const twoHundredDayAverage = summary?.twoHundredDayAverage || null;
         
-        console.log(`[YAHOO] ✅ ${ticker} - Float: ${floatShares}, Outstanding: ${sharesOutstanding}, Avg Vol 10d: ${averageVolume10Day}, Insiders: ${heldPercentInsiders}%, Institutions: ${heldPercentInstitutions}%`);
+        // Extract financial metrics from financialData
+        const returnOnAssets = financial?.returnOnAssets ? financial.returnOnAssets * 100 : null;
+        const debtToEquity = financial?.debtToEquity || null;
+        const quarterlyRevenueGrowth = financial?.revenueGrowth ? financial.revenueGrowth * 100 : null;
+        const quarterlyEarningsGrowth = financial?.earningsGrowth ? financial.earningsGrowth * 100 : null;
+        
+        // Extract price ratios from summaryDetail or defaultKeyStatistics
+        const priceToSales = summary?.priceToSalesTrailing12Months || null;
+        
+        console.log(`[YAHOO] ✅ ${ticker} - Float: ${floatShares}, Outstanding: ${sharesOutstanding}, ROA: ${returnOnAssets}%, D/E: ${debtToEquity}, P/S: ${priceToSales}`);
         
         return {
             floatShares,
@@ -261,7 +281,12 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
             fiftyTwoWeekHigh,
             fiftyTwoWeekLow,
             fiftyDayAverage,
-            twoHundredDayAverage
+            twoHundredDayAverage,
+            returnOnAssets,
+            debtToEquity,
+            quarterlyRevenueGrowth,
+            quarterlyEarningsGrowth,
+            priceToSales
         };
     } catch (error) {
         console.error(`[YAHOO] ❌ Error fetching statistics for ${ticker}:`, error);

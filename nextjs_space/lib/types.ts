@@ -49,6 +49,12 @@ export interface StockData {
   // Yahoo Finance 52-week price range
   fiftyTwoWeekHigh?: number | null;
   fiftyTwoWeekLow?: number | null;
+  // Yahoo Finance financial metrics
+  returnOnAssets?: number | null;
+  debtToEquity?: number | null;
+  quarterlyRevenueGrowth?: number | null;
+  quarterlyEarningsGrowth?: number | null;
+  priceToSales?: number | null;
   // Finnhub valuation metrics
   pe_ratio?: number;
   pb_ratio?: number;
