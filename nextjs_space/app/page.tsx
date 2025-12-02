@@ -3,6 +3,7 @@ import path from 'path';
 import { Suspense } from 'react';
 import type { StockInsightsData } from '@/lib/types';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
+import { fetchPolygonStockStats } from '@/lib/polygon';
 import { 
   fetchFinnhubMetrics, 
   fetchCompanyProfile, 
@@ -107,6 +108,26 @@ async function getStockData(): Promise<StockInsightsData> {
         console.error(`Error enriching ${ticker}:`, error);
       }
     }));
+
+    // POC: Fetch Polygon.io data for GOOG only
+    const timestamp = new Date().toISOString();
+    console.log(`[PAGE] 🎯 POC: Fetching Polygon.io data for GOOG at ${timestamp}...`);
+    
+    const googEntry = mergedData['GOOG'];
+    if (googEntry && isRecord(googEntry) && googEntry.stock_data) {
+      try {
+        const polygonStats = await fetchPolygonStockStats('GOOG');
+        
+        if (polygonStats) {
+          Object.assign(googEntry.stock_data, polygonStats);
+          console.log(`[PAGE] ✅ GOOG Polygon data at ${timestamp}:`, JSON.stringify(polygonStats, null, 2));
+        } else {
+          console.log(`[PAGE] ⚠️ No Polygon data returned for GOOG at ${timestamp}`);
+        }
+      } catch (error) {
+        console.error(`[PAGE] ❌ Error fetching Polygon data for GOOG at ${timestamp}:`, error);
+      }
+    }
 
     return mergedData;
   } catch (error) {
