@@ -1,6 +1,9 @@
 // Yahoo Finance API utility functions for fetching real-time stock data
 
-import yahooFinance from 'yahoo-finance2';
+import YahooFinance from 'yahoo-finance2';
+
+// Initialize yahoo-finance2 instance
+const yahooFinance = new YahooFinance();
 
 export interface YahooQuoteResponse {
     regularMarketPrice: number;
