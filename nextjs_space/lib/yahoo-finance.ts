@@ -187,14 +187,9 @@ export async function fetchYahooPriceHistory(ticker: string): Promise<{ Date: st
 
 /**
  * Fetch stock statistics including free-float and average volume from Yahoo Finance
+ * Uses the quoteSummary API endpoint to get defaultKeyStatistics
  * 
- * NOTE: Yahoo Finance has restricted access to the quoteSummary endpoint (requires crumb authentication).
- * This function currently returns null for these fields. To get this data, you would need to:
- * 1. Use a paid financial data API (Alpha Vantage, Financial Modeling Prep, Polygon.io)
- * 2. Implement Yahoo Finance crumb authentication (complex and may break)
- * 3. Manually populate data in your JSON files
- * 
- * Fields that would be returned (when using a proper API):
+ * Fields returned:
  * - floatShares: Number of shares available for public trading (free float)
  * - averageVolume10Day: 10-day average trading volume
  * - averageVolume: Longer-term average volume
@@ -207,14 +202,48 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
         return null;
     }
     
-    console.log(`[YAHOO] Statistics API currently unavailable for ${ticker} - Yahoo Finance requires authentication for quoteSummary endpoint`);
-    
-    // Return null for now - this data requires a paid API or crumb authentication
-    // You can manually populate these values in your JSON files if needed
-    return {
-        floatShares: null,
-        averageVolume10Day: null,
-        averageVolume: null,
-        sharesOutstanding: null
-    };
+    try {
+        console.log(`[YAHOO] 🔍 Fetching statistics for ${ticker}...`);
+        
+        // Yahoo Finance quoteSummary endpoint for key statistics
+        const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=defaultKeyStatistics`;
+        
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            },
+            next: { revalidate: 86400 } // Cache for 24 hours
+        });
+        
+        if (!response.ok) {
+            console.error(`[YAHOO] ❌ Statistics API error for ${ticker}: ${response.status}`);
+            return null;
+        }
+        
+        const data = await response.json();
+        const stats = data?.quoteSummary?.result?.[0]?.defaultKeyStatistics;
+        
+        if (!stats) {
+            console.error(`[YAHOO] ❌ No statistics data found for ${ticker}`);
+            return null;
+        }
+        
+        // Extract raw values (Yahoo returns objects with {raw, fmt} structure)
+        const floatShares = stats.floatShares?.raw || null;
+        const averageVolume10Day = stats.averageDailyVolume10Day?.raw || null;
+        const averageVolume = stats.averageVolume?.raw || null;
+        const sharesOutstanding = stats.sharesOutstanding?.raw || null;
+        
+        console.log(`[YAHOO] ✅ ${ticker} - Float: ${floatShares}, Outstanding: ${sharesOutstanding}, Avg Vol 10d: ${averageVolume10Day}`);
+        
+        return {
+            floatShares,
+            averageVolume10Day,
+            averageVolume,
+            sharesOutstanding
+        };
+    } catch (error) {
+        console.error(`[YAHOO] ❌ Error fetching statistics for ${ticker}:`, error);
+        return null;
+    }
 }

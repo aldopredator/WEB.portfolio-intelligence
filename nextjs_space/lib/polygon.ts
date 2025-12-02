@@ -1,6 +1,8 @@
 // Polygon.io API utility functions for fetching stock statistics
 // Free tier: 5 calls per minute
 
+import { fetchYahooStatistics } from './yahoo-finance';
+
 export interface PolygonTickerDetails {
     name?: string;
     market_cap?: number;
@@ -130,15 +132,18 @@ function delay(ms: number): Promise<void> {
 }
 
 /**
- * Fetch comprehensive stock statistics from Polygon.io
- * Combines ticker details and aggregates data
+ * Fetch comprehensive stock statistics from Polygon.io + Yahoo Finance
+ * Combines:
+ * - Polygon: sharesOutstanding, dailyVolume, totalEmployees
+ * - Yahoo Finance: floatShares (more accurate), averageVolume10Day
+ * 
  * NOTE: Free tier limit is 5 calls/minute, so we add delays
  */
 export async function fetchPolygonStockStats(ticker: string): Promise<PolygonStockStats | null> {
     console.log(`[POLYGON] 🚀 fetchPolygonStockStats START for ${ticker}`);
     
     try {
-        // Fetch ticker details first
+        // Fetch ticker details from Polygon
         console.log(`[POLYGON] ⏳ Calling fetchPolygonTickerDetails for ${ticker}...`);
         const details = await fetchPolygonTickerDetails(ticker);
         console.log(`[POLYGON] 📋 Details result for ${ticker}:`, details ? JSON.stringify(details) : 'null');
@@ -146,36 +151,41 @@ export async function fetchPolygonStockStats(ticker: string): Promise<PolygonSto
         // Add 250ms delay between calls to respect rate limits (5 calls/min = 12 sec/call, but we batch them)
         await delay(250);
         
-        // Fetch aggregates
+        // Fetch aggregates from Polygon
         console.log(`[POLYGON] ⏳ Calling fetchPolygonAggregates for ${ticker}...`);
         const aggregates = await fetchPolygonAggregates(ticker);
         console.log(`[POLYGON] 📊 Aggregates result for ${ticker}:`, aggregates ? JSON.stringify(aggregates) : 'null');
         
-        if (!details && !aggregates) {
-            console.log(`[POLYGON] ⚠️ No data available for ${ticker}`);
+        // Fetch float shares from Yahoo Finance (more accurate than Polygon)
+        console.log(`[YAHOO] ⏳ Calling fetchYahooStatistics for ${ticker}...`);
+        const yahooStats = await fetchYahooStatistics(ticker);
+        console.log(`[YAHOO] 📈 Statistics result for ${ticker}:`, yahooStats ? JSON.stringify(yahooStats) : 'null');
+        
+        if (!details && !aggregates && !yahooStats) {
+            console.log(`[POLYGON+YAHOO] ⚠️ No data available for ${ticker}`);
             return null;
         }
         
         const stats: PolygonStockStats = {
-            // FIXED: Corrected the field mapping
-            // share_class_shares_outstanding is typically the smaller number (specific class)
-            // weighted_shares_outstanding is the total across all classes
-            floatShares: details?.share_class_shares_outstanding || null,
+            // Use Yahoo Finance for float shares (most accurate source)
+            floatShares: yahooStats?.floatShares || null,
+            // Use Polygon for shares outstanding (weighted across all classes)
             sharesOutstanding: details?.weighted_shares_outstanding || null,
+            // Use Polygon for daily volume
             dailyVolume: aggregates?.volume || null,
+            // Use Polygon for employee count
             totalEmployees: details?.total_employees || null,
-            // Polygon.io free tier doesn't provide average volume calculations
-            // These would need to be calculated from historical data
-            averageVolume10Day: null,
-            averageVolume: null
+            // Use Yahoo Finance for average volume metrics
+            averageVolume10Day: yahooStats?.averageVolume10Day || null,
+            averageVolume: yahooStats?.averageVolume || null
         };
         
-        console.log(`[POLYGON] ✅ Stats constructed for ${ticker}:`, JSON.stringify(stats));
-        console.log(`[POLYGON] 🏁 fetchPolygonStockStats END for ${ticker}`);
+        console.log(`[POLYGON+YAHOO] ✅ Stats constructed for ${ticker}:`, JSON.stringify(stats));
+        console.log(`[POLYGON+YAHOO] 🏁 fetchPolygonStockStats END for ${ticker}`);
         
         return stats;
     } catch (error) {
-        console.error(`[POLYGON] Error fetching stock stats for ${ticker}:`, error);
+        console.error(`[POLYGON+YAHOO] Error fetching stock stats for ${ticker}:`, error);
         return null;
     }
 }
