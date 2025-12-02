@@ -157,10 +157,11 @@ export async function fetchPolygonStockStats(ticker: string): Promise<PolygonSto
         }
         
         const stats: PolygonStockStats = {
-            // Use weighted shares outstanding as an estimate for float
-            // (actual float shares not available in free tier)
-            floatShares: details?.weighted_shares_outstanding || null,
-            sharesOutstanding: details?.share_class_shares_outstanding || null,
+            // FIXED: Corrected the field mapping
+            // share_class_shares_outstanding is typically the smaller number (specific class)
+            // weighted_shares_outstanding is the total across all classes
+            floatShares: details?.share_class_shares_outstanding || null,
+            sharesOutstanding: details?.weighted_shares_outstanding || null,
             dailyVolume: aggregates?.volume || null,
             totalEmployees: details?.total_employees || null,
             // Polygon.io free tier doesn't provide average volume calculations
