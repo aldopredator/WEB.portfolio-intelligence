@@ -57,12 +57,12 @@ export default function StockDetailsCard({
   priceToBook,
 }: StockDetailsCardProps) {
   const valuationMetrics = [
-    { label: 'Enterprise Value', value: enterpriseValue ? enterpriseValue >= 1e12 ? `$${(enterpriseValue / 1e12).toFixed(1)}T` : `$${(enterpriseValue / 1e9).toFixed(0)}B` : 'N/A' },
+    { label: 'Price/Sales (ttm)', value: priceToSales ? priceToSales.toFixed(0) : 'N/A' },
     { label: 'Trailing P/E', value: trailingPE ? trailingPE.toFixed(0) : 'N/A' },
+    { label: 'Price/Book', value: priceToBook ? priceToBook.toFixed(0) : 'N/A' },
+    { label: 'Enterprise Value', value: enterpriseValue ? enterpriseValue >= 1e12 ? `$${(enterpriseValue / 1e12).toFixed(1)}T` : `$${(enterpriseValue / 1e9).toFixed(0)}B` : 'N/A' },
     { label: 'Forward P/E', value: forwardPE ? forwardPE.toFixed(0) : 'N/A' },
     { label: 'PEG Ratio (5yr expected)', value: pegRatio ? pegRatio.toFixed(0) : 'N/A' },
-    { label: 'Price/Sales (ttm)', value: priceToSales ? priceToSales.toFixed(0) : 'N/A' },
-    { label: 'Price/Book', value: priceToBook ? priceToBook.toFixed(0) : 'N/A' },
     { label: 'Enterprise Value/Revenue', value: enterpriseToRevenue ? enterpriseToRevenue.toFixed(0) : 'N/A' },
     { label: 'Enterprise Value/EBITDA', value: enterpriseToEbitda ? enterpriseToEbitda.toFixed(0) : 'N/A' },
   ];
