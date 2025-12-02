@@ -109,25 +109,27 @@ async function getStockData(): Promise<StockInsightsData> {
       }
     }));
 
-    // POC: Fetch Polygon.io data for GOOG only
+    // Fetch Polygon.io data for all tickers
     const timestamp = new Date().toISOString();
-    console.log(`[PAGE] 🎯 POC: Fetching Polygon.io data for GOOG at ${timestamp}...`);
+    console.log(`[PAGE] 🎯 Fetching Polygon.io data for all tickers at ${timestamp}...`);
     
-    const googEntry = mergedData['GOOG'];
-    if (googEntry && isRecord(googEntry) && googEntry.stock_data) {
-      try {
-        const polygonStats = await fetchPolygonStockStats('GOOG');
-        
-        if (polygonStats) {
-          Object.assign(googEntry.stock_data, polygonStats);
-          console.log(`[PAGE] ✅ GOOG Polygon data at ${timestamp}:`, JSON.stringify(polygonStats, null, 2));
-        } else {
-          console.log(`[PAGE] ⚠️ No Polygon data returned for GOOG at ${timestamp}`);
+    await Promise.allSettled(validTickers.map(async (ticker) => {
+      const stockEntry = mergedData[ticker];
+      if (stockEntry && isRecord(stockEntry) && stockEntry.stock_data) {
+        try {
+          const polygonStats = await fetchPolygonStockStats(ticker);
+          
+          if (polygonStats) {
+            Object.assign(stockEntry.stock_data, polygonStats);
+            console.log(`[PAGE] ✅ ${ticker} Polygon:`, JSON.stringify(polygonStats));
+          } else {
+            console.log(`[PAGE] ⚠️ No Polygon data for ${ticker}`);
+          }
+        } catch (error) {
+          console.error(`[PAGE] ❌ Polygon error for ${ticker}:`, error);
         }
-      } catch (error) {
-        console.error(`[PAGE] ❌ Error fetching Polygon data for GOOG at ${timestamp}:`, error);
       }
-    }
+    }));
 
     return mergedData;
   } catch (error) {
