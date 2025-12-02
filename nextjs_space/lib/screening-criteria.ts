@@ -14,6 +14,38 @@ export interface ScreeningCriteria {
   roeEnabled: boolean;
   minProfitMargin: number;
   profitMarginEnabled: boolean;
+  minPriceToSales: number;
+  maxPriceToSales: number;
+  priceToSalesEnabled: boolean;
+  minForwardPE: number;
+  maxForwardPE: number;
+  forwardPEEnabled: boolean;
+  minPEGRatio: number;
+  maxPEGRatio: number;
+  pegRatioEnabled: boolean;
+  minEnterpriseValue: number;
+  maxEnterpriseValue: number;
+  enterpriseValueEnabled: boolean;
+  minEVRevenue: number;
+  maxEVRevenue: number;
+  evRevenueEnabled: boolean;
+  minEVEBITDA: number;
+  maxEVEBITDA: number;
+  evEbitdaEnabled: boolean;
+  minROA: number;
+  roaEnabled: boolean;
+  minQuarterlyRevenueGrowth: number;
+  quarterlyRevenueGrowthEnabled: boolean;
+  minQuarterlyEarningsGrowth: number;
+  quarterlyEarningsGrowthEnabled: boolean;
+  maxDebtToEquity: number;
+  debtToEquityEnabled: boolean;
+  minHeldByInsiders: number;
+  maxHeldByInsiders: number;
+  heldByInsidersEnabled: boolean;
+  minHeldByInstitutions: number;
+  maxHeldByInstitutions: number;
+  heldByInstitutionsEnabled: boolean;
   sentimentFilter: 'all' | 'positive' | 'neutral' | 'negative';
   sentimentEnabled: boolean;
   excludeSectors: string[];
@@ -37,6 +69,38 @@ export const DEFAULT_CRITERIA: ScreeningCriteria = {
   roeEnabled: false,
   minProfitMargin: 10,
   profitMarginEnabled: false,
+  minPriceToSales: 0,
+  maxPriceToSales: 10,
+  priceToSalesEnabled: false,
+  minForwardPE: 5,
+  maxForwardPE: 50,
+  forwardPEEnabled: false,
+  minPEGRatio: 0,
+  maxPEGRatio: 3,
+  pegRatioEnabled: false,
+  minEnterpriseValue: 0,
+  maxEnterpriseValue: 5000,
+  enterpriseValueEnabled: false,
+  minEVRevenue: 0,
+  maxEVRevenue: 20,
+  evRevenueEnabled: false,
+  minEVEBITDA: 0,
+  maxEVEBITDA: 30,
+  evEbitdaEnabled: false,
+  minROA: 5,
+  roaEnabled: false,
+  minQuarterlyRevenueGrowth: 0,
+  quarterlyRevenueGrowthEnabled: false,
+  minQuarterlyEarningsGrowth: 0,
+  quarterlyEarningsGrowthEnabled: false,
+  maxDebtToEquity: 100,
+  debtToEquityEnabled: false,
+  minHeldByInsiders: 0,
+  maxHeldByInsiders: 100,
+  heldByInsidersEnabled: false,
+  minHeldByInstitutions: 0,
+  maxHeldByInstitutions: 100,
+  heldByInstitutionsEnabled: false,
   sentimentFilter: 'all',
   sentimentEnabled: false,
   excludeSectors: ['Alcohol', 'Gambling'],
@@ -62,6 +126,38 @@ export function parseCriteriaFromParams(searchParams: URLSearchParams): Screenin
     roeEnabled: searchParams.get('roeEnabled') === 'true',
     minProfitMargin: parseFloat(searchParams.get('minProfitMargin') || String(DEFAULT_CRITERIA.minProfitMargin)),
     profitMarginEnabled: searchParams.get('profitMarginEnabled') === 'true',
+    minPriceToSales: parseFloat(searchParams.get('minPriceToSales') || String(DEFAULT_CRITERIA.minPriceToSales)),
+    maxPriceToSales: parseFloat(searchParams.get('maxPriceToSales') || String(DEFAULT_CRITERIA.maxPriceToSales)),
+    priceToSalesEnabled: searchParams.get('priceToSalesEnabled') === 'true',
+    minForwardPE: parseFloat(searchParams.get('minForwardPE') || String(DEFAULT_CRITERIA.minForwardPE)),
+    maxForwardPE: parseFloat(searchParams.get('maxForwardPE') || String(DEFAULT_CRITERIA.maxForwardPE)),
+    forwardPEEnabled: searchParams.get('forwardPEEnabled') === 'true',
+    minPEGRatio: parseFloat(searchParams.get('minPEGRatio') || String(DEFAULT_CRITERIA.minPEGRatio)),
+    maxPEGRatio: parseFloat(searchParams.get('maxPEGRatio') || String(DEFAULT_CRITERIA.maxPEGRatio)),
+    pegRatioEnabled: searchParams.get('pegRatioEnabled') === 'true',
+    minEnterpriseValue: parseFloat(searchParams.get('minEnterpriseValue') || String(DEFAULT_CRITERIA.minEnterpriseValue)),
+    maxEnterpriseValue: parseFloat(searchParams.get('maxEnterpriseValue') || String(DEFAULT_CRITERIA.maxEnterpriseValue)),
+    enterpriseValueEnabled: searchParams.get('enterpriseValueEnabled') === 'true',
+    minEVRevenue: parseFloat(searchParams.get('minEVRevenue') || String(DEFAULT_CRITERIA.minEVRevenue)),
+    maxEVRevenue: parseFloat(searchParams.get('maxEVRevenue') || String(DEFAULT_CRITERIA.maxEVRevenue)),
+    evRevenueEnabled: searchParams.get('evRevenueEnabled') === 'true',
+    minEVEBITDA: parseFloat(searchParams.get('minEVEBITDA') || String(DEFAULT_CRITERIA.minEVEBITDA)),
+    maxEVEBITDA: parseFloat(searchParams.get('maxEVEBITDA') || String(DEFAULT_CRITERIA.maxEVEBITDA)),
+    evEbitdaEnabled: searchParams.get('evEbitdaEnabled') === 'true',
+    minROA: parseFloat(searchParams.get('minROA') || String(DEFAULT_CRITERIA.minROA)),
+    roaEnabled: searchParams.get('roaEnabled') === 'true',
+    minQuarterlyRevenueGrowth: parseFloat(searchParams.get('minQuarterlyRevenueGrowth') || String(DEFAULT_CRITERIA.minQuarterlyRevenueGrowth)),
+    quarterlyRevenueGrowthEnabled: searchParams.get('quarterlyRevenueGrowthEnabled') === 'true',
+    minQuarterlyEarningsGrowth: parseFloat(searchParams.get('minQuarterlyEarningsGrowth') || String(DEFAULT_CRITERIA.minQuarterlyEarningsGrowth)),
+    quarterlyEarningsGrowthEnabled: searchParams.get('quarterlyEarningsGrowthEnabled') === 'true',
+    maxDebtToEquity: parseFloat(searchParams.get('maxDebtToEquity') || String(DEFAULT_CRITERIA.maxDebtToEquity)),
+    debtToEquityEnabled: searchParams.get('debtToEquityEnabled') === 'true',
+    minHeldByInsiders: parseFloat(searchParams.get('minHeldByInsiders') || String(DEFAULT_CRITERIA.minHeldByInsiders)),
+    maxHeldByInsiders: parseFloat(searchParams.get('maxHeldByInsiders') || String(DEFAULT_CRITERIA.maxHeldByInsiders)),
+    heldByInsidersEnabled: searchParams.get('heldByInsidersEnabled') === 'true',
+    minHeldByInstitutions: parseFloat(searchParams.get('minHeldByInstitutions') || String(DEFAULT_CRITERIA.minHeldByInstitutions)),
+    maxHeldByInstitutions: parseFloat(searchParams.get('maxHeldByInstitutions') || String(DEFAULT_CRITERIA.maxHeldByInstitutions)),
+    heldByInstitutionsEnabled: searchParams.get('heldByInstitutionsEnabled') === 'true',
     sentimentFilter: (searchParams.get('sentimentFilter') as 'all' | 'positive' | 'neutral' | 'negative') || DEFAULT_CRITERIA.sentimentFilter,
     sentimentEnabled: searchParams.get('sentimentEnabled') === 'true',
     excludeSectors: searchParams.get('excludeSectors')?.split(',').filter(s => s) || DEFAULT_CRITERIA.excludeSectors,
@@ -88,6 +184,38 @@ export function buildCriteriaURL(criteria: ScreeningCriteria): string {
     roeEnabled: String(criteria.roeEnabled),
     minProfitMargin: String(criteria.minProfitMargin),
     profitMarginEnabled: String(criteria.profitMarginEnabled),
+    minPriceToSales: String(criteria.minPriceToSales),
+    maxPriceToSales: String(criteria.maxPriceToSales),
+    priceToSalesEnabled: String(criteria.priceToSalesEnabled),
+    minForwardPE: String(criteria.minForwardPE),
+    maxForwardPE: String(criteria.maxForwardPE),
+    forwardPEEnabled: String(criteria.forwardPEEnabled),
+    minPEGRatio: String(criteria.minPEGRatio),
+    maxPEGRatio: String(criteria.maxPEGRatio),
+    pegRatioEnabled: String(criteria.pegRatioEnabled),
+    minEnterpriseValue: String(criteria.minEnterpriseValue),
+    maxEnterpriseValue: String(criteria.maxEnterpriseValue),
+    enterpriseValueEnabled: String(criteria.enterpriseValueEnabled),
+    minEVRevenue: String(criteria.minEVRevenue),
+    maxEVRevenue: String(criteria.maxEVRevenue),
+    evRevenueEnabled: String(criteria.evRevenueEnabled),
+    minEVEBITDA: String(criteria.minEVEBITDA),
+    maxEVEBITDA: String(criteria.maxEVEBITDA),
+    evEbitdaEnabled: String(criteria.evEbitdaEnabled),
+    minROA: String(criteria.minROA),
+    roaEnabled: String(criteria.roaEnabled),
+    minQuarterlyRevenueGrowth: String(criteria.minQuarterlyRevenueGrowth),
+    quarterlyRevenueGrowthEnabled: String(criteria.quarterlyRevenueGrowthEnabled),
+    minQuarterlyEarningsGrowth: String(criteria.minQuarterlyEarningsGrowth),
+    quarterlyEarningsGrowthEnabled: String(criteria.quarterlyEarningsGrowthEnabled),
+    maxDebtToEquity: String(criteria.maxDebtToEquity),
+    debtToEquityEnabled: String(criteria.debtToEquityEnabled),
+    minHeldByInsiders: String(criteria.minHeldByInsiders),
+    maxHeldByInsiders: String(criteria.maxHeldByInsiders),
+    heldByInsidersEnabled: String(criteria.heldByInsidersEnabled),
+    minHeldByInstitutions: String(criteria.minHeldByInstitutions),
+    maxHeldByInstitutions: String(criteria.maxHeldByInstitutions),
+    heldByInstitutionsEnabled: String(criteria.heldByInstitutionsEnabled),
     sentimentFilter: criteria.sentimentFilter,
     sentimentEnabled: String(criteria.sentimentEnabled),
     excludeSectors: criteria.excludeSectors.join(','),
