@@ -32,7 +32,13 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
     return <Typography>Stock data not available</Typography>;
   }
 
-
+  // Debug: Log Polygon data
+  console.log('[MainGrid] Stock data for', selectedStock, ':', {
+    floatShares: stock.floatShares,
+    sharesOutstanding: stock.sharesOutstanding,
+    dailyVolume: stock.dailyVolume,
+    totalEmployees: stock.totalEmployees,
+  });
 
   // Get company name from stock config
   const companyNameMap: Record<string, string> = {
