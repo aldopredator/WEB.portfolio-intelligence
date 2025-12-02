@@ -90,6 +90,7 @@ export default function PriceHistoryChart({
               alignContent: { xs: 'center', sm: 'flex-start' },
               alignItems: 'center',
               gap: 1,
+              flexWrap: 'wrap',
             }}
           >
             <Typography variant="h4" component="p">
@@ -100,6 +101,16 @@ export default function PriceHistoryChart({
               color={isPositive ? 'success' : 'error'}
               label={`${isPositive ? '+' : ''}${priceChangePercent.toFixed(2)}%`}
             />
+            {fiftyDayAverage && (
+              <Typography variant="body2" sx={{ color: 'text.secondary', ml: 1 }}>
+                50-Day MA: <strong>${fiftyDayAverage.toFixed(2)}</strong>
+              </Typography>
+            )}
+            {twoHundredDayAverage && (
+              <Typography variant="body2" sx={{ color: 'text.secondary', ml: 1 }}>
+                200-Day MA: <strong>${twoHundredDayAverage.toFixed(2)}</strong>
+              </Typography>
+            )}
           </Stack>
         </Stack>
 
