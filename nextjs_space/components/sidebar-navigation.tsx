@@ -23,6 +23,7 @@ export function SidebarNavigation() {
     { name: 'Dashboard', href: '/', icon: BarChart3, description: 'Stock insights & analytics' },
 
     { name: 'Screening', href: '/screening', icon: Filter, description: 'Stock screening results' },
+    { name: 'Benchmark', href: '/benchmark', icon: TrendingUp, description: 'Market benchmark comparison' },
   ];
 
   const SidebarContent = () => (
