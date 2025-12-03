@@ -24,17 +24,62 @@ interface YahooSearchResult {
   typeDisp: string;
 }
 
+// Static database of common tickers as fallback
+const COMMON_TICKERS = [
+  { symbol: 'GOOG', name: 'Alphabet Inc.', exchange: 'NASDAQ', type: 'Equity' },
+  { symbol: 'GOOGL', name: 'Alphabet Inc. Class A', exchange: 'NASDAQ', type: 'Equity' },
+  { symbol: 'TSLA', name: 'Tesla Inc.', exchange: 'NASDAQ', type: 'Equity' },
+  { symbol: 'NVDA', name: 'NVIDIA Corporation', exchange: 'NASDAQ', type: 'Equity' },
+  { symbol: 'AMZN', name: 'Amazon.com Inc.', exchange: 'NASDAQ', type: 'Equity' },
+  { symbol: 'AAPL', name: 'Apple Inc.', exchange: 'NASDAQ', type: 'Equity' },
+  { symbol: 'MSFT', name: 'Microsoft Corporation', exchange: 'NASDAQ', type: 'Equity' },
+  { symbol: 'META', name: 'Meta Platforms Inc.', exchange: 'NASDAQ', type: 'Equity' },
+  { symbol: 'BRK-B', name: 'Berkshire Hathaway Inc. Class B', exchange: 'NYSE', type: 'Equity' },
+  { symbol: 'ISRG', name: 'Intuitive Surgical Inc.', exchange: 'NASDAQ', type: 'Equity' },
+  { symbol: 'NFLX', name: 'Netflix Inc.', exchange: 'NASDAQ', type: 'Equity' },
+  { symbol: 'IDXX', name: 'IDEXX Laboratories Inc.', exchange: 'NASDAQ', type: 'Equity' },
+  { symbol: 'III', name: '3i Group plc', exchange: 'LSE', type: 'Equity' },
+  { symbol: 'PLTR', name: 'Palantir Technologies Inc.', exchange: 'NYSE', type: 'Equity' },
+  { symbol: 'QBTS', name: 'D-Wave Quantum Inc.', exchange: 'NYSE', type: 'Equity' },
+  { symbol: 'RGTI', name: 'Rigetti Computing Inc.', exchange: 'NASDAQ', type: 'Equity' },
+  { symbol: 'BXXX', name: 'BXX Holdings', exchange: 'NYSE', type: 'Equity' },
+  { symbol: 'CW8U.PA', name: 'Amundi MSCI World UCITS ETF', exchange: 'Euronext Paris', type: 'ETF' },
+  { symbol: 'MWRL.L', name: 'Amundi Core MSCI World UCITS ETF', exchange: 'LSE', type: 'ETF' },
+];
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get('q');
 
+    console.log('[Search API] Query:', query);
+
     if (!query || query.length < 1) {
       return NextResponse.json({ results: [] });
     }
 
-    // Try Yahoo Finance first (free, no API key needed)
+    const queryLower = query.toLowerCase();
+
+    // First, search in our static database
+    const staticResults = COMMON_TICKERS.filter(ticker => 
+      ticker.symbol.toLowerCase().includes(queryLower) || 
+      ticker.name.toLowerCase().includes(queryLower)
+    ).map(ticker => ({
+      ...ticker,
+      region: ticker.exchange.includes('NASDAQ') || ticker.exchange.includes('NYSE') ? 'United States' : undefined,
+      currency: 'USD',
+    }));
+
+    console.log('[Search API] Static results:', staticResults.length);
+
+    // If we found results in static database, return them
+    if (staticResults.length > 0) {
+      return NextResponse.json({ results: staticResults });
+    }
+
+    // Try Yahoo Finance for other tickers
     try {
+      console.log('[Search API] Trying Yahoo Finance...');
       const yahooResponse = await fetch(
         `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0&enableFuzzyQuery=false`,
         {
@@ -44,9 +89,13 @@ export async function GET(request: NextRequest) {
         }
       );
 
+      console.log('[Search API] Yahoo response status:', yahooResponse.status);
+
       if (yahooResponse.ok) {
         const data = await yahooResponse.json();
         const quotes = data.quotes || [];
+        
+        console.log('[Search API] Yahoo quotes found:', quotes.length);
         
         const results = quotes
           .filter((q: YahooSearchResult) => q.symbol && q.name)
@@ -60,16 +109,19 @@ export async function GET(request: NextRequest) {
           }))
           .slice(0, 10);
 
-        return NextResponse.json({ results });
+        if (results.length > 0) {
+          return NextResponse.json({ results });
+        }
       }
     } catch (yahooError) {
-      console.error('Yahoo Finance API error:', yahooError);
+      console.error('[Search API] Yahoo Finance API error:', yahooError);
     }
 
     // Fallback: Try Alpha Vantage if API key is available
     const alphaVantageKey = process.env.ALPHA_VANTAGE_API_KEY;
     if (alphaVantageKey) {
       try {
+        console.log('[Search API] Trying Alpha Vantage...');
         const avResponse = await fetch(
           `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(query)}&apikey=${alphaVantageKey}`
         );
@@ -77,6 +129,8 @@ export async function GET(request: NextRequest) {
         if (avResponse.ok) {
           const data = await avResponse.json();
           const matches = data.bestMatches || [];
+          
+          console.log('[Search API] Alpha Vantage matches:', matches.length);
           
           const results = matches.map((match: AlphaVantageSearchResult) => ({
             symbol: match['1. symbol'],
@@ -87,22 +141,32 @@ export async function GET(request: NextRequest) {
             currency: match['8. currency'],
           }));
 
-          return NextResponse.json({ results });
+          if (results.length > 0) {
+            return NextResponse.json({ results });
+          }
         }
       } catch (avError) {
-        console.error('Alpha Vantage API error:', avError);
+        console.error('[Search API] Alpha Vantage API error:', avError);
       }
     }
 
-    // If all APIs fail, return mock data for development
-    const mockResults = [
-      { symbol: query.toUpperCase(), name: `${query.toUpperCase()} Corporation`, exchange: 'NASDAQ', type: 'Equity', region: 'United States' },
+    // Last resort: return a generic result
+    console.log('[Search API] Returning generic fallback');
+    const fallbackResults = [
+      { 
+        symbol: query.toUpperCase(), 
+        name: `${query.toUpperCase()} - Search externally`, 
+        exchange: 'Unknown', 
+        type: 'Equity', 
+        region: 'Unknown',
+        currency: 'USD'
+      },
     ];
 
-    return NextResponse.json({ results: mockResults });
+    return NextResponse.json({ results: fallbackResults });
 
   } catch (error) {
-    console.error('Search ticker error:', error);
+    console.error('[Search API] Fatal error:', error);
     return NextResponse.json(
       { error: 'Failed to search tickers' },
       { status: 500 }
