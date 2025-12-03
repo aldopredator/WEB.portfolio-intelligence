@@ -67,11 +67,6 @@ export default function DashboardClient({ initialData, stocks }: DashboardClient
       setSnackbarOpen(true);
     }
   };
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
-      }
-    }
-  };
 
   return (
     <ThemeProvider theme={theme}>
