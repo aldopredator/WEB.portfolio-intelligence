@@ -210,37 +210,7 @@ function BenchmarkCard({ ticker, data }: BenchmarkCardProps) {
           </Box>
         )}
 
-        {/* Stats */}
-        <Stack spacing={1.5}>
-          <Stack direction="row" justifyContent="space-between">
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Previous Close
-            </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {data.currency === 'GBp' ? '£' : '$'}{data.previous_close?.toFixed(2)}
-            </Typography>
-          </Stack>
-          {data.volume && (
-            <Stack direction="row" justifyContent="space-between">
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Volume
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {(data.volume / 1e6).toFixed(2)}M
-              </Typography>
-            </Stack>
-          )}
-          {data.market_cap && (
-            <Stack direction="row" justifyContent="space-between">
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Market Cap
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {data.currency === 'GBp' ? '£' : '$'}{(data.market_cap / 1e9).toFixed(2)}B
-              </Typography>
-            </Stack>
-          )}
-        </Stack>
+        {/* Stats - removed Previous Close, Volume, Market Cap */}
       </CardContent>
     </Card>
   );
@@ -250,7 +220,7 @@ export default async function BenchmarkPage() {
   const benchmarkData = await getBenchmarkData();
   
   return (
-    <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' }, mx: 'auto', p: 3 }}>
+    <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' }, mx: 'auto', p: 3, minHeight: '100vh', bgcolor: '#000' }}>
       {/* Page Header */}
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 4 }}>
         <TrendingUp className="w-8 h-8 text-blue-400" />
