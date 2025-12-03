@@ -61,48 +61,12 @@ export default function DashboardClient({ initialData, stocks }: DashboardClient
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
     } else {
-      // Add new ticker to watchlist via database
-      setSnackbarMessage(`Adding ${result.symbol} to your watchlist...`);
+      // Show info message - ticker will be added in future implementation
+      setSnackbarMessage(`${result.symbol} - ${result.name} | Add to portfolio feature coming soon!`);
       setSnackbarSeverity('info');
       setSnackbarOpen(true);
-
-      try {
-        const response = await fetch('/api/tickers', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            symbol: result.symbol,
-            name: result.name,
-            exchange: result.exchange,
-            type: result.type,
-            category: 'watchlist',
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setSnackbarMessage(`${result.symbol} added to watchlist! Refreshing...`);
-          setSnackbarSeverity('success');
-          setSnackbarOpen(true);
-          
-          // Wait a moment then refresh the page to load new data
-          setTimeout(() => {
-            router.push(`/dashboard?stock=${result.symbol}`);
-            router.refresh();
-          }, 1000);
-        } else {
-          const errorData = await response.json();
-          const errorMessage = errorData.error || 'Unknown error';
-          console.error('Failed to add ticker:', errorData);
-          setSnackbarMessage(`Failed to add ${result.symbol}: ${errorMessage}`);
-          setSnackbarSeverity('error');
-          setSnackbarOpen(true);
-        }
-      } catch (error) {
-        console.error('Error adding ticker:', error);
-        setSnackbarMessage(`Error adding ${result.symbol}. Please try again.`);
+    }
+  };
         setSnackbarSeverity('error');
         setSnackbarOpen(true);
       }
