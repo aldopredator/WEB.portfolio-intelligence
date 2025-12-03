@@ -89,7 +89,10 @@ export default function DashboardClient({ initialData, stocks }: DashboardClient
             router.refresh();
           }, 1000);
         } else {
-          setSnackbarMessage(`Failed to add ${result.symbol}. Please try again.`);
+          const errorData = await response.json();
+          const errorMessage = errorData.details || errorData.error || 'Unknown error';
+          console.error('Failed to add ticker:', errorData);
+          setSnackbarMessage(`Failed to add ${result.symbol}: ${errorMessage}`);
           setSnackbarSeverity('error');
           setSnackbarOpen(true);
         }

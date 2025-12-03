@@ -8,3 +8,17 @@ datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
 }
+
+model Ticker {
+    id          String   @id @default(cuid())
+    symbol      String   @unique
+    name        String
+    exchange    String?
+    type        String?  @default("Equity")
+    category    String   @default("watchlist") // "portfolio" or "watchlist"
+    addedAt     DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    
+    @@index([category])
+    @@index([symbol])
+}

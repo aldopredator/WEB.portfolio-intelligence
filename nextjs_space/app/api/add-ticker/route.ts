@@ -77,7 +77,16 @@ export async function POST(request: NextRequest) {
     stockData.timestamp = new Date().toISOString();
 
     // Write back to file
-    await fs.writeFile(dataPath, JSON.stringify(stockData, null, 2), 'utf-8');
+    try {
+      await fs.writeFile(dataPath, JSON.stringify(stockData, null, 2), 'utf-8');
+      console.log('[Add Ticker API] Successfully wrote file for ticker:', ticker);
+    } catch (writeError) {
+      console.error('[Add Ticker API] Error writing file:', writeError);
+      return NextResponse.json(
+        { error: 'Failed to save ticker data', details: writeError instanceof Error ? writeError.message : 'Unknown error' },
+        { status: 500 }
+      );
+    }
 
     console.log('[Add Ticker API] Successfully added ticker:', ticker);
 
@@ -90,8 +99,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('[Add Ticker API] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to add ticker' },
+      { error: 'Failed to add ticker', details: errorMessage },
       { status: 500 }
     );
   }
