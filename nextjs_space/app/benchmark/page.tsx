@@ -6,24 +6,38 @@ import CardContent from '@mui/material/CardContent';
 import Stack from '@mui/material/Stack';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
-const BENCHMARK_TICKERS = ['CW8', 'MWRL'];
+// CW8 is London Stock Exchange (LSE) ticker for Computacenter
+// MWRL is London Stock Exchange (LSE) ticker for M&G Credit Income Investment Trust
+const BENCHMARK_TICKERS = [
+  { ticker: 'CW8', symbol: 'CW8.L', name: 'Computacenter' },
+  { ticker: 'MWRL', symbol: 'MWRL.L', name: 'M&G Credit Income' }
+];
 
 export const dynamic = 'force-dynamic';
 
 async function getBenchmarkData() {
   const data: Record<string, any> = {};
   
-  for (const ticker of BENCHMARK_TICKERS) {
+  for (const config of BENCHMARK_TICKERS) {
     try {
-      const quote = await fetchYahooQuote(ticker);
+      console.log(`[BENCHMARK] Fetching data for ${config.ticker} (${config.symbol})...`);
+      const quote = await fetchYahooQuote(config.symbol);
       if (quote) {
-        data[ticker] = quote;
+        data[config.ticker] = {
+          ...quote,
+          ticker: config.ticker,
+          name: config.name
+        };
+        console.log(`[BENCHMARK] ✅ Successfully fetched ${config.ticker}:`, quote.current_price);
+      } else {
+        console.log(`[BENCHMARK] ⚠️ No data returned for ${config.ticker}`);
       }
     } catch (error) {
-      console.error(`Error fetching ${ticker}:`, error);
+      console.error(`[BENCHMARK] ❌ Error fetching ${config.ticker}:`, error);
     }
   }
   
+  console.log(`[BENCHMARK] Final data:`, Object.keys(data));
   return data;
 }
 
@@ -38,8 +52,11 @@ function BenchmarkCard({ ticker, data }: BenchmarkCardProps) {
       <Card>
         <CardContent>
           <Typography variant="h6">{ticker}</Typography>
-          <Typography variant="body2" color="text.secondary">
-            No data available
+          <Typography variant="body2" color="error.main" sx={{ mt: 2 }}>
+            No data available - ticker may not be found on Yahoo Finance
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+            Try checking if the ticker format is correct (e.g., {ticker}.L for London Exchange)
           </Typography>
         </CardContent>
       </Card>
@@ -62,12 +79,12 @@ function BenchmarkCard({ ticker, data }: BenchmarkCardProps) {
               {ticker}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              {data.currency || 'USD'}
+              {data.name || data.currency || 'GBP'}
             </Typography>
           </Box>
           <Box sx={{ textAlign: 'right' }}>
             <Typography variant="h4" sx={{ fontWeight: 700 }}>
-              ${data.current_price?.toFixed(2)}
+              {data.currency === 'GBp' ? '£' : '$'}{data.current_price?.toFixed(2)}
             </Typography>
             <Stack direction="row" alignItems="center" spacing={0.5} sx={{ justifyContent: 'flex-end', mt: 0.5 }}>
               {isPositive ? (
@@ -95,7 +112,7 @@ function BenchmarkCard({ ticker, data }: BenchmarkCardProps) {
               52 Week Range
             </Typography>
             <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 600 }}>
-              ${data.current_price?.toFixed(2)}
+              {data.currency === 'GBp' ? '£' : '$'}{data.current_price?.toFixed(2)}
             </Typography>
           </Stack>
           <Box sx={{ position: 'relative', height: 8, bgcolor: 'grey.800', borderRadius: 1, overflow: 'hidden' }}>
@@ -130,10 +147,10 @@ function BenchmarkCard({ ticker, data }: BenchmarkCardProps) {
           </Box>
           <Stack direction="row" justifyContent="space-between" sx={{ mt: 1 }}>
             <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              ${data['52_week_low']?.toFixed(2)}
+              {data.currency === 'GBp' ? '£' : '$'}{data['52_week_low']?.toFixed(2)}
             </Typography>
             <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              ${data['52_week_high']?.toFixed(2)}
+              {data.currency === 'GBp' ? '£' : '$'}{data['52_week_high']?.toFixed(2)}
             </Typography>
           </Stack>
         </Box>
@@ -200,7 +217,7 @@ function BenchmarkCard({ ticker, data }: BenchmarkCardProps) {
               Previous Close
             </Typography>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              ${data.previous_close?.toFixed(2)}
+              {data.currency === 'GBp' ? '£' : '$'}{data.previous_close?.toFixed(2)}
             </Typography>
           </Stack>
           {data.volume && (
@@ -219,7 +236,7 @@ function BenchmarkCard({ ticker, data }: BenchmarkCardProps) {
                 Market Cap
               </Typography>
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                ${(data.market_cap / 1e9).toFixed(2)}B
+                {data.currency === 'GBp' ? '£' : '$'}{(data.market_cap / 1e9).toFixed(2)}B
               </Typography>
             </Stack>
           )}
