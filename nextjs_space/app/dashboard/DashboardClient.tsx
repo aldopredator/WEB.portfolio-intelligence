@@ -61,25 +61,29 @@ export default function DashboardClient({ initialData, stocks }: DashboardClient
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
     } else {
-      // Add new ticker to portfolio
-      setSnackbarMessage(`Adding ${result.symbol} to your portfolio...`);
+      // Add new ticker to watchlist via database
+      setSnackbarMessage(`Adding ${result.symbol} to your watchlist...`);
       setSnackbarSeverity('info');
       setSnackbarOpen(true);
 
       try {
-        const response = await fetch('/api/add-ticker', {
+        const response = await fetch('/api/tickers', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            ticker: result.symbol,
+            symbol: result.symbol,
             name: result.name,
+            exchange: result.exchange,
+            type: result.type,
+            category: 'watchlist',
           }),
         });
 
         if (response.ok) {
-          setSnackbarMessage(`${result.symbol} added successfully! Refreshing...`);
+          const data = await response.json();
+          setSnackbarMessage(`${result.symbol} added to watchlist! Refreshing...`);
           setSnackbarSeverity('success');
           setSnackbarOpen(true);
           
@@ -90,7 +94,7 @@ export default function DashboardClient({ initialData, stocks }: DashboardClient
           }, 1000);
         } else {
           const errorData = await response.json();
-          const errorMessage = errorData.details || errorData.error || 'Unknown error';
+          const errorMessage = errorData.error || 'Unknown error';
           console.error('Failed to add ticker:', errorData);
           setSnackbarMessage(`Failed to add ${result.symbol}: ${errorMessage}`);
           setSnackbarSeverity('error');
