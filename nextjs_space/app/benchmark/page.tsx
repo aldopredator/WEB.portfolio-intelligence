@@ -71,7 +71,7 @@ function BenchmarkCard({ ticker, data }: BenchmarkCardProps) {
       priceChangePercent={data.change_percent || 0}
       weekLow52={data['52_week_low']}
       weekHigh52={data['52_week_high']}
-      volume={data.volume}
+      volume={undefined}
       fiftyDayAverage={null}
       twoHundredDayAverage={null}
     />
