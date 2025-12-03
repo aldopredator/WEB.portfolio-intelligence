@@ -48,7 +48,7 @@ export default function DashboardClient({ initialData, stocks }: DashboardClient
     }
   }, [stockParam]);
 
-  const handleTickerSelect = (result: { symbol: string; name: string; exchange: string; type: string }) => {
+  const handleTickerSelect = async (result: { symbol: string; name: string; exchange: string; type: string }) => {
     console.log('Selected ticker:', result);
     
     // Check if ticker already exists in portfolio
@@ -59,13 +59,47 @@ export default function DashboardClient({ initialData, stocks }: DashboardClient
       router.push(`/dashboard?stock=${result.symbol}`);
       setSnackbarMessage(`Switched to ${result.symbol}`);
       setSnackbarSeverity('success');
+      setSnackbarOpen(true);
     } else {
-      // Show info that ticker needs to be added
-      setSnackbarMessage(`${result.symbol} - ${result.name} selected. To add to portfolio, update stock_insights_data.json`);
+      // Add new ticker to portfolio
+      setSnackbarMessage(`Adding ${result.symbol} to your portfolio...`);
       setSnackbarSeverity('info');
+      setSnackbarOpen(true);
+
+      try {
+        const response = await fetch('/api/add-ticker', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ticker: result.symbol,
+            name: result.name,
+          }),
+        });
+
+        if (response.ok) {
+          setSnackbarMessage(`${result.symbol} added successfully! Refreshing...`);
+          setSnackbarSeverity('success');
+          setSnackbarOpen(true);
+          
+          // Wait a moment then refresh the page to load new data
+          setTimeout(() => {
+            router.push(`/dashboard?stock=${result.symbol}`);
+            router.refresh();
+          }, 1000);
+        } else {
+          setSnackbarMessage(`Failed to add ${result.symbol}. Please try again.`);
+          setSnackbarSeverity('error');
+          setSnackbarOpen(true);
+        }
+      } catch (error) {
+        console.error('Error adding ticker:', error);
+        setSnackbarMessage(`Error adding ${result.symbol}. Please try again.`);
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+      }
     }
-    
-    setSnackbarOpen(true);
   };
 
   return (
