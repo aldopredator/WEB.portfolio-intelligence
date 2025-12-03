@@ -46,6 +46,9 @@ export interface ScreeningCriteria {
   minHeldByInstitutions: number;
   maxHeldByInstitutions: number;
   heldByInstitutionsEnabled: boolean;
+  minAvgDailyVolume: number;
+  maxAvgDailyVolume: number;
+  avgDailyVolumeEnabled: boolean;
   sentimentFilter: 'all' | 'positive' | 'neutral' | 'negative';
   sentimentEnabled: boolean;
   excludeSectors: string[];
@@ -101,6 +104,9 @@ export const DEFAULT_CRITERIA: ScreeningCriteria = {
   minHeldByInstitutions: 0,
   maxHeldByInstitutions: 100,
   heldByInstitutionsEnabled: false,
+  minAvgDailyVolume: 0,
+  maxAvgDailyVolume: 1000,
+  avgDailyVolumeEnabled: false,
   sentimentFilter: 'all',
   sentimentEnabled: false,
   excludeSectors: ['Alcohol', 'Gambling'],
@@ -158,6 +164,9 @@ export function parseCriteriaFromParams(searchParams: URLSearchParams): Screenin
     minHeldByInstitutions: parseFloat(searchParams.get('minHeldByInstitutions') || String(DEFAULT_CRITERIA.minHeldByInstitutions)),
     maxHeldByInstitutions: parseFloat(searchParams.get('maxHeldByInstitutions') || String(DEFAULT_CRITERIA.maxHeldByInstitutions)),
     heldByInstitutionsEnabled: searchParams.get('heldByInstitutionsEnabled') === 'true',
+    minAvgDailyVolume: parseFloat(searchParams.get('minAvgDailyVolume') || String(DEFAULT_CRITERIA.minAvgDailyVolume)),
+    maxAvgDailyVolume: parseFloat(searchParams.get('maxAvgDailyVolume') || String(DEFAULT_CRITERIA.maxAvgDailyVolume)),
+    avgDailyVolumeEnabled: searchParams.get('avgDailyVolumeEnabled') === 'true',
     sentimentFilter: (searchParams.get('sentimentFilter') as 'all' | 'positive' | 'neutral' | 'negative') || DEFAULT_CRITERIA.sentimentFilter,
     sentimentEnabled: searchParams.get('sentimentEnabled') === 'true',
     excludeSectors: searchParams.get('excludeSectors')?.split(',').filter(s => s) || DEFAULT_CRITERIA.excludeSectors,
@@ -216,6 +225,9 @@ export function buildCriteriaURL(criteria: ScreeningCriteria): string {
     minHeldByInstitutions: String(criteria.minHeldByInstitutions),
     maxHeldByInstitutions: String(criteria.maxHeldByInstitutions),
     heldByInstitutionsEnabled: String(criteria.heldByInstitutionsEnabled),
+    minAvgDailyVolume: String(criteria.minAvgDailyVolume),
+    maxAvgDailyVolume: String(criteria.maxAvgDailyVolume),
+    avgDailyVolumeEnabled: String(criteria.avgDailyVolumeEnabled),
     sentimentFilter: criteria.sentimentFilter,
     sentimentEnabled: String(criteria.sentimentEnabled),
     excludeSectors: criteria.excludeSectors.join(','),
