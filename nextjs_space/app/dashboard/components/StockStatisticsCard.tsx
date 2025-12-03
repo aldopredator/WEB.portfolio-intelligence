@@ -16,7 +16,6 @@ interface StockStatisticsCardProps {
   profitMargin?: number;
   quarterlyRevenueGrowth?: number | null;
   quarterlyEarningsGrowth?: number | null;
-  debtToEquity?: number;
 }
 
 export default function StockStatisticsCard({
@@ -26,7 +25,6 @@ export default function StockStatisticsCard({
   profitMargin,
   quarterlyRevenueGrowth,
   quarterlyEarningsGrowth,
-  debtToEquity,
 }: StockStatisticsCardProps) {
   const profitabilityMetrics = [
     { label: 'ROE', value: roe ? `${roe.toFixed(0)}%` : 'N/A' },
@@ -39,17 +37,13 @@ export default function StockStatisticsCard({
     { label: 'Quarterly Earnings Growth (yoy)', value: quarterlyEarningsGrowth ? `${quarterlyEarningsGrowth.toFixed(0)}%` : 'N/A' },
   ];
 
-  const financialHealthMetrics = [
-    { label: 'Total Debt/Equity (mrq)', value: debtToEquity ? debtToEquity.toFixed(0) : 'N/A' },
-  ];
-
   return (
     <Card sx={{ height: '100%' }}>
       <CardContent>
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
           <TrendingUpIcon sx={{ color: 'primary.main' }} />
           <Typography component="h2" variant="h6" sx={{ fontSize: '1.25rem', fontWeight: 700 }}>
-            Stock Statistics
+            Stock Ratios
           </Typography>
         </Stack>
 
@@ -121,42 +115,6 @@ export default function StockStatisticsCard({
                   borderBottom: index < growthMetrics.length - 1 ? '1px solid' : 'none',
                   borderColor: 'divider',
                 }}
-              >
-                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                  {detail.label}
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {detail.value}
-                </Typography>
-              </Stack>
-            ))}
-          </Stack>
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
-
-        {/* Financial Health Pillar */}
-        <Box>
-          <Typography
-            variant="overline"
-            sx={{
-              color: 'warning.main',
-              fontWeight: 700,
-              fontSize: '0.75rem',
-              letterSpacing: 1,
-              mb: 2,
-              display: 'block',
-            }}
-          >
-            FINANCIAL HEALTH
-          </Typography>
-          <Stack spacing={2}>
-            {financialHealthMetrics.map((detail, index) => (
-              <Stack
-                key={index}
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
               >
                 <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                   {detail.label}

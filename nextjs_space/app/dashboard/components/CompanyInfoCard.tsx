@@ -33,6 +33,7 @@ interface CompanyInfoCardProps {
   fiftyTwoWeekLow?: number | null;
   fiftyDayAverage?: number | null;
   twoHundredDayAverage?: number | null;
+  enterpriseValue?: number | null;
 }
 
 export default function CompanyInfoCard({
@@ -59,6 +60,7 @@ export default function CompanyInfoCard({
   fiftyTwoWeekLow,
   fiftyDayAverage,
   twoHundredDayAverage,
+  enterpriseValue,
 }: CompanyInfoCardProps) {
   // Debug logging
   React.useEffect(() => {
@@ -149,18 +151,18 @@ export default function CompanyInfoCard({
                 {totalEmployees ? totalEmployees.toLocaleString() : 'Loading...'}
               </Typography>
             </Box>
-            {marketCapitalization && (
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Market Cap
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {marketCapitalization >= 1000e9
-                    ? `${currency || '$'} ${(marketCapitalization / 1e12).toFixed(1)}T`
-                    : `${currency || '$'} ${(marketCapitalization / 1e9).toFixed(1)}B`}
-                </Typography>
-              </Box>
-            )}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Market Cap (Enterprise Value)
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: enterpriseValue ? 'text.primary' : 'text.disabled' }}>
+                {enterpriseValue
+                  ? enterpriseValue >= 1e12
+                    ? `$${(enterpriseValue / 1e12).toFixed(1)}T`
+                    : `$${(enterpriseValue / 1e9).toFixed(0)}B`
+                  : 'Loading...'}
+              </Typography>
+            </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 Shares Outstanding

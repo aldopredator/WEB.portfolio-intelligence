@@ -97,18 +97,18 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
                 fiftyTwoWeekLow={stock.fiftyTwoWeekLow}
                 fiftyDayAverage={stock.fiftyDayAverage}
                 twoHundredDayAverage={stock.twoHundredDayAverage}
+                enterpriseValue={stock.enterpriseValue}
               />
             )}
             <StockDetailsCard
               ticker={selectedStock}
               priceToSales={stock.priceToSales}
-              enterpriseValue={stock.enterpriseValue}
               enterpriseToRevenue={stock.enterpriseToRevenue}
               enterpriseToEbitda={stock.enterpriseToEbitda}
               trailingPE={stock.trailingPE}
               forwardPE={stock.forwardPE}
-              pegRatio={stock.pegRatio}
               priceToBook={stock.priceToBook}
+              debtToEquity={stock.debtToEquity || stock.debt_to_equity}
             />
             <StockStatisticsCard
               ticker={selectedStock}
@@ -117,7 +117,6 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               profitMargin={stock.profit_margin}
               quarterlyRevenueGrowth={stock.quarterlyRevenueGrowth}
               quarterlyEarningsGrowth={stock.quarterlyEarningsGrowth}
-              debtToEquity={stock.debtToEquity || stock.debt_to_equity}
             />
           </Box>
         </Box>

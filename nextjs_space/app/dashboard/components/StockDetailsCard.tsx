@@ -12,33 +12,30 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 interface StockDetailsCardProps {
   ticker: string;
   priceToSales?: number | null;
-  enterpriseValue?: number | null;
   enterpriseToRevenue?: number | null;
   enterpriseToEbitda?: number | null;
   trailingPE?: number | null;
   forwardPE?: number | null;
-  pegRatio?: number | null;
   priceToBook?: number | null;
+  debtToEquity?: number;
 }
 
 export default function StockDetailsCard({
   ticker,
   priceToSales,
-  enterpriseValue,
   enterpriseToRevenue,
   enterpriseToEbitda,
   trailingPE,
   forwardPE,
-  pegRatio,
   priceToBook,
+  debtToEquity,
 }: StockDetailsCardProps) {
   const valuationMetrics = [
-    { label: 'Price/Sales (ttm)', value: priceToSales ? priceToSales.toFixed(0) : 'N/A' },
+    { label: 'Price/Sales', value: priceToSales ? priceToSales.toFixed(0) : 'N/A' },
     { label: 'Trailing P/E', value: trailingPE ? trailingPE.toFixed(0) : 'N/A' },
     { label: 'Price/Book', value: priceToBook ? priceToBook.toFixed(0) : 'N/A' },
-    { label: 'Enterprise Value', value: enterpriseValue ? enterpriseValue >= 1e12 ? `$${(enterpriseValue / 1e12).toFixed(1)}T` : `$${(enterpriseValue / 1e9).toFixed(0)}B` : 'N/A' },
     { label: 'Forward P/E', value: forwardPE ? forwardPE.toFixed(0) : 'N/A' },
-    { label: 'PEG Ratio (5yr expected)', value: pegRatio ? pegRatio.toFixed(0) : 'N/A' },
+    { label: 'Total Debt/Equity', value: debtToEquity ? debtToEquity.toFixed(0) : 'N/A' },
     { label: 'Enterprise Value/Revenue', value: enterpriseToRevenue ? enterpriseToRevenue.toFixed(0) : 'N/A' },
     { label: 'Enterprise Value/EBITDA', value: enterpriseToEbitda ? enterpriseToEbitda.toFixed(0) : 'N/A' },
   ];
@@ -49,11 +46,11 @@ export default function StockDetailsCard({
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
           <BarChartIcon sx={{ color: 'primary.main' }} />
           <Typography component="h2" variant="h6" sx={{ fontSize: '1.25rem', fontWeight: 700 }}>
-            Stock Fundamentals
+            Stock Multipliers
           </Typography>
         </Stack>
 
-        {/* Valuation Pillar */}
+        {/* Multipliers Section */}
         <Box>
           <Typography
             variant="overline"
@@ -66,7 +63,7 @@ export default function StockDetailsCard({
               display: 'block',
             }}
           >
-            VALUATION
+            STOCK MULTIPLIERS
           </Typography>
           <Stack spacing={2}>
             {valuationMetrics.map((detail, index) => (
