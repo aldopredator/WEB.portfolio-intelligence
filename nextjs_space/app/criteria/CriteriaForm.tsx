@@ -205,7 +205,7 @@ export default function CriteriaForm() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between gap-3 mb-2">
-                    <h3 className="text-white font-semibold text-base">P/E Ratio</h3>
+                    <h3 className="text-white font-semibold text-base">P/E</h3>
                     <div className="flex items-center gap-3">
                       <span className="text-white font-mono font-bold text-base">{criteria.maxPE.toFixed(1)}</span>
                       <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
@@ -276,6 +276,137 @@ export default function CriteriaForm() {
               </div>
             </div>
 
+            {/* P/S */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-0">
+                  <button
+                    type="button"
+                    onClick={() => setCriteria({ ...criteria, priceToSalesEnabled: !criteria.priceToSalesEnabled })}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
+                      criteria.priceToSalesEnabled
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
+                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
+                    }`}
+                  >
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.priceToSalesEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
+                  </button>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">P/S</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                      criteria.priceToSalesEnabled
+                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
+                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                    }`}>
+                      {criteria.priceToSalesEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
+                  
+                  <div className="mt-1 space-y-3">
+                    {/* Min Price/Sales */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-slate-400 text-xs font-medium">Minimum</span>
+                        <span className="text-white font-mono font-bold text-sm">{criteria.minPriceToSales.toFixed(1)}</span>
+                      </div>
+                      <div className="relative px-2">
+                        <div className="relative h-8 flex items-center">
+                          <div
+                            className="absolute left-0 right-0 h-3 rounded-full"
+                            style={{
+                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
+                              opacity: criteria.priceToSalesEnabled ? 0.4 : 0.2,
+                            }}
+                          />
+                          <div
+                            className="absolute"
+                            style={{
+                              left: `${(criteria.minPriceToSales / 20) * 100}%`,
+                              transform: 'translateX(-50%)',
+                              zIndex: 10,
+                            }}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                              criteria.priceToSalesEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
+                            }`} />
+                          </div>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="20"
+                          step="0.1"
+                          value={criteria.minPriceToSales}
+                          onChange={(e) => setCriteria({ ...criteria, minPriceToSales: parseFloat(e.target.value) })}
+                          disabled={!criteria.priceToSalesEnabled}
+                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          style={{ zIndex: 20 }}
+                        />
+                        <div className="flex justify-between mt-2 text-xs text-slate-500">
+                          <span>0</span>
+                          <span>5</span>
+                          <span>10</span>
+                          <span>15</span>
+                          <span>20</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Max Price/Sales */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-slate-400 text-xs font-medium">Maximum</span>
+                        <span className="text-white font-mono font-bold text-sm">{criteria.maxPriceToSales.toFixed(1)}</span>
+                      </div>
+                      <div className="relative px-2">
+                        <div className="relative h-8 flex items-center">
+                          <div
+                            className="absolute left-0 right-0 h-3 rounded-full"
+                            style={{
+                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
+                              opacity: criteria.priceToSalesEnabled ? 0.4 : 0.2,
+                            }}
+                          />
+                          <div
+                            className="absolute"
+                            style={{
+                              left: `${(criteria.maxPriceToSales / 20) * 100}%`,
+                              transform: 'translateX(-50%)',
+                              zIndex: 10,
+                            }}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                              criteria.priceToSalesEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
+                            }`} />
+                          </div>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="20"
+                          step="0.1"
+                          value={criteria.maxPriceToSales}
+                          onChange={(e) => setCriteria({ ...criteria, maxPriceToSales: parseFloat(e.target.value) })}
+                          disabled={!criteria.priceToSalesEnabled}
+                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          style={{ zIndex: 20 }}
+                        />
+                        <div className="flex justify-between mt-2 text-xs text-slate-500">
+                          <span>0</span>
+                          <span>5</span>
+                          <span>10</span>
+                          <span>15</span>
+                          <span>20</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* P/B Ratio */}
             <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
               <div className="flex items-start gap-3">
@@ -294,7 +425,7 @@ export default function CriteriaForm() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between gap-3 mb-2">
-                    <h3 className="text-white font-semibold text-base">P/B Ratio</h3>
+                    <h3 className="text-white font-semibold text-base">P/B</h3>
                     <div className="flex items-center gap-3">
                       <span className="text-white font-mono font-bold text-base">{criteria.maxPB.toFixed(1)}</span>
                       <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
@@ -358,6 +489,137 @@ export default function CriteriaForm() {
                         <span>50</span>
                         <span>75</span>
                         <span>100</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Avg Daily Volume */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-0">
+                  <button
+                    type="button"
+                    onClick={() => setCriteria({ ...criteria, avgDailyVolumeEnabled: !criteria.avgDailyVolumeEnabled })}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
+                      criteria.avgDailyVolumeEnabled
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
+                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
+                    }`}
+                  >
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.avgDailyVolumeEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
+                  </button>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">Avg Daily Volume</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                      criteria.avgDailyVolumeEnabled
+                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
+                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                    }`}>
+                      {criteria.avgDailyVolumeEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
+                  
+                  <div className="mt-1 space-y-3">
+                    {/* Min Avg Daily Volume */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-slate-400 text-xs font-medium">Minimum</span>
+                        <span className="text-white font-mono font-bold text-sm">{criteria.minAvgDailyVolume.toFixed(0)}M</span>
+                      </div>
+                      <div className="relative px-2">
+                        <div className="relative h-8 flex items-center">
+                          <div
+                            className="absolute left-0 right-0 h-3 rounded-full"
+                            style={{
+                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
+                              opacity: criteria.avgDailyVolumeEnabled ? 0.4 : 0.2,
+                            }}
+                          />
+                          <div
+                            className="absolute"
+                            style={{
+                              left: `${(criteria.minAvgDailyVolume / 1000) * 100}%`,
+                              transform: 'translateX(-50%)',
+                              zIndex: 10,
+                            }}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                              criteria.avgDailyVolumeEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
+                            }`} />
+                          </div>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1000"
+                          step="1"
+                          value={criteria.minAvgDailyVolume}
+                          onChange={(e) => setCriteria({ ...criteria, minAvgDailyVolume: parseFloat(e.target.value) })}
+                          disabled={!criteria.avgDailyVolumeEnabled}
+                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          style={{ zIndex: 20 }}
+                        />
+                        <div className="flex justify-between mt-2 text-xs text-slate-500">
+                          <span>0M</span>
+                          <span>250M</span>
+                          <span>500M</span>
+                          <span>750M</span>
+                          <span>1000M</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Max Avg Daily Volume */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-slate-400 text-xs font-medium">Maximum</span>
+                        <span className="text-white font-mono font-bold text-sm">{criteria.maxAvgDailyVolume.toFixed(0)}M</span>
+                      </div>
+                      <div className="relative px-2">
+                        <div className="relative h-8 flex items-center">
+                          <div
+                            className="absolute left-0 right-0 h-3 rounded-full"
+                            style={{
+                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
+                              opacity: criteria.avgDailyVolumeEnabled ? 0.4 : 0.2,
+                            }}
+                          />
+                          <div
+                            className="absolute"
+                            style={{
+                              left: `${(criteria.maxAvgDailyVolume / 1000) * 100}%`,
+                              transform: 'translateX(-50%)',
+                              zIndex: 10,
+                            }}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                              criteria.avgDailyVolumeEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
+                            }`} />
+                          </div>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1000"
+                          step="1"
+                          value={criteria.maxAvgDailyVolume}
+                          onChange={(e) => setCriteria({ ...criteria, maxAvgDailyVolume: parseFloat(e.target.value) })}
+                          disabled={!criteria.avgDailyVolumeEnabled}
+                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          style={{ zIndex: 20 }}
+                        />
+                        <div className="flex justify-between mt-2 text-xs text-slate-500">
+                          <span>0M</span>
+                          <span>250M</span>
+                          <span>500M</span>
+                          <span>750M</span>
+                          <span>1000M</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -489,6 +751,84 @@ export default function CriteriaForm() {
                           <span>3750B</span>
                           <span>5T</span>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Debt/Equity */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-0">
+                  <button
+                    type="button"
+                    onClick={() => setCriteria({ ...criteria, debtToEquityEnabled: !criteria.debtToEquityEnabled })}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
+                      criteria.debtToEquityEnabled
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
+                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
+                    }`}
+                  >
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.debtToEquityEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
+                  </button>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">Debt/Equity</h3>
+                    <div className="flex items-center gap-3">
+                      <span className="text-white font-mono font-bold text-base">{criteria.maxDebtToEquity.toFixed(0)}</span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                        criteria.debtToEquityEnabled
+                          ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
+                          : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                      }`}>
+                        {criteria.debtToEquityEnabled ? 'Enabled' : 'Disabled'}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-1">
+                    <div className="relative px-2">
+                      <div className="relative h-8 flex items-center">
+                        <div
+                          className="absolute left-0 right-0 h-3 rounded-full"
+                          style={{
+                            background: 'linear-gradient(to right, #10b981, #fbbf24, #ef4444)',
+                            opacity: criteria.debtToEquityEnabled ? 0.4 : 0.2,
+                          }}
+                        />
+                        <div
+                          className="absolute"
+                          style={{
+                            left: `${(criteria.maxDebtToEquity / 200) * 100}%`,
+                            transform: 'translateX(-50%)',
+                            zIndex: 10,
+                          }}
+                        >
+                          <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                            criteria.debtToEquityEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
+                          }`} />
+                        </div>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="200"
+                        step="1"
+                        value={criteria.maxDebtToEquity}
+                        onChange={(e) => setCriteria({ ...criteria, maxDebtToEquity: parseFloat(e.target.value) })}
+                        disabled={!criteria.debtToEquityEnabled}
+                        className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                        style={{ zIndex: 20 }}
+                      />
+                      <div className="flex justify-between mt-2 text-xs text-slate-500">
+                        <span>0</span>
+                        <span>50</span>
+                        <span>100</span>
+                        <span>150</span>
+                        <span>200</span>
                       </div>
                     </div>
                   </div>
@@ -645,7 +985,7 @@ export default function CriteriaForm() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between gap-3 mb-2">
-                    <h3 className="text-white font-semibold text-base">ROE (Return on Equity)</h3>
+                    <h3 className="text-white font-semibold text-base">ROE</h3>
                     <div className="flex items-center gap-3">
                       <span className="text-white font-mono font-bold text-base">{criteria.minROE.toFixed(1)}%</span>
                       <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
@@ -776,477 +1116,6 @@ export default function CriteriaForm() {
                         <span>50%</span>
                         <span>75%</span>
                         <span>100%</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Enterprise Value */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-0">
-                  <button
-                    type="button"
-                    onClick={() => setCriteria({ ...criteria, enterpriseValueEnabled: !criteria.enterpriseValueEnabled })}
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
-                      criteria.enterpriseValueEnabled
-                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
-                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
-                    }`}
-                  >
-                    <CheckCircle2 className={`w-5 h-5 ${criteria.enterpriseValueEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
-                  </button>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between gap-3 mb-2">
-                    <h3 className="text-white font-semibold text-base">Market Cap (Enterprise Value)</h3>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
-                      criteria.enterpriseValueEnabled
-                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
-                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
-                    }`}>
-                      {criteria.enterpriseValueEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
-                  </div>
-                  
-                  <div className="mt-1 space-y-3">
-                    {/* Min Enterprise Value */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-slate-400 text-xs font-medium">Minimum</span>
-                        <span className="text-white font-mono font-bold text-sm">${(criteria.minEnterpriseValue / 1000).toFixed(0)}B</span>
-                      </div>
-                      <div className="relative px-2">
-                        <div className="relative h-8 flex items-center">
-                          <div
-                            className="absolute left-0 right-0 h-3 rounded-full"
-                            style={{
-                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
-                              opacity: criteria.enterpriseValueEnabled ? 0.4 : 0.2,
-                            }}
-                          />
-                          <div
-                            className="absolute"
-                            style={{
-                              left: `${(criteria.minEnterpriseValue / 5000) * 100}%`,
-                              transform: 'translateX(-50%)',
-                              zIndex: 10,
-                            }}
-                          >
-                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
-                              criteria.enterpriseValueEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
-                            }`} />
-                          </div>
-                        </div>
-                        <input
-                          type="range"
-                          min="0"
-                          max="5000"
-                          step="10"
-                          value={criteria.minEnterpriseValue}
-                          onChange={(e) => setCriteria({ ...criteria, minEnterpriseValue: parseFloat(e.target.value) })}
-                          disabled={!criteria.enterpriseValueEnabled}
-                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                          style={{ zIndex: 20 }}
-                        />
-                        <div className="flex justify-between mt-2 text-xs text-slate-500">
-                          <span>$0B</span>
-                          <span>$1250B</span>
-                          <span>$2500B</span>
-                          <span>$3750B</span>
-                          <span>$5000B</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Max Enterprise Value */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-slate-400 text-xs font-medium">Maximum</span>
-                        <span className="text-white font-mono font-bold text-sm">${(criteria.maxEnterpriseValue / 1000).toFixed(0)}B</span>
-                      </div>
-                      <div className="relative px-2">
-                        <div className="relative h-8 flex items-center">
-                          <div
-                            className="absolute left-0 right-0 h-3 rounded-full"
-                            style={{
-                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
-                              opacity: criteria.enterpriseValueEnabled ? 0.4 : 0.2,
-                            }}
-                          />
-                          <div
-                            className="absolute"
-                            style={{
-                              left: `${(criteria.maxEnterpriseValue / 5000) * 100}%`,
-                              transform: 'translateX(-50%)',
-                              zIndex: 10,
-                            }}
-                          >
-                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
-                              criteria.enterpriseValueEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
-                            }`} />
-                          </div>
-                        </div>
-                        <input
-                          type="range"
-                          min="0"
-                          max="5000"
-                          step="10"
-                          value={criteria.maxEnterpriseValue}
-                          onChange={(e) => setCriteria({ ...criteria, maxEnterpriseValue: parseFloat(e.target.value) })}
-                          disabled={!criteria.enterpriseValueEnabled}
-                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                          style={{ zIndex: 20 }}
-                        />
-                        <div className="flex justify-between mt-2 text-xs text-slate-500">
-                          <span>$0B</span>
-                          <span>$1250B</span>
-                          <span>$2500B</span>
-                          <span>$3750B</span>
-                          <span>$5000B</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Price/Sales */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-0">
-                  <button
-                    type="button"
-                    onClick={() => setCriteria({ ...criteria, priceToSalesEnabled: !criteria.priceToSalesEnabled })}
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
-                      criteria.priceToSalesEnabled
-                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
-                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
-                    }`}
-                  >
-                    <CheckCircle2 className={`w-5 h-5 ${criteria.priceToSalesEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
-                  </button>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between gap-3 mb-2">
-                    <h3 className="text-white font-semibold text-base">Price/Sales</h3>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
-                      criteria.priceToSalesEnabled
-                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
-                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
-                    }`}>
-                      {criteria.priceToSalesEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
-                  </div>
-                  
-                  <div className="mt-1 space-y-3">
-                    {/* Min Price/Sales */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-slate-400 text-xs font-medium">Minimum</span>
-                        <span className="text-white font-mono font-bold text-sm">{criteria.minPriceToSales.toFixed(1)}</span>
-                      </div>
-                      <div className="relative px-2">
-                        <div className="relative h-8 flex items-center">
-                          <div
-                            className="absolute left-0 right-0 h-3 rounded-full"
-                            style={{
-                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
-                              opacity: criteria.priceToSalesEnabled ? 0.4 : 0.2,
-                            }}
-                          />
-                          <div
-                            className="absolute"
-                            style={{
-                              left: `${(criteria.minPriceToSales / 20) * 100}%`,
-                              transform: 'translateX(-50%)',
-                              zIndex: 10,
-                            }}
-                          >
-                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
-                              criteria.priceToSalesEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
-                            }`} />
-                          </div>
-                        </div>
-                        <input
-                          type="range"
-                          min="0"
-                          max="20"
-                          step="0.1"
-                          value={criteria.minPriceToSales}
-                          onChange={(e) => setCriteria({ ...criteria, minPriceToSales: parseFloat(e.target.value) })}
-                          disabled={!criteria.priceToSalesEnabled}
-                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                          style={{ zIndex: 20 }}
-                        />
-                        <div className="flex justify-between mt-2 text-xs text-slate-500">
-                          <span>0</span>
-                          <span>5</span>
-                          <span>10</span>
-                          <span>15</span>
-                          <span>20</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Max Price/Sales */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-slate-400 text-xs font-medium">Maximum</span>
-                        <span className="text-white font-mono font-bold text-sm">{criteria.maxPriceToSales.toFixed(1)}</span>
-                      </div>
-                      <div className="relative px-2">
-                        <div className="relative h-8 flex items-center">
-                          <div
-                            className="absolute left-0 right-0 h-3 rounded-full"
-                            style={{
-                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
-                              opacity: criteria.priceToSalesEnabled ? 0.4 : 0.2,
-                            }}
-                          />
-                          <div
-                            className="absolute"
-                            style={{
-                              left: `${(criteria.maxPriceToSales / 20) * 100}%`,
-                              transform: 'translateX(-50%)',
-                              zIndex: 10,
-                            }}
-                          >
-                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
-                              criteria.priceToSalesEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
-                            }`} />
-                          </div>
-                        </div>
-                        <input
-                          type="range"
-                          min="0"
-                          max="20"
-                          step="0.1"
-                          value={criteria.maxPriceToSales}
-                          onChange={(e) => setCriteria({ ...criteria, maxPriceToSales: parseFloat(e.target.value) })}
-                          disabled={!criteria.priceToSalesEnabled}
-                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                          style={{ zIndex: 20 }}
-                        />
-                        <div className="flex justify-between mt-2 text-xs text-slate-500">
-                          <span>0</span>
-                          <span>5</span>
-                          <span>10</span>
-                          <span>15</span>
-                          <span>20</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Total Debt/Equity */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-0">
-                  <button
-                    type="button"
-                    onClick={() => setCriteria({ ...criteria, debtToEquityEnabled: !criteria.debtToEquityEnabled })}
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
-                      criteria.debtToEquityEnabled
-                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
-                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
-                    }`}
-                  >
-                    <CheckCircle2 className={`w-5 h-5 ${criteria.debtToEquityEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
-                  </button>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between gap-3 mb-2">
-                    <h3 className="text-white font-semibold text-base">Total Debt/Equity</h3>
-                    <div className="flex items-center gap-3">
-                      <span className="text-white font-mono font-bold text-base">{criteria.maxDebtToEquity.toFixed(0)}</span>
-                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
-                        criteria.debtToEquityEnabled
-                          ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
-                          : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
-                      }`}>
-                        {criteria.debtToEquityEnabled ? 'Enabled' : 'Disabled'}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-1">
-                    <div className="relative px-2">
-                      <div className="relative h-8 flex items-center">
-                        <div
-                          className="absolute left-0 right-0 h-3 rounded-full"
-                          style={{
-                            background: 'linear-gradient(to right, #10b981, #fbbf24, #ef4444)',
-                            opacity: criteria.debtToEquityEnabled ? 0.4 : 0.2,
-                          }}
-                        />
-                        <div
-                          className="absolute"
-                          style={{
-                            left: `${(criteria.maxDebtToEquity / 200) * 100}%`,
-                            transform: 'translateX(-50%)',
-                            zIndex: 10,
-                          }}
-                        >
-                          <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
-                            criteria.debtToEquityEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
-                          }`} />
-                        </div>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="200"
-                        step="1"
-                        value={criteria.maxDebtToEquity}
-                        onChange={(e) => setCriteria({ ...criteria, maxDebtToEquity: parseFloat(e.target.value) })}
-                        disabled={!criteria.debtToEquityEnabled}
-                        className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                        style={{ zIndex: 20 }}
-                      />
-                      <div className="flex justify-between mt-2 text-xs text-slate-500">
-                        <span>0</span>
-                        <span>50</span>
-                        <span>100</span>
-                        <span>150</span>
-                        <span>200</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Avg Daily Volume (10D) */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-0">
-                  <button
-                    type="button"
-                    onClick={() => setCriteria({ ...criteria, avgDailyVolumeEnabled: !criteria.avgDailyVolumeEnabled })}
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
-                      criteria.avgDailyVolumeEnabled
-                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
-                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
-                    }`}
-                  >
-                    <CheckCircle2 className={`w-5 h-5 ${criteria.avgDailyVolumeEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
-                  </button>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between gap-3 mb-2">
-                    <h3 className="text-white font-semibold text-base">Avg Daily Volume (10D)</h3>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
-                      criteria.avgDailyVolumeEnabled
-                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
-                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
-                    }`}>
-                      {criteria.avgDailyVolumeEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
-                  </div>
-                  
-                  <div className="mt-1 space-y-3">
-                    {/* Min Avg Daily Volume */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-slate-400 text-xs font-medium">Minimum</span>
-                        <span className="text-white font-mono font-bold text-sm">{criteria.minAvgDailyVolume.toFixed(0)}M</span>
-                      </div>
-                      <div className="relative px-2">
-                        <div className="relative h-8 flex items-center">
-                          <div
-                            className="absolute left-0 right-0 h-3 rounded-full"
-                            style={{
-                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
-                              opacity: criteria.avgDailyVolumeEnabled ? 0.4 : 0.2,
-                            }}
-                          />
-                          <div
-                            className="absolute"
-                            style={{
-                              left: `${(criteria.minAvgDailyVolume / 1000) * 100}%`,
-                              transform: 'translateX(-50%)',
-                              zIndex: 10,
-                            }}
-                          >
-                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
-                              criteria.avgDailyVolumeEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
-                            }`} />
-                          </div>
-                        </div>
-                        <input
-                          type="range"
-                          min="0"
-                          max="1000"
-                          step="1"
-                          value={criteria.minAvgDailyVolume}
-                          onChange={(e) => setCriteria({ ...criteria, minAvgDailyVolume: parseFloat(e.target.value) })}
-                          disabled={!criteria.avgDailyVolumeEnabled}
-                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                          style={{ zIndex: 20 }}
-                        />
-                        <div className="flex justify-between mt-2 text-xs text-slate-500">
-                          <span>0M</span>
-                          <span>250M</span>
-                          <span>500M</span>
-                          <span>750M</span>
-                          <span>1000M</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Max Avg Daily Volume */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-slate-400 text-xs font-medium">Maximum</span>
-                        <span className="text-white font-mono font-bold text-sm">{criteria.maxAvgDailyVolume.toFixed(0)}M</span>
-                      </div>
-                      <div className="relative px-2">
-                        <div className="relative h-8 flex items-center">
-                          <div
-                            className="absolute left-0 right-0 h-3 rounded-full"
-                            style={{
-                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
-                              opacity: criteria.avgDailyVolumeEnabled ? 0.4 : 0.2,
-                            }}
-                          />
-                          <div
-                            className="absolute"
-                            style={{
-                              left: `${(criteria.maxAvgDailyVolume / 1000) * 100}%`,
-                              transform: 'translateX(-50%)',
-                              zIndex: 10,
-                            }}
-                          >
-                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
-                              criteria.avgDailyVolumeEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
-                            }`} />
-                          </div>
-                        </div>
-                        <input
-                          type="range"
-                          min="0"
-                          max="1000"
-                          step="1"
-                          value={criteria.maxAvgDailyVolume}
-                          onChange={(e) => setCriteria({ ...criteria, maxAvgDailyVolume: parseFloat(e.target.value) })}
-                          disabled={!criteria.avgDailyVolumeEnabled}
-                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                          style={{ zIndex: 20 }}
-                        />
-                        <div className="flex justify-between mt-2 text-xs text-slate-500">
-                          <span>0M</span>
-                          <span>250M</span>
-                          <span>500M</span>
-                          <span>750M</span>
-                          <span>1000M</span>
-                        </div>
                       </div>
                     </div>
                   </div>
