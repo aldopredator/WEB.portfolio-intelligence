@@ -6,11 +6,11 @@ import CardContent from '@mui/material/CardContent';
 import Stack from '@mui/material/Stack';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
-// CW8 is London Stock Exchange (LSE) ticker for Computacenter
-// MWRL is London Stock Exchange (LSE) ticker for M&G Credit Income Investment Trust
+// CW8U.PA is Euronext Paris ticker for Amundi MSCI World UCITS ETF
+// MWRL.L is London Stock Exchange (LSE) ticker for Amundi Core MSCI World UCITS ETF Acc
 const BENCHMARK_TICKERS = [
-  { ticker: 'CW8', symbol: 'CW8.L', name: 'Computacenter' },
-  { ticker: 'MWRL', symbol: 'MWRL.L', name: 'M&G Credit Income' }
+  { ticker: 'CW8', symbol: 'CW8U.PA', name: 'Amundi MSCI World' },
+  { ticker: 'MWRL', symbol: 'MWRL.L', name: 'Amundi Core MSCI World UCITS ETF Acc' }
 ];
 
 export const dynamic = 'force-dynamic';
