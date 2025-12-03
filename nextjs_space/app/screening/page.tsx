@@ -130,12 +130,12 @@ export default async function ScreeningPage({
       ticker: config.ticker,
       name: config.name,
       sector: config.sector,
-      pe: stockInfo.pe_ratio?.toFixed(2) || 'N/A',
-      pb: stockInfo.pb_ratio?.toFixed(2) || 'N/A',
-      marketCap: stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(2)}B` : 'N/A',
-      beta: stockInfo.beta?.toFixed(2) || 'N/A',
-      roe: stockInfo.roe ? `${stockInfo.roe.toFixed(2)}%` : 'N/A',
-      profitMargin: stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(2)}%` : 'N/A',
+      pe: stockInfo.pe_ratio?.toFixed(0) || 'N/A',
+      pb: stockInfo.pb_ratio?.toFixed(0) || 'N/A',
+      marketCap: stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(0)}B` : 'N/A',
+      beta: stockInfo.beta?.toFixed(0) || 'N/A',
+      roe: stockInfo.roe ? `${stockInfo.roe.toFixed(0)}%` : 'N/A',
+      profitMargin: stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(0)}%` : 'N/A',
       sentiment: data && typeof data === 'object' && 'sentiment_data' in data 
         ? (data.sentiment_data as any)?.overall_sentiment || 'N/A'
         : 'N/A',
