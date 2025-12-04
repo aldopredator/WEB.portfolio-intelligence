@@ -32,8 +32,9 @@ function GlobalHeaderContent() {
   // Fetch stocks based on selected portfolio
   useEffect(() => {
     const fetchStocks = async () => {
+      setLoading(true);
       try {
-        const portfolioId = searchParams.get('portfolio');
+        const portfolioId = selectedPortfolio?.id || searchParams.get('portfolio');
         const response = await fetch(`/api/stock-list${portfolioId ? `?portfolio=${portfolioId}` : ''}`);
         const data = await response.json();
         if (data.success) {
@@ -46,7 +47,7 @@ function GlobalHeaderContent() {
       }
     };
     fetchStocks();
-  }, [searchParams]);
+  }, [searchParams, selectedPortfolio]);
 
   const handlePortfolioChange = (value: string) => {
     if (value === 'all') {
