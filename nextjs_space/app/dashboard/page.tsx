@@ -7,8 +7,13 @@ import DashboardClient from './DashboardClient';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Disable caching for POC
 
-export default async function DashboardPage() {
-  const stockData = await getStockData();
+interface DashboardPageProps {
+  searchParams: { portfolio?: string };
+}
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  const portfolioId = searchParams.portfolio || null;
+  const stockData = await getStockData(portfolioId);
 
   // Debug: Check if Polygon data exists
   const googData = stockData.GOOG;

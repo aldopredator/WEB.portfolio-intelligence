@@ -146,9 +146,8 @@ export default function PortfoliosPage() {
   };
 
   const openEditDialog = (portfolio: Portfolio) => {
-    setSelectedPortfolio(portfolio);
-    setFormData({ name: portfolio.name, description: portfolio.description || '' });
-    setIsEditDialogOpen(true);
+    // Redirect to dedicated edit page
+    window.location.href = `/portfolios/${portfolio.id}/edit`;
   };
 
   const openDeleteDialog = (portfolio: Portfolio) => {

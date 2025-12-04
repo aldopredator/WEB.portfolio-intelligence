@@ -17,14 +17,21 @@ export let STOCK_CONFIG: Array<{ ticker: string; name: string; sector: string }>
 /**
  * Fetch and enrich stock data from database
  * This is the single source of truth for stock data across the application
+ * @param portfolioId - Optional portfolio ID to filter stocks
  */
-export async function getStockData(): Promise<StockInsightsData> {
+export async function getStockData(portfolioId?: string | null): Promise<StockInsightsData> {
   try {
     console.log('[STOCK-DATA] 📊 Fetching stock data from database...');
+    if (portfolioId) {
+      console.log(`[STOCK-DATA] 🎯 Filtering by portfolio: ${portfolioId}`);
+    }
     
     // Fetch all active stocks with their related data
     const stocks = await prisma.stock.findMany({
-      where: { isActive: true },
+      where: { 
+        isActive: true,
+        ...(portfolioId ? { portfolioId } : {}),
+      },
       include: {
         stockData: true,
         priceHistory: {

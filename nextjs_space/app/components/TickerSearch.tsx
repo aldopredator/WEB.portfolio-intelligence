@@ -346,3 +346,6 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search by 
     </Box>
   );
 }
+
+// Named export for compatibility
+export { TickerSearch };
