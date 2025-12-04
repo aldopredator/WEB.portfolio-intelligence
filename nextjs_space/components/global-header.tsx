@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { usePortfolio } from '@/lib/portfolio-context';
 import { Search, Package } from 'lucide-react';
 import {
@@ -19,7 +19,7 @@ interface Stock {
   change_percent?: number;
 }
 
-export function GlobalHeader() {
+function GlobalHeaderContent() {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -147,5 +147,30 @@ export function GlobalHeader() {
         </div>
       </div>
     </header>
+  );
+}
+
+export function GlobalHeader() {
+  return (
+    <Suspense fallback={
+      <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-sm border-b border-slate-800/50 lg:left-72 lg:right-[540px]">
+        <div className="w-full px-4 py-4">
+          <div className="flex items-center gap-4 mb-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white leading-tight">Portfolio Intelligence</h1>
+              <p className="text-base text-blue-400 font-medium">Solutions</p>
+            </div>
+          </div>
+          <div className="text-slate-400 text-sm">Loading...</div>
+        </div>
+      </header>
+    }>
+      <GlobalHeaderContent />
+    </Suspense>
   );
 }
