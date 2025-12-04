@@ -48,9 +48,19 @@ export function SidebarNavigation() {
             onValueChange={(value) => {
               if (value === 'all') {
                 selectPortfolio(null);
+                // Redirect to dashboard without filter
+                if (pathname === '/' || pathname === '/dashboard') {
+                  window.location.href = '/';
+                }
               } else {
                 const portfolio = portfolios.find(p => p.id === value);
-                if (portfolio) selectPortfolio(portfolio);
+                if (portfolio) {
+                  selectPortfolio(portfolio);
+                  // Redirect to dashboard with portfolio filter
+                  if (pathname === '/' || pathname === '/dashboard') {
+                    window.location.href = `/?portfolio=${value}`;
+                  }
+                }
               }
             }}
           >

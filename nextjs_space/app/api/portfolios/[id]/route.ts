@@ -2,6 +2,53 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 /**
+ * GET /api/portfolios/[id]
+ * Retrieves a single portfolio with its stocks
+ */
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params;
+
+    const portfolio = await prisma.portfolio.findUnique({
+      where: { id },
+      include: {
+        stocks: {
+          orderBy: { ticker: 'asc' },
+          select: {
+            id: true,
+            ticker: true,
+            company: true,
+            type: true,
+            exchange: true,
+          }
+        }
+      }
+    });
+
+    if (!portfolio) {
+      return NextResponse.json(
+        { success: false, error: 'Portfolio not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      portfolio
+    });
+  } catch (error) {
+    console.error('Error fetching portfolio:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch portfolio' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
  * PUT /api/portfolios/[id]
  * Updates a portfolio's name and/or description
  */
