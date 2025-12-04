@@ -99,7 +99,7 @@ export async function getStockData(): Promise<StockInsightsData> {
     }
 
     // Enrich with real-time APIs (optional - can be disabled for faster loading)
-    const validTickers = stocks.map(s => s.ticker);
+    const validTickers = stocks.map((s: any) => s.ticker);
     
     console.log('[STOCK-DATA] 🔄 Enriching with real-time data...');
     
