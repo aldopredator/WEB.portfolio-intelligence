@@ -77,7 +77,7 @@ function GlobalHeaderContent() {
         </div>
 
         {/* Portfolio Filter and Search */}
-        <div className="flex gap-3 mb-3">
+        <div className="hidden flex gap-3 mb-3">
           <Select
             value={selectedPortfolio?.id || 'all'}
             onValueChange={handlePortfolioChange}
