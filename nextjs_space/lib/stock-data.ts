@@ -104,7 +104,7 @@ export async function getStockData(): Promise<StockInsightsData> {
     console.log('[STOCK-DATA] 🔄 Enriching with real-time data...');
     
     // Process other APIs in parallel (Finnhub, sentiment, Polygon)
-    await Promise.allSettled(validTickers.map(async (ticker) => {
+    await Promise.allSettled(validTickers.map(async (ticker: string) => {
       try {
         const stockEntry = mergedData[ticker];
 
