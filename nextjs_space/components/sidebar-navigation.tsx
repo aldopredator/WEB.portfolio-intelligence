@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   BarChart3,
   ListChecks,
@@ -28,6 +28,7 @@ export function SidebarNavigation() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { selectedPortfolio, portfolios, selectPortfolio } = usePortfolio();
 
   const navigation = [
@@ -46,11 +47,13 @@ export function SidebarNavigation() {
           <Select
             value={selectedPortfolio?.id || 'all'}
             onValueChange={(value) => {
+              console.log('[Sidebar] Portfolio selection changed to:', value);
               if (value === 'all') {
                 selectPortfolio(null);
                 // Redirect to dashboard without filter
                 if (pathname === '/' || pathname === '/dashboard') {
-                  window.location.href = '/';
+                  console.log('[Sidebar] Redirecting to dashboard (all portfolios)');
+                  router.push('/');
                 }
               } else {
                 const portfolio = portfolios.find(p => p.id === value);
@@ -58,7 +61,8 @@ export function SidebarNavigation() {
                   selectPortfolio(portfolio);
                   // Redirect to dashboard with portfolio filter
                   if (pathname === '/' || pathname === '/dashboard') {
-                    window.location.href = `/?portfolio=${value}`;
+                    console.log('[Sidebar] Redirecting to dashboard with portfolio filter:', value);
+                    router.push(`/?portfolio=${value}`);
                   }
                 }
               }

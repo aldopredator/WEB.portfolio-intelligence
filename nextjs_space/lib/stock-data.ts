@@ -23,7 +23,9 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
   try {
     console.log('[STOCK-DATA] 📊 Fetching stock data from database...');
     if (portfolioId) {
-      console.log(`[STOCK-DATA] 🎯 Filtering by portfolio: ${portfolioId}`);
+      console.log(`[STOCK-DATA] 🎯 Filtering by portfolio ID: ${portfolioId}`);
+    } else {
+      console.log('[STOCK-DATA] 📋 Fetching ALL active stocks (no portfolio filter)');
     }
     
     // Fetch all active stocks with their related data
@@ -48,7 +50,10 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
       },
     });
 
-    console.log(`[STOCK-DATA] Found ${stocks.length} active stocks in database`);
+    console.log(`[STOCK-DATA] ✅ Found ${stocks.length} active stocks in database`);
+    if (stocks.length > 0) {
+      console.log(`[STOCK-DATA] 📋 Tickers: ${stocks.map((s: any) => s.ticker).join(', ')}`);
+    }
 
     // Update STOCK_CONFIG dynamically
     STOCK_CONFIG = stocks.map((stock: any) => ({

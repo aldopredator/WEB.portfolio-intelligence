@@ -226,33 +226,35 @@ export default function EditPortfolioClient({ portfolioId }: { portfolioId: stri
                 No stocks in this portfolio yet. Add some above!
               </div>
             ) : (
-              portfolio.stocks.map((stock) => (
-                <div
-                  key={stock.id}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <GripVertical className="h-5 w-5 text-muted-foreground cursor-move" />
-                    <div>
-                      <div className="font-semibold">{stock.ticker}</div>
-                      <div className="text-sm text-muted-foreground">{stock.company}</div>
-                    </div>
-                    {stock.type && (
-                      <Badge variant="outline" className="text-xs">
-                        {stock.type}
-                      </Badge>
-                    )}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleRemoveTicker(stock.id, stock.ticker)}
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              <div className="max-h-[600px] overflow-y-auto space-y-2 pr-2">
+                {portfolio.stocks.map((stock) => (
+                  <div
+                    key={stock.id}
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"
                   >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))
+                    <div className="flex items-center gap-3">
+                      <GripVertical className="h-5 w-5 text-muted-foreground cursor-move" />
+                      <div>
+                        <div className="font-semibold">{stock.ticker}</div>
+                        <div className="text-sm text-muted-foreground">{stock.company}</div>
+                      </div>
+                      {stock.type && (
+                        <Badge variant="outline" className="text-xs">
+                          {stock.type}
+                        </Badge>
+                      )}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveTicker(stock.id, stock.ticker)}
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </CardContent>
