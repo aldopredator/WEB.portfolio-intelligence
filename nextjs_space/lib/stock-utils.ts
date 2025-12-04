@@ -49,7 +49,8 @@ export function formatPrice(price: number): string {
 
 export function formatLargeNumber(value: number | undefined | null): string {
   const n = Number(value ?? 0);
-  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
+  if (n >= 1_000_000_000_000) return `${Math.floor(n / 1_000_000_000_000)}T`;
+  if (n >= 1_000_000_000) return `${Math.floor(n / 1_000_000_000)}B`;
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(2)}K`;
   return `${n}`;

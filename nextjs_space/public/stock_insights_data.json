@@ -1,492 +1,1563 @@
 {
-    "META": {
-        "stock_data": {
-            "ticker": "META",
-            "company": "Meta Platforms (META)",
-            "current_price": 595.00,
-            "change": 12.50,
-            "change_percent": 2.15,
-            "52_week_high": 714.00,
-            "52_week_low": 476.00,
-            "price_movement_30_days": [
-                {
-                    "date": "2025-10-28",
-                    "price": 580.12
-                },
-                {
-                    "date": "2025-10-29",
-                    "price": 585.45
-                },
-                {
-                    "date": "2025-10-30",
-                    "price": 582.30
-                },
-                {
-                    "date": "2025-10-31",
-                    "price": 588.90
-                },
-                {
-                    "date": "2025-11-01",
-                    "price": 590.15
-                },
-                {
-                    "date": "2025-11-02",
-                    "price": 592.40
-                },
-                {
-                    "date": "2025-11-03",
-                    "price": 589.80
-                },
-                {
-                    "date": "2025-11-04",
-                    "price": 593.25
-                },
-                {
-                    "date": "2025-11-05",
-                    "price": 595.00
-                }
-            ]
+  "NVDA": {
+    "stock_data": {
+      "ticker": "NVDA",
+      "company": "Nvidia Corporation (NVDA)",
+      "current_price": 140,
+      "change": 3.5,
+      "change_percent": 2.56,
+      "52_week_high": 168,
+      "52_week_low": 112,
+      "price_movement_30_days": [
+        {
+          "date": "2025-10-29T13:30:00.000Z",
+          "price": 207.04
         },
-        "analyst_recommendations": {
-            "strong_buy": 28,
-            "buy": 15,
-            "hold": 5,
-            "sell": 1,
-            "strong_sell": 0,
-            "consensus": "Strong Buy",
-            "price_target": 685.00
+        {
+          "date": "2025-10-30T13:30:00.000Z",
+          "price": 202.89
         },
-        "social_sentiment": {
-            "positive": 75,
-            "neutral": 20,
-            "negative": 5,
-            "overall": "Bullish"
+        {
+          "date": "2025-10-31T13:30:00.000Z",
+          "price": 202.49
         },
-        "latest_news": [
-            {
-                "title": "Meta Reports Strong Ad Revenue",
-                "summary": "Quarterly results exceed analyst expectations driven by AI investments.",
-                "source": "Financial Times",
-                "date": "2025-11-27",
-                "url": "https://ft.com"
-            }
-        ],
-        "emerging_trends": [
-            "🤖 AI Integration",
-            "💰 Strong Cash Flow"
-        ]
+        {
+          "date": "2025-11-03T14:30:00.000Z",
+          "price": 206.88
+        },
+        {
+          "date": "2025-11-04T14:30:00.000Z",
+          "price": 198.69
+        },
+        {
+          "date": "2025-11-05T14:30:00.000Z",
+          "price": 195.21
+        },
+        {
+          "date": "2025-11-06T14:30:00.000Z",
+          "price": 188.08
+        },
+        {
+          "date": "2025-11-07T14:30:00.000Z",
+          "price": 188.15
+        },
+        {
+          "date": "2025-11-10T14:30:00.000Z",
+          "price": 199.05
+        },
+        {
+          "date": "2025-11-11T14:30:00.000Z",
+          "price": 193.16
+        },
+        {
+          "date": "2025-11-12T14:30:00.000Z",
+          "price": 193.8
+        },
+        {
+          "date": "2025-11-13T14:30:00.000Z",
+          "price": 186.86
+        },
+        {
+          "date": "2025-11-14T14:30:00.000Z",
+          "price": 190.17
+        },
+        {
+          "date": "2025-11-17T14:30:00.000Z",
+          "price": 186.6
+        },
+        {
+          "date": "2025-11-18T14:30:00.000Z",
+          "price": 181.36
+        },
+        {
+          "date": "2025-11-19T14:30:00.000Z",
+          "price": 186.52
+        },
+        {
+          "date": "2025-11-20T14:30:00.000Z",
+          "price": 180.64
+        },
+        {
+          "date": "2025-11-21T14:30:00.000Z",
+          "price": 178.88
+        },
+        {
+          "date": "2025-11-24T14:30:00.000Z",
+          "price": 182.55
+        },
+        {
+          "date": "2025-11-25T14:30:00.000Z",
+          "price": 177.82
+        },
+        {
+          "date": "2025-11-26T14:30:00.000Z",
+          "price": 180.26
+        },
+        {
+          "date": "2025-11-28T18:00:02.000Z",
+          "price": 177
+        }
+      ]
     },
-    "NVDA": {
-        "stock_data": {
-            "ticker": "NVDA",
-            "company": "Nvidia Corporation (NVDA)",
-            "current_price": 140.00,
-            "change": 3.50,
-            "change_percent": 2.56,
-            "52_week_high": 168.00,
-            "52_week_low": 112.00,
-            "price_movement_30_days": [
-                {
-                    "date": "2025-11-01",
-                    "price": 135.20
-                },
-                {
-                    "date": "2025-11-05",
-                    "price": 140.00
-                }
-            ]
-        },
-        "analyst_recommendations": {
-            "strong_buy": 35,
-            "buy": 10,
-            "hold": 3,
-            "sell": 0,
-            "strong_sell": 0,
-            "consensus": "Strong Buy",
-            "price_target": 165.00
-        },
-        "social_sentiment": {
-            "positive": 85,
-            "neutral": 10,
-            "negative": 5,
-            "overall": "Very Bullish"
-        },
-        "latest_news": [],
-        "emerging_trends": [
-            "📈 AI Chip Demand"
-        ]
+    "analyst_recommendations": {
+      "strong_buy": 35,
+      "buy": 10,
+      "hold": 3,
+      "sell": 0,
+      "strong_sell": 0,
+      "consensus": "Strong Buy",
+      "price_target": 165
     },
-    "GOOG": {
-        "stock_data": {
-            "ticker": "GOOG",
-            "company": "Alphabet Inc. Class C (GOOG)",
-            "current_price": 175.00,
-            "change": -1.20,
-            "change_percent": -0.68,
-            "52_week_high": 210.00,
-            "52_week_low": 140.00,
-            "price_movement_30_days": []
-        },
-        "analyst_recommendations": {
-            "strong_buy": 20,
-            "buy": 20,
-            "hold": 8,
-            "sell": 2,
-            "strong_sell": 0,
-            "consensus": "Buy",
-            "price_target": 195.00
-        },
-        "social_sentiment": {
-            "positive": 60,
-            "neutral": 30,
-            "negative": 10,
-            "overall": "Positive"
-        },
-        "latest_news": [],
-        "emerging_trends": [
-            "☁️ Cloud Growth"
-        ]
+    "social_sentiment": {
+      "positive": 85,
+      "neutral": 10,
+      "negative": 5,
+      "overall": "Very Bullish"
     },
-    "TSLA": {
-        "stock_data": {
-            "ticker": "TSLA",
-            "company": "Tesla, Inc. (TSLA)",
-            "current_price": 248.00,
-            "change": 5.80,
-            "change_percent": 2.39,
-            "52_week_high": 297.60,
-            "52_week_low": 198.40,
-            "price_movement_30_days": []
+    "latest_news": [],
+    "emerging_trends": [
+      "\ud83d\udcc8 AI Chip Demand"
+    ]
+  },
+  "GOOG": {
+    "stock_data": {
+      "ticker": "GOOG",
+      "company": "Alphabet Inc. Class C (GOOG)",
+      "current_price": 175,
+      "change": -1.2,
+      "change_percent": -0.68,
+      "52_week_high": 210,
+      "52_week_low": 140,
+      "price_movement_30_days": [
+        {
+          "date": "2025-10-29T13:30:00.000Z",
+          "price": 275.17
         },
-        "analyst_recommendations": {
-            "strong_buy": 10,
-            "buy": 15,
-            "hold": 15,
-            "sell": 5,
-            "strong_sell": 2,
-            "consensus": "Hold",
-            "price_target": 260.00
+        {
+          "date": "2025-10-30T13:30:00.000Z",
+          "price": 281.9
         },
-        "social_sentiment": {
-            "positive": 50,
-            "neutral": 20,
-            "negative": 30,
-            "overall": "Neutral"
+        {
+          "date": "2025-10-31T13:30:00.000Z",
+          "price": 281.82
         },
-        "latest_news": [],
-        "emerging_trends": [
-            "🚗 EV Competition"
-        ]
+        {
+          "date": "2025-11-03T14:30:00.000Z",
+          "price": 284.12
+        },
+        {
+          "date": "2025-11-04T14:30:00.000Z",
+          "price": 278.06
+        },
+        {
+          "date": "2025-11-05T14:30:00.000Z",
+          "price": 284.75
+        },
+        {
+          "date": "2025-11-06T14:30:00.000Z",
+          "price": 285.34
+        },
+        {
+          "date": "2025-11-07T14:30:00.000Z",
+          "price": 279.7
+        },
+        {
+          "date": "2025-11-10T14:30:00.000Z",
+          "price": 290.59
+        },
+        {
+          "date": "2025-11-11T14:30:00.000Z",
+          "price": 291.74
+        },
+        {
+          "date": "2025-11-12T14:30:00.000Z",
+          "price": 287.43
+        },
+        {
+          "date": "2025-11-13T14:30:00.000Z",
+          "price": 279.12
+        },
+        {
+          "date": "2025-11-14T14:30:00.000Z",
+          "price": 276.98
+        },
+        {
+          "date": "2025-11-17T14:30:00.000Z",
+          "price": 285.6
+        },
+        {
+          "date": "2025-11-18T14:30:00.000Z",
+          "price": 284.96
+        },
+        {
+          "date": "2025-11-19T14:30:00.000Z",
+          "price": 292.99
+        },
+        {
+          "date": "2025-11-20T14:30:00.000Z",
+          "price": 289.98
+        },
+        {
+          "date": "2025-11-21T14:30:00.000Z",
+          "price": 299.65
+        },
+        {
+          "date": "2025-11-24T14:30:00.000Z",
+          "price": 318.47
+        },
+        {
+          "date": "2025-11-25T14:30:00.000Z",
+          "price": 323.64
+        },
+        {
+          "date": "2025-11-26T14:30:00.000Z",
+          "price": 320.28
+        },
+        {
+          "date": "2025-11-28T21:00:00.000Z",
+          "price": 320.12
+        }
+      ]
     },
-    "BRK-B": {
-        "stock_data": {
-            "ticker": "BRK-B",
-            "company": "Berkshire Hathaway Inc. (BRK-B)",
-            "current_price": 465.50,
-            "change": 2.10,
-            "change_percent": 0.45,
-            "52_week_high": 558.60,
-            "52_week_low": 372.40,
-            "price_movement_30_days": []
-        },
-        "analyst_recommendations": {
-            "strong_buy": 5,
-            "buy": 10,
-            "hold": 5,
-            "sell": 0,
-            "strong_sell": 0,
-            "consensus": "Buy",
-            "price_target": 500.00
-        },
-        "social_sentiment": {
-            "positive": 70,
-            "neutral": 25,
-            "negative": 5,
-            "overall": "Positive"
-        },
-        "latest_news": [],
-        "emerging_trends": [
-            "🛡️ Defensive Play"
-        ]
+    "analyst_recommendations": {
+      "strong_buy": 20,
+      "buy": 20,
+      "hold": 8,
+      "sell": 2,
+      "strong_sell": 0,
+      "consensus": "Buy",
+      "price_target": 195
     },
-    "ISRG": {
-        "stock_data": {
-            "ticker": "ISRG",
-            "company": "Intuitive Surgical Inc. (ISRG)",
-            "current_price": 385.20,
-            "change": 4.50,
-            "change_percent": 1.18,
-            "52_week_high": 462.24,
-            "52_week_low": 308.16,
-            "price_movement_30_days": []
-        },
-        "analyst_recommendations": {
-            "strong_buy": 12,
-            "buy": 8,
-            "hold": 4,
-            "sell": 1,
-            "strong_sell": 0,
-            "consensus": "Buy",
-            "price_target": 420.00
-        },
-        "social_sentiment": {
-            "positive": 65,
-            "neutral": 30,
-            "negative": 5,
-            "overall": "Positive"
-        },
-        "latest_news": [],
-        "emerging_trends": [
-            "🏥 MedTech Growth"
-        ]
+    "social_sentiment": {
+      "positive": 60,
+      "neutral": 30,
+      "negative": 10,
+      "overall": "Positive"
     },
-    "NFLX": {
-        "stock_data": {
-            "ticker": "NFLX",
-            "company": "Netflix Inc. (NFLX)",
-            "current_price": 620.15,
-            "change": -5.20,
-            "change_percent": -0.83,
-            "52_week_high": 744.18,
-            "52_week_low": 496.12,
-            "price_movement_30_days": []
+    "latest_news": [],
+    "emerging_trends": [
+      "\u2601\ufe0f Cloud Growth"
+    ]
+  },
+  "TSLA": {
+    "stock_data": {
+      "ticker": "TSLA",
+      "company": "Tesla, Inc. (TSLA)",
+      "current_price": 248,
+      "change": 5.8,
+      "change_percent": 2.39,
+      "52_week_high": 297.6,
+      "52_week_low": 198.4,
+      "price_movement_30_days": [
+        {
+          "date": "2025-10-29T13:30:00.000Z",
+          "price": 461.51
         },
-        "analyst_recommendations": {
-            "strong_buy": 15,
-            "buy": 12,
-            "hold": 8,
-            "sell": 2,
-            "strong_sell": 0,
-            "consensus": "Buy",
-            "price_target": 650.00
+        {
+          "date": "2025-10-30T13:30:00.000Z",
+          "price": 440.1
         },
-        "social_sentiment": {
-            "positive": 55,
-            "neutral": 35,
-            "negative": 10,
-            "overall": "Neutral"
+        {
+          "date": "2025-10-31T13:30:00.000Z",
+          "price": 456.56
         },
-        "latest_news": [],
-        "emerging_trends": [
-            "📺 Streaming Wars"
-        ]
+        {
+          "date": "2025-11-03T14:30:00.000Z",
+          "price": 468.37
+        },
+        {
+          "date": "2025-11-04T14:30:00.000Z",
+          "price": 444.26
+        },
+        {
+          "date": "2025-11-05T14:30:00.000Z",
+          "price": 462.07
+        },
+        {
+          "date": "2025-11-06T14:30:00.000Z",
+          "price": 445.91
+        },
+        {
+          "date": "2025-11-07T14:30:00.000Z",
+          "price": 429.52
+        },
+        {
+          "date": "2025-11-10T14:30:00.000Z",
+          "price": 445.23
+        },
+        {
+          "date": "2025-11-11T14:30:00.000Z",
+          "price": 439.62
+        },
+        {
+          "date": "2025-11-12T14:30:00.000Z",
+          "price": 430.6
+        },
+        {
+          "date": "2025-11-13T14:30:00.000Z",
+          "price": 401.99
+        },
+        {
+          "date": "2025-11-14T14:30:00.000Z",
+          "price": 404.35
+        },
+        {
+          "date": "2025-11-17T14:30:00.000Z",
+          "price": 408.92
+        },
+        {
+          "date": "2025-11-18T14:30:00.000Z",
+          "price": 401.25
+        },
+        {
+          "date": "2025-11-19T14:30:00.000Z",
+          "price": 403.99
+        },
+        {
+          "date": "2025-11-20T14:30:00.000Z",
+          "price": 395.23
+        },
+        {
+          "date": "2025-11-21T14:30:00.000Z",
+          "price": 391.09
+        },
+        {
+          "date": "2025-11-24T14:30:00.000Z",
+          "price": 417.78
+        },
+        {
+          "date": "2025-11-25T14:30:00.000Z",
+          "price": 419.4
+        },
+        {
+          "date": "2025-11-26T14:30:00.000Z",
+          "price": 426.58
+        },
+        {
+          "date": "2025-11-28T18:00:00.000Z",
+          "price": 430.17
+        }
+      ]
     },
-    "GOOGL": {
-        "stock_data": {
-            "ticker": "GOOGL",
-            "company": "Alphabet Inc. Class A (GOOGL)",
-            "current_price": 176.40,
-            "change": -1.10,
-            "change_percent": -0.62,
-            "52_week_high": 211.68,
-            "52_week_low": 141.12,
-            "price_movement_30_days": []
-        },
-        "analyst_recommendations": {
-            "strong_buy": 22,
-            "buy": 18,
-            "hold": 7,
-            "sell": 1,
-            "strong_sell": 0,
-            "consensus": "Buy",
-            "price_target": 198.00
-        },
-        "social_sentiment": {
-            "positive": 62,
-            "neutral": 28,
-            "negative": 10,
-            "overall": "Positive"
-        },
-        "latest_news": [],
-        "emerging_trends": [
-            "🤖 Gemini AI"
-        ]
+    "analyst_recommendations": {
+      "strong_buy": 10,
+      "buy": 15,
+      "hold": 15,
+      "sell": 5,
+      "strong_sell": 2,
+      "consensus": "Hold",
+      "price_target": 260
     },
-    "AMZN": {
-        "stock_data": {
-            "ticker": "AMZN",
-            "company": "Amazon.com Inc. (AMZN)",
-            "current_price": 182.30,
-            "change": 2.80,
-            "change_percent": 1.56,
-            "52_week_high": 218.76,
-            "52_week_low": 145.84,
-            "price_movement_30_days": []
-        },
-        "analyst_recommendations": {
-            "strong_buy": 38,
-            "buy": 10,
-            "hold": 2,
-            "sell": 0,
-            "strong_sell": 0,
-            "consensus": "Strong Buy",
-            "price_target": 210.00
-        },
-        "social_sentiment": {
-            "positive": 80,
-            "neutral": 15,
-            "negative": 5,
-            "overall": "Bullish"
-        },
-        "latest_news": [],
-        "emerging_trends": [
-            "📦 E-commerce Dominance"
-        ]
+    "social_sentiment": {
+      "positive": 50,
+      "neutral": 20,
+      "negative": 30,
+      "overall": "Neutral"
     },
-    "IDXX": {
-        "stock_data": {
-            "ticker": "IDXX",
-            "company": "IDEXX Laboratories Inc. (IDXX)",
-            "current_price": 510.60,
-            "change": 1.20,
-            "change_percent": 0.24,
-            "52_week_high": 612.72,
-            "52_week_low": 408.48,
-            "price_movement_30_days": []
+    "latest_news": [],
+    "emerging_trends": [
+      "\ud83d\ude97 EV Competition"
+    ]
+  },
+  "BRK-B": {
+    "stock_data": {
+      "ticker": "BRK-B",
+      "company": "Berkshire Hathaway Inc. (BRK-B)",
+      "current_price": 465.5,
+      "change": 2.1,
+      "change_percent": 0.45,
+      "52_week_high": 558.6,
+      "52_week_low": 372.4,
+      "price_movement_30_days": [
+        {
+          "date": "2025-10-29T13:30:00.000Z",
+          "price": 475.76
         },
-        "analyst_recommendations": {
-            "strong_buy": 8,
-            "buy": 10,
-            "hold": 6,
-            "sell": 1,
-            "strong_sell": 0,
-            "consensus": "Buy",
-            "price_target": 540.00
+        {
+          "date": "2025-10-30T13:30:00.000Z",
+          "price": 478.52
         },
-        "social_sentiment": {
-            "positive": 60,
-            "neutral": 35,
-            "negative": 5,
-            "overall": "Positive"
+        {
+          "date": "2025-10-31T13:30:00.000Z",
+          "price": 477.54
         },
-        "latest_news": [],
-        "emerging_trends": [
-            "🐶 Pet Healthcare"
-        ]
+        {
+          "date": "2025-11-03T14:30:00.000Z",
+          "price": 475.68
+        },
+        {
+          "date": "2025-11-04T14:30:00.000Z",
+          "price": 487.66
+        },
+        {
+          "date": "2025-11-05T14:30:00.000Z",
+          "price": 488.77
+        },
+        {
+          "date": "2025-11-06T14:30:00.000Z",
+          "price": 493.15
+        },
+        {
+          "date": "2025-11-07T14:30:00.000Z",
+          "price": 499.06
+        },
+        {
+          "date": "2025-11-10T14:30:00.000Z",
+          "price": 496.98
+        },
+        {
+          "date": "2025-11-11T14:30:00.000Z",
+          "price": 497.07
+        },
+        {
+          "date": "2025-11-12T14:30:00.000Z",
+          "price": 502.4
+        },
+        {
+          "date": "2025-11-13T14:30:00.000Z",
+          "price": 513.11
+        },
+        {
+          "date": "2025-11-14T14:30:00.000Z",
+          "price": 508.94
+        },
+        {
+          "date": "2025-11-17T14:30:00.000Z",
+          "price": 503.26
+        },
+        {
+          "date": "2025-11-18T14:30:00.000Z",
+          "price": 504.37
+        },
+        {
+          "date": "2025-11-19T14:30:00.000Z",
+          "price": 501.26
+        },
+        {
+          "date": "2025-11-20T14:30:00.000Z",
+          "price": 501.12
+        },
+        {
+          "date": "2025-11-21T14:30:00.000Z",
+          "price": 504.04
+        },
+        {
+          "date": "2025-11-24T14:30:00.000Z",
+          "price": 507.81
+        },
+        {
+          "date": "2025-11-25T14:30:00.000Z",
+          "price": 508.57
+        },
+        {
+          "date": "2025-11-26T14:30:00.000Z",
+          "price": 511.23
+        },
+        {
+          "date": "2025-11-28T18:00:02.000Z",
+          "price": 513.81
+        }
+      ]
     },
-    "III": {
-        "stock_data": {
-            "ticker": "III",
-            "company": "3i Group plc (III)",
-            "current_price": 32.40,
-            "change": 0.45,
-            "change_percent": 1.41,
-            "52_week_high": 38.88,
-            "52_week_low": 25.92,
-            "price_movement_30_days": []
-        },
-        "analyst_recommendations": {
-            "strong_buy": 4,
-            "buy": 6,
-            "hold": 4,
-            "sell": 0,
-            "strong_sell": 0,
-            "consensus": "Buy",
-            "price_target": 36.00
-        },
-        "social_sentiment": {
-            "positive": 55,
-            "neutral": 40,
-            "negative": 5,
-            "overall": "Neutral"
-        },
-        "latest_news": [],
-        "emerging_trends": [
-            "💼 Private Equity"
-        ]
+    "analyst_recommendations": {
+      "strong_buy": 5,
+      "buy": 10,
+      "hold": 5,
+      "sell": 0,
+      "strong_sell": 0,
+      "consensus": "Buy",
+      "price_target": 500
     },
-    "PLTR": {
-        "stock_data": {
-            "ticker": "PLTR",
-            "company": "Palantir Technologies Inc. (PLTR)",
-            "current_price": 24.80,
-            "change": 1.10,
-            "change_percent": 4.64,
-            "52_week_high": 29.76,
-            "52_week_low": 19.84,
-            "price_movement_30_days": []
-        },
-        "analyst_recommendations": {
-            "strong_buy": 8,
-            "buy": 10,
-            "hold": 12,
-            "sell": 5,
-            "strong_sell": 3,
-            "consensus": "Hold",
-            "price_target": 22.00
-        },
-        "social_sentiment": {
-            "positive": 85,
-            "neutral": 5,
-            "negative": 10,
-            "overall": "Very Bullish"
-        },
-        "latest_news": [],
-        "emerging_trends": [
-            "🛡️ Defense Tech"
-        ]
+    "social_sentiment": {
+      "positive": 70,
+      "neutral": 25,
+      "negative": 5,
+      "overall": "Positive"
     },
-    "QBTS": {
-        "stock_data": {
-            "ticker": "QBTS",
-            "company": "D-Wave Quantum Inc. (QBTS)",
-            "current_price": 1.45,
-            "change": -0.05,
-            "change_percent": -3.33,
-            "52_week_high": 1.74,
-            "52_week_low": 1.16,
-            "price_movement_30_days": []
+    "latest_news": [],
+    "emerging_trends": [
+      "\ud83d\udee1\ufe0f Defensive Play"
+    ]
+  },
+  "ISRG": {
+    "stock_data": {
+      "ticker": "ISRG",
+      "company": "Intuitive Surgical Inc. (ISRG)",
+      "current_price": 385.2,
+      "change": 4.5,
+      "change_percent": 1.18,
+      "52_week_high": 462.24,
+      "52_week_low": 308.16,
+      "price_movement_30_days": [
+        {
+          "date": "2025-10-29T13:30:00.000Z",
+          "price": 537.59
         },
-        "analyst_recommendations": {
-            "strong_buy": 2,
-            "buy": 3,
-            "hold": 2,
-            "sell": 0,
-            "strong_sell": 0,
-            "consensus": "Buy",
-            "price_target": 2.50
+        {
+          "date": "2025-10-30T13:30:00.000Z",
+          "price": 530.02
         },
-        "social_sentiment": {
-            "positive": 40,
-            "neutral": 40,
-            "negative": 20,
-            "overall": "Neutral"
+        {
+          "date": "2025-10-31T13:30:00.000Z",
+          "price": 534.28
         },
-        "latest_news": [],
-        "emerging_trends": [
-            "⚛️ Quantum Computing"
-        ]
+        {
+          "date": "2025-11-03T14:30:00.000Z",
+          "price": 544.21
+        },
+        {
+          "date": "2025-11-04T14:30:00.000Z",
+          "price": 538.82
+        },
+        {
+          "date": "2025-11-05T14:30:00.000Z",
+          "price": 548.55
+        },
+        {
+          "date": "2025-11-06T14:30:00.000Z",
+          "price": 547.78
+        },
+        {
+          "date": "2025-11-07T14:30:00.000Z",
+          "price": 560
+        },
+        {
+          "date": "2025-11-10T14:30:00.000Z",
+          "price": 576.2
+        },
+        {
+          "date": "2025-11-11T14:30:00.000Z",
+          "price": 572.17
+        },
+        {
+          "date": "2025-11-12T14:30:00.000Z",
+          "price": 572.45
+        },
+        {
+          "date": "2025-11-13T14:30:00.000Z",
+          "price": 565.51
+        },
+        {
+          "date": "2025-11-14T14:30:00.000Z",
+          "price": 549.51
+        },
+        {
+          "date": "2025-11-17T14:30:00.000Z",
+          "price": 546.71
+        },
+        {
+          "date": "2025-11-18T14:30:00.000Z",
+          "price": 546.77
+        },
+        {
+          "date": "2025-11-19T14:30:00.000Z",
+          "price": 564.64
+        },
+        {
+          "date": "2025-11-20T14:30:00.000Z",
+          "price": 552.23
+        },
+        {
+          "date": "2025-11-21T14:30:00.000Z",
+          "price": 561.61
+        },
+        {
+          "date": "2025-11-24T14:30:00.000Z",
+          "price": 568.48
+        },
+        {
+          "date": "2025-11-25T14:30:00.000Z",
+          "price": 578.87
+        },
+        {
+          "date": "2025-11-26T14:30:00.000Z",
+          "price": 574.23
+        },
+        {
+          "date": "2025-11-28T21:00:00.000Z",
+          "price": 573.48
+        }
+      ]
     },
-    "RGTI": {
-        "stock_data": {
-            "ticker": "RGTI",
-            "company": "Rigetti Computing Inc. (RGTI)",
-            "current_price": 1.15,
-            "change": 0.02,
-            "change_percent": 1.77,
-            "52_week_high": 1.38,
-            "52_week_low": 0.92,
-            "price_movement_30_days": []
-        },
-        "analyst_recommendations": {
-            "strong_buy": 1,
-            "buy": 4,
-            "hold": 2,
-            "sell": 0,
-            "strong_sell": 0,
-            "consensus": "Buy",
-            "price_target": 2.00
-        },
-        "social_sentiment": {
-            "positive": 45,
-            "neutral": 45,
-            "negative": 10,
-            "overall": "Neutral"
-        },
-        "latest_news": [],
-        "emerging_trends": [
-            "⚛️ Quantum Hardware"
-        ]
+    "analyst_recommendations": {
+      "strong_buy": 12,
+      "buy": 8,
+      "hold": 4,
+      "sell": 1,
+      "strong_sell": 0,
+      "consensus": "Buy",
+      "price_target": 420
     },
-    "timestamp": "2025-11-27T12:00:00.000Z"
+    "social_sentiment": {
+      "positive": 65,
+      "neutral": 30,
+      "negative": 5,
+      "overall": "Positive"
+    },
+    "latest_news": [],
+    "emerging_trends": [
+      "\ud83c\udfe5 MedTech Growth"
+    ]
+  },
+  "NFLX": {
+    "stock_data": {
+      "ticker": "NFLX",
+      "company": "Netflix Inc. (NFLX)",
+      "current_price": 620.15,
+      "change": -5.2,
+      "change_percent": -0.83,
+      "52_week_high": 744.18,
+      "52_week_low": 496.12,
+      "price_movement_30_days": [
+        {
+          "date": "2025-10-29T13:30:00.000Z",
+          "price": 110.04
+        },
+        {
+          "date": "2025-10-30T13:30:00.000Z",
+          "price": 108.9
+        },
+        {
+          "date": "2025-10-31T13:30:00.000Z",
+          "price": 111.89
+        },
+        {
+          "date": "2025-11-03T14:30:00.000Z",
+          "price": 110.01
+        },
+        {
+          "date": "2025-11-04T14:30:00.000Z",
+          "price": 109.3
+        },
+        {
+          "date": "2025-11-05T14:30:00.000Z",
+          "price": 109.85
+        },
+        {
+          "date": "2025-11-06T14:30:00.000Z",
+          "price": 109.7
+        },
+        {
+          "date": "2025-11-07T14:30:00.000Z",
+          "price": 110.37
+        },
+        {
+          "date": "2025-11-10T14:30:00.000Z",
+          "price": 112.01
+        },
+        {
+          "date": "2025-11-11T14:30:00.000Z",
+          "price": 113.64
+        },
+        {
+          "date": "2025-11-12T14:30:00.000Z",
+          "price": 115.75
+        },
+        {
+          "date": "2025-11-13T14:30:00.000Z",
+          "price": 115.42
+        },
+        {
+          "date": "2025-11-14T14:30:00.000Z",
+          "price": 111.22
+        },
+        {
+          "date": "2025-11-17T14:30:00.000Z",
+          "price": 110.29
+        },
+        {
+          "date": "2025-11-18T14:30:00.000Z",
+          "price": 114.09
+        },
+        {
+          "date": "2025-11-19T14:30:00.000Z",
+          "price": 110
+        },
+        {
+          "date": "2025-11-20T14:30:00.000Z",
+          "price": 105.67
+        },
+        {
+          "date": "2025-11-21T14:30:00.000Z",
+          "price": 104.31
+        },
+        {
+          "date": "2025-11-24T14:30:00.000Z",
+          "price": 106.97
+        },
+        {
+          "date": "2025-11-25T14:30:00.000Z",
+          "price": 104.4
+        },
+        {
+          "date": "2025-11-26T14:30:00.000Z",
+          "price": 106.14
+        },
+        {
+          "date": "2025-11-28T18:00:02.000Z",
+          "price": 107.58
+        }
+      ]
+    },
+    "analyst_recommendations": {
+      "strong_buy": 15,
+      "buy": 12,
+      "hold": 8,
+      "sell": 2,
+      "strong_sell": 0,
+      "consensus": "Buy",
+      "price_target": 650
+    },
+    "social_sentiment": {
+      "positive": 55,
+      "neutral": 35,
+      "negative": 10,
+      "overall": "Neutral"
+    },
+    "latest_news": [],
+    "emerging_trends": [
+      "\ud83d\udcfa Streaming Wars"
+    ]
+  },
+  "GOOGL": {
+    "stock_data": {
+      "ticker": "GOOGL",
+      "company": "Alphabet Inc. Class A (GOOGL)",
+      "current_price": 176.4,
+      "change": -1.1,
+      "change_percent": -0.62,
+      "52_week_high": 211.68,
+      "52_week_low": 141.12,
+      "price_movement_30_days": [
+        {
+          "date": "2025-10-29T13:30:00.000Z",
+          "price": 274.57
+        },
+        {
+          "date": "2025-10-30T13:30:00.000Z",
+          "price": 281.48
+        },
+        {
+          "date": "2025-10-31T13:30:00.000Z",
+          "price": 281.19
+        },
+        {
+          "date": "2025-11-03T14:30:00.000Z",
+          "price": 283.72
+        },
+        {
+          "date": "2025-11-04T14:30:00.000Z",
+          "price": 277.54
+        },
+        {
+          "date": "2025-11-05T14:30:00.000Z",
+          "price": 284.31
+        },
+        {
+          "date": "2025-11-06T14:30:00.000Z",
+          "price": 284.75
+        },
+        {
+          "date": "2025-11-07T14:30:00.000Z",
+          "price": 278.83
+        },
+        {
+          "date": "2025-11-10T14:30:00.000Z",
+          "price": 290.1
+        },
+        {
+          "date": "2025-11-11T14:30:00.000Z",
+          "price": 291.31
+        },
+        {
+          "date": "2025-11-12T14:30:00.000Z",
+          "price": 286.71
+        },
+        {
+          "date": "2025-11-13T14:30:00.000Z",
+          "price": 278.57
+        },
+        {
+          "date": "2025-11-14T14:30:00.000Z",
+          "price": 276.41
+        },
+        {
+          "date": "2025-11-17T14:30:00.000Z",
+          "price": 285.02
+        },
+        {
+          "date": "2025-11-18T14:30:00.000Z",
+          "price": 284.28
+        },
+        {
+          "date": "2025-11-19T14:30:00.000Z",
+          "price": 292.81
+        },
+        {
+          "date": "2025-11-20T14:30:00.000Z",
+          "price": 289.45
+        },
+        {
+          "date": "2025-11-21T14:30:00.000Z",
+          "price": 299.66
+        },
+        {
+          "date": "2025-11-24T14:30:00.000Z",
+          "price": 318.58
+        },
+        {
+          "date": "2025-11-25T14:30:00.000Z",
+          "price": 323.44
+        },
+        {
+          "date": "2025-11-26T14:30:00.000Z",
+          "price": 319.95
+        },
+        {
+          "date": "2025-11-28T21:00:00.000Z",
+          "price": 320.18
+        }
+      ]
+    },
+    "analyst_recommendations": {
+      "strong_buy": 22,
+      "buy": 18,
+      "hold": 7,
+      "sell": 1,
+      "strong_sell": 0,
+      "consensus": "Buy",
+      "price_target": 198
+    },
+    "social_sentiment": {
+      "positive": 62,
+      "neutral": 28,
+      "negative": 10,
+      "overall": "Positive"
+    },
+    "latest_news": [],
+    "emerging_trends": [
+      "\ud83e\udd16 Gemini AI"
+    ]
+  },
+  "AMZN": {
+    "stock_data": {
+      "ticker": "AMZN",
+      "company": "Amazon.com Inc. (AMZN)",
+      "current_price": 182.3,
+      "change": 2.8,
+      "change_percent": 1.56,
+      "52_week_high": 218.76,
+      "52_week_low": 145.84,
+      "price_movement_30_days": [
+        {
+          "date": "2025-10-29T13:30:00.000Z",
+          "price": 230.3
+        },
+        {
+          "date": "2025-10-30T13:30:00.000Z",
+          "price": 222.86
+        },
+        {
+          "date": "2025-10-31T13:30:00.000Z",
+          "price": 244.22
+        },
+        {
+          "date": "2025-11-03T14:30:00.000Z",
+          "price": 254
+        },
+        {
+          "date": "2025-11-04T14:30:00.000Z",
+          "price": 249.32
+        },
+        {
+          "date": "2025-11-05T14:30:00.000Z",
+          "price": 250.2
+        },
+        {
+          "date": "2025-11-06T14:30:00.000Z",
+          "price": 243.04
+        },
+        {
+          "date": "2025-11-07T14:30:00.000Z",
+          "price": 244.41
+        },
+        {
+          "date": "2025-11-10T14:30:00.000Z",
+          "price": 248.4
+        },
+        {
+          "date": "2025-11-11T14:30:00.000Z",
+          "price": 249.1
+        },
+        {
+          "date": "2025-11-12T14:30:00.000Z",
+          "price": 244.2
+        },
+        {
+          "date": "2025-11-13T14:30:00.000Z",
+          "price": 237.58
+        },
+        {
+          "date": "2025-11-14T14:30:00.000Z",
+          "price": 234.69
+        },
+        {
+          "date": "2025-11-17T14:30:00.000Z",
+          "price": 232.87
+        },
+        {
+          "date": "2025-11-18T14:30:00.000Z",
+          "price": 222.55
+        },
+        {
+          "date": "2025-11-19T14:30:00.000Z",
+          "price": 222.69
+        },
+        {
+          "date": "2025-11-20T14:30:00.000Z",
+          "price": 217.14
+        },
+        {
+          "date": "2025-11-21T14:30:00.000Z",
+          "price": 220.69
+        },
+        {
+          "date": "2025-11-24T14:30:00.000Z",
+          "price": 226.28
+        },
+        {
+          "date": "2025-11-25T14:30:00.000Z",
+          "price": 229.67
+        },
+        {
+          "date": "2025-11-26T14:30:00.000Z",
+          "price": 229.16
+        },
+        {
+          "date": "2025-11-28T18:00:02.000Z",
+          "price": 233.22
+        }
+      ]
+    },
+    "analyst_recommendations": {
+      "strong_buy": 38,
+      "buy": 10,
+      "hold": 2,
+      "sell": 0,
+      "strong_sell": 0,
+      "consensus": "Strong Buy",
+      "price_target": 210
+    },
+    "social_sentiment": {
+      "positive": 80,
+      "neutral": 15,
+      "negative": 5,
+      "overall": "Bullish"
+    },
+    "latest_news": [],
+    "emerging_trends": [
+      "\ud83d\udce6 E-commerce Dominance"
+    ]
+  },
+  "IDXX": {
+    "stock_data": {
+      "ticker": "IDXX",
+      "company": "IDEXX Laboratories Inc. (IDXX)",
+      "current_price": 510.6,
+      "change": 1.2,
+      "change_percent": 0.24,
+      "52_week_high": 612.72,
+      "52_week_low": 408.48,
+      "price_movement_30_days": [
+        {
+          "date": "2025-10-29T13:30:00.000Z",
+          "price": 627.66
+        },
+        {
+          "date": "2025-10-30T13:30:00.000Z",
+          "price": 628.54
+        },
+        {
+          "date": "2025-10-31T13:30:00.000Z",
+          "price": 629.51
+        },
+        {
+          "date": "2025-11-03T14:30:00.000Z",
+          "price": 722.94
+        },
+        {
+          "date": "2025-11-04T14:30:00.000Z",
+          "price": 722.12
+        },
+        {
+          "date": "2025-11-05T14:30:00.000Z",
+          "price": 720.21
+        },
+        {
+          "date": "2025-11-06T14:30:00.000Z",
+          "price": 713.74
+        },
+        {
+          "date": "2025-11-07T14:30:00.000Z",
+          "price": 708.45
+        },
+        {
+          "date": "2025-11-10T14:30:00.000Z",
+          "price": 709.59
+        },
+        {
+          "date": "2025-11-11T14:30:00.000Z",
+          "price": 712.47
+        },
+        {
+          "date": "2025-11-12T14:30:00.000Z",
+          "price": 713.56
+        },
+        {
+          "date": "2025-11-13T14:30:00.000Z",
+          "price": 701.48
+        },
+        {
+          "date": "2025-11-14T14:30:00.000Z",
+          "price": 689.93
+        },
+        {
+          "date": "2025-11-17T14:30:00.000Z",
+          "price": 669
+        },
+        {
+          "date": "2025-11-18T14:30:00.000Z",
+          "price": 670.21
+        },
+        {
+          "date": "2025-11-19T14:30:00.000Z",
+          "price": 697.1
+        },
+        {
+          "date": "2025-11-20T14:30:00.000Z",
+          "price": 689.35
+        },
+        {
+          "date": "2025-11-21T14:30:00.000Z",
+          "price": 725.91
+        },
+        {
+          "date": "2025-11-24T14:30:00.000Z",
+          "price": 752.14
+        },
+        {
+          "date": "2025-11-25T14:30:00.000Z",
+          "price": 766.68
+        },
+        {
+          "date": "2025-11-26T14:30:00.000Z",
+          "price": 755.96
+        },
+        {
+          "date": "2025-11-28T21:00:00.000Z",
+          "price": 752.88
+        }
+      ]
+    },
+    "analyst_recommendations": {
+      "strong_buy": 8,
+      "buy": 10,
+      "hold": 6,
+      "sell": 1,
+      "strong_sell": 0,
+      "consensus": "Buy",
+      "price_target": 540
+    },
+    "social_sentiment": {
+      "positive": 60,
+      "neutral": 35,
+      "negative": 5,
+      "overall": "Positive"
+    },
+    "latest_news": [],
+    "emerging_trends": [
+      "\ud83d\udc36 Pet Healthcare"
+    ]
+  },
+  "III": {
+    "stock_data": {
+      "ticker": "III",
+      "company": "3i Group plc (III)",
+      "current_price": 32.4,
+      "change": 0.45,
+      "change_percent": 1.41,
+      "52_week_high": 38.88,
+      "52_week_low": 25.92,
+      "price_movement_30_days": [
+        {
+          "date": "2025-10-29T13:30:00.000Z",
+          "price": 5.53
+        },
+        {
+          "date": "2025-10-30T13:30:00.000Z",
+          "price": 5.47
+        },
+        {
+          "date": "2025-10-31T13:30:00.000Z",
+          "price": 5.51
+        },
+        {
+          "date": "2025-11-03T14:30:00.000Z",
+          "price": 6.07
+        },
+        {
+          "date": "2025-11-04T14:30:00.000Z",
+          "price": 5.91
+        },
+        {
+          "date": "2025-11-05T14:30:00.000Z",
+          "price": 5.85
+        },
+        {
+          "date": "2025-11-06T14:30:00.000Z",
+          "price": 5.79
+        },
+        {
+          "date": "2025-11-07T14:30:00.000Z",
+          "price": 5.25
+        },
+        {
+          "date": "2025-11-10T14:30:00.000Z",
+          "price": 5.2
+        },
+        {
+          "date": "2025-11-11T14:30:00.000Z",
+          "price": 5.2
+        },
+        {
+          "date": "2025-11-12T14:30:00.000Z",
+          "price": 5.41
+        },
+        {
+          "date": "2025-11-13T14:30:00.000Z",
+          "price": 5.25
+        },
+        {
+          "date": "2025-11-14T14:30:00.000Z",
+          "price": 5.25
+        },
+        {
+          "date": "2025-11-17T14:30:00.000Z",
+          "price": 5.14
+        },
+        {
+          "date": "2025-11-18T14:30:00.000Z",
+          "price": 5.14
+        },
+        {
+          "date": "2025-11-19T14:30:00.000Z",
+          "price": 5.11
+        },
+        {
+          "date": "2025-11-20T14:30:00.000Z",
+          "price": 5.01
+        },
+        {
+          "date": "2025-11-21T14:30:00.000Z",
+          "price": 5.13
+        },
+        {
+          "date": "2025-11-24T14:30:00.000Z",
+          "price": 5.24
+        },
+        {
+          "date": "2025-11-25T14:30:00.000Z",
+          "price": 5.29
+        },
+        {
+          "date": "2025-11-26T14:30:00.000Z",
+          "price": 5.35
+        },
+        {
+          "date": "2025-11-28T21:00:00.000Z",
+          "price": 5.38
+        }
+      ]
+    },
+    "analyst_recommendations": {
+      "strong_buy": 4,
+      "buy": 6,
+      "hold": 4,
+      "sell": 0,
+      "strong_sell": 0,
+      "consensus": "Buy",
+      "price_target": 36
+    },
+    "social_sentiment": {
+      "positive": 55,
+      "neutral": 40,
+      "negative": 5,
+      "overall": "Neutral"
+    },
+    "latest_news": [],
+    "emerging_trends": [
+      "\ud83d\udcbc Private Equity"
+    ]
+  },
+  "PLTR": {
+    "stock_data": {
+      "ticker": "PLTR",
+      "company": "Palantir Technologies Inc. (PLTR)",
+      "current_price": 24.8,
+      "change": 1.1,
+      "change_percent": 4.64,
+      "52_week_high": 29.76,
+      "52_week_low": 19.84,
+      "price_movement_30_days": [
+        {
+          "date": "2025-10-29T13:30:00.000Z",
+          "price": 198.81
+        },
+        {
+          "date": "2025-10-30T13:30:00.000Z",
+          "price": 194.55
+        },
+        {
+          "date": "2025-10-31T13:30:00.000Z",
+          "price": 200.47
+        },
+        {
+          "date": "2025-11-03T14:30:00.000Z",
+          "price": 207.18
+        },
+        {
+          "date": "2025-11-04T14:30:00.000Z",
+          "price": 190.74
+        },
+        {
+          "date": "2025-11-05T14:30:00.000Z",
+          "price": 187.9
+        },
+        {
+          "date": "2025-11-06T14:30:00.000Z",
+          "price": 175.05
+        },
+        {
+          "date": "2025-11-07T14:30:00.000Z",
+          "price": 177.93
+        },
+        {
+          "date": "2025-11-10T14:30:00.000Z",
+          "price": 193.61
+        },
+        {
+          "date": "2025-11-11T14:30:00.000Z",
+          "price": 190.96
+        },
+        {
+          "date": "2025-11-12T14:30:00.000Z",
+          "price": 184.17
+        },
+        {
+          "date": "2025-11-13T14:30:00.000Z",
+          "price": 172.14
+        },
+        {
+          "date": "2025-11-14T14:30:00.000Z",
+          "price": 174.01
+        },
+        {
+          "date": "2025-11-17T14:30:00.000Z",
+          "price": 171.25
+        },
+        {
+          "date": "2025-11-18T14:30:00.000Z",
+          "price": 167.33
+        },
+        {
+          "date": "2025-11-19T14:30:00.000Z",
+          "price": 165.42
+        },
+        {
+          "date": "2025-11-20T14:30:00.000Z",
+          "price": 155.74
+        },
+        {
+          "date": "2025-11-21T14:30:00.000Z",
+          "price": 154.85
+        },
+        {
+          "date": "2025-11-24T14:30:00.000Z",
+          "price": 162.25
+        },
+        {
+          "date": "2025-11-25T14:30:00.000Z",
+          "price": 163.55
+        },
+        {
+          "date": "2025-11-26T14:30:00.000Z",
+          "price": 165.77
+        },
+        {
+          "date": "2025-11-28T18:00:00.000Z",
+          "price": 168.45
+        }
+      ]
+    },
+    "analyst_recommendations": {
+      "strong_buy": 8,
+      "buy": 10,
+      "hold": 12,
+      "sell": 5,
+      "strong_sell": 3,
+      "consensus": "Hold",
+      "price_target": 22
+    },
+    "social_sentiment": {
+      "positive": 85,
+      "neutral": 5,
+      "negative": 10,
+      "overall": "Very Bullish"
+    },
+    "latest_news": [],
+    "emerging_trends": [
+      "\ud83d\udee1\ufe0f Defense Tech"
+    ]
+  },
+  "QBTS": {
+    "stock_data": {
+      "ticker": "QBTS",
+      "company": "D-Wave Quantum Inc. (QBTS)",
+      "current_price": 1.45,
+      "change": -0.05,
+      "change_percent": -3.33,
+      "52_week_high": 1.74,
+      "52_week_low": 1.16,
+      "price_movement_30_days": [
+        {
+          "date": "2025-10-29T13:30:00.000Z",
+          "price": 34.26
+        },
+        {
+          "date": "2025-10-30T13:30:00.000Z",
+          "price": 36.11
+        },
+        {
+          "date": "2025-10-31T13:30:00.000Z",
+          "price": 37.06
+        },
+        {
+          "date": "2025-11-03T14:30:00.000Z",
+          "price": 33.09
+        },
+        {
+          "date": "2025-11-04T14:30:00.000Z",
+          "price": 29.74
+        },
+        {
+          "date": "2025-11-05T14:30:00.000Z",
+          "price": 31.02
+        },
+        {
+          "date": "2025-11-06T14:30:00.000Z",
+          "price": 28.39
+        },
+        {
+          "date": "2025-11-07T14:30:00.000Z",
+          "price": 29.5
+        },
+        {
+          "date": "2025-11-10T14:30:00.000Z",
+          "price": 29.37
+        },
+        {
+          "date": "2025-11-11T14:30:00.000Z",
+          "price": 28.99
+        },
+        {
+          "date": "2025-11-12T14:30:00.000Z",
+          "price": 26.4
+        },
+        {
+          "date": "2025-11-13T14:30:00.000Z",
+          "price": 23.39
+        },
+        {
+          "date": "2025-11-14T14:30:00.000Z",
+          "price": 23.61
+        },
+        {
+          "date": "2025-11-17T14:30:00.000Z",
+          "price": 22.83
+        },
+        {
+          "date": "2025-11-18T14:30:00.000Z",
+          "price": 22.93
+        },
+        {
+          "date": "2025-11-19T14:30:00.000Z",
+          "price": 23.44
+        },
+        {
+          "date": "2025-11-20T14:30:00.000Z",
+          "price": 20.51
+        },
+        {
+          "date": "2025-11-21T14:30:00.000Z",
+          "price": 20.41
+        },
+        {
+          "date": "2025-11-24T14:30:00.000Z",
+          "price": 23.11
+        },
+        {
+          "date": "2025-11-25T14:30:00.000Z",
+          "price": 22.59
+        },
+        {
+          "date": "2025-11-26T14:30:00.000Z",
+          "price": 22.41
+        },
+        {
+          "date": "2025-11-28T18:00:02.000Z",
+          "price": 22.67
+        }
+      ]
+    },
+    "analyst_recommendations": {
+      "strong_buy": 2,
+      "buy": 3,
+      "hold": 2,
+      "sell": 0,
+      "strong_sell": 0,
+      "consensus": "Buy",
+      "price_target": 2.5
+    },
+    "social_sentiment": {
+      "positive": 40,
+      "neutral": 40,
+      "negative": 20,
+      "overall": "Neutral"
+    },
+    "latest_news": [],
+    "emerging_trends": [
+      "\u269b\ufe0f Quantum Computing"
+    ]
+  },
+  "RGTI": {
+    "stock_data": {
+      "ticker": "RGTI",
+      "company": "Rigetti Computing Inc. (RGTI)",
+      "current_price": 1.15,
+      "change": 0.02,
+      "change_percent": 1.77,
+      "52_week_high": 1.38,
+      "52_week_low": 0.92,
+      "price_movement_30_days": [
+        {
+          "date": "2025-10-29T13:30:00.000Z",
+          "price": 39.41
+        },
+        {
+          "date": "2025-10-30T13:30:00.000Z",
+          "price": 42.52
+        },
+        {
+          "date": "2025-10-31T13:30:00.000Z",
+          "price": 44.27
+        },
+        {
+          "date": "2025-11-03T14:30:00.000Z",
+          "price": 39.12
+        },
+        {
+          "date": "2025-11-04T14:30:00.000Z",
+          "price": 35.18
+        },
+        {
+          "date": "2025-11-05T14:30:00.000Z",
+          "price": 37.29
+        },
+        {
+          "date": "2025-11-06T14:30:00.000Z",
+          "price": 34.36
+        },
+        {
+          "date": "2025-11-07T14:30:00.000Z",
+          "price": 33.77
+        },
+        {
+          "date": "2025-11-10T14:30:00.000Z",
+          "price": 33.08
+        },
+        {
+          "date": "2025-11-11T14:30:00.000Z",
+          "price": 31.4
+        },
+        {
+          "date": "2025-11-12T14:30:00.000Z",
+          "price": 28.3
+        },
+        {
+          "date": "2025-11-13T14:30:00.000Z",
+          "price": 25.2
+        },
+        {
+          "date": "2025-11-14T14:30:00.000Z",
+          "price": 25.48
+        },
+        {
+          "date": "2025-11-17T14:30:00.000Z",
+          "price": 24.69
+        },
+        {
+          "date": "2025-11-18T14:30:00.000Z",
+          "price": 25.71
+        },
+        {
+          "date": "2025-11-19T14:30:00.000Z",
+          "price": 25.46
+        },
+        {
+          "date": "2025-11-20T14:30:00.000Z",
+          "price": 22.8
+        },
+        {
+          "date": "2025-11-21T14:30:00.000Z",
+          "price": 23.59
+        },
+        {
+          "date": "2025-11-24T14:30:00.000Z",
+          "price": 26.57
+        },
+        {
+          "date": "2025-11-25T14:30:00.000Z",
+          "price": 26.08
+        },
+        {
+          "date": "2025-11-26T14:30:00.000Z",
+          "price": 25.57
+        },
+        {
+          "date": "2025-11-28T18:00:02.000Z",
+          "price": 25.57
+        }
+      ]
+    },
+    "analyst_recommendations": {
+      "strong_buy": 1,
+      "buy": 4,
+      "hold": 2,
+      "sell": 0,
+      "strong_sell": 0,
+      "consensus": "Buy",
+      "price_target": 2
+    },
+    "social_sentiment": {
+      "positive": 45,
+      "neutral": 45,
+      "negative": 10,
+      "overall": "Neutral"
+    },
+    "latest_news": [],
+    "emerging_trends": [
+      "\u269b\ufe0f Quantum Hardware"
+    ]
+  },
+  "timestamp": "2025-11-27T12:00:00.000Z"
 }

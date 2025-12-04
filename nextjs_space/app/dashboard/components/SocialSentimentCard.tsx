@@ -6,7 +6,7 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import { PieChart } from '@mui/x-charts/PieChart';
 
 interface SocialSentimentCardProps {
@@ -39,63 +39,32 @@ export default function SocialSentimentCard({ ticker, sentiment }: SocialSentime
   return (
     <Card sx={{ height: '100%' }}>
       <CardContent>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
+          <SentimentSatisfiedAltIcon sx={{ color: 'warning.main' }} />
           <Typography component="h2" variant="h6" sx={{ fontSize: '1.25rem', fontWeight: 700 }}>
             Social Sentiment
           </Typography>
-          <FavoriteIcon sx={{ color: 'error.main', cursor: 'pointer' }} />
         </Stack>
 
-        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 3 }}>
-          Community-based market sentiment
-        </Typography>
-
-        {/* Overall Sentiment Badge */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>
-            Overall Sentiment
-          </Typography>
-          <Box
-            sx={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 1,
-              px: 2,
-              py: 1,
-              borderRadius: 2,
-              backgroundColor: overallSentiment === 'Positive' ? 'success.dark' : overallSentiment === 'Negative' ? 'error.dark' : 'warning.dark',
-            }}
-          >
-            <Box
-              sx={{
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                backgroundColor: overallSentiment === 'Positive' ? 'success.main' : overallSentiment === 'Negative' ? 'error.main' : 'warning.main',
-              }}
-            />
-            <Typography variant="body2" sx={{ color: 'white', fontWeight: 600 }}>
-              {overallSentiment}
-            </Typography>
-          </Box>
-        </Box>
-
         {/* Pie Chart */}
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3 }}>
           <PieChart
             series={[
               {
                 data,
                 innerRadius: 80,
-                outerRadius: 120,
+                outerRadius: 140,
                 paddingAngle: 2,
                 cornerRadius: 4,
+                cx: 190,
               },
             ]}
-            width={300}
-            height={250}
+            width={380}
+            height={300}
             slotProps={{
-              legend: { hidden: true },
+              legend: { 
+                hidden: true,
+              },
             }}
           />
         </Box>

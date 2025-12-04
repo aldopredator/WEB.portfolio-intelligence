@@ -5,11 +5,15 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import StatCard, { StatCardProps } from './StatCard';
 import PriceHistoryChart from './PriceHistoryChart';
 import StockDetailsCard from './StockDetailsCard';
-import ProsConsCard from './ProsConsCard';
+import StockStatisticsCard from './StockStatisticsCard';
 import SocialSentimentCard from './SocialSentimentCard';
+import CompanyInfoCard from './CompanyInfoCard';
+import MarketNewsCard from './MarketNewsCard';
+import RecommendationTrendsCard from './RecommendationTrendsCard';
+import EarningsCalendarCard from './EarningsCalendarCard';
+import EarningsSurprisesCard from './EarningsSurprisesCard';
 import type { StockInsightsData } from '@/lib/types';
 
 interface MainGridProps {
@@ -29,16 +33,13 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
     return <Typography>Stock data not available</Typography>;
   }
 
-  // Generate stat cards data - only Volume now
-  const statCards: StatCardProps[] = [
-    {
-      title: 'Volume',
-      value: `${((stock.volume || 0) / 1e6).toFixed(2)}M`,
-      interval: 'Today',
-      trend: 'up',
-      data: Array.from({ length: 15 }, (_, i) => (stock.volume || 0) / 1e6 + Math.random() * 5),
-    },
-  ];
+  // Debug: Log Polygon data
+  console.log('[MainGrid] Stock data for', selectedStock, ':', {
+    floatShares: stock.floatShares,
+    sharesOutstanding: stock.sharesOutstanding,
+    dailyVolume: stock.dailyVolume,
+    totalEmployees: stock.totalEmployees,
+  });
 
   // Get company name from stock config
   const companyNameMap: Record<string, string> = {
@@ -58,24 +59,82 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
 
   return (
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
-      {/* Header */}
-      <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-        {companyNameMap[selectedStock] || selectedStock} ({selectedStock})
-      </Typography>
+      {/* Top row: Company Info, Stock Fundamentals, and Stock Statistics */}
+      {stockEntry.company_profile && (
+        <Box sx={{ mb: 3 }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                lg: 'repeat(3, 1fr)',
+              },
+              gap: 2,
+            }}
+          >
+            {stockEntry.company_profile && (
+              <CompanyInfoCard
+                ticker={selectedStock}
+                companyName={stockEntry.company_profile.name}
+                logo={stockEntry.company_profile.logo}
+                industry={stockEntry.company_profile.industry}
+                sector={stockEntry.company_profile.sector}
+                subSector={stockEntry.company_profile.subSector}
+                country={stockEntry.company_profile.country}
+                marketCapitalization={stockEntry.company_profile.marketCapitalization}
+                currency={stockEntry.company_profile.currency}
+                weburl={stockEntry.company_profile.weburl}
+                assets={stockEntry.company_profile.assets}
+                liabilities={stockEntry.company_profile.liabilities}
+                floatShares={stock.floatShares}
+                averageVolume={stock.averageVolume}
+                averageVolume10Day={stock.averageVolume10Day}
+                sharesOutstanding={stock.sharesOutstanding}
+                totalEmployees={stock.totalEmployees}
+                heldPercentInsiders={stock.heldPercentInsiders}
+                heldPercentInstitutions={stock.heldPercentInstitutions}
+                fiftyTwoWeekHigh={stock.fiftyTwoWeekHigh}
+                fiftyTwoWeekLow={stock.fiftyTwoWeekLow}
+                fiftyDayAverage={stock.fiftyDayAverage}
+                twoHundredDayAverage={stock.twoHundredDayAverage}
+                enterpriseValue={stock.enterpriseValue}
+              />
+            )}
+            <StockDetailsCard
+              ticker={selectedStock}
+              priceToSales={stock.priceToSales}
+              enterpriseToRevenue={stock.enterpriseToRevenue}
+              enterpriseToEbitda={stock.enterpriseToEbitda}
+              trailingPE={stock.trailingPE}
+              forwardPE={stock.forwardPE}
+              priceToBook={stock.priceToBook}
+              debtToEquity={stock.debtToEquity || stock.debt_to_equity}
+            />
+            <StockStatisticsCard
+              ticker={selectedStock}
+              roe={stock.roe}
+              returnOnAssets={stock.returnOnAssets}
+              profitMargin={stock.profit_margin}
+              quarterlyRevenueGrowth={stock.quarterlyRevenueGrowth}
+              quarterlyEarningsGrowth={stock.quarterlyEarningsGrowth}
+            />
+          </Box>
+        </Box>
+      )}
 
-      {/* Three Column Layout: Equal widths */}
+      {/* Two Column Layout: Price Chart (larger) and Social Sentiment (smaller) */}
       <Box
         sx={{
           display: 'grid',
           gridTemplateColumns: {
             xs: '1fr',
-            lg: 'repeat(3, 1fr)',
+            lg: '2fr 1fr',
           },
           gap: 2,
         }}
       >
-        {/* Block 1: Price Chart and Volume */}
-        <Stack spacing={2}>
+        {/* Block 1: Price Chart */}
+        <Box>
           {/* Price History Chart with 52 Week Range */}
           {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
             <PriceHistoryChart
@@ -84,55 +143,73 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
               currentPrice={stock.current_price || 0}
               priceChange={stock.change || 0}
               priceChangePercent={stock.change_percent || 0}
-              weekLow52={stock['52_week_low']}
-              weekHigh52={stock['52_week_high']}
+              weekLow52={stock.fiftyTwoWeekLow || stock['52_week_low']}
+              weekHigh52={stock.fiftyTwoWeekHigh || stock['52_week_high']}
+              volume={stock.volume}
+              fiftyDayAverage={stock.fiftyDayAverage}
+              twoHundredDayAverage={stock.twoHundredDayAverage}
             />
           )}
-
-          {/* Volume Card */}
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: '1fr',
-              gap: 2,
-            }}
-          >
-            {statCards.map((card, index) => (
-              <StatCard key={index} {...card} />
-            ))}
-          </Box>
-        </Stack>
-
-        {/* Block 2: Stock Details (middle column) */}
-        <Box>
-          <StockDetailsCard
-            ticker={selectedStock}
-            marketCap={stock.market_cap}
-            peRatio={(stockEntry as any).pe_ratio}
-            roe={(stockEntry as any).roe}
-            profitMargin={(stockEntry as any).profit_margin}
-            pbRatio={(stockEntry as any).pb_ratio}
-            debtToEquity={(stockEntry as any).debt_to_equity}
-            dividendYield={(stockEntry as any).dividend_yield}
-          />
         </Box>
 
-        {/* Block 3: Social Sentiment and Pros & Cons */}
-        <Stack spacing={2}>
-          {/* Social Sentiment */}
+        {/* Block 2: Social Sentiment */}
+        <Box>
           <SocialSentimentCard
             ticker={selectedStock}
             sentiment={stockEntry.social_sentiment}
           />
-
-          {/* Pros & Cons */}
-          <ProsConsCard
-            ticker={selectedStock}
-            pros={stockEntry.pros}
-            cons={stockEntry.cons}
-          />
-        </Stack>
+        </Box>
       </Box>
+
+      {/* Earnings Surprises, Recommendation Trends, and Market News Section */}
+      {(stockEntry.earnings_surprises && stockEntry.earnings_surprises.length > 0) ||
+        (stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0) ||
+        (stockEntry.latest_news && stockEntry.latest_news.length > 0) ? (
+        <Box sx={{ mt: 3 }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                lg: 'repeat(3, 1fr)',
+              },
+              gap: 2,
+            }}
+          >
+            {/* Earnings Surprises */}
+            {stockEntry.earnings_surprises && stockEntry.earnings_surprises.length > 0 && (
+              <EarningsSurprisesCard
+                ticker={selectedStock}
+                surprises={stockEntry.earnings_surprises}
+              />
+            )}
+
+            {/* Recommendation Trends */}
+            {stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0 && (
+              <RecommendationTrendsCard
+                ticker={selectedStock}
+                trends={stockEntry.recommendation_trends}
+              />
+            )}
+
+            {/* Earnings Calendar */}
+            {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
+              <EarningsCalendarCard
+                ticker={selectedStock}
+                earnings={stockEntry.earnings_calendar}
+              />
+            )}
+
+            {/* Market News */}
+            {stockEntry.latest_news && stockEntry.latest_news.length > 0 && (
+              <MarketNewsCard
+                ticker={selectedStock}
+                articles={stockEntry.latest_news}
+              />
+            )}
+          </Box>
+        </Box>
+      ) : null}
     </Box>
   );
 }

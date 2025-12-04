@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { clearCache } from '@/lib/cache';
+import { clearPolygonCache } from '@/lib/polygon-cache';
 
 function unauthorized() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -13,7 +14,8 @@ export async function POST(request: Request) {
 
   try {
     await clearCache();
-    return NextResponse.json({ ok: true });
+    await clearPolygonCache();
+    return NextResponse.json({ ok: true, message: 'All caches cleared (sentiment + polygon)' });
   } catch (err) {
     return NextResponse.json({ error: 'Failed to clear cache' }, { status: 500 });
   }
@@ -28,7 +30,8 @@ export async function GET(request: Request) {
 
   try {
     await clearCache();
-    return NextResponse.json({ ok: true });
+    await clearPolygonCache();
+    return NextResponse.json({ ok: true, message: 'All caches cleared (sentiment + polygon)' });
   } catch (err) {
     return NextResponse.json({ error: 'Failed to clear cache' }, { status: 500 });
   }

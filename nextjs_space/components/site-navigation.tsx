@@ -9,7 +9,7 @@ export function SiteNavigation() {
 
   const links = [
     { href: '/', label: 'Dashboard', icon: BarChart3 },
-    { href: '/criteria', label: 'Criteria', icon: ListChecks },
+
     { href: '/screening', label: 'Screening', icon: Filter },
   ];
 
@@ -39,9 +39,6 @@ export function SiteNavigation() {
                 </Link>
               );
             })}
-          </div>
-          <div className="text-sm text-slate-400">
-            Read-Only View
           </div>
         </div>
       </div>

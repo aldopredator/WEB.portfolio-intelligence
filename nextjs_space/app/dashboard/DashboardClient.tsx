@@ -1,12 +1,15 @@
 'use client';
 
 import * as React from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { alpha } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Typography, Paper, Snackbar, Alert } from '@mui/material';
 import MainGrid from './components/MainGrid';
+import TickerSearch from '../components/TickerSearch';
 import type { StockInsightsData } from '@/lib/types';
 
 interface DashboardClientProps {
@@ -29,92 +32,46 @@ const theme = createTheme({
     fontFamily: 'var(--font-geist-sans)',
   },
 });
-
 export default function DashboardClient({ initialData, stocks }: DashboardClientProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const stockParam = searchParams.get('stock');
   const [selectedStock, setSelectedStock] = React.useState(stocks[0]?.ticker || 'GOOG');
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'info' | 'warning' | 'error'>('info');
+
+  // Update selected stock when URL param changes
+  React.useEffect(() => {
+    if (stockParam) {
+      setSelectedStock(stockParam);
+    }
+  }, [stockParam]);
+
+  const handleTickerSelect = async (result: { symbol: string; name: string; exchange: string; type: string }) => {
+    console.log('Selected ticker:', result);
+    
+    // Check if ticker already exists in portfolio
+    const tickerExists = stocks.some(s => s.ticker === result.symbol);
+    
+    if (tickerExists) {
+      // Navigate to existing ticker
+      router.push(`/dashboard?stock=${result.symbol}`);
+      setSnackbarMessage(`Switched to ${result.symbol}`);
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+    } else {
+      // Show info message - ticker will be added in future implementation
+      setSnackbarMessage(`${result.symbol} - ${result.name} | Add to portfolio feature coming soon!`);
+      setSnackbarSeverity('info');
+      setSnackbarOpen(true);
+    }
+  };
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
       <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        {/* Top Toolbar with Stock List */}
-        <Box
-          sx={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 1100,
-            backgroundColor: 'background.paper',
-            borderBottom: 1,
-            borderColor: 'divider',
-            px: 3,
-            py: 2,
-          }}
-        >
-          <Stack direction="row" spacing={2} alignItems="center" sx={{ overflowX: 'auto' }}>
-            {stocks.map((stock) => (
-              <Box
-                key={stock.ticker}
-                onClick={() => setSelectedStock(stock.ticker)}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1.5,
-                  px: 2,
-                  py: 1.5,
-                  borderRadius: 2,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  backgroundColor: selectedStock === stock.ticker ? 'primary.main' : 'transparent',
-                  '&:hover': {
-                    backgroundColor: selectedStock === stock.ticker ? 'primary.dark' : 'action.hover',
-                  },
-                  minWidth: 'fit-content',
-                  border: 1,
-                  borderColor: selectedStock === stock.ticker ? 'primary.main' : 'divider',
-                }}
-              >
-                <Box
-                  component="img"
-                  src={`/logos/${stock.ticker}.svg`}
-                  alt={stock.ticker}
-                  sx={{ width: 32, height: 32, borderRadius: 1 }}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-                <Box>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <Box
-                      sx={{
-                        fontWeight: 700,
-                        fontSize: '0.875rem',
-                        color: selectedStock === stock.ticker ? 'white' : 'text.primary',
-                      }}
-                    >
-                      {stock.ticker}
-                    </Box>
-                    {stock.change_percent !== undefined && (
-                      <Box
-                        sx={{
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          color: selectedStock === stock.ticker 
-                            ? 'white' 
-                            : stock.change_percent >= 0 
-                              ? 'success.main' 
-                              : 'error.main',
-                        }}
-                      >
-                        {stock.change_percent >= 0 ? '+' : ''}{stock.change_percent.toFixed(2)}%
-                      </Box>
-                    )}
-                  </Stack>
-                </Box>
-              </Box>
-            ))}
-          </Stack>
-        </Box>
-
         {/* Main Content */}
         <Box
           component="main"
@@ -135,10 +92,55 @@ export default function DashboardClient({ initialData, stocks }: DashboardClient
               mt: 3,
             }}
           >
+            {/* Search Toolbar */}
+            <Paper
+              elevation={0}
+              sx={{
+                width: '100%',
+                maxWidth: { sm: '100%', md: '1700px' },
+                bgcolor: 'transparent',
+                mb: 2,
+              }}
+            >
+              <Box sx={{ mb: 2 }}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: '#fff',
+                    mb: 1.5,
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  Search Tickers
+                </Typography>
+                <TickerSearch
+                  onTickerSelect={handleTickerSelect}
+                  placeholder="Search by ticker or company name..."
+                />
+              </Box>
+            </Paper>
+
             <MainGrid stockData={initialData} selectedStock={selectedStock} />
           </Stack>
         </Box>
       </Box>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 }

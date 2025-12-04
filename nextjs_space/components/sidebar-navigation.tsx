@@ -21,27 +21,13 @@ export function SidebarNavigation() {
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: BarChart3, description: 'Stock insights & analytics' },
-    { name: 'Criteria', href: '/criteria', icon: ListChecks, description: 'Screening criteria' },
+
     { name: 'Screening', href: '/screening', icon: Filter, description: 'Stock screening results' },
+    { name: 'Benchmark', href: '/benchmark', icon: TrendingUp, description: 'Market benchmark comparison' },
   ];
 
   const SidebarContent = () => (
     <>
-      {/* Logo / Brand */}
-      <div className="p-6 border-b border-slate-800/50">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
-            <TrendingUp className="w-6 h-6 text-white" />
-          </div>
-          {!collapsed && (
-            <div className="overflow-hidden">
-              <h1 className="text-lg font-bold text-white whitespace-nowrap">Portfolio Intel</h1>
-              <p className="text-xs text-slate-400 whitespace-nowrap">Financial Markets</p>
-            </div>
-          )}
-        </div>
-      </div>
-
       {/* Navigation Links */}
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {navigation.map((item) => {
@@ -76,61 +62,34 @@ export function SidebarNavigation() {
             </Link>
           );
         })}
-      </nav>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-slate-800/50">
-        <div className={`px-4 py-3 bg-slate-800/50 rounded-xl ${collapsed ? 'text-center' : ''}`}>
+        
+        {/* Desktop Collapse Toggle - moved to top */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="hidden lg:flex items-center justify-center w-full px-4 py-3 mt-2 rounded-xl border border-slate-800/50 text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors"
+        >
           {collapsed ? (
-            <div className="w-2 h-2 bg-green-400 rounded-full mx-auto" />
+            <ChevronRight className="w-5 h-5" />
           ) : (
             <>
-              <div className="flex items-center gap-2 mb-1">
-                <div className="w-2 h-2 bg-green-400 rounded-full" />
-                <span className="text-xs font-medium text-slate-400">Read-Only View</span>
-              </div>
-              <p className="text-xs text-slate-500">Public access mode</p>
+              <ChevronLeft className="w-5 h-5" />
+              <span className="ml-2 text-sm">Collapse</span>
             </>
           )}
-        </div>
-      </div>
-
-      {/* Desktop Collapse Toggle */}
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="hidden lg:flex items-center justify-center w-full p-4 border-t border-slate-800/50 text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors"
-      >
-        {collapsed ? (
-          <ChevronRight className="w-5 h-5" />
-        ) : (
-          <>
-            <ChevronLeft className="w-5 h-5" />
-            <span className="ml-2 text-sm">Collapse</span>
-          </>
-        )}
-      </button>
+        </button>
+      </nav>
     </>
   );
 
   return (
     <>
-      {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-sm border-b border-slate-800/50">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-white" />
-            </div>
-            <h1 className="text-lg font-bold text-white">Portfolio Intel</h1>
-          </div>
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="p-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors"
-          >
-            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-      </div>
+      {/* Mobile Menu Toggle - positioned in top-right of header */}
+      <button
+        onClick={() => setMobileOpen(!mobileOpen)}
+        className="lg:hidden fixed top-4 right-4 z-50 p-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors backdrop-blur-sm bg-slate-900/80 border border-slate-700"
+      >
+        {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+      </button>
 
       {/* Mobile Overlay */}
       {mobileOpen && (
@@ -143,7 +102,7 @@ export function SidebarNavigation() {
       {/* Mobile Sidebar */}
       <aside
         className={`
-          lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-slate-950 border-r border-slate-800/50 flex flex-col
+          lg:hidden fixed top-28 left-0 bottom-0 z-40 w-72 bg-slate-950 border-r border-slate-800/50 flex flex-col
           transform transition-transform duration-300 ease-in-out
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
@@ -154,7 +113,7 @@ export function SidebarNavigation() {
       {/* Desktop Sidebar */}
       <aside
         className={`
-          hidden lg:flex fixed top-0 left-0 bottom-0 z-40 bg-slate-950 border-r border-slate-800/50 flex-col
+          hidden lg:flex fixed top-28 left-0 bottom-0 z-40 bg-slate-950 border-r border-slate-800/50 flex-col
           transition-all duration-300 ease-in-out
           ${collapsed ? 'w-20' : 'w-72'}
         `}

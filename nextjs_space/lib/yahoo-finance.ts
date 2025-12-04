@@ -1,5 +1,10 @@
 // Yahoo Finance API utility functions for fetching real-time stock data
 
+import YahooFinance from 'yahoo-finance2';
+
+// Initialize yahoo-finance2 instance
+const yahooFinance = new YahooFinance();
+
 export interface YahooQuoteResponse {
     regularMarketPrice: number;
     regularMarketChange: number;
@@ -25,11 +30,42 @@ export interface StockQuote {
     currency?: string;
 }
 
+export interface YahooStockStatistics {
+    floatShares?: number | null;              // Free float shares
+    averageVolume10Day?: number | null;       // 10-day average volume
+    averageVolume?: number | null;            // Average volume (3 months)
+    sharesOutstanding?: number | null;        // Total shares outstanding
+    heldPercentInsiders?: number | null;      // % held by insiders
+    heldPercentInstitutions?: number | null;  // % held by institutions
+    fiftyTwoWeekHigh?: number | null;         // 52-week high price
+    fiftyTwoWeekLow?: number | null;          // 52-week low price
+    fiftyDayAverage?: number | null;          // 50-day moving average
+    twoHundredDayAverage?: number | null;     // 200-day moving average
+    returnOnAssets?: number | null;           // Return on Assets (ttm)
+    debtToEquity?: number | null;             // Total Debt/Equity (mrq)
+    quarterlyRevenueGrowth?: number | null;   // Quarterly Revenue Growth (yoy)
+    quarterlyEarningsGrowth?: number | null;  // Quarterly Earnings Growth (yoy)
+    priceToSales?: number | null;             // Price/Sales (ttm)
+    enterpriseValue?: number | null;          // Enterprise Value
+    enterpriseToRevenue?: number | null;      // Enterprise Value/Revenue
+    enterpriseToEbitda?: number | null;       // Enterprise Value/EBITDA
+    trailingPE?: number | null;               // Trailing P/E
+    forwardPE?: number | null;                // Forward P/E
+    pegRatio?: number | null;                 // PEG Ratio (5yr expected)
+    priceToBook?: number | null;              // Price/Book
+}
+
 /**
  * Fetch real-time stock quote from Yahoo Finance
  * Uses the unofficial Yahoo Finance API endpoint
  */
 export async function fetchYahooQuote(ticker: string): Promise<StockQuote | null> {
+    // Check if Yahoo Finance is enabled
+    if (process.env.ENABLE_YAHOO_FINANCE === 'false') {
+        console.log(`[YAHOO] Yahoo Finance is disabled via ENABLE_YAHOO_FINANCE env var`);
+        return null;
+    }
+    
     try {
         // Yahoo Finance query API endpoint with historical data
         const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=1mo&interval=1d`;
@@ -132,6 +168,12 @@ export async function fetchMultipleQuotes(tickers: string[]): Promise<Record<str
  * All other data (real-time quotes, financial metrics) uses Finnhub as primary source.
  */
 export async function fetchYahooPriceHistory(ticker: string): Promise<{ Date: string; Close: number }[]> {
+    // Check if Yahoo Finance is enabled
+    if (process.env.ENABLE_YAHOO_FINANCE === 'false') {
+        console.log(`[YAHOO] Yahoo Finance is disabled via ENABLE_YAHOO_FINANCE env var`);
+        return [];
+    }
+    
     try {
         const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=1mo&interval=1d`;
         const response = await fetch(url, {
@@ -163,5 +205,114 @@ export async function fetchYahooPriceHistory(ticker: string): Promise<{ Date: st
     } catch (error) {
         console.error(`Error fetching price history for ${ticker}:`, error);
         return [];
+    }
+}
+
+/**
+ * Fetch stock statistics including free-float and average volume from Yahoo Finance
+ * Uses the yahoo-finance2 package which handles authentication automatically
+ * 
+ * Fields returned:
+ * - floatShares: Number of shares available for public trading (free float)
+ * - averageVolume10Day: 10-day average trading volume
+ * - averageVolume: Average volume (3 months)
+ * - sharesOutstanding: Total number of shares issued
+ * - heldPercentInsiders: % held by insiders
+ * - heldPercentInstitutions: % held by institutions
+ * - fiftyTwoWeekHigh: 52-week high price
+ * - fiftyTwoWeekLow: 52-week low price
+ * - fiftyDayAverage: 50-day moving average
+ * - twoHundredDayAverage: 200-day moving average
+ * - returnOnAssets: Return on Assets (ttm)
+ * - debtToEquity: Total Debt/Equity (mrq)
+ * - quarterlyRevenueGrowth: Quarterly Revenue Growth (yoy)
+ * - quarterlyEarningsGrowth: Quarterly Earnings Growth (yoy)
+ * - priceToSales: Price/Sales (ttm)
+ */
+export async function fetchYahooStatistics(ticker: string): Promise<YahooStockStatistics | null> {
+    // Check if Yahoo Finance is enabled
+    if (process.env.ENABLE_YAHOO_FINANCE === 'false') {
+        console.log(`[YAHOO] Yahoo Finance is disabled via ENABLE_YAHOO_FINANCE env var`);
+        return null;
+    }
+    
+    try {
+        console.log(`[YAHOO] 🔍 Fetching statistics for ${ticker} using yahoo-finance2...`);
+        
+        // Fetch quoteSummary with multiple modules for comprehensive data
+        const result: any = await yahooFinance.quoteSummary(ticker, {
+            modules: ['defaultKeyStatistics', 'summaryDetail', 'financialData']
+        });
+        
+        const stats = result?.defaultKeyStatistics;
+        const summary = result?.summaryDetail;
+        const financial = result?.financialData;
+        
+        if (!stats && !summary && !financial) {
+            console.error(`[YAHOO] ❌ No statistics data found for ${ticker}`);
+            return null;
+        }
+        
+        // Extract values from defaultKeyStatistics
+        const floatShares = stats?.floatShares || null;
+        const averageVolume10Day = summary?.averageDailyVolume10Day || null;
+        const averageVolume = summary?.averageVolume || null;
+        const sharesOutstanding = stats?.sharesOutstanding || null;
+        const heldPercentInsiders = stats?.heldPercentInsiders ? stats.heldPercentInsiders * 100 : null;
+        const heldPercentInstitutions = stats?.heldPercentInstitutions ? stats.heldPercentInstitutions * 100 : null;
+        
+        // Extract values from summaryDetail
+        const fiftyTwoWeekHigh = summary?.fiftyTwoWeekHigh || null;
+        const fiftyTwoWeekLow = summary?.fiftyTwoWeekLow || null;
+        const fiftyDayAverage = summary?.fiftyDayAverage || null;
+        const twoHundredDayAverage = summary?.twoHundredDayAverage || null;
+        
+        // Extract financial metrics from financialData
+        const returnOnAssets = financial?.returnOnAssets ? financial.returnOnAssets * 100 : null;
+        const debtToEquity = financial?.debtToEquity || null;
+        const quarterlyRevenueGrowth = financial?.revenueGrowth ? financial.revenueGrowth * 100 : null;
+        const quarterlyEarningsGrowth = financial?.earningsGrowth ? financial.earningsGrowth * 100 : null;
+        
+        // Extract price ratios from summaryDetail or defaultKeyStatistics
+        const priceToSales = summary?.priceToSalesTrailing12Months || null;
+        
+        // Extract valuation metrics from defaultKeyStatistics
+        const enterpriseValue = stats?.enterpriseValue || null;
+        const enterpriseToRevenue = stats?.enterpriseToRevenue || null;
+        const enterpriseToEbitda = stats?.enterpriseToEbitda || null;
+        const trailingPE = summary?.trailingPE || null;
+        const forwardPE = stats?.forwardPE || null;
+        const pegRatio = stats?.pegRatio || null;
+        const priceToBook = stats?.priceToBook || null;
+        
+        console.log(`[YAHOO] ✅ ${ticker} - Float: ${floatShares}, Outstanding: ${sharesOutstanding}, ROA: ${returnOnAssets}%, D/E: ${debtToEquity}, P/S: ${priceToSales}`);
+        
+        return {
+            floatShares,
+            averageVolume10Day,
+            averageVolume,
+            sharesOutstanding,
+            heldPercentInsiders,
+            heldPercentInstitutions,
+            fiftyTwoWeekHigh,
+            fiftyTwoWeekLow,
+            fiftyDayAverage,
+            twoHundredDayAverage,
+            returnOnAssets,
+            debtToEquity,
+            quarterlyRevenueGrowth,
+            quarterlyEarningsGrowth,
+            priceToSales,
+            enterpriseValue,
+            enterpriseToRevenue,
+            enterpriseToEbitda,
+            trailingPE,
+            forwardPE,
+            pegRatio,
+            priceToBook
+        };
+    } catch (error) {
+        console.error(`[YAHOO] ❌ Error fetching statistics for ${ticker}:`, error);
+        return null;
     }
 }

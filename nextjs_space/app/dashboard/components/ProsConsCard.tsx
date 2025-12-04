@@ -20,27 +20,27 @@ interface ProsConsCardProps {
 export default function ProsConsCard({ ticker, pros = [], cons = [] }: ProsConsCardProps) {
   return (
     <Card sx={{ height: '100%' }}>
-      <CardContent>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
-          <Typography component="h2" variant="h6" sx={{ fontSize: '1.25rem', fontWeight: 700 }}>
+      <CardContent sx={{ '&:last-child': { pb: 2 } }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Typography component="h2" variant="h6" sx={{ fontSize: '1.1rem', fontWeight: 700 }}>
             Pros & Cons
           </Typography>
-          <SettingsIcon sx={{ color: 'primary.main', cursor: 'pointer' }} />
+          <SettingsIcon sx={{ color: 'primary.main', cursor: 'pointer', fontSize: '1.2rem' }} />
         </Stack>
         
-        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 2 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1.5 }}>
           Key factors for {ticker}
         </Typography>
 
         {/* Pros Section */}
-        <Box sx={{ mb: 3 }}>
-          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-            <CheckCircleIcon sx={{ color: 'success.main', fontSize: '1.25rem' }} />
-            <Typography variant="subtitle2" sx={{ color: 'success.main', fontWeight: 600 }}>
+        <Box sx={{ mb: 2 }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
+            <CheckCircleIcon sx={{ color: 'success.main', fontSize: '1.1rem' }} />
+            <Typography variant="subtitle2" sx={{ color: 'success.main', fontWeight: 600, fontSize: '0.85rem' }}>
               Pros
             </Typography>
           </Stack>
-          <Stack spacing={1}>
+          <Stack spacing={0.75}>
             {pros.length > 0 ? (
               pros.map((pro, index) => (
                 <Box
@@ -54,21 +54,21 @@ export default function ProsConsCard({ ticker, pros = [], cons = [] }: ProsConsC
                 >
                   <Box
                     sx={{
-                      width: 6,
-                      height: 6,
+                      width: 5,
+                      height: 5,
                       borderRadius: '50%',
                       backgroundColor: 'success.main',
-                      mt: 1,
+                      mt: 0.75,
                       flexShrink: 0,
                     }}
                   />
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.85rem', lineHeight: 1.4 }}>
                     {pro}
                   </Typography>
                 </Box>
               ))
             ) : (
-              <Typography variant="body2" sx={{ color: 'text.disabled', pl: 1 }}>
+              <Typography variant="body2" sx={{ color: 'text.disabled', pl: 1, fontSize: '0.85rem' }}>
                 Cloud Growth
               </Typography>
             )}
@@ -77,13 +77,13 @@ export default function ProsConsCard({ ticker, pros = [], cons = [] }: ProsConsC
 
         {/* Cons Section */}
         <Box>
-          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-            <CancelIcon sx={{ color: 'error.main', fontSize: '1.25rem' }} />
-            <Typography variant="subtitle2" sx={{ color: 'error.main', fontWeight: 600 }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
+            <CancelIcon sx={{ color: 'error.main', fontSize: '1.1rem' }} />
+            <Typography variant="subtitle2" sx={{ color: 'error.main', fontWeight: 600, fontSize: '0.85rem' }}>
               Cons
             </Typography>
           </Stack>
-          <Stack spacing={1}>
+          <Stack spacing={0.75}>
             {cons.length > 0 ? (
               cons.map((con, index) => (
                 <Box
@@ -97,21 +97,21 @@ export default function ProsConsCard({ ticker, pros = [], cons = [] }: ProsConsC
                 >
                   <Box
                     sx={{
-                      width: 6,
-                      height: 6,
+                      width: 5,
+                      height: 5,
                       borderRadius: '50%',
                       backgroundColor: 'error.main',
-                      mt: 1,
+                      mt: 0.75,
                       flexShrink: 0,
                     }}
                   />
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.85rem', lineHeight: 1.4 }}>
                     {con}
                   </Typography>
                 </Box>
               ))
             ) : (
-              <Typography variant="body2" sx={{ color: 'text.disabled', pl: 1 }}>
+              <Typography variant="body2" sx={{ color: 'text.disabled', pl: 1, fontSize: '0.85rem' }}>
                 No specific concerns identified
               </Typography>
             )}

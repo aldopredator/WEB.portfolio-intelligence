@@ -7,53 +7,51 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
+import BarChartIcon from '@mui/icons-material/BarChart';
 
 interface StockDetailsCardProps {
   ticker: string;
-  marketCap?: number;
-  peRatio?: number;
-  roe?: number;
-  profitMargin?: number;
+  priceToSales?: number | null;
+  enterpriseToRevenue?: number | null;
+  enterpriseToEbitda?: number | null;
+  trailingPE?: number | null;
+  forwardPE?: number | null;
+  priceToBook?: number | null;
   debtToEquity?: number;
-  dividendYield?: number;
-  pbRatio?: number;
 }
 
 export default function StockDetailsCard({
   ticker,
-  marketCap,
-  peRatio,
-  roe,
-  profitMargin,
+  priceToSales,
+  enterpriseToRevenue,
+  enterpriseToEbitda,
+  trailingPE,
+  forwardPE,
+  priceToBook,
   debtToEquity,
-  dividendYield,
-  pbRatio,
 }: StockDetailsCardProps) {
   const valuationMetrics = [
-    { label: 'Market Cap', value: marketCap ? `$${(marketCap / 1e9).toFixed(2)}B` : 'N/A' },
-    { label: 'P/E Ratio', value: peRatio?.toFixed(2) || 'N/A' },
-    { label: 'P/B Ratio', value: pbRatio?.toFixed(2) || 'N/A' },
-  ];
-
-  const profitabilityMetrics = [
-    { label: 'ROE', value: roe ? `${roe.toFixed(2)}%` : 'N/A%' },
-    { label: 'Profit Margin', value: profitMargin ? `${profitMargin.toFixed(2)}%` : 'N/A%' },
-  ];
-
-  const financialHealthMetrics = [
-    { label: 'D/E Ratio', value: debtToEquity?.toFixed(2) || 'N/A' },
-    { label: 'Dividend Yield', value: dividendYield ? `${dividendYield.toFixed(2)}%` : 'N/A%' },
+    { label: 'Price/Sales', value: priceToSales ? priceToSales.toFixed(0) : 'N/A' },
+    { label: 'Trailing P/E', value: trailingPE ? trailingPE.toFixed(0) : 'N/A' },
+    { label: 'Price/Book', value: priceToBook ? priceToBook.toFixed(0) : 'N/A' },
+    { label: 'Forward P/E', value: forwardPE ? forwardPE.toFixed(0) : 'N/A' },
+    { label: 'Total Debt/Equity', value: debtToEquity ? debtToEquity.toFixed(0) : 'N/A' },
+    { label: 'Enterprise Value/Revenue', value: enterpriseToRevenue ? enterpriseToRevenue.toFixed(0) : 'N/A' },
+    { label: 'Enterprise Value/EBITDA', value: enterpriseToEbitda ? enterpriseToEbitda.toFixed(0) : 'N/A' },
   ];
 
   return (
     <Card sx={{ height: '100%' }}>
       <CardContent>
-        <Typography component="h2" variant="h6" sx={{ mb: 3, fontSize: '1.5rem', fontWeight: 700 }}>
-          Stock Details
-        </Typography>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
+          <BarChartIcon sx={{ color: 'primary.main' }} />
+          <Typography component="h2" variant="h6" sx={{ fontSize: '1.25rem', fontWeight: 700 }}>
+            Stock Multipliers
+          </Typography>
+        </Stack>
 
-        {/* Valuation Pillar */}
-        <Box sx={{ mb: 3 }}>
+        {/* Multipliers Section */}
+        <Box>
           <Typography
             variant="overline"
             sx={{
@@ -65,7 +63,7 @@ export default function StockDetailsCard({
               display: 'block',
             }}
           >
-            VALUATION
+            STOCK MULTIPLIERS
           </Typography>
           <Stack spacing={2}>
             {valuationMetrics.map((detail, index) => (
@@ -77,88 +75,6 @@ export default function StockDetailsCard({
                 sx={{
                   pb: index < valuationMetrics.length - 1 ? 1.5 : 0,
                   borderBottom: index < valuationMetrics.length - 1 ? '1px solid' : 'none',
-                  borderColor: 'divider',
-                }}
-              >
-                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                  {detail.label}
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {detail.value}
-                </Typography>
-              </Stack>
-            ))}
-          </Stack>
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
-
-        {/* Profitability Pillar */}
-        <Box sx={{ mb: 3 }}>
-          <Typography
-            variant="overline"
-            sx={{
-              color: 'success.main',
-              fontWeight: 700,
-              fontSize: '0.75rem',
-              letterSpacing: 1,
-              mb: 2,
-              display: 'block',
-            }}
-          >
-            PROFITABILITY
-          </Typography>
-          <Stack spacing={2}>
-            {profitabilityMetrics.map((detail, index) => (
-              <Stack
-                key={index}
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{
-                  pb: index < profitabilityMetrics.length - 1 ? 1.5 : 0,
-                  borderBottom: index < profitabilityMetrics.length - 1 ? '1px solid' : 'none',
-                  borderColor: 'divider',
-                }}
-              >
-                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                  {detail.label}
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {detail.value}
-                </Typography>
-              </Stack>
-            ))}
-          </Stack>
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
-
-        {/* Financial Health Pillar */}
-        <Box>
-          <Typography
-            variant="overline"
-            sx={{
-              color: 'warning.main',
-              fontWeight: 700,
-              fontSize: '0.75rem',
-              letterSpacing: 1,
-              mb: 2,
-              display: 'block',
-            }}
-          >
-            FINANCIAL HEALTH
-          </Typography>
-          <Stack spacing={2}>
-            {financialHealthMetrics.map((detail, index) => (
-              <Stack
-                key={index}
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{
-                  pb: index < financialHealthMetrics.length - 1 ? 1.5 : 0,
-                  borderBottom: index < financialHealthMetrics.length - 1 ? '1px solid' : 'none',
                   borderColor: 'divider',
                 }}
               >

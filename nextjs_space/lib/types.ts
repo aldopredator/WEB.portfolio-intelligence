@@ -32,7 +32,37 @@ export interface StockData {
   previous_close?: number;
   market_cap?: number;
   volume?: number;
+  averageVolume10Day?: number | null;
+  averageVolume?: number | null;
+  floatShares?: number | null;
+  sharesOutstanding?: number | null;
+  dailyVolume?: number | null;
+  totalEmployees?: number | null;
   currency?: string;
+  country?: string;
+  // Yahoo Finance ownership metrics
+  heldPercentInsiders?: number | null;
+  heldPercentInstitutions?: number | null;
+  // Yahoo Finance moving averages
+  fiftyDayAverage?: number | null;
+  twoHundredDayAverage?: number | null;
+  // Yahoo Finance 52-week price range
+  fiftyTwoWeekHigh?: number | null;
+  fiftyTwoWeekLow?: number | null;
+  // Yahoo Finance financial metrics
+  returnOnAssets?: number | null;
+  debtToEquity?: number | null;
+  quarterlyRevenueGrowth?: number | null;
+  quarterlyEarningsGrowth?: number | null;
+  priceToSales?: number | null;
+  // Yahoo Finance valuation metrics
+  enterpriseValue?: number | null;
+  enterpriseToRevenue?: number | null;
+  enterpriseToEbitda?: number | null;
+  trailingPE?: number | null;
+  forwardPE?: number | null;
+  pegRatio?: number | null;
+  priceToBook?: number | null;
   // Finnhub valuation metrics
   pe_ratio?: number;
   pb_ratio?: number;
@@ -70,13 +100,69 @@ export interface SocialSentiment {
   lastUpdated?: string;
 }
 
+export interface CompanyProfile {
+  name?: string;
+  logo?: string;
+  industry?: string;
+  sector?: string;
+  subSector?: string;
+  country?: string;
+  marketCapitalization?: number;
+  currency?: string;
+  weburl?: string;
+  assets?: number;
+  liabilities?: number;
+}
+
+export interface NewsArticle {
+  headline: string;
+  source: string;
+  url: string;
+  datetime?: number;
+  summary?: string;
+  image?: string;
+}
+
+export interface PriceTarget {
+  targetHigh?: number;
+  targetLow?: number;
+  targetMean?: number;
+  targetMedian?: number;
+  numberOfAnalysts?: number;
+}
+
+export interface EarningsEvent {
+  date: string;
+  epsEstimate?: number;
+  epsActual?: number;
+  revenueEstimate?: number;
+  revenueActual?: number;
+  quarter?: number;
+  year?: number;
+}
+
+export interface EarningsSurprise {
+  actual?: number;
+  estimate?: number;
+  period: string;
+  quarter?: number;
+  year?: number;
+  surprise?: number;
+  surprisePercent?: number;
+}
+
 export interface StockInfo {
   stock_data: StockData;
   analyst_recommendations: AnalystData;
-  latest_news: any[];
+  latest_news: NewsArticle[];
   social_sentiment: SocialSentiment;
   pros: string[];
   cons: string[];
+  company_profile?: CompanyProfile;
+  price_target?: PriceTarget;
+  earnings_calendar?: EarningsEvent[];
+  earnings_surprises?: EarningsSurprise[];
+  recommendation_trends?: AnalystRecommendation[];
 }
 
 export interface StockInsightsData {

@@ -1,13 +1,24 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import { Suspense } from 'react';
 import type { StockInsightsData } from '@/lib/types';
-import { fetchYahooPriceHistory } from '@/lib/yahoo-finance';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
-import { fetchFinnhubMetrics } from '@/lib/finnhub-metrics';
+import { fetchPolygonStockStats } from '@/lib/polygon';
+import { 
+  fetchFinnhubMetrics, 
+  fetchCompanyProfile, 
+  fetchCompanyNews, 
+  fetchPriceTarget, 
+  fetchEarningsCalendar, 
+  fetchEarningsSurprises,
+  fetchRecommendationTrends 
+} from '@/lib/finnhub-metrics';
 import { isRecord } from '@/lib/utils';
 import DashboardClient from './dashboard/DashboardClient';
 
-export const revalidate = 1800; // 30 minutes
+// Force dynamic rendering - runs on every request for Polygon POC testing
+export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Disable caching for POC
 
 const STOCK_CONFIG = [
   { ticker: 'GOOG', name: 'Alphabet Inc. (GOOG)' },
@@ -31,8 +42,12 @@ async function getStockData(): Promise<StockInsightsData> {
     const staticData = JSON.parse(fileContents);
     const mergedData: StockInsightsData = { ...staticData };
 
-    // Enrich with real-time data
-    await Promise.allSettled(Object.keys(mergedData).map(async (ticker) => {
+    // Enrich with real-time data (skip non-ticker keys like 'timestamp')
+    const validTickers = Object.keys(mergedData).filter(key => 
+      key !== 'timestamp' && isRecord(mergedData[key]) && 'stock_data' in (mergedData[key] as any)
+    );
+    
+    await Promise.allSettled(validTickers.map(async (ticker) => {
       try {
         const cfg = STOCK_CONFIG.find(c => c.ticker === ticker);
         const companyName = cfg?.name;
@@ -48,15 +63,71 @@ async function getStockData(): Promise<StockInsightsData> {
         const metrics = await fetchFinnhubMetrics(ticker);
         if (metrics && isRecord(stockEntry) && stockEntry.stock_data) {
           Object.assign(stockEntry.stock_data, metrics);
+          console.log(`[PAGE] ${ticker} - Finnhub 52-week: ${metrics['52_week_low']} - ${metrics['52_week_high']}`);
         }
 
-        // Fetch price history
-        const priceHistory = await fetchYahooPriceHistory(ticker);
-        if (priceHistory && priceHistory.length > 0 && isRecord(stockEntry) && stockEntry.stock_data) {
-          (stockEntry.stock_data as any).price_movement_30_days = priceHistory;
+        // Fetch company profile
+        const profile = await fetchCompanyProfile(ticker);
+        if (profile && isRecord(stockEntry)) {
+          stockEntry.company_profile = profile as any;
         }
+
+        // Fetch company news
+        const news = await fetchCompanyNews(ticker, 5);
+        if (news && isRecord(stockEntry)) {
+          stockEntry.latest_news = news as any;
+        }
+
+        // Fetch price target
+        const priceTarget = await fetchPriceTarget(ticker);
+        if (priceTarget && isRecord(stockEntry)) {
+          stockEntry.price_target = priceTarget as any;
+        }
+
+        // Fetch earnings calendar
+        const earnings = await fetchEarningsCalendar(ticker);
+        if (earnings && isRecord(stockEntry)) {
+          stockEntry.earnings_calendar = earnings as any;
+        }
+
+        // Fetch earnings surprises
+        const earningSurprises = await fetchEarningsSurprises(ticker);
+        if (earningSurprises && isRecord(stockEntry)) {
+          stockEntry.earnings_surprises = earningSurprises as any;
+        }
+
+        // Fetch recommendation trends
+        const recTrends = await fetchRecommendationTrends(ticker);
+        if (recTrends && isRecord(stockEntry)) {
+          stockEntry.recommendation_trends = recTrends as any;
+        }
+
+        // Note: Price history is already in the JSON file (updates once per day)
+        // No need to fetch from Yahoo Finance on every request
       } catch (error) {
         console.error(`Error enriching ${ticker}:`, error);
+      }
+    }));
+
+    // Fetch Polygon.io data for all tickers
+    const timestamp = new Date().toISOString();
+    console.log(`[PAGE] 🎯 Fetching Polygon.io data for all tickers at ${timestamp}...`);
+    
+    await Promise.allSettled(validTickers.map(async (ticker) => {
+      const stockEntry = mergedData[ticker];
+      if (stockEntry && isRecord(stockEntry) && stockEntry.stock_data) {
+        try {
+          const polygonStats = await fetchPolygonStockStats(ticker);
+          
+          if (polygonStats) {
+            Object.assign(stockEntry.stock_data, polygonStats);
+            console.log(`[PAGE] ✅ ${ticker} Polygon:`, JSON.stringify(polygonStats));
+          } else {
+            console.log(`[PAGE] ⚠️ No Polygon data for ${ticker}`);
+          }
+        } catch (error) {
+          console.error(`[PAGE] ❌ Polygon error for ${ticker}:`, error);
+        }
       }
     }));
 
@@ -80,5 +151,9 @@ export default async function HomePage() {
     };
   });
 
-  return <DashboardClient initialData={stockData} stocks={stocks} />;
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+      <DashboardClient initialData={stockData} stocks={stocks} />
+    </Suspense>
+  );
 }

@@ -1,6 +1,64 @@
 // Server-only module for fetching financial metrics and company data from Finnhub
 // Uses Next.js fetch caching with 30-day revalidation for persistent caching
 
+import type { AnalystRecommendation } from './types';
+
+export interface CompanyProfile {
+  name?: string;
+  logo?: string;
+  industry?: string;
+  sector?: string;
+  subSector?: string;
+  country?: string;
+  marketCapitalization?: number;
+  currency?: string;
+  weburl?: string;
+}
+
+export interface BalanceSheet {
+  assets?: number;
+  liabilities?: number;
+  equity?: number;
+  currency?: string;
+}
+
+export interface NewsArticle {
+  headline: string;
+  source: string;
+  url: string;
+  datetime?: number;
+  summary?: string;
+  image?: string;
+}
+
+export interface PriceTarget {
+  targetHigh?: number;
+  targetLow?: number;
+  targetMean?: number;
+  targetMedian?: number;
+  numberOfAnalysts?: number;
+}
+
+export interface EarningsEvent {
+  date: string;
+  epsEstimate?: number;
+  epsActual?: number;
+  revenueEstimate?: number;
+  revenueActual?: number;
+  quarter?: number;
+  year?: number;
+}
+
+export interface EarningsSurprise {
+  actual?: number;
+  estimate?: number;
+  period: string;
+  quarter?: number;
+  year?: number;
+  surprise?: number;
+  surprisePercent?: number;
+}
+
 export interface FinnhubMetrics {
   // Valuation metrics
   pe_ratio?: number;
@@ -32,6 +90,7 @@ export interface FinnhubMetrics {
   // Market data
   market_cap?: number;
   volume?: number;
+  averageVolume10Day?: number;
   currency?: string;
   beta?: number;
 
@@ -202,4 +261,269 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
 
   // Fetch with Next.js cache built into fetch() calls
   return fetchFinnhubMetricsInternal(ticker, apiKey);
+}
+
+/**
+ * Fetch company profile data from Finnhub
+ */
+export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfile> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured for profile`);
+    return {};
+  }
+
+  try {
+    const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${apiKey}`;
+    const response = await fetch(url, {
+      next: { revalidate: METRICS_CACHE_TTL_SECONDS }
+    } as any);
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        name: data.name,
+        logo: data.logo,
+        industry: data.finnhubIndustry,
+        sector: data.gsector,
+        subSector: data.naicsSubsector,
+        country: data.country,
+        marketCapitalization: data.marketCapitalization ? data.marketCapitalization * 1000000 : undefined,
+        currency: data.currency,
+        weburl: data.weburl,
+      };
+    }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Error fetching profile:`, error);
+  }
+  return {};
+}
+
+/**
+ * Fetch company news from Finnhub
+ */
+export async function fetchCompanyNews(ticker: string, limit: number = 10): Promise<NewsArticle[]> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured for news`);
+    return [];
+  }
+
+  try {
+    // Get news from last 30 days
+    const toDate = new Date();
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - 30);
+
+    const from = fromDate.toISOString().split('T')[0];
+    const to = toDate.toISOString().split('T')[0];
+
+    const url = `https://finnhub.io/api/v1/company-news?symbol=${ticker}&from=${from}&to=${to}&token=${apiKey}`;
+    const response = await fetch(url, {
+      next: { revalidate: 3600 } // Cache for 1 hour (news is time-sensitive)
+    } as any);
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.slice(0, limit).map((article: any) => ({
+        headline: article.headline,
+        source: article.source,
+        url: article.url,
+        datetime: article.datetime,
+        summary: article.summary,
+        image: article.image,
+      }));
+    }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Error fetching news:`, error);
+  }
+  return [];
+}
+
+/**
+ * Fetch price target from Finnhub
+ */
+export async function fetchPriceTarget(ticker: string): Promise<PriceTarget> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured for price target`);
+    return {};
+  }
+
+  try {
+    const url = `https://finnhub.io/api/v1/stock/price-target?symbol=${ticker}&token=${apiKey}`;
+    const response = await fetch(url, {
+      next: { revalidate: 86400 } // Cache for 1 day
+    } as any);
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        targetHigh: data.targetHigh,
+        targetLow: data.targetLow,
+        targetMean: data.targetMean,
+        targetMedian: data.targetMedian,
+        numberOfAnalysts: data.numberOfAnalysts,
+      };
+    }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Error fetching price target:`, error);
+  }
+  return {};
+}
+
+/**
+ * Fetch earnings calendar from Finnhub
+ */
+export async function fetchEarningsCalendar(ticker: string): Promise<EarningsEvent[]> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured for earnings`);
+    return [];
+  }
+
+  try {
+    const url = `https://finnhub.io/api/v1/calendar/earnings?symbol=${ticker}&token=${apiKey}`;
+    const response = await fetch(url, {
+      next: { revalidate: 86400 } // Cache for 1 day
+    } as any);
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.earningsCalendar && Array.isArray(data.earningsCalendar)) {
+        return data.earningsCalendar.map((event: any) => ({
+          date: event.date,
+          epsEstimate: event.epsEstimate,
+          epsActual: event.epsActual,
+          revenueEstimate: event.revenueEstimate,
+          revenueActual: event.revenueActual,
+          quarter: event.quarter,
+          year: event.year,
+        }));
+      }
+    }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Error fetching earnings calendar:`, error);
+  }
+  return [];
+}
+
+/**
+ * Fetch earnings surprises from Finnhub
+ */
+export async function fetchEarningsSurprises(ticker: string): Promise<EarningsSurprise[]> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured for earnings surprises`);
+    return [];
+  }
+
+  try {
+    const url = `https://finnhub.io/api/v1/stock/earnings?symbol=${ticker}&token=${apiKey}`;
+    const response = await fetch(url, {
+      next: { revalidate: 86400 } // Cache for 1 day
+    } as any);
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data && Array.isArray(data)) {
+        return data.map((item: any) => ({
+          actual: item.actual,
+          estimate: item.estimate,
+          period: item.period,
+          quarter: item.quarter,
+          year: item.year,
+          surprise: item.surprise,
+          surprisePercent: item.surprisePercent,
+        }));
+      }
+    }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Error fetching earnings surprises:`, error);
+  }
+  return [];
+}
+
+/**
+ * Fetch recommendation trends from Finnhub
+ */
+export async function fetchRecommendationTrends(ticker: string): Promise<AnalystRecommendation[]> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured for recommendations`);
+    return [];
+  }
+
+  try {
+    const url = `https://finnhub.io/api/v1/stock/recommendation?symbol=${ticker}&token=${apiKey}`;
+    const response = await fetch(url, {
+      next: { revalidate: 86400 } // Cache for 1 day
+    } as any);
+
+    if (response.ok) {
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        return data.map((rec: any) => ({
+          period: rec.period,
+          strongBuy: rec.strongBuy || 0,
+          buy: rec.buy || 0,
+          hold: rec.hold || 0,
+          sell: rec.sell || 0,
+          strongSell: rec.strongSell || 0,
+        }));
+      }
+    }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Error fetching recommendations:`, error);
+  }
+  return [];
+}
+
+/**
+ * Fetch balance sheet data from Finnhub
+ */
+export async function fetchBalanceSheet(ticker: string): Promise<BalanceSheet> {
+  const apiKey = process.env.FINNHUB_API_KEY;
+  if (!apiKey) {
+    console.warn(`[FINNHUB] ${ticker} - API key not configured for balance sheet`);
+    return {};
+  }
+
+  try {
+    const url = `https://finnhub.io/api/v1/stock/financials-reported?symbol=${ticker}&token=${apiKey}`;
+    const response = await fetch(url, {
+      next: { revalidate: METRICS_CACHE_TTL_SECONDS }
+    } as any);
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.data && data.data.length > 0) {
+        // Get most recent annual report
+        const report = data.data.find((r: any) => r.form === '10-K') || data.data[0];
+        if (report && report.report && report.report.bs) {
+          const bs = report.report.bs;
+          // Find assets and liabilities in the balance sheet
+          const assetsItem = bs.find((item: any) => 
+            item.label && (item.label.toLowerCase().includes('total assets') || item.label.toLowerCase() === 'assets')
+          );
+          const liabilitiesItem = bs.find((item: any) => 
+            item.label && (item.label.toLowerCase().includes('total liabilities') || item.label.toLowerCase() === 'liabilities')
+          );
+          const equityItem = bs.find((item: any) => 
+            item.label && item.label.toLowerCase().includes('equity')
+          );
+
+          return {
+            assets: assetsItem?.value,
+            liabilities: liabilitiesItem?.value,
+            equity: equityItem?.value,
+            currency: report.report.currency || 'USD',
+          };
+        }
+      }
+    }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Error fetching balance sheet:`, error);
+  }
+  return {};
 }
