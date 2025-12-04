@@ -159,7 +159,6 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
               right: 24,
               zIndex: 100,
               width: '400px',
-              display: 'none',
             }}>
               <Paper
                 elevation={3}
