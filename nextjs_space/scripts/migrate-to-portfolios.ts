@@ -66,7 +66,7 @@ async function migrateToPortfolios() {
     });
 
     console.log('\n📈 Portfolio Summary:');
-    portfolios.forEach(portfolio => {
+    portfolios.forEach((portfolio: any) => {
       console.log(`  • ${portfolio.name}: ${portfolio._count.stocks} stocks`);
     });
 
