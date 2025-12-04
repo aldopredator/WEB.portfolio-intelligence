@@ -226,47 +226,6 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
                   />
                 )}
               </Box>
-
-              <Box sx={{ mb: 2 }}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: '#fff',
-                    mb: 1.5,
-                    fontSize: '1.1rem',
-                    fontWeight: 600,
-                  }}
-                >
-                  Search Tickers
-                </Typography>
-                <Box sx={{ position: 'relative' }}>
-                  <TickerSearch
-                    onTickerSelect={handleTickerSelect}
-                    placeholder="Search by ticker or company name..."
-                  />
-                  {isAddingTicker && (
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        bgcolor: 'rgba(0, 0, 0, 0.5)',
-                        borderRadius: 2,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 10,
-                      }}
-                    >
-                      <Typography sx={{ color: '#fff', fontSize: '0.9rem' }}>
-                        Adding ticker...
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-              </Box>
             </Paper>
 
             <MainGrid stockData={initialData} selectedStock={selectedStock} />
