@@ -23,7 +23,7 @@ function GlobalHeaderContent() {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isDashboard = pathname === '/';
+  const isDashboard = pathname === '/' || pathname === '/dashboard';
   const { selectedPortfolio, portfolios } = usePortfolio();
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -35,13 +35,20 @@ function GlobalHeaderContent() {
       setLoading(true);
       try {
         const portfolioId = selectedPortfolio?.id || searchParams.get('portfolio');
+        console.log('[GlobalHeader] Fetching stocks for portfolio:', portfolioId || 'ALL');
         const response = await fetch(`/api/stock-list${portfolioId ? `?portfolio=${portfolioId}` : ''}`);
         const data = await response.json();
-        if (data.success) {
-          setStocks(data.stocks || []);
+        console.log('[GlobalHeader] API response:', data);
+        if (data.success && data.stocks) {
+          console.log('[GlobalHeader] Setting stocks:', data.stocks.length);
+          setStocks(data.stocks);
+        } else {
+          console.warn('[GlobalHeader] No stocks in response or failed:', data);
+          setStocks([]);
         }
       } catch (error) {
-        console.error('Error fetching stocks:', error);
+        console.error('[GlobalHeader] Error fetching stocks:', error);
+        setStocks([]);
       } finally {
         setLoading(false);
       }
