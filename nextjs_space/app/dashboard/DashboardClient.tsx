@@ -152,122 +152,133 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
               mt: 3,
             }}
           >
-            {/* Search Toolbar */}
-            <Paper
-              elevation={0}
-              sx={{
-                width: '100%',
-                maxWidth: { sm: '100%', md: '1700px' },
-                bgcolor: 'transparent',
-                mb: 2,
-              }}
-            >
-              {/* Portfolio Selector */}
-              <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-                <FormControl 
-                  sx={{ 
-                    minWidth: 250,
-                    '& .MuiOutlinedInput-root': {
-                      bgcolor: 'rgba(30, 41, 59, 0.8)',
-                      borderRadius: 2,
-                      '&:hover': {
-                        bgcolor: 'rgba(30, 41, 59, 1)',
-                      }
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: '#94a3b8',
-                    },
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(148, 163, 184, 0.2)',
-                    }
-                  }}
-                  size="small"
-                >
-                  <InputLabel sx={{ color: '#94a3b8' }}>Portfolio Filter</InputLabel>
-                  <Select
-                    value={selectedPortfolio?.id || 'all'}
-                    onChange={(e) => handlePortfolioChange(e.target.value)}
-                    label="Portfolio Filter"
+            {/* Top Right Toolbar */}
+            <Box sx={{ 
+              position: 'fixed',
+              top: 180,
+              right: 24,
+              zIndex: 100,
+              width: '400px',
+            }}>
+              <Paper
+                elevation={3}
+                sx={{
+                  bgcolor: 'rgba(30, 41, 59, 0.95)',
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: 2,
+                  p: 2.5,
+                  border: '1px solid rgba(148, 163, 184, 0.1)',
+                }}
+              >
+                {/* Portfolio Selector */}
+                <Box sx={{ mb: 2.5 }}>
+                  <FormControl 
+                    fullWidth
                     sx={{ 
-                      color: '#fff',
-                      '& .MuiSvgIcon-root': {
-                        color: '#94a3b8',
-                      }
-                    }}
-                  >
-                    <MenuItem value="all">
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Package size={16} />
-                        All Portfolios ({stocks.length} tickers)
-                      </Box>
-                    </MenuItem>
-                    {portfolios.map((portfolio) => (
-                      <MenuItem key={portfolio.id} value={portfolio.id}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Package size={16} />
-                          {portfolio.name}
-                        </Box>
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                
-                {selectedPortfolio && (
-                  <Chip 
-                    label={`Showing ${stocks.length} tickers from ${selectedPortfolio.name}`}
-                    color="primary"
-                    size="small"
-                    sx={{ 
-                      bgcolor: 'rgba(59, 130, 246, 0.2)',
-                      color: '#60a5fa',
-                      borderRadius: 2,
-                      fontWeight: 500,
-                    }}
-                  />
-                )}
-              </Box>
-
-              <Box sx={{ mb: 2 }}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: '#fff',
-                    mb: 1.5,
-                    fontSize: '1.1rem',
-                    fontWeight: 600,
-                  }}
-                >
-                  Search Tickers
-                </Typography>
-                <Box sx={{ position: 'relative' }}>
-                  <TickerSearch
-                    onTickerSelect={handleTickerSelect}
-                    placeholder="Search by ticker or company name..."
-                  />
-                  {isAddingTicker && (
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        bgcolor: 'rgba(0, 0, 0, 0.5)',
+                      '& .MuiOutlinedInput-root': {
+                        bgcolor: 'rgba(15, 23, 42, 0.6)',
                         borderRadius: 2,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 10,
+                        '&:hover': {
+                          bgcolor: 'rgba(15, 23, 42, 0.8)',
+                        }
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#94a3b8',
+                      },
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(148, 163, 184, 0.2)',
+                      }
+                    }}
+                    size="small"
+                  >
+                    <InputLabel sx={{ color: '#94a3b8' }}>Portfolio Filter</InputLabel>
+                    <Select
+                      value={selectedPortfolio?.id || 'all'}
+                      onChange={(e) => handlePortfolioChange(e.target.value)}
+                      label="Portfolio Filter"
+                      sx={{ 
+                        color: '#fff',
+                        '& .MuiSvgIcon-root': {
+                          color: '#94a3b8',
+                        }
                       }}
                     >
-                      <Typography sx={{ color: '#fff', fontSize: '0.9rem' }}>
-                        Adding ticker...
-                      </Typography>
-                    </Box>
+                      <MenuItem value="all">
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Package size={16} />
+                          All Portfolios ({stocks.length} tickers)
+                        </Box>
+                      </MenuItem>
+                      {portfolios.map((portfolio) => (
+                        <MenuItem key={portfolio.id} value={portfolio.id}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Package size={16} />
+                            {portfolio.name}
+                          </Box>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  
+                  {selectedPortfolio && (
+                    <Chip 
+                      label={`Showing ${stocks.length} tickers from ${selectedPortfolio.name}`}
+                      color="primary"
+                      size="small"
+                      sx={{ 
+                        bgcolor: 'rgba(59, 130, 246, 0.2)',
+                        color: '#60a5fa',
+                        borderRadius: 2,
+                        fontWeight: 500,
+                        mt: 1.5,
+                      }}
+                    />
                   )}
                 </Box>
-              </Box>
-            </Paper>
+
+                {/* Search Tickers */}
+                <Box>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: '#fff',
+                      mb: 1.5,
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Search Tickers
+                  </Typography>
+                  <Box sx={{ position: 'relative' }}>
+                    <TickerSearch
+                      onTickerSelect={handleTickerSelect}
+                      placeholder="Search by ticker or company name..."
+                    />
+                    {isAddingTicker && (
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          bgcolor: 'rgba(0, 0, 0, 0.5)',
+                          borderRadius: 2,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          zIndex: 10,
+                        }}
+                      >
+                        <Typography sx={{ color: '#fff', fontSize: '0.9rem' }}>
+                          Adding ticker...
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                </Box>
+              </Paper>
+            </Box>
 
             <MainGrid stockData={initialData} selectedStock={selectedStock} />
           </Stack>
