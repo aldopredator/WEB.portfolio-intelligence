@@ -7,7 +7,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Typography, Paper, Snackbar, Alert } from '@mui/material';
+import { Typography, Paper, Snackbar, Alert, Select, MenuItem, FormControl, InputLabel, Chip } from '@mui/material';
+import { Package } from 'lucide-react';
 import MainGrid from './components/MainGrid';
 import TickerSearch from '../components/TickerSearch';
 import type { StockInsightsData } from '@/lib/types';
@@ -37,12 +38,27 @@ export default function DashboardClient({ initialData, stocks }: DashboardClient
   const searchParams = useSearchParams();
   const router = useRouter();
   const stockParam = searchParams.get('stock');
-  const { selectedPortfolio } = usePortfolio();
+  const { selectedPortfolio, portfolios, selectPortfolio } = usePortfolio();
   const [selectedStock, setSelectedStock] = React.useState(stocks[0]?.ticker || 'GOOG');
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'info' | 'warning' | 'error'>('info');
   const [isAddingTicker, setIsAddingTicker] = React.useState(false);
+
+  // Handle portfolio change
+  const handlePortfolioChange = (portfolioId: string) => {
+    console.log('[DashboardClient] Portfolio changed to:', portfolioId);
+    if (portfolioId === 'all') {
+      selectPortfolio(null);
+      window.location.href = '/';
+    } else {
+      const portfolio = portfolios.find(p => p.id === portfolioId);
+      if (portfolio) {
+        selectPortfolio(portfolio);
+        window.location.href = `/?portfolio=${portfolioId}`;
+      }
+    }
+  };
 
   // Update selected stock when URL param changes
   React.useEffect(() => {
@@ -145,6 +161,71 @@ export default function DashboardClient({ initialData, stocks }: DashboardClient
                 mb: 2,
               }}
             >
+              {/* Portfolio Selector */}
+              <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+                <FormControl 
+                  sx={{ 
+                    minWidth: 250,
+                    '& .MuiOutlinedInput-root': {
+                      bgcolor: 'rgba(30, 41, 59, 0.8)',
+                      borderRadius: 2,
+                      '&:hover': {
+                        bgcolor: 'rgba(30, 41, 59, 1)',
+                      }
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#94a3b8',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(148, 163, 184, 0.2)',
+                    }
+                  }}
+                  size="small"
+                >
+                  <InputLabel sx={{ color: '#94a3b8' }}>Portfolio Filter</InputLabel>
+                  <Select
+                    value={selectedPortfolio?.id || 'all'}
+                    onChange={(e) => handlePortfolioChange(e.target.value)}
+                    label="Portfolio Filter"
+                    sx={{ 
+                      color: '#fff',
+                      '& .MuiSvgIcon-root': {
+                        color: '#94a3b8',
+                      }
+                    }}
+                  >
+                    <MenuItem value="all">
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Package size={16} />
+                        All Portfolios ({stocks.length} tickers)
+                      </Box>
+                    </MenuItem>
+                    {portfolios.map((portfolio) => (
+                      <MenuItem key={portfolio.id} value={portfolio.id}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Package size={16} />
+                          {portfolio.name}
+                        </Box>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                
+                {selectedPortfolio && (
+                  <Chip 
+                    label={`Showing ${stocks.length} tickers from ${selectedPortfolio.name}`}
+                    color="primary"
+                    size="small"
+                    sx={{ 
+                      bgcolor: 'rgba(59, 130, 246, 0.2)',
+                      color: '#60a5fa',
+                      borderRadius: 2,
+                      fontWeight: 500,
+                    }}
+                  />
+                )}
+              </Box>
+
               <Box sx={{ mb: 2 }}>
                 <Typography
                   variant="h6"
