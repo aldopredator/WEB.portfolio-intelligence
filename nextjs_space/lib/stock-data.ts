@@ -69,7 +69,7 @@ export async function getStockData(): Promise<StockInsightsData> {
           change_percent: stockData?.changePercent || 0,
           '52_week_high': stockData?.week52High || 0,
           '52_week_low': stockData?.week52Low || 0,
-          price_movement_30_days: stock.priceHistory.map(ph => ({
+          price_movement_30_days: stock.priceHistory.map((ph: any) => ({
             Date: ph.date.toISOString().split('T')[0],
             Close: ph.price,
           })),
@@ -86,7 +86,7 @@ export async function getStockData(): Promise<StockInsightsData> {
           neutral: socialSent?.neutral || 0,
           negative: socialSent?.negative || 0,
         },
-        latest_news: stock.news.map(article => ({
+        latest_news: stock.news.map((article: any) => ({
           headline: article.title,
           datetime: article.publishedAt?.getTime() || 0,
           image: '',
