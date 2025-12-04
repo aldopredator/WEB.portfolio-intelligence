@@ -1,0 +1,2 @@
+-- This migration was previously applied
+-- Placeholder file for migration consistency

@@ -4,6 +4,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { SidebarNavigation } from "@/components/sidebar-navigation";
 import { GlobalHeader } from "@/components/global-header";
+import { PortfolioProvider } from "@/lib/portfolio-context";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,14 +31,16 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={inter.className}>
-        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-          {/* Top Header Bar with Tickers - Fixed, Always visible */}
-          <GlobalHeader />
-          
-          <SidebarNavigation />
-          <div className="lg:pl-0 pt-44 pb-32">
-            {children}
-          </div>
+        <PortfolioProvider>
+          <Toaster position="top-right" />
+          <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+            {/* Top Header Bar with Tickers - Fixed, Always visible */}
+            <GlobalHeader />
+            
+            <SidebarNavigation />
+            <div className="lg:pl-0 pt-44 pb-32">
+              {children}
+            </div>
           
           {/* Bottom Disclaimer Bar - Always visible */}
           <footer className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-orange-900/30 to-red-900/30 backdrop-blur-sm border-t border-orange-800/30">
@@ -59,7 +63,8 @@ export default function RootLayout({
               </div>
             </div>
           </footer>
-        </div>
+          </div>
+        </PortfolioProvider>
       </body>
     </html>
   );

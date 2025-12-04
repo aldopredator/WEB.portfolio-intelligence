@@ -10,12 +10,13 @@ interface AddTickerRequest {
   name: string;
   type?: string;
   exchange?: string;
+  portfolioId?: string;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: AddTickerRequest = await request.json();
-    const { ticker, name, type, exchange } = body;
+    const { ticker, name, type, exchange, portfolioId } = body;
 
     if (!ticker || !name) {
       return NextResponse.json(
@@ -36,11 +37,27 @@ export async function POST(request: NextRequest) {
       if (!existingStock.isActive) {
         await prisma.stock.update({
           where: { ticker },
-          data: { isActive: true },
+          data: { 
+            isActive: true,
+            portfolioId: portfolioId || existingStock.portfolioId
+          },
         });
         return NextResponse.json({
           success: true,
           message: `${ticker} has been reactivated in your portfolio`,
+          ticker,
+        });
+      }
+
+      // If portfolioId is provided and different, update it
+      if (portfolioId && existingStock.portfolioId !== portfolioId) {
+        await prisma.stock.update({
+          where: { ticker },
+          data: { portfolioId },
+        });
+        return NextResponse.json({
+          success: true,
+          message: `${ticker} has been moved to the selected portfolio`,
           ticker,
         });
       }
@@ -59,6 +76,7 @@ export async function POST(request: NextRequest) {
         type: type || 'Equity',
         exchange: exchange,
         isActive: true,
+        portfolioId: portfolioId || null,
       },
     });
 

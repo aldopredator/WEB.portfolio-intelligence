@@ -11,23 +11,77 @@ import {
   ChevronRight,
   TrendingUp,
   Menu,
-  X
+  X,
+  Briefcase,
+  Package
 } from 'lucide-react';
+import { usePortfolio } from '@/lib/portfolio-context';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export function SidebarNavigation() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const { selectedPortfolio, portfolios, selectPortfolio } = usePortfolio();
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: BarChart3, description: 'Stock insights & analytics' },
-
+    { name: 'Portfolios', href: '/portfolios', icon: Briefcase, description: 'Manage your portfolios' },
     { name: 'Screening', href: '/screening', icon: Filter, description: 'Stock screening results' },
     { name: 'Benchmark', href: '/benchmark', icon: TrendingUp, description: 'Market benchmark comparison' },
   ];
 
   const SidebarContent = () => (
     <>
+      {/* Portfolio Selector */}
+      {!collapsed && (
+        <div className="p-4 border-b border-slate-800/50">
+          <label className="text-xs text-slate-400 mb-2 block">Active Portfolio</label>
+          <Select
+            value={selectedPortfolio?.id || 'all'}
+            onValueChange={(value) => {
+              if (value === 'all') {
+                selectPortfolio(null);
+              } else {
+                const portfolio = portfolios.find(p => p.id === value);
+                if (portfolio) selectPortfolio(portfolio);
+              }
+            }}
+          >
+            <SelectTrigger className="w-full bg-slate-800/50 border-slate-700 text-white">
+              <SelectValue placeholder="Select portfolio">
+                <div className="flex items-center gap-2">
+                  <Package className="h-4 w-4 text-blue-400" />
+                  <span className="truncate">{selectedPortfolio?.name || 'All Portfolios'}</span>
+                </div>
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">
+                <div className="flex items-center gap-2">
+                  <Package className="h-4 w-4" />
+                  All Portfolios
+                </div>
+              </SelectItem>
+              {portfolios.map((portfolio) => (
+                <SelectItem key={portfolio.id} value={portfolio.id}>
+                  <div className="flex items-center gap-2">
+                    <Package className="h-4 w-4" />
+                    {portfolio.name}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+      
       {/* Navigation Links */}
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {navigation.map((item) => {

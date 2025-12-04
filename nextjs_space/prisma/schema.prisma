@@ -9,6 +9,20 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+// Portfolio model to organize stocks into different portfolios
+model Portfolio {
+    id          String   @id @default(cuid())
+    name        String   @unique
+    description String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    
+    // Relations
+    stocks      Stock[]
+    
+    @@index([name])
+}
+
 // Core stock/ticker information
 model Stock {
     id          String   @id @default(cuid())
@@ -21,6 +35,10 @@ model Stock {
     isActive    Boolean  @default(true) // Whether the stock is in the user's portfolio
     addedAt     DateTime @default(now())
     updatedAt   DateTime @updatedAt
+    
+    // Portfolio relationship
+    portfolioId String?
+    portfolio   Portfolio? @relation(fields: [portfolioId], references: [id], onDelete: SetNull)
 
     // Relations
     stockData           StockData?
@@ -32,6 +50,7 @@ model Stock {
 
     @@index([ticker])
     @@index([isActive])
+    @@index([portfolioId])
 }
 
 // Current stock price and basic data

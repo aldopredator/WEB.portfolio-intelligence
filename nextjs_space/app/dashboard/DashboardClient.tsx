@@ -11,6 +11,7 @@ import { Typography, Paper, Snackbar, Alert } from '@mui/material';
 import MainGrid from './components/MainGrid';
 import TickerSearch from '../components/TickerSearch';
 import type { StockInsightsData } from '@/lib/types';
+import { usePortfolio } from '@/lib/portfolio-context';
 
 interface DashboardClientProps {
   initialData: StockInsightsData;
@@ -36,6 +37,7 @@ export default function DashboardClient({ initialData, stocks }: DashboardClient
   const searchParams = useSearchParams();
   const router = useRouter();
   const stockParam = searchParams.get('stock');
+  const { selectedPortfolio } = usePortfolio();
   const [selectedStock, setSelectedStock] = React.useState(stocks[0]?.ticker || 'GOOG');
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
@@ -79,6 +81,7 @@ export default function DashboardClient({ initialData, stocks }: DashboardClient
             name: result.name,
             type: result.type,
             exchange: result.exchange,
+            portfolioId: selectedPortfolio?.id,
           }),
         });
 
