@@ -34,7 +34,8 @@ const theme = createTheme({
     fontFamily: 'var(--font-geist-sans)',
   },
 });
-export default function DashboardClient({ initialData, stocks }: DashboardClientProps) {
+
+function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const stockParam = searchParams.get('stock');
@@ -289,5 +290,19 @@ export default function DashboardClient({ initialData, stocks }: DashboardClient
         </Alert>
       </Snackbar>
     </ThemeProvider>
+  );
+}
+
+export default function DashboardClient(props: DashboardClientProps) {
+  return (
+    <React.Suspense fallback={
+      <ThemeProvider theme={theme}>
+        <Box sx={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center' }}>
+          <Typography sx={{ color: 'text.secondary' }}>Loading dashboard...</Typography>
+        </Box>
+      </ThemeProvider>
+    }>
+      <DashboardClientContent {...props} />
+    </React.Suspense>
   );
 }

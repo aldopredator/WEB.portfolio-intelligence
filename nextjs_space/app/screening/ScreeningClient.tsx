@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import CriteriaForm from '../criteria/CriteriaForm';
@@ -9,7 +9,7 @@ interface ScreeningClientProps {
   children: React.ReactNode;
 }
 
-export default function ScreeningClient({ children }: ScreeningClientProps) {
+function ScreeningClientContent({ children }: ScreeningClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true); // Always open by default
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -61,5 +61,13 @@ export default function ScreeningClient({ children }: ScreeningClientProps) {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ScreeningClient(props: ScreeningClientProps) {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><div className="text-slate-400">Loading...</div></div>}>
+      <ScreeningClientContent {...props} />
+    </Suspense>
   );
 }
