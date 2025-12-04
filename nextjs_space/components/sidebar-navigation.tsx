@@ -40,61 +40,7 @@ export function SidebarNavigation() {
 
   const SidebarContent = () => (
     <>
-      {/* Portfolio Selector */}
-      {!collapsed && (
-        <div className="p-4 border-b border-slate-800/50">
-          <label className="text-xs text-slate-400 mb-2 block">Active Portfolio</label>
-          <Select
-            value={selectedPortfolio?.id || 'all'}
-            onValueChange={(value) => {
-              console.log('[Sidebar] Portfolio selection changed to:', value);
-              if (value === 'all') {
-                selectPortfolio(null);
-                // Redirect to dashboard without filter
-                if (pathname === '/' || pathname === '/dashboard') {
-                  console.log('[Sidebar] Redirecting to dashboard (all portfolios)');
-                  router.push('/');
-                }
-              } else {
-                const portfolio = portfolios.find(p => p.id === value);
-                if (portfolio) {
-                  selectPortfolio(portfolio);
-                  // Redirect to dashboard with portfolio filter
-                  if (pathname === '/' || pathname === '/dashboard') {
-                    console.log('[Sidebar] Redirecting to dashboard with portfolio filter:', value);
-                    router.push(`/?portfolio=${value}`);
-                  }
-                }
-              }
-            }}
-          >
-            <SelectTrigger className="w-full bg-slate-800/50 border-slate-700 text-white">
-              <SelectValue placeholder="Select portfolio">
-                <div className="flex items-center gap-2">
-                  <Package className="h-4 w-4 text-blue-400" />
-                  <span className="truncate">{selectedPortfolio?.name || 'All Portfolios'}</span>
-                </div>
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">
-                <div className="flex items-center gap-2">
-                  <Package className="h-4 w-4" />
-                  All Portfolios
-                </div>
-              </SelectItem>
-              {portfolios.map((portfolio) => (
-                <SelectItem key={portfolio.id} value={portfolio.id}>
-                  <div className="flex items-center gap-2">
-                    <Package className="h-4 w-4" />
-                    {portfolio.name}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
+
       
       {/* Navigation Links */}
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
