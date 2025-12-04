@@ -8,3 +8,154 @@ datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
 }
+
+// Core stock/ticker information
+model Stock {
+    id          String   @id @default(cuid())
+    ticker      String   @unique
+    company     String
+    type        String?  // 'Equity', 'ETF', etc.
+    exchange    String?  // 'NASDAQ', 'NYSE', etc.
+    region      String?  // 'United States', etc.
+    currency    String?  @default("USD")
+    isActive    Boolean  @default(true) // Whether the stock is in the user's portfolio
+    addedAt     DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    // Relations
+    stockData           StockData?
+    priceHistory        PriceHistory[]
+    analystRecommendations AnalystRecommendation[]
+    socialSentiments    SocialSentiment[]
+    news                News[]
+    metrics             Metrics?
+
+    @@index([ticker])
+    @@index([isActive])
+}
+
+// Current stock price and basic data
+model StockData {
+    id              String   @id @default(cuid())
+    stockId         String   @unique
+    stock           Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+    
+    currentPrice    Float?
+    change          Float?
+    changePercent   Float?
+    week52High      Float?
+    week52Low       Float?
+    volume          Float?
+    marketCap       Float?
+    
+    lastUpdated     DateTime @default(now())
+
+    @@index([stockId])
+}
+
+// Historical price data for charts
+model PriceHistory {
+    id        String   @id @default(cuid())
+    stockId   String
+    stock     Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+    
+    date      DateTime
+    price     Float
+    volume    Float?
+    
+    createdAt DateTime @default(now())
+
+    @@unique([stockId, date])
+    @@index([stockId, date])
+}
+
+// Analyst recommendations
+model AnalystRecommendation {
+    id          String   @id @default(cuid())
+    stockId     String   @unique
+    stock       Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+    
+    strongBuy   Int      @default(0)
+    buy         Int      @default(0)
+    hold        Int      @default(0)
+    sell        Int      @default(0)
+    strongSell  Int      @default(0)
+    consensus   String?  // 'Buy', 'Hold', 'Sell', 'N/A'
+    priceTarget Float?
+    
+    lastUpdated DateTime @default(now())
+
+    @@index([stockId])
+}
+
+// Social sentiment data
+model SocialSentiment {
+    id        String   @id @default(cuid())
+    stockId   String   @unique
+    stock     Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+    
+    positive  Int      @default(0)
+    neutral   Int      @default(0)
+    negative  Int      @default(0)
+    overall   String?  // 'Positive', 'Neutral', 'Negative', 'N/A'
+    
+    lastUpdated DateTime @default(now())
+
+    @@index([stockId])
+}
+
+// News articles
+model News {
+    id          String   @id @default(cuid())
+    stockId     String
+    stock       Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+    
+    title       String
+    url         String?
+    source      String?
+    summary     String?  @db.Text
+    publishedAt DateTime?
+    
+    createdAt   DateTime @default(now())
+
+    @@index([stockId, publishedAt])
+}
+
+// Financial metrics
+model Metrics {
+    id                      String   @id @default(cuid())
+    stockId                 String   @unique
+    stock                   Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+    
+    // Valuation metrics
+    peRatio                 Float?
+    forwardPE               Float?
+    pbRatio                 Float?
+    psRatio                 Float?
+    priceToBook             Float?
+    evToRevenue             Float?
+    evToEbitda              Float?
+    
+    // Performance metrics
+    beta5Y                  Float?
+    ytdReturn               Float?
+    week52Return            Float?
+    
+    // Financial health
+    debtToEquity            Float?
+    roe                     Float?   // Return on Equity
+    operatingMargin         Float?
+    profitMargin            Float?
+    
+    // Growth metrics
+    revenueGrowthQoQ        Float?
+    earningsGrowthQoQ       Float?
+    
+    // Other
+    dividendYield           Float?
+    payoutRatio             Float?
+    
+    lastUpdated             DateTime @default(now())
+
+    @@index([stockId])
+}

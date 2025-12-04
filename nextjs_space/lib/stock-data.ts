@@ -7,52 +7,108 @@ import { fetchFinnhubMetrics, fetchBalanceSheet, fetchCompanyProfile } from '@/l
 import { fetchPolygonStockStats } from '@/lib/polygon';
 import { getPolygonCached, setPolygonCached, getNextTickerToFetch } from '@/lib/polygon-cache';
 import { isRecord } from '@/lib/utils';
+import { PrismaClient } from '@prisma/client';
 
-export const STOCK_CONFIG = [
-  { ticker: 'GOOG', name: 'Alphabet Inc. (GOOG)', sector: 'Technology' },
-  { ticker: 'TSLA', name: 'Tesla, Inc. (TSLA)', sector: 'Consumer Cyclical' },
-  { ticker: 'NVDA', name: 'Nvidia Corporation (NVDA)', sector: 'Technology' },
-  { ticker: 'AMZN', name: 'Amazon.com Inc. (AMZN)', sector: 'Consumer Cyclical' },
-  { ticker: 'BRK-B', name: 'Berkshire Hathaway Inc. (BRK-B)', sector: 'Financial Services' },
-  { ticker: 'ISRG', name: 'Intuitive Surgical Inc. (ISRG)', sector: 'Healthcare' },
-  { ticker: 'NFLX', name: 'Netflix Inc. (NFLX)', sector: 'Communication Services' },
-  { ticker: 'IDXX', name: 'IDEXX Laboratories Inc. (IDXX)', sector: 'Healthcare' },
-  { ticker: 'III', name: '3i Group plc (III)', sector: 'Financial Services' },
-  { ticker: 'PLTR', name: 'Palantir Technologies Inc. (PLTR)', sector: 'Technology' },
-  { ticker: 'QBTS', name: 'D-Wave Quantum Inc. (QBTS)', sector: 'Technology' },
-  { ticker: 'RGTI', name: 'Rigetti Computing Inc. (RGTI)', sector: 'Technology' },
-];
+const prisma = new PrismaClient();
+
+// Dynamic STOCK_CONFIG - will be loaded from database
+export let STOCK_CONFIG: Array<{ ticker: string; name: string; sector: string }> = [];
 
 /**
- * Fetch and enrich stock data from all sources
+ * Fetch and enrich stock data from database
  * This is the single source of truth for stock data across the application
  */
 export async function getStockData(): Promise<StockInsightsData> {
   try {
-    const filePath = path.join(process.cwd(), 'public', 'stock_insights_data.json');
-    const fileContents = await fs.readFile(filePath, 'utf8');
-    const staticData = JSON.parse(fileContents);
-    const mergedData: StockInsightsData = { ...staticData };
-
-    // Enrich with real-time data (skip non-ticker keys like 'timestamp')
-    const validTickers = Object.keys(mergedData).filter(key => 
-      key !== 'timestamp' && isRecord(mergedData[key]) && 'stock_data' in (mergedData[key] as any)
-    );
+    console.log('[STOCK-DATA] 📊 Fetching stock data from database...');
     
-    // Process other APIs in parallel (Finnhub, sentiment, balance sheet)
+    // Fetch all active stocks with their related data
+    const stocks = await prisma.stock.findMany({
+      where: { isActive: true },
+      include: {
+        stockData: true,
+        priceHistory: {
+          orderBy: { date: 'asc' },
+          take: 30, // Last 30 days
+        },
+        analystRecommendations: true,
+        socialSentiments: true,
+        news: {
+          orderBy: { publishedAt: 'desc' },
+          take: 5,
+        },
+        metrics: true,
+      },
+    });
+
+    console.log(`[STOCK-DATA] Found ${stocks.length} active stocks in database`);
+
+    // Update STOCK_CONFIG dynamically
+    STOCK_CONFIG = stocks.map(stock => ({
+      ticker: stock.ticker,
+      name: stock.company,
+      sector: 'Technology', // TODO: Add sector to database schema
+    }));
+
+    // Convert database format to StockInsightsData format
+    const mergedData: StockInsightsData = {
+      timestamp: new Date().toISOString(),
+    };
+
+    for (const stock of stocks) {
+      const stockData = stock.stockData;
+      const analystRec = stock.analystRecommendations?.[0]; // Get first element since it's an array
+      const socialSent = stock.socialSentiments?.[0]; // Get first element since it's an array
+
+      (mergedData as any)[stock.ticker] = {
+        stock_data: {
+          ticker: stock.ticker,
+          company: stock.company,
+          current_price: stockData?.currentPrice || 0,
+          change: stockData?.change || 0,
+          change_percent: stockData?.changePercent || 0,
+          '52_week_high': stockData?.week52High || 0,
+          '52_week_low': stockData?.week52Low || 0,
+          price_movement_30_days: stock.priceHistory.map(ph => ({
+            Date: ph.date.toISOString().split('T')[0],
+            Close: ph.price,
+          })),
+        },
+        analyst_recommendations: {
+          buy: analystRec?.buy || 0,
+          hold: analystRec?.hold || 0,
+          sell: analystRec?.sell || 0,
+          strongBuy: analystRec?.strongBuy || 0,
+          strongSell: analystRec?.strongSell || 0,
+        },
+        social_sentiment: {
+          positive: socialSent?.positive || 0,
+          neutral: socialSent?.neutral || 0,
+          negative: socialSent?.negative || 0,
+        },
+        latest_news: stock.news.map(article => ({
+          headline: article.title,
+          datetime: article.publishedAt?.getTime() || 0,
+          image: '',
+          source: article.source || '',
+          summary: article.summary || '',
+          url: article.url || '',
+        })),
+        emerging_trends: ['📊 Real-time data from database'],
+      };
+    }
+
+    // Enrich with real-time APIs (optional - can be disabled for faster loading)
+    const validTickers = stocks.map(s => s.ticker);
+    
+    console.log('[STOCK-DATA] 🔄 Enriching with real-time data...');
+    
+    // Process other APIs in parallel (Finnhub, sentiment, Polygon)
     await Promise.allSettled(validTickers.map(async (ticker) => {
       try {
-        const cfg = STOCK_CONFIG.find(c => c.ticker === ticker);
-        const companyName = cfg?.name;
         const stockEntry = mergedData[ticker];
 
-        // Fetch sentiment
-        const sentiment = await fetchAndScoreSentiment(ticker, companyName, []);
-        if (sentiment && isRecord(stockEntry)) {
-          stockEntry.social_sentiment = sentiment as any;
-        }
-
-        // Fetch company profile (includes country, industry, etc.)
+        // Fetch company profile
         const profile = await fetchCompanyProfile(ticker);
         if (profile && isRecord(stockEntry)) {
           stockEntry.company_profile = profile as any;
@@ -69,41 +125,34 @@ export async function getStockData(): Promise<StockInsightsData> {
         if (balanceSheet && isRecord(stockEntry) && stockEntry.company_profile) {
           Object.assign(stockEntry.company_profile, balanceSheet);
         }
+
+        // Fetch Polygon data
+        const polygonStats = await fetchPolygonStockStats(ticker);
+        if (polygonStats && isRecord(stockEntry) && stockEntry.stock_data) {
+          Object.assign(stockEntry.stock_data, polygonStats);
+        }
       } catch (error) {
         console.error(`Error enriching ${ticker}:`, error);
       }
     }));
-
-    // Fetch Polygon.io data for all tickers
-    const timestamp = new Date().toISOString();
-    console.log(`[STOCK-DATA] 🎯 Fetching Polygon.io data for all tickers at ${timestamp}...`);
     
-    await Promise.allSettled(validTickers.map(async (ticker) => {
-      const stockEntry = mergedData[ticker];
-      if (stockEntry && isRecord(stockEntry) && stockEntry.stock_data) {
-        try {
-          const polygonStats = await fetchPolygonStockStats(ticker);
-          
-          if (polygonStats) {
-            Object.assign(stockEntry.stock_data, polygonStats);
-            console.log(`[STOCK-DATA] ✅ ${ticker} Polygon:`, JSON.stringify(polygonStats));
-          } else {
-            console.log(`[STOCK-DATA] ⚠️ No Polygon data for ${ticker}`);
-          }
-        } catch (error) {
-          console.error(`[STOCK-DATA] ❌ Polygon error for ${ticker}:`, error);
-        }
-      }
-    }));
-    
-    console.log('[STOCK-DATA] 🏁 Completed data enrichment');
-
-    // Note: Price history is already in the JSON file (updates once per day)
-    // No need to fetch from Yahoo Finance on every request
+    console.log('[STOCK-DATA] ✅ Completed data enrichment');
 
     return mergedData;
   } catch (error) {
-    console.error('Error loading stock data:', error);
-    return {};
+    console.error('Error loading stock data from database:', error);
+    
+    // Fallback to JSON file if database fails
+    try {
+      console.log('[STOCK-DATA] ⚠️ Falling back to JSON file...');
+      const filePath = path.join(process.cwd(), 'public', 'stock_insights_data.json');
+      const fileContents = await fs.readFile(filePath, 'utf8');
+      return JSON.parse(fileContents);
+    } catch (fallbackError) {
+      console.error('Error loading fallback JSON data:', fallbackError);
+      return {};
+    }
+  } finally {
+    await prisma.$disconnect();
   }
 }
