@@ -44,7 +44,7 @@ export async function getStockData(): Promise<StockInsightsData> {
     console.log(`[STOCK-DATA] Found ${stocks.length} active stocks in database`);
 
     // Update STOCK_CONFIG dynamically
-    STOCK_CONFIG = stocks.map(stock => ({
+    STOCK_CONFIG = stocks.map((stock: any) => ({
       ticker: stock.ticker,
       name: stock.company,
       sector: 'Technology', // TODO: Add sector to database schema
