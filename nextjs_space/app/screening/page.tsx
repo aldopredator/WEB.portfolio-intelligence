@@ -139,24 +139,37 @@ export default async function ScreeningPage({
       return null;
     }
 
-    return {
+    // Filter out stocks with missing portfolio assignment
+    if (!stock.portfolio?.name) {
+      return null;
+    }
+
+    const stockData = {
       ticker: stock.ticker,
       name: stock.company,
-      sector: companyProfile?.industry || stock.type || 'N/A',
-      portfolio: stock.portfolio?.name || 'Unassigned',
-      pe: stockInfo.pe_ratio?.toFixed(0) || 'N/A',
-      pb: stockInfo.pb_ratio?.toFixed(0) || 'N/A',
-      priceToSales: stockInfo.priceToSales?.toFixed(1) || 'N/A',
-      marketCap: stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(0)}B` : 'N/A',
-      avgVolume: stockInfo.averageVolume ? `${(stockInfo.averageVolume / 1e6).toFixed(1)}M` : 'N/A',
-      beta: stockInfo.beta?.toFixed(0) || 'N/A',
-      roe: stockInfo.roe ? `${stockInfo.roe.toFixed(0)}%` : 'N/A',
-      profitMargin: stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(0)}%` : 'N/A',
+      sector: companyProfile?.industry || stock.type || null,
+      portfolio: stock.portfolio.name,
+      pe: stockInfo.pe_ratio?.toFixed(0) || null,
+      pb: stockInfo.pb_ratio?.toFixed(0) || null,
+      priceToSales: stockInfo.priceToSales?.toFixed(1) || null,
+      marketCap: stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(0)}B` : null,
+      avgVolume: stockInfo.averageVolume ? `${(stockInfo.averageVolume / 1e6).toFixed(1)}M` : null,
+      beta: stockInfo.beta?.toFixed(0) || null,
+      roe: stockInfo.roe ? `${stockInfo.roe.toFixed(0)}%` : null,
+      profitMargin: stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(0)}%` : null,
       sentiment: data && typeof data === 'object' && 'sentiment_data' in data 
-        ? (data.sentiment_data as any)?.overall_sentiment || 'N/A'
-        : 'N/A',
+        ? (data.sentiment_data as any)?.overall_sentiment || null
+        : null,
       matchScore,
     };
+
+    // Filter out stocks with any N/A values in key data fields
+    if (!stockData.sector || !stockData.pe || !stockData.pb || !stockData.priceToSales || 
+        !stockData.marketCap || !stockData.avgVolume) {
+      return null;
+    }
+
+    return stockData;
   }).filter((stock): stock is NonNullable<typeof stock> => stock !== null);
 
   await prisma.$disconnect();
