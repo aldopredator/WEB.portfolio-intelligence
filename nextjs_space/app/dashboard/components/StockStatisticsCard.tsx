@@ -80,14 +80,17 @@ export default function StockStatisticsCard({
                 </Typography>
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <Typography 
-                    variant="h6" 
+                    variant={detail.value === 'N/A' ? 'body2' : 'h6'}
                     sx={{ 
-                      fontWeight: 700,
-                      color: detail.rawValue && detail.rawValue < 0 ? 'error.main' : 'inherit'
+                      fontWeight: detail.value === 'N/A' ? 400 : 700,
+                      color: detail.value === 'N/A' ? 'text.disabled' : (detail.rawValue && detail.rawValue < 0 ? 'error.main' : 'inherit')
                     }}
                   >
                     {detail.value}
                   </Typography>
+                  {detail.value === 'N/A' && (
+                    <Box sx={{ color: 'text.disabled', fontSize: '1rem' }}>❓</Box>
+                  )}
                   {detail.rawValue && detail.rawValue < 0 && (
                     <Box sx={{ color: 'error.main', fontSize: '1.2rem' }}>⚠️</Box>
                   )}
@@ -132,14 +135,17 @@ export default function StockStatisticsCard({
                 </Typography>
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <Typography 
-                    variant="h6" 
+                    variant={detail.value === 'N/A' ? 'body2' : 'h6'}
                     sx={{ 
-                      fontWeight: 700,
-                      color: detail.rawValue && detail.rawValue < 0 ? 'error.main' : 'inherit'
+                      fontWeight: detail.value === 'N/A' ? 400 : 700,
+                      color: detail.value === 'N/A' ? 'text.disabled' : (detail.rawValue && detail.rawValue < 0 ? 'error.main' : 'inherit')
                     }}
                   >
                     {detail.value}
                   </Typography>
+                  {detail.value === 'N/A' && (
+                    <Box sx={{ color: 'text.disabled', fontSize: '1rem' }}>❓</Box>
+                  )}
                   {detail.rawValue && detail.rawValue < 0 && (
                     <Box sx={{ color: 'error.main', fontSize: '1.2rem' }}>⚠️</Box>
                   )}
