@@ -161,12 +161,8 @@ export default function EditPortfolioClient({ portfolioId }: { portfolioId: stri
 
     if (file.name.endsWith('.csv') || file.name.endsWith('.txt')) {
       reader.readAsText(file);
-    } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-      // For Excel files, we'll read as text and try to parse
-      reader.readAsText(file);
-      toast('For Excel files, please save as CSV first for best results', { icon: 'ℹ️' });
     } else {
-      toast.error('Please upload a CSV, TXT, or Excel file');
+      toast.error('Please upload a CSV or TXT file');
     }
 
     // Reset file input
@@ -324,7 +320,7 @@ export default function EditPortfolioClient({ portfolioId }: { portfolioId: stri
                 <DialogHeader>
                   <DialogTitle>Import Tickers from File</DialogTitle>
                   <DialogDescription>
-                    Upload a CSV, Excel, or text file with ticker symbols, or paste them below (comma, semicolon, or newline separated)
+                    Upload a CSV or text file with ticker symbols, or paste them below (comma, semicolon, or newline separated)
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
@@ -337,12 +333,12 @@ export default function EditPortfolioClient({ portfolioId }: { portfolioId: stri
                         onClick={() => fileInputRef.current?.click()}
                       >
                         <FileUp className="h-4 w-4" />
-                        Choose File (CSV, TXT, Excel)
+                        Choose File (CSV, TXT)
                       </Button>
                       <input
                         ref={fileInputRef}
                         type="file"
-                        accept=".csv,.txt,.xlsx,.xls"
+                        accept=".csv,.txt"
                         onChange={handleFileUpload}
                         className="hidden"
                       />
