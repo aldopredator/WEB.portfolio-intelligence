@@ -157,8 +157,11 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
               position: 'fixed',
               top: 180,
               right: 24,
+              bottom: 24,
               zIndex: 100,
               width: '400px',
+              display: 'flex',
+              flexDirection: 'column',
             }}>
               <Paper
                 elevation={3}
@@ -168,6 +171,10 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
                   borderRadius: 2,
                   p: 2.5,
                   border: '1px solid rgba(148, 163, 184, 0.1)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '100%',
+                  overflow: 'hidden',
                 }}
               >
                 {/* Portfolio Selector */}
@@ -279,7 +286,7 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
                 </Box>
 
                 {/* Ticker List */}
-                <Box sx={{ mt: 3, maxHeight: '400px', overflowY: 'auto' }}>
+                <Box sx={{ mt: 3, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
                   <Typography
                     variant="h6"
                     sx={{
@@ -291,7 +298,7 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
                   >
                     Tickers ({stocks.length})
                   </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, overflowY: 'auto', flex: 1, pr: 1 }}>
                     {stocks.map((stock) => (
                       <Box
                         key={stock.ticker}
