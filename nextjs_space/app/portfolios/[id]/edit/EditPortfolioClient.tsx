@@ -395,7 +395,7 @@ export default function EditPortfolioClient({ portfolioId }: { portfolioId: stri
               </div>
             ) : (
               <div className="max-h-[600px] overflow-y-auto space-y-2 pr-2">
-                {portfolio.stocks.map((stock) => (
+                {[...portfolio.stocks].sort((a, b) => a.ticker.localeCompare(b.ticker)).map((stock) => (
                   <div
                     key={stock.id}
                     className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"
