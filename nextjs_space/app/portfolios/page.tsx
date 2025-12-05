@@ -178,7 +178,7 @@ export default function PortfoliosPage() {
             Portfolio Management
           </h1>
           <p className="text-muted-foreground">
-            Organize your stocks into different portfolios
+            Organize your stocks into different buckets
           </p>
         </div>
         
@@ -242,7 +242,7 @@ export default function PortfoliosPage() {
       {/* Portfolios Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {portfolios.map((portfolio) => (
-          <Card key={portfolio.id} className="hover:shadow-lg transition-shadow">
+          <Card key={portfolio.id} className="hover:shadow-lg transition-shadow min-h-[280px]">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex-1">

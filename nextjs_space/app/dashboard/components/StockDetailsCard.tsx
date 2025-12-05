@@ -31,13 +31,13 @@ export default function StockDetailsCard({
   debtToEquity,
 }: StockDetailsCardProps) {
   const valuationMetrics = [
-    { label: 'Price/Sales', value: priceToSales ? priceToSales.toFixed(0) : 'N/A' },
-    { label: 'Trailing P/E', value: trailingPE ? trailingPE.toFixed(0) : 'N/A' },
-    { label: 'Price/Book', value: priceToBook ? priceToBook.toFixed(0) : 'N/A' },
-    { label: 'Forward P/E', value: forwardPE ? forwardPE.toFixed(0) : 'N/A' },
-    { label: 'Total Debt/Equity', value: debtToEquity ? debtToEquity.toFixed(0) : 'N/A' },
-    { label: 'Enterprise Value/Revenue', value: enterpriseToRevenue ? enterpriseToRevenue.toFixed(0) : 'N/A' },
-    { label: 'Enterprise Value/EBITDA', value: enterpriseToEbitda ? enterpriseToEbitda.toFixed(0) : 'N/A' },
+    { label: 'Price/Sales', value: priceToSales ? priceToSales.toFixed(0) : 'N/A', rawValue: priceToSales },
+    { label: 'Trailing P/E', value: trailingPE ? trailingPE.toFixed(0) : 'N/A', rawValue: trailingPE },
+    { label: 'Price/Book', value: priceToBook ? priceToBook.toFixed(0) : 'N/A', rawValue: priceToBook },
+    { label: 'Forward P/E', value: forwardPE ? forwardPE.toFixed(0) : 'N/A', rawValue: forwardPE },
+    { label: 'Total Debt/Equity', value: debtToEquity ? debtToEquity.toFixed(0) : 'N/A', rawValue: debtToEquity },
+    { label: 'Enterprise Value/Revenue', value: enterpriseToRevenue ? enterpriseToRevenue.toFixed(0) : 'N/A', rawValue: enterpriseToRevenue },
+    { label: 'Enterprise Value/EBITDA', value: enterpriseToEbitda ? enterpriseToEbitda.toFixed(0) : 'N/A', rawValue: enterpriseToEbitda },
   ];
 
   return (
@@ -81,9 +81,20 @@ export default function StockDetailsCard({
                 <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                   {detail.label}
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {detail.value}
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 700,
+                      color: detail.rawValue && detail.rawValue < 0 ? 'error.main' : 'inherit'
+                    }}
+                  >
+                    {detail.value}
+                  </Typography>
+                  {detail.rawValue && detail.rawValue < 0 && (
+                    <Box sx={{ color: 'error.main', fontSize: '1.2rem' }}>⚠️</Box>
+                  )}
+                </Stack>
               </Stack>
             ))}
           </Stack>
