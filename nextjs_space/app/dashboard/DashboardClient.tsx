@@ -350,7 +350,7 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
                     Tickers ({stocks.length})
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, overflowY: 'auto', flex: 1, pr: 1 }}>
-                    {stocks.map((stock) => (
+                    {[...stocks].sort((a, b) => a.ticker.localeCompare(b.ticker)).map((stock) => (
                       <Box
                         key={stock.ticker}
                         onClick={() => {
