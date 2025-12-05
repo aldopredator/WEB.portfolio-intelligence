@@ -129,7 +129,7 @@ function GlobalHeaderContent() {
         </div>
         
         {/* Stock Tickers Row - Dynamically filtered */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="hidden flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {loading ? (
             <div className="text-slate-400 text-sm">Loading...</div>
           ) : filteredStocks.length === 0 ? (
