@@ -156,10 +156,10 @@ export async function GET(request: NextRequest) {
       { 
         symbol: query.toUpperCase(), 
         name: query.toUpperCase(), 
-        exchange: 'Unknown', 
+        exchange: '', 
         type: 'Equity', 
-        region: 'Unknown',
-        currency: 'USD'
+        region: '',
+        currency: ''
       },
     ];
 
