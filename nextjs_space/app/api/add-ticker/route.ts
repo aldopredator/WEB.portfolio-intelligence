@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { fetchYahooPriceHistory } from '@/lib/yahoo-finance';
 
 const prisma = new PrismaClient();
 
@@ -115,6 +116,41 @@ export async function POST(request: NextRequest) {
         overall: 'N/A',
       },
     });
+
+    // Fetch and store 30-day price history
+    try {
+      console.log('[Add Ticker API] Fetching price history for:', ticker);
+      const priceHistory = await fetchYahooPriceHistory(ticker);
+      
+      if (priceHistory && priceHistory.length > 0) {
+        // Store last 30 days of price history
+        const last30Days = priceHistory.slice(-30);
+        
+        for (const dataPoint of last30Days) {
+          await prisma.priceHistory.upsert({
+            where: {
+              stockId_date: {
+                stockId: stock.id,
+                date: new Date(dataPoint.Date),
+              },
+            },
+            update: {
+              price: dataPoint.Close,
+            },
+            create: {
+              stockId: stock.id,
+              date: new Date(dataPoint.Date),
+              price: dataPoint.Close,
+            },
+          });
+        }
+        
+        console.log('[Add Ticker API] Stored', last30Days.length, 'price history records');
+      }
+    } catch (priceError) {
+      console.error('[Add Ticker API] Error fetching price history:', priceError);
+      // Continue even if price history fails - not critical
+    }
 
     console.log('[Add Ticker API] Successfully added ticker:', ticker);
 
