@@ -155,7 +155,7 @@ export async function GET(request: NextRequest) {
     const fallbackResults = [
       { 
         symbol: query.toUpperCase(), 
-        name: `${query.toUpperCase()} - Search externally`, 
+        name: query.toUpperCase(), 
         exchange: 'Unknown', 
         type: 'Equity', 
         region: 'Unknown',
