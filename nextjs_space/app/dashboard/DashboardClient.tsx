@@ -203,19 +203,29 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
               >
                 {/* Collapse Button Inside Panel */}
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
-                  <IconButton
+                  <Box
                     onClick={() => setPanelCollapsed(true)}
-                    size="small"
                     sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      px: 2,
+                      py: 1,
                       color: '#94a3b8',
+                      cursor: 'pointer',
+                      borderRadius: 1,
+                      transition: 'all 0.2s',
                       '&:hover': {
                         color: '#fff',
                         bgcolor: 'rgba(148, 163, 184, 0.1)',
                       },
                     }}
                   >
-                    <ChevronRight className="w-5 h-5" />
-                  </IconButton>
+                    <ChevronRight className="w-4 h-4" />
+                    <Typography sx={{ fontSize: '0.875rem', fontWeight: 500 }}>
+                      Collapse
+                    </Typography>
+                  </Box>
                 </Box>
                 {/* Portfolio Selector */}
                 <Box sx={{ mb: 2.5 }}>
