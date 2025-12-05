@@ -277,6 +277,66 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
                     )}
                   </Box>
                 </Box>
+
+                {/* Ticker List */}
+                <Box sx={{ mt: 3, maxHeight: '400px', overflowY: 'auto' }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: '#fff',
+                      mb: 1.5,
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Tickers ({stocks.length})
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {stocks.map((stock) => (
+                      <Box
+                        key={stock.ticker}
+                        onClick={() => {
+                          setSelectedStock(stock.ticker);
+                          router.push(`/?stock=${stock.ticker}${selectedPortfolio ? `&portfolio=${selectedPortfolio.id}` : ''}`);
+                        }}
+                        sx={{
+                          p: 1.5,
+                          bgcolor: selectedStock === stock.ticker ? 'rgba(59, 130, 246, 0.2)' : 'rgba(15, 23, 42, 0.6)',
+                          border: selectedStock === stock.ticker ? '1px solid rgba(59, 130, 246, 0.4)' : '1px solid rgba(148, 163, 184, 0.1)',
+                          borderRadius: 2,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          '&:hover': {
+                            bgcolor: selectedStock === stock.ticker ? 'rgba(59, 130, 246, 0.25)' : 'rgba(15, 23, 42, 0.8)',
+                            borderColor: 'rgba(59, 130, 246, 0.3)',
+                          }
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <Box>
+                            <Typography sx={{ color: '#fff', fontWeight: 600, fontSize: '0.9rem' }}>
+                              {stock.ticker}
+                            </Typography>
+                            <Typography sx={{ color: '#94a3b8', fontSize: '0.75rem', mt: 0.25 }}>
+                              {stock.company}
+                            </Typography>
+                          </Box>
+                          {stock.change_percent !== undefined && (
+                            <Typography 
+                              sx={{ 
+                                color: stock.change_percent >= 0 ? '#4ade80' : '#f87171',
+                                fontWeight: 600,
+                                fontSize: '0.85rem'
+                              }}
+                            >
+                              {stock.change_percent >= 0 ? '+' : ''}{stock.change_percent.toFixed(2)}%
+                            </Typography>
+                          )}
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
               </Paper>
             </Box>
 
