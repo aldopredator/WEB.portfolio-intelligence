@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
-type SortField = 'ticker' | 'sector' | 'portfolio' | 'pe' | 'pb' | 'marketCap' | 'beta' | 'roe' | 'profitMargin' | 'sentiment' | 'matchScore';
+type SortField = 'ticker' | 'sector' | 'portfolio' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'beta' | 'roe' | 'profitMargin' | 'sentiment' | 'matchScore';
 type SortDirection = 'asc' | 'desc';
 
 interface Stock {
@@ -13,7 +13,9 @@ interface Stock {
   portfolio: string;
   pe: string;
   pb: string;
+  priceToSales: string;
   marketCap: string;
+  avgVolume: string;
   beta: string;
   roe: string;
   profitMargin: string;
@@ -53,12 +55,15 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
       let bVal: any = b[sortField];
 
       // Convert string numbers to actual numbers for sorting
-      if (sortField === 'pe' || sortField === 'pb' || sortField === 'beta' || sortField === 'roe' || sortField === 'profitMargin') {
+      if (sortField === 'pe' || sortField === 'pb' || sortField === 'priceToSales' || sortField === 'beta' || sortField === 'roe' || sortField === 'profitMargin') {
         aVal = aVal === 'N/A' ? -Infinity : parseFloat(aVal);
         bVal = bVal === 'N/A' ? -Infinity : parseFloat(bVal);
       } else if (sortField === 'marketCap') {
         aVal = aVal === 'N/A' ? -Infinity : parseFloat(aVal.replace(/[$B]/g, ''));
         bVal = bVal === 'N/A' ? -Infinity : parseFloat(bVal.replace(/[$B]/g, ''));
+      } else if (sortField === 'avgVolume') {
+        aVal = aVal === 'N/A' ? -Infinity : parseFloat(aVal.replace(/[M]/g, ''));
+        bVal = bVal === 'N/A' ? -Infinity : parseFloat(bVal.replace(/[M]/g, ''));
       } else if (sortField === 'matchScore') {
         aVal = a.matchScore;
         bVal = b.matchScore;
@@ -97,9 +102,6 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   Portfolio
                   <SortIcon field="portfolio" />
                 </div>
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
-                Logo
               </th>
               <th 
                 className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
@@ -141,6 +143,15 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   </div>
                 </th>
               )}
+              <th 
+                className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('priceToSales')}
+              >
+                <div className="flex items-center justify-end gap-2">
+                  P/S Ratio
+                  <SortIcon field="priceToSales" />
+                </div>
+              </th>
               {criteria.marketCapEnabled && (
                 <th 
                   className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
@@ -152,7 +163,16 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   </div>
                 </th>
               )}
-              {criteria.betaEnabled && (
+              <th 
+                className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('avgVolume')}
+              >
+                <div className="flex items-center justify-end gap-2">
+                  Avg Volume
+                  <SortIcon field="avgVolume" />
+                </div>
+              </th>
+              {criteria.dividendYieldEnabled && (
                 <th 
                   className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
                   onClick={() => handleSort('beta')}
@@ -219,20 +239,6 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   </span>
                 </td>
                 <td className="px-6 py-5">
-                  <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
-                    <img 
-                      src={`/logos/${stock.ticker}.svg`} 
-                      alt={stock.ticker}
-                      className="w-8 h-8 object-contain"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        target.parentElement!.innerHTML = `<span class="text-slate-400 font-bold text-sm">${stock.ticker.substring(0, 3)}</span>`;
-                      }}
-                    />
-                  </div>
-                </td>
-                <td className="px-6 py-5">
                   <div>
                     <div className="text-white font-bold text-lg">{stock.ticker}</div>
                     <div className="text-slate-400 text-sm mt-1">{stock.name}</div>
@@ -253,11 +259,17 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                     <span className="text-emerald-400 font-mono font-bold text-lg">{stock.pb}</span>
                   </td>
                 )}
+                <td className="px-6 py-5 text-right">
+                  <span className="text-emerald-400 font-mono font-bold text-lg">{stock.priceToSales}</span>
+                </td>
                 {criteria.marketCapEnabled && (
                   <td className="px-6 py-5 text-right">
                     <span className="text-purple-400 font-mono font-bold text-lg">{stock.marketCap}</span>
                   </td>
                 )}
+                <td className="px-6 py-5 text-right">
+                  <span className="text-purple-400 font-mono font-bold text-lg">{stock.avgVolume}</span>
+                </td>
                 {criteria.betaEnabled && (
                   <td className="px-6 py-5 text-right">
                     <span className="text-purple-400 font-mono font-bold text-lg">{stock.beta}</span>
