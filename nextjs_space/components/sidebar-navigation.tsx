@@ -32,7 +32,12 @@ export function SidebarNavigation() {
   const { selectedPortfolio, portfolios, selectPortfolio } = usePortfolio();
 
   const navigation = [
-    { name: 'Dashboard', href: '/', icon: BarChart3, description: 'Stock insights & analytics' },
+    { 
+      name: 'Dashboard', 
+      href: selectedPortfolio ? `/?portfolio=${selectedPortfolio.id}` : '/', 
+      icon: BarChart3, 
+      description: 'Stock insights & analytics' 
+    },
     { name: 'Portfolios', href: '/portfolios', icon: Briefcase, description: 'Manage your portfolios' },
     { name: 'Screening', href: '/screening', icon: Filter, description: 'Stock screening results' },
     { name: 'Benchmark', href: '/benchmark', icon: TrendingUp, description: 'Market benchmark comparison' },
