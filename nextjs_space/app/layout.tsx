@@ -54,9 +54,8 @@ export default function RootLayout({
                   </div>
                 </div>
                 <div className="flex-1 flex items-center gap-2">
-                  <h3 className="text-xs font-semibold text-orange-400 whitespace-nowrap">Investment Disclaimer:</h3>
-                  <p className="text-slate-300 text-xs">
-                    This information is for educational and informational purposes only and should not be considered as financial advice, investment recommendations, or an offer to buy or sell securities. Past performance does not guarantee future results. Always conduct thorough due diligence and consult with a qualified financial advisor before making any investment decisions.
+                  <p className="text-orange-400 text-xs">
+                    <span className="font-semibold">Investment Disclaimer:</span> This information is for educational and informational purposes only and should not be considered as financial advice, investment recommendations, or an offer to buy or sell securities. Past performance does not guarantee future results. Always conduct thorough due diligence and consult with a qualified financial advisor before making any investment decisions.
                   </p>
                 </div>
               </div>
