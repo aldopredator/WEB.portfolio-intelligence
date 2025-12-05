@@ -27,14 +27,14 @@ export default function StockStatisticsCard({
   quarterlyEarningsGrowth,
 }: StockStatisticsCardProps) {
   const profitabilityMetrics = [
-    { label: 'ROE', value: roe ? `${roe.toFixed(0)}%` : 'N/A' },
-    { label: 'Return on Assets', value: returnOnAssets ? `${returnOnAssets.toFixed(0)}%` : 'N/A' },
-    { label: 'Profit Margin', value: profitMargin ? `${profitMargin.toFixed(0)}%` : 'N/A' },
+    { label: 'ROE', value: roe ? `${roe.toFixed(0)}%` : 'N/A', rawValue: roe },
+    { label: 'Return on Assets', value: returnOnAssets ? `${returnOnAssets.toFixed(0)}%` : 'N/A', rawValue: returnOnAssets },
+    { label: 'Profit Margin', value: profitMargin ? `${profitMargin.toFixed(0)}%` : 'N/A', rawValue: profitMargin },
   ];
 
   const growthMetrics = [
-    { label: 'Quarterly Revenue Growth (yoy)', value: quarterlyRevenueGrowth ? `${quarterlyRevenueGrowth.toFixed(0)}%` : 'N/A' },
-    { label: 'Quarterly Earnings Growth (yoy)', value: quarterlyEarningsGrowth ? `${quarterlyEarningsGrowth.toFixed(0)}%` : 'N/A' },
+    { label: 'Quarterly Revenue Growth (yoy)', value: quarterlyRevenueGrowth ? `${quarterlyRevenueGrowth.toFixed(0)}%` : 'N/A', rawValue: quarterlyRevenueGrowth },
+    { label: 'Quarterly Earnings Growth (yoy)', value: quarterlyEarningsGrowth ? `${quarterlyEarningsGrowth.toFixed(0)}%` : 'N/A', rawValue: quarterlyEarningsGrowth },
   ];
 
   return (
@@ -78,9 +78,20 @@ export default function StockStatisticsCard({
                 <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                   {detail.label}
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {detail.value}
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 700,
+                      color: detail.rawValue && detail.rawValue < 0 ? 'error.main' : 'inherit'
+                    }}
+                  >
+                    {detail.value}
+                  </Typography>
+                  {detail.rawValue && detail.rawValue < 0 && (
+                    <Box sx={{ color: 'error.main', fontSize: '1.2rem' }}>⚠️</Box>
+                  )}
+                </Stack>
               </Stack>
             ))}
           </Stack>
@@ -119,9 +130,20 @@ export default function StockStatisticsCard({
                 <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                   {detail.label}
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {detail.value}
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 700,
+                      color: detail.rawValue && detail.rawValue < 0 ? 'error.main' : 'inherit'
+                    }}
+                  >
+                    {detail.value}
+                  </Typography>
+                  {detail.rawValue && detail.rawValue < 0 && (
+                    <Box sx={{ color: 'error.main', fontSize: '1.2rem' }}>⚠️</Box>
+                  )}
+                </Stack>
               </Stack>
             ))}
           </Stack>
