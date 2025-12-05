@@ -164,7 +164,7 @@ export default function EditPortfolioClient({ portfolioId }: { portfolioId: stri
     } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
       // For Excel files, we'll read as text and try to parse
       reader.readAsText(file);
-      toast.info('For Excel files, please save as CSV first for best results');
+      toast('For Excel files, please save as CSV first for best results', { icon: 'ℹ️' });
     } else {
       toast.error('Please upload a CSV, TXT, or Excel file');
     }
