@@ -59,11 +59,11 @@ export default async function ScreeningPage({
   });
   
   // Fetch real stock data
-  const stockData = await getStockData();
+  const allStockData = await getStockData();
   
   // Build screening results from real data with actual filtering
   const recommendedStocks = dbStocks.map((stock) => {
-    const data: any = stockData[stock.ticker];
+    const data: any = allStockData[stock.ticker];
     const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
     const companyProfile = data && typeof data === 'object' && 'company_profile' in data ? data.company_profile : null;
     
