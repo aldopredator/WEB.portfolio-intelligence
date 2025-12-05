@@ -3,13 +3,14 @@
 import { useState, useMemo } from 'react';
 import { CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
-type SortField = 'ticker' | 'sector' | 'pe' | 'pb' | 'marketCap' | 'beta' | 'roe' | 'profitMargin' | 'sentiment' | 'matchScore';
+type SortField = 'ticker' | 'sector' | 'portfolio' | 'pe' | 'pb' | 'marketCap' | 'beta' | 'roe' | 'profitMargin' | 'sentiment' | 'matchScore';
 type SortDirection = 'asc' | 'desc';
 
 interface Stock {
   ticker: string;
   name: string;
   sector: string;
+  portfolio: string;
   pe: string;
   pb: string;
   marketCap: string;
@@ -88,6 +89,15 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
         <table className="w-full">
           <thead>
             <tr className="bg-gradient-to-r from-slate-950/50 to-slate-900/50 border-b border-slate-800/50">
+              <th 
+                className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('portfolio')}
+              >
+                <div className="flex items-center gap-2">
+                  Portfolio
+                  <SortIcon field="portfolio" />
+                </div>
+              </th>
               <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
                 Logo
               </th>
@@ -203,6 +213,11 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                 key={stock.ticker}
                 className="hover:bg-slate-800/30 transition-all group"
               >
+                <td className="px-6 py-5">
+                  <span className="inline-block px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-400 text-xs font-medium">
+                    {stock.portfolio}
+                  </span>
+                </td>
                 <td className="px-6 py-5">
                   <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
                     <img 
