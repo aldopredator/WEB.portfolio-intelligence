@@ -63,7 +63,7 @@ export default async function ScreeningPage({
   
   // Build screening results from real data with actual filtering
   const recommendedStocks = dbStocks.map((stock) => {
-    const data = stockData[stock.ticker];
+    const data: any = stockData[stock.ticker];
     const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
     const companyProfile = data && typeof data === 'object' && 'company_profile' in data ? data.company_profile : null;
     
