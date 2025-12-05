@@ -40,7 +40,7 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
   const router = useRouter();
   const stockParam = searchParams.get('stock');
   const { selectedPortfolio, portfolios, selectPortfolio } = usePortfolio();
-  const [selectedStock, setSelectedStock] = React.useState(stocks[0]?.ticker || 'GOOG');
+  const [selectedStock, setSelectedStock] = React.useState(stocks[0]?.ticker || '');
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'info' | 'warning' | 'error'>('info');
@@ -112,8 +112,9 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
           
           // Wait a bit to show the success message, then refresh the page
           setTimeout(() => {
-            // Refresh the page to load the new ticker data
-            window.location.href = `/dashboard?stock=${result.symbol}`;
+            // Refresh the page to load the new ticker data with portfolio filter
+            const portfolioParam = selectedPortfolio ? `&portfolio=${selectedPortfolio.id}` : '';
+            window.location.href = `/?stock=${result.symbol}${portfolioParam}`;
           }, 1500);
         } else {
           throw new Error(data.error || 'Failed to add ticker');

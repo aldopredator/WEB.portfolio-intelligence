@@ -298,7 +298,7 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search by 
                           whiteSpace: 'nowrap',
                         }}
                       >
-                        {result.name}
+                        {result.name || result.symbol || 'Unknown Company'}
                       </Typography>
                     </Box>
 
