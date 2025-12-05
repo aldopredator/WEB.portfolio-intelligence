@@ -144,32 +144,41 @@ export default async function ScreeningPage({
       return null;
     }
 
-    const stockData = {
-      ticker: stock.ticker,
-      name: stock.company,
-      sector: companyProfile?.industry || stock.type || null,
-      portfolio: stock.portfolio.name,
-      pe: stockInfo.pe_ratio?.toFixed(0) || null,
-      pb: stockInfo.pb_ratio?.toFixed(0) || null,
-      priceToSales: stockInfo.priceToSales?.toFixed(1) || null,
-      marketCap: stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(0)}B` : null,
-      avgVolume: stockInfo.averageVolume ? `${(stockInfo.averageVolume / 1e6).toFixed(1)}M` : null,
-      beta: stockInfo.beta?.toFixed(0) || null,
-      roe: stockInfo.roe ? `${stockInfo.roe.toFixed(0)}%` : null,
-      profitMargin: stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(0)}%` : null,
-      sentiment: data && typeof data === 'object' && 'sentiment_data' in data 
-        ? (data.sentiment_data as any)?.overall_sentiment || null
-        : null,
-      matchScore,
-    };
+    // Build the initial stock data object
+    const sector = companyProfile?.industry || stock.type;
+    const pe = stockInfo.pe_ratio?.toFixed(0);
+    const pb = stockInfo.pb_ratio?.toFixed(0);
+    const priceToSales = stockInfo.priceToSales?.toFixed(1);
+    const marketCap = stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(0)}B` : null;
+    const avgVolume = stockInfo.averageVolume ? `${(stockInfo.averageVolume / 1e6).toFixed(1)}M` : null;
+    const beta = stockInfo.beta?.toFixed(0);
+    const roe = stockInfo.roe ? `${stockInfo.roe.toFixed(0)}%` : null;
+    const profitMargin = stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(0)}%` : null;
+    const sentiment = data && typeof data === 'object' && 'sentiment_data' in data 
+      ? (data.sentiment_data as any)?.overall_sentiment
+      : null;
 
-    // Filter out stocks with any N/A values in key data fields
-    if (!stockData.sector || !stockData.pe || !stockData.pb || !stockData.priceToSales || 
-        !stockData.marketCap || !stockData.avgVolume) {
+    // Filter out stocks with any missing values in key data fields
+    if (!sector || !pe || !pb || !priceToSales || !marketCap || !avgVolume) {
       return null;
     }
 
-    return stockData;
+    return {
+      ticker: stock.ticker,
+      name: stock.company,
+      sector,
+      portfolio: stock.portfolio.name,
+      pe,
+      pb,
+      priceToSales,
+      marketCap,
+      avgVolume,
+      beta: beta || 'N/A',
+      roe: roe || 'N/A',
+      profitMargin: profitMargin || 'N/A',
+      sentiment: sentiment || 'N/A',
+      matchScore,
+    };
   }).filter((stock): stock is NonNullable<typeof stock> => stock !== null);
 
   await prisma.$disconnect();
