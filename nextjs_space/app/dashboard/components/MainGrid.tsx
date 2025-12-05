@@ -194,54 +194,36 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
       </Box>
 
       {/* Earnings Surprises, Recommendation Trends, and Market News Section */}
-      {(stockEntry.earnings_surprises && stockEntry.earnings_surprises.length > 0) ||
-        (stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0) ||
-        (stockEntry.latest_news && stockEntry.latest_news.length > 0) ? (
-        <Box sx={{ mt: 3 }}>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: '1fr',
-                lg: 'repeat(3, 1fr)',
-              },
-              gap: 2,
-            }}
-          >
-            {/* Earnings Surprises */}
-            {stockEntry.earnings_surprises && stockEntry.earnings_surprises.length > 0 && (
-              <EarningsSurprisesCard
-                ticker={selectedStock}
-                surprises={stockEntry.earnings_surprises}
-              />
-            )}
+      <Box sx={{ mt: 3 }}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              lg: 'repeat(3, 1fr)',
+            },
+            gap: 2,
+          }}
+        >
+          {/* Earnings Surprises */}
+          <EarningsSurprisesCard
+            ticker={selectedStock}
+            surprises={stockEntry.earnings_surprises || []}
+          />
 
-            {/* Recommendation Trends */}
-            {stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0 && (
-              <RecommendationTrendsCard
-                ticker={selectedStock}
-                trends={stockEntry.recommendation_trends}
-              />
-            )}
+          {/* Recommendation Trends */}
+          <RecommendationTrendsCard
+            ticker={selectedStock}
+            trends={stockEntry.recommendation_trends || []}
+          />
 
-            {/* Earnings Calendar */}
-            {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
-              <EarningsCalendarCard
-                ticker={selectedStock}
-                earnings={stockEntry.earnings_calendar}
-              />
-            )}
-
-            {/* Market News */}
-            {stockEntry.latest_news && stockEntry.latest_news.length > 0 && (
-              <MarketNewsCard
-                ticker={selectedStock}
-                articles={stockEntry.latest_news}
-              />
-            )}
-          </Box>
+          {/* Market News */}
+          <MarketNewsCard
+            ticker={selectedStock}
+            articles={stockEntry.latest_news || []}
+          />
         </Box>
-      ) : null}
+      </Box>
     </Box>
   );
 }
