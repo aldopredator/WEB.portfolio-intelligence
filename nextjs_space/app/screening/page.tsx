@@ -1,9 +1,12 @@
 import { CheckCircle2, Filter, Info, AlertTriangle } from 'lucide-react';
 import { PageHeader } from '@/components/page-header';
-import { getStockData, STOCK_CONFIG } from '@/lib/stock-data';
+import { getStockData } from '@/lib/stock-data';
 import { parseCriteriaFromParams } from '@/lib/screening-criteria';
 import ScreeningClient from './ScreeningClient';
 import ScreeningTable from './ScreeningTable';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export const revalidate = 1800; // 30 minutes
 
@@ -45,12 +48,22 @@ export default async function ScreeningPage({
   // Parse criteria from URL parameters (or use defaults)
   const CRITERIA = parseCriteriaFromParams(new URLSearchParams(searchParams as Record<string, string>));
   
+  // Fetch stocks from database with portfolio information
+  const dbStocks = await prisma.stock.findMany({
+    where: { isActive: true },
+    include: {
+      portfolio: {
+        select: { name: true }
+      }
+    }
+  });
+  
   // Fetch real stock data
   const stockData = await getStockData();
   
   // Build screening results from real data with actual filtering
-  const recommendedStocks = STOCK_CONFIG.map((config) => {
-    const data = stockData[config.ticker];
+  const recommendedStocks = dbStocks.map((stock) => {
+    const data = stockData[stock.ticker];
     const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
     const companyProfile = data && typeof data === 'object' && 'company_profile' in data ? data.company_profile : null;
     
@@ -109,8 +122,8 @@ export default async function ScreeningPage({
       }
     }
     
-    if (CRITERIA.sectorsEnabled) {
-      passes.sector = !CRITERIA.excludeSectors.includes(config.sector);
+    if (CRITERIA.sectorsEnabled && companyProfile?.industry) {
+      passes.sector = !CRITERIA.excludeSectors.includes(companyProfile.industry);
     }
     
     if (CRITERIA.countriesEnabled && companyProfile?.country) {
@@ -127,9 +140,10 @@ export default async function ScreeningPage({
     }
 
     return {
-      ticker: config.ticker,
-      name: config.name,
-      sector: config.sector,
+      ticker: stock.ticker,
+      name: stock.company,
+      sector: companyProfile?.industry || stock.type || 'N/A',
+      portfolio: stock.portfolio?.name || 'Unassigned',
       pe: stockInfo.pe_ratio?.toFixed(0) || 'N/A',
       pb: stockInfo.pb_ratio?.toFixed(0) || 'N/A',
       marketCap: stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(0)}B` : 'N/A',
@@ -142,6 +156,8 @@ export default async function ScreeningPage({
       matchScore,
     };
   }).filter((stock): stock is NonNullable<typeof stock> => stock !== null);
+
+  await prisma.$disconnect();
 
   return (
     <ScreeningClient>
