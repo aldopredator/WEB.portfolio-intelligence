@@ -188,133 +188,80 @@ export default async function ScreeningPage({
       <main className="min-h-screen">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         {/* Active Criteria Display */}
-        <div className="mb-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-800/30 rounded-lg p-4 backdrop-blur-sm">
-          <div className="flex items-start gap-3">
+        <div className="mb-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-800/30 rounded-lg px-4 py-2 backdrop-blur-sm">
+          <div className="flex items-center gap-3">
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center border border-blue-500/20">
-                <Info className="w-4 h-4 text-blue-400" />
+              <div className="w-6 h-6 bg-blue-500/10 rounded-lg flex items-center justify-center border border-blue-500/20">
+                <Info className="w-3 h-3 text-blue-400" />
               </div>
             </div>
             <div className="flex-1">
-              <h3 className="text-base font-semibold text-blue-400 mb-2">Active Screening Criteria</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                <div className={`bg-slate-900/50 border rounded-lg p-2 ${
-                  CRITERIA.peEnabled ? 'border-emerald-500/30' : 'border-slate-800/50 opacity-50'
+              <h3 className="text-sm font-semibold text-blue-400 mb-1">Active Screening Criteria</h3>
+              <div className="flex flex-wrap items-center gap-3 text-xs">
+                <div className={`flex items-center gap-2 px-3 py-1 border rounded-lg ${
+                  CRITERIA.peEnabled ? 'border-emerald-500/30 bg-slate-900/50' : 'border-slate-800/50 bg-slate-900/30 opacity-50'
                 }`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-slate-400 text-xs">P/E Ratio</p>
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      CRITERIA.peEnabled ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-500/10 text-slate-500'
-                    }`}>
-                      {CRITERIA.peEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
-                  </div>
-                  <p className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPE}</p>
+                  <span className="text-slate-400">P/E Ratio</span>
+                  <span className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPE}</span>
                 </div>
-                <div className={`bg-slate-900/50 border rounded-lg p-2 ${
-                  CRITERIA.pbEnabled ? 'border-emerald-500/30' : 'border-slate-800/50 opacity-50'
+                <div className={`flex items-center gap-2 px-3 py-1 border rounded-lg ${
+                  CRITERIA.pbEnabled ? 'border-emerald-500/30 bg-slate-900/50' : 'border-slate-800/50 bg-slate-900/30 opacity-50'
                 }`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-slate-400 text-xs">P/B Ratio</p>
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      CRITERIA.pbEnabled ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-500/10 text-slate-500'
-                    }`}>
-                      {CRITERIA.pbEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
-                  </div>
-                  <p className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPB}</p>
+                  <span className="text-slate-400">P/B Ratio</span>
+                  <span className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPB}</span>
                 </div>
                 
                 {CRITERIA.marketCapEnabled && (
-                  <div className="bg-slate-900/50 border border-purple-500/30 rounded-lg p-2 col-span-1 md:col-span-2">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-slate-400 text-xs">Market Cap Range</p>
-                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400">
-                        Enabled
-                      </span>
-                    </div>
-                    <p className="text-white font-mono font-semibold">${CRITERIA.minMarketCap}B - ${CRITERIA.maxMarketCap}B</p>
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Market Cap Range</span>
+                    <span className="text-white font-mono font-semibold">${CRITERIA.minMarketCap}B - ${CRITERIA.maxMarketCap}B</span>
                   </div>
                 )}
                 
                 {CRITERIA.betaEnabled && (
-                  <div className="bg-slate-900/50 border border-purple-500/30 rounded-lg p-2">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-slate-400 text-xs">Beta Range</p>
-                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400">
-                        Enabled
-                      </span>
-                    </div>
-                    <p className="text-white font-mono font-semibold">{CRITERIA.minBeta.toFixed(2)} - {CRITERIA.maxBeta.toFixed(2)}</p>
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Beta Range</span>
+                    <span className="text-white font-mono font-semibold">{CRITERIA.minBeta.toFixed(2)} - {CRITERIA.maxBeta.toFixed(2)}</span>
                   </div>
                 )}
                 
                 {CRITERIA.roeEnabled && (
-                  <div className="bg-slate-900/50 border border-purple-500/30 rounded-lg p-2">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-slate-400 text-xs">Min ROE</p>
-                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400">
-                        Enabled
-                      </span>
-                    </div>
-                    <p className="text-white font-mono font-semibold">&gt; {CRITERIA.minROE}%</p>
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Min ROE</span>
+                    <span className="text-white font-mono font-semibold">&gt; {CRITERIA.minROE}%</span>
                   </div>
                 )}
                 
                 {CRITERIA.profitMarginEnabled && (
-                  <div className="bg-slate-900/50 border border-purple-500/30 rounded-lg p-2">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-slate-400 text-xs">Min Profit Margin</p>
-                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400">
-                        Enabled
-                      </span>
-                    </div>
-                    <p className="text-white font-mono font-semibold">&gt; {CRITERIA.minProfitMargin}%</p>
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Min Profit Margin</span>
+                    <span className="text-white font-mono font-semibold">&gt; {CRITERIA.minProfitMargin}%</span>
                   </div>
                 )}
                 
                 {CRITERIA.sentimentEnabled && (
-                  <div className="bg-slate-900/50 border border-purple-500/30 rounded-lg p-2">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-slate-400 text-xs">Sentiment Filter</p>
-                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400">
-                        Enabled
-                      </span>
-                    </div>
-                    <p className="text-white font-mono font-semibold capitalize">{CRITERIA.sentimentFilter}</p>
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Sentiment Filter</span>
+                    <span className="text-white font-mono font-semibold capitalize">{CRITERIA.sentimentFilter}</span>
                   </div>
                 )}
                 
-                <div className={`bg-slate-900/50 border rounded-lg p-2 col-span-1 md:col-span-2 ${
-                  CRITERIA.sectorsEnabled ? 'border-red-500/30' : 'border-slate-800/50 opacity-50'
+                <div className={`flex items-center gap-2 px-3 py-1 border rounded-lg ${
+                  CRITERIA.sectorsEnabled ? 'border-red-500/30 bg-slate-900/50' : 'border-slate-800/50 bg-slate-900/30 opacity-50'
                 }`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-slate-400 text-xs">Excluded Sectors</p>
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      CRITERIA.sectorsEnabled ? 'bg-red-500/10 text-red-400' : 'bg-slate-500/10 text-slate-500'
-                    }`}>
-                      {CRITERIA.sectorsEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
-                  </div>
-                  <p className="text-white font-mono font-semibold">
+                  <span className="text-slate-400">Excluded Sectors</span>
+                  <span className="text-white font-mono font-semibold">
                     {CRITERIA.excludeSectors.length > 0 ? CRITERIA.excludeSectors.join(', ') : 'None'}
-                  </p>
+                  </span>
                 </div>
                 
-                <div className={`bg-slate-900/50 border rounded-lg p-2 col-span-1 md:col-span-2 ${
-                  CRITERIA.countriesEnabled ? 'border-orange-500/30' : 'border-slate-800/50 opacity-50'
+                <div className={`flex items-center gap-2 px-3 py-1 border rounded-lg ${
+                  CRITERIA.countriesEnabled ? 'border-orange-500/30 bg-slate-900/50' : 'border-slate-800/50 bg-slate-900/30 opacity-50'
                 }`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-slate-400 text-xs">Excluded Countries</p>
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      CRITERIA.countriesEnabled ? 'bg-orange-500/10 text-orange-400' : 'bg-slate-500/10 text-slate-500'
-                    }`}>
-                      {CRITERIA.countriesEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
-                  </div>
-                  <p className="text-white font-mono font-semibold">
+                  <span className="text-slate-400">Excluded Countries</span>
+                  <span className="text-white font-mono font-semibold">
                     {CRITERIA.excludeCountries.length > 0 ? CRITERIA.excludeCountries.map(getCountryName).join(', ') : 'None'}
-                  </p>
+                  </span>
                 </div>
               </div>
             </div>
