@@ -7,8 +7,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Typography, Paper, Snackbar, Alert, Select, MenuItem, FormControl, InputLabel, Chip } from '@mui/material';
-import { Package } from 'lucide-react';
+import { Typography, Paper, Snackbar, Alert, Select, MenuItem, FormControl, InputLabel, Chip, IconButton } from '@mui/material';
+import { Package, ChevronRight } from 'lucide-react';
 import MainGrid from './components/MainGrid';
 import TickerSearch from '../components/TickerSearch';
 import type { StockInsightsData } from '@/lib/types';
@@ -45,6 +45,7 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'info' | 'warning' | 'error'>('info');
   const [isAddingTicker, setIsAddingTicker] = React.useState(false);
+  const [panelCollapsed, setPanelCollapsed] = React.useState(false);
 
   // Handle portfolio change
   const handlePortfolioChange = (portfolioId: string) => {
@@ -156,13 +157,36 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
             <Box sx={{ 
               position: 'fixed',
               top: 180,
-              right: 24,
+              right: panelCollapsed ? -376 : 24,
               bottom: 24,
               zIndex: 100,
               width: '400px',
               display: 'flex',
               flexDirection: 'column',
+              transition: 'right 0.3s ease',
             }}>
+              {/* Collapse Button */}
+              {panelCollapsed && (
+                <IconButton
+                  onClick={() => setPanelCollapsed(false)}
+                  sx={{
+                    position: 'absolute',
+                    left: -40,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    bgcolor: 'rgba(30, 41, 59, 0.95)',
+                    border: '1px solid rgba(148, 163, 184, 0.1)',
+                    '&:hover': {
+                      bgcolor: 'rgba(30, 41, 59, 1)',
+                    },
+                    width: 40,
+                    height: 60,
+                    borderRadius: '8px 0 0 8px',
+                  }}
+                >
+                  <ChevronRight className="w-5 h-5 text-slate-400" style={{ transform: 'rotate(180deg)' }} />
+                </IconButton>
+              )}
               <Paper
                 elevation={3}
                 sx={{
@@ -177,6 +201,22 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
                   overflow: 'hidden',
                 }}
               >
+                {/* Collapse Button Inside Panel */}
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                  <IconButton
+                    onClick={() => setPanelCollapsed(true)}
+                    size="small"
+                    sx={{
+                      color: '#94a3b8',
+                      '&:hover': {
+                        color: '#fff',
+                        bgcolor: 'rgba(148, 163, 184, 0.1)',
+                      },
+                    }}
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </IconButton>
+                </Box>
                 {/* Portfolio Selector */}
                 <Box sx={{ mb: 2.5 }}>
                   <FormControl 
