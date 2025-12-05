@@ -172,7 +172,7 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   <SortIcon field="avgVolume" />
                 </div>
               </th>
-              {criteria.dividendYieldEnabled && (
+              {criteria.betaEnabled && (
                 <th 
                   className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
                   onClick={() => handleSort('beta')}
