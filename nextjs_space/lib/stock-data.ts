@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import type { StockInsightsData } from '@/lib/types';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
-import { fetchFinnhubMetrics, fetchBalanceSheet, fetchCompanyProfile, fetchEarningsSurprises, fetchRecommendationTrends } from '@/lib/finnhub-metrics';
+import { fetchFinnhubMetrics, fetchBalanceSheet, fetchCompanyProfile, fetchEarningsSurprises, fetchRecommendationTrends, fetchCompanyNews } from '@/lib/finnhub-metrics';
 import { fetchPolygonStockStats } from '@/lib/polygon';
 import { getPolygonCached, setPolygonCached, getNextTickerToFetch } from '@/lib/polygon-cache';
 import { isRecord } from '@/lib/utils';
@@ -154,6 +154,12 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
         const recommendationTrends = await fetchRecommendationTrends(ticker);
         if (recommendationTrends && isRecord(stockEntry)) {
           stockEntry.recommendation_trends = recommendationTrends as any;
+        }
+
+        // Fetch company news
+        const news = await fetchCompanyNews(ticker, 10);
+        if (news && news.length > 0 && isRecord(stockEntry)) {
+          stockEntry.latest_news = news as any;
         }
       } catch (error) {
         console.error(`Error enriching ${ticker}:`, error);
