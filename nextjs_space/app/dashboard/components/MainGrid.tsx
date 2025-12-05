@@ -24,8 +24,40 @@ interface MainGridProps {
 export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
   const stockEntry = stockData[selectedStock];
   
+  // Handle empty portfolio or no stock selected
+  if (!selectedStock) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        minHeight: '400px',
+        flexDirection: 'column',
+        gap: 2
+      }}>
+        <Typography variant="h5" sx={{ color: '#94a3b8' }}>
+          No stock selected
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#64748b' }}>
+          Select a ticker from the list or add a new one to get started
+        </Typography>
+      </Box>
+    );
+  }
+  
   if (!stockEntry || typeof stockEntry === 'string') {
-    return <Typography>No data available for {selectedStock}</Typography>;
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        minHeight: '400px'
+      }}>
+        <Typography sx={{ color: '#94a3b8' }}>
+          No data available for {selectedStock}
+        </Typography>
+      </Box>
+    );
   }
 
   const stock = stockEntry.stock_data;
