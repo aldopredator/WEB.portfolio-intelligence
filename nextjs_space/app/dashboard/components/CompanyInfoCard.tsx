@@ -106,8 +106,10 @@ export default function CompanyInfoCard({
 
       if (response.ok) {
         toast.success(data.message || 'Stock moved successfully');
-        // Reload the page to reflect changes
-        setTimeout(() => window.location.reload(), 1000);
+        // Navigate to the new portfolio with the same ticker
+        setTimeout(() => {
+          window.location.href = `/?stock=${ticker}&portfolio=${targetPortfolioId}`;
+        }, 1000);
       } else {
         toast.error(data.error || 'Failed to move stock');
       }
@@ -162,6 +164,16 @@ export default function CompanyInfoCard({
           borderBottom: '1px solid',
           borderColor: 'divider',
         }}>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              mb: 1.5, 
+              color: 'text.secondary',
+              fontWeight: 500,
+            }}
+          >
+            Rate this stock
+          </Typography>
           <Stack direction="row" spacing={0.5} sx={{ mb: 2 }}>
             {[1, 2, 3, 4, 5].map((star) => (
               <IconButton
@@ -215,7 +227,7 @@ export default function CompanyInfoCard({
                   },
                 }}
               >
-                Move to Portfolio
+                Transfer to Other Portfolio
               </Button>
               <Menu
                 anchorEl={anchorEl}
