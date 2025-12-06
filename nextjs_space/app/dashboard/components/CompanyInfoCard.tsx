@@ -132,8 +132,6 @@ export default function CompanyInfoCard({
       if (response.ok) {
         setRating(newRating);
         toast.success(`Rating updated to ${newRating} star${newRating !== 1 ? 's' : ''}`);
-        // Reload after a short delay to persist rating in the stocks list
-        setTimeout(() => window.location.reload(), 500);
       } else {
         toast.error('Failed to update rating');
       }
