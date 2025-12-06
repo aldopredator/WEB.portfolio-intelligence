@@ -398,7 +398,7 @@ export default function CompanyInfoCard({
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 700, color: (averageVolume10Day && floatShares) ? 'text.primary' : 'text.disabled' }}>
                 {(averageVolume10Day && floatShares)
-                  ? `${(((averageVolume10Day * 365) / floatShares) * 100).toFixed(2)}%`
+                  ? `${((averageVolume10Day * 365 / floatShares) * 100).toFixed(2)}%`
                   : 'N/A'}
               </Typography>
             </Box>
