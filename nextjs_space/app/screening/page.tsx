@@ -8,7 +8,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const revalidate = 1800; // 30 minutes
+export const revalidate = 0; // Revalidate on every request to show latest portfolio names
 
 // Country code to name mapping (matches Finnhub API format)
 const COUNTRY_NAMES: Record<string, string> = {
@@ -303,7 +303,16 @@ export default async function ScreeningPage({
         </div>
 
         {/* Stock Cards Grid (Mobile-friendly alternative to table) */}
-        <div className="lg:hidden space-y-4 mb-8">
+        <div className="lg:hidden mb-6">
+          <div className="flex items-center justify-between mb-4 px-2">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+              <span className="text-slate-300 text-sm font-medium">
+                {recommendedStocks.length} {recommendedStocks.length === 1 ? 'stock' : 'stocks'} match your criteria
+              </span>
+            </div>
+          </div>
+          <div className="space-y-4">
           {recommendedStocks.map((stock) => (
             <div
               key={stock.ticker}
@@ -376,10 +385,19 @@ export default async function ScreeningPage({
               </div>
             </div>
           ))}
+          </div>
         </div>
 
         {/* Stock Table (Desktop) */}
         <div className="hidden lg:block mb-8">
+          <div className="flex items-center justify-between mb-4 px-2">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+              <span className="text-slate-300 text-sm font-medium">
+                {recommendedStocks.length} {recommendedStocks.length === 1 ? 'stock' : 'stocks'} match your criteria
+              </span>
+            </div>
+          </div>
           <ScreeningTable 
             stocks={recommendedStocks} 
             criteria={{
