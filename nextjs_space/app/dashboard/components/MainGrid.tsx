@@ -111,6 +111,7 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
           >
             {stockEntry.company_profile && (
               <CompanyInfoCard
+                key={selectedStock}
                 ticker={selectedStock}
                 companyName={stockEntry.company_profile.name}
                 logo={stockEntry.company_profile.logo}

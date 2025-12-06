@@ -1,11 +1,14 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import { LineChart } from '@mui/x-charts/LineChart';
 
 function AreaGradient({ color, id }: { color: string; id: string }) {
@@ -45,6 +48,47 @@ export default function PriceHistoryChart({
   twoHundredDayAverage,
 }: PriceHistoryChartProps) {
   const theme = useTheme();
+  const [showBenchmark, setShowBenchmark] = useState(false);
+  const [benchmarkData, setBenchmarkData] = useState<Array<{ date: string; price: number }>>([]);
+  const [isLoadingBenchmark, setIsLoadingBenchmark] = useState(false);
+
+  // Fetch benchmark data when checkbox is checked
+  useEffect(() => {
+    if (!showBenchmark) {
+      setBenchmarkData([]);
+      return;
+    }
+
+    const fetchBenchmarkData = async () => {
+      setIsLoadingBenchmark(true);
+      try {
+        const response = await fetch('/api/stock?ticker=CW8');
+        if (response.ok) {
+          const stockData = await response.json();
+          const priceHistory = stockData.price_history || [];
+          
+          // Create a map for quick date lookups
+          const benchmarkMap = new Map(
+            priceHistory.map((d: any) => [d.date || d.Date, d.price || d.Close])
+          );
+          
+          // Align benchmark data with the stock's date range
+          const alignedBenchmark = dates.map(date => {
+            const price = benchmarkMap.get(date);
+            return { date, price: price || 0 };
+          });
+          
+          setBenchmarkData(alignedBenchmark);
+        }
+      } catch (error) {
+        console.error('Error fetching benchmark data:', error);
+      } finally {
+        setIsLoadingBenchmark(false);
+      }
+    };
+
+    fetchBenchmarkData();
+  }, [showBenchmark, dates]);
 
   // Normalize data format (support both lowercase and uppercase field names)
   const normalizedData = data.map(d => ({
@@ -220,8 +264,26 @@ export default function PriceHistoryChart({
           </Stack>
         ) : null}
 
+        {/* Benchmark Comparison Checkbox */}
+        <Stack direction="row" alignItems="center" sx={{ mt: 2, mb: 1 }}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={showBenchmark}
+                onChange={(e) => setShowBenchmark(e.target.checked)}
+                sx={{ color: 'primary.main' }}
+              />
+            }
+            label={
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Compare with CW8 benchmark {isLoadingBenchmark && '(Loading...)'}
+              </Typography>
+            }
+          />
+        </Stack>
+
         <LineChart
-          colors={colorPalette}
+          colors={showBenchmark && benchmarkData.length > 0 ? [theme.palette.primary.main, theme.palette.warning.main] : colorPalette}
           xAxis={[
             {
               scaleType: 'point',
@@ -239,17 +301,29 @@ export default function PriceHistoryChart({
           series={[
             {
               id: 'price',
-              label: 'Price',
+              label: ticker,
               showMark: false,
               curve: 'linear',
-              area: true,
+              area: !showBenchmark,
               data: prices,
             },
+            ...(showBenchmark && benchmarkData.length > 0
+              ? [
+                  {
+                    id: 'benchmark',
+                    label: 'CW8',
+                    showMark: false,
+                    curve: 'linear' as const,
+                    area: false,
+                    data: benchmarkData.map(d => d.price),
+                  },
+                ]
+              : []),
           ]}
           height={300}
           margin={{ left: 50, right: 20, top: 20, bottom: 20 }}
           slotProps={{
-            legend: { hidden: true },
+            legend: { hidden: !showBenchmark },
           }}
           sx={{
             '& .MuiAreaElement-series-price': {
