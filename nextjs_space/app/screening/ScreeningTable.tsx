@@ -127,7 +127,7 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   onClick={() => handleSort('pe')}
                 >
                   <div className="flex items-center justify-end gap-2">
-                    P/E Ratio
+                    P/E
                     <SortIcon field="pe" />
                   </div>
                 </th>
@@ -138,7 +138,7 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   onClick={() => handleSort('pb')}
                 >
                   <div className="flex items-center justify-end gap-2">
-                    P/B Ratio
+                    P/B
                     <SortIcon field="pb" />
                   </div>
                 </th>
@@ -148,7 +148,7 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                 onClick={() => handleSort('priceToSales')}
               >
                 <div className="flex items-center justify-end gap-2">
-                  P/S Ratio
+                  P/S
                   <SortIcon field="priceToSales" />
                 </div>
               </th>

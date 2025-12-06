@@ -135,6 +135,11 @@ export default async function ScreeningPage({
       }
     }
     
+    if (CRITERIA.portfolioFilterEnabled && CRITERIA.portfolioFilter.length > 0) {
+      const portfolioName = stock.portfolio?.name || '';
+      passes.portfolio = CRITERIA.portfolioFilter.includes(portfolioName);
+    }
+    
     if (CRITERIA.sectorsEnabled && companyProfile?.industry) {
       passes.sector = !CRITERIA.excludeSectors.includes(companyProfile.industry);
     }

@@ -51,6 +51,8 @@ export interface ScreeningCriteria {
   avgDailyVolumeEnabled: boolean;
   sentimentFilter: 'all' | 'positive' | 'neutral' | 'negative';
   sentimentEnabled: boolean;
+  portfolioFilter: string[];
+  portfolioFilterEnabled: boolean;
   excludeSectors: string[];
   sectorsEnabled: boolean;
   excludeCountries: string[];
@@ -109,6 +111,8 @@ export const DEFAULT_CRITERIA: ScreeningCriteria = {
   avgDailyVolumeEnabled: false,
   sentimentFilter: 'all',
   sentimentEnabled: false,
+  portfolioFilter: [],
+  portfolioFilterEnabled: false,
   excludeSectors: ['Alcohol', 'Gambling'],
   sectorsEnabled: true,
   excludeCountries: [],
@@ -169,6 +173,8 @@ export function parseCriteriaFromParams(searchParams: URLSearchParams): Screenin
     avgDailyVolumeEnabled: searchParams.get('avgDailyVolumeEnabled') === 'true',
     sentimentFilter: (searchParams.get('sentimentFilter') as 'all' | 'positive' | 'neutral' | 'negative') || DEFAULT_CRITERIA.sentimentFilter,
     sentimentEnabled: searchParams.get('sentimentEnabled') === 'true',
+    portfolioFilter: searchParams.get('portfolioFilter')?.split(',').filter(s => s) || DEFAULT_CRITERIA.portfolioFilter,
+    portfolioFilterEnabled: searchParams.get('portfolioFilterEnabled') === 'true',
     excludeSectors: searchParams.get('excludeSectors')?.split(',').filter(s => s) || DEFAULT_CRITERIA.excludeSectors,
     sectorsEnabled: searchParams.get('sectorsEnabled') === 'true',
     excludeCountries: searchParams.get('excludeCountries')?.split(',').filter(s => s) || DEFAULT_CRITERIA.excludeCountries,
@@ -230,6 +236,8 @@ export function buildCriteriaURL(criteria: ScreeningCriteria): string {
     avgDailyVolumeEnabled: String(criteria.avgDailyVolumeEnabled),
     sentimentFilter: criteria.sentimentFilter,
     sentimentEnabled: String(criteria.sentimentEnabled),
+    portfolioFilter: criteria.portfolioFilter.join(','),
+    portfolioFilterEnabled: String(criteria.portfolioFilterEnabled),
     excludeSectors: criteria.excludeSectors.join(','),
     sectorsEnabled: String(criteria.sectorsEnabled),
     excludeCountries: criteria.excludeCountries.join(','),

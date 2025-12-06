@@ -60,7 +60,25 @@ export default function CriteriaForm() {
   const [criteria, setCriteria] = useState<ScreeningCriteria>(DEFAULT_CRITERIA);
   const [newSector, setNewSector] = useState('');
   const [newCountry, setNewCountry] = useState('');
+  const [newPortfolio, setNewPortfolio] = useState('');
+  const [portfolios, setPortfolios] = useState<{ id: string; name: string }[]>([]);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Fetch portfolios
+  useEffect(() => {
+    async function fetchPortfolios() {
+      try {
+        const res = await fetch('/api/portfolios');
+        if (res.ok) {
+          const data = await res.json();
+          setPortfolios(data.portfolios || []);
+        }
+      } catch (e) {
+        console.error('Failed to fetch portfolios:', e);
+      }
+    }
+    fetchPortfolios();
+  }, []);
 
   // Load saved criteria from localStorage on mount and auto-apply
   useEffect(() => {
@@ -75,6 +93,7 @@ export default function CriteriaForm() {
           // Ensure arrays exist
           excludeSectors: Array.isArray(parsed.excludeSectors) ? parsed.excludeSectors : DEFAULT_CRITERIA.excludeSectors,
           excludeCountries: Array.isArray(parsed.excludeCountries) ? parsed.excludeCountries : DEFAULT_CRITERIA.excludeCountries,
+          portfolioFilter: Array.isArray(parsed.portfolioFilter) ? parsed.portfolioFilter : DEFAULT_CRITERIA.portfolioFilter,
         };
         setCriteria(loadedCriteria);
         
@@ -105,6 +124,7 @@ export default function CriteriaForm() {
     setCriteria(DEFAULT_CRITERIA);
     setNewSector('');
     setNewCountry('');
+    setNewPortfolio('');
     localStorage.removeItem(STORAGE_KEY);
   };
 
@@ -139,6 +159,23 @@ export default function CriteriaForm() {
     setCriteria(prev => ({
       ...prev,
       excludeCountries: prev.excludeCountries.filter(c => c !== country),
+    }));
+  };
+
+  const addPortfolio = () => {
+    if (newPortfolio.trim() && !criteria.portfolioFilter.includes(newPortfolio.trim())) {
+      setCriteria(prev => ({
+        ...prev,
+        portfolioFilter: [...prev.portfolioFilter, newPortfolio.trim()],
+      }));
+      setNewPortfolio('');
+    }
+  };
+
+  const removePortfolio = (portfolio: string) => {
+    setCriteria(prev => ({
+      ...prev,
+      portfolioFilter: prev.portfolioFilter.filter(p => p !== portfolio),
     }));
   };
 
@@ -1199,6 +1236,87 @@ export default function CriteriaForm() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Portfolio Filter */}
+        <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border-b border-blue-500/30 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
+                <Filter className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-white">Portfolio Filter</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCriteria({ ...criteria, portfolioFilterEnabled: !criteria.portfolioFilterEnabled })}
+                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                  criteria.portfolioFilterEnabled
+                    ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20'
+                    : 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20'
+                }`}
+              >
+                {criteria.portfolioFilterEnabled ? 'Enabled' : 'Disabled'}
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-4">
+            {/* Add Portfolio */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <select
+                  value={newPortfolio}
+                  onChange={(e) => setNewPortfolio(e.target.value)}
+                  disabled={!criteria.portfolioFilterEnabled}
+                  className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                    !criteria.portfolioFilterEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <option value="">Select a portfolio to filter...</option>
+                  {portfolios.map((portfolio) => (
+                    <option key={portfolio.id} value={portfolio.name} disabled={criteria.portfolioFilter.includes(portfolio.name)}>
+                      {portfolio.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={addPortfolio}
+                  disabled={!criteria.portfolioFilterEnabled || !newPortfolio.trim()}
+                  className={`px-4 py-3 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-lg text-blue-400 font-medium transition-colors flex items-center gap-2 ${
+                    (!criteria.portfolioFilterEnabled || !newPortfolio.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <Plus className="w-4 h-4" />
+                  Add
+                </button>
+              </div>
+            </div>
+
+            {/* Selected Portfolios List */}
+            {criteria.portfolioFilter.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {criteria.portfolioFilter.map((portfolio) => (
+                  <div key={portfolio} className="bg-slate-950/50 border border-slate-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                    <span className="text-white text-sm font-medium">{portfolio}</span>
+                    <button
+                      type="button"
+                      onClick={() => removePortfolio(portfolio)}
+                      disabled={!criteria.portfolioFilterEnabled}
+                      className={`p-1 hover:bg-blue-500/20 rounded text-blue-400 transition-colors ${
+                        !criteria.portfolioFilterEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
 
