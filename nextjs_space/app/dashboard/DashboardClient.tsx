@@ -16,7 +16,7 @@ import { usePortfolio } from '@/lib/portfolio-context';
 
 interface DashboardClientProps {
   initialData: StockInsightsData;
-  stocks: Array<{ ticker: string; company: string; change_percent?: number }>;
+  stocks: Array<{ ticker: string; company: string; change_percent?: number; rating?: number; portfolioId?: string | null }>;
 }
 
 const theme = createTheme({
@@ -398,7 +398,12 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
               </Paper>
             </Box>
 
-            <MainGrid stockData={initialData} selectedStock={selectedStock} />
+            <MainGrid 
+              stockData={initialData} 
+              selectedStock={selectedStock} 
+              stocks={stocks}
+              portfolios={portfolios}
+            />
           </Stack>
         </Box>
       </Box>

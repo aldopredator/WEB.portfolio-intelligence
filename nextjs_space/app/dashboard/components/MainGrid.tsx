@@ -19,10 +19,15 @@ import type { StockInsightsData } from '@/lib/types';
 interface MainGridProps {
   stockData: StockInsightsData;
   selectedStock: string;
+  stocks?: Array<{ ticker: string; company: string; change_percent?: number; rating?: number; portfolioId?: string | null }>;
+  portfolios?: Array<{ id: string; name: string; description?: string | null }>;
 }
 
-export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
+export default function MainGrid({ stockData, selectedStock, stocks = [], portfolios = [] }: MainGridProps) {
   const stockEntry = stockData[selectedStock];
+  const currentStock = stocks.find(s => s.ticker === selectedStock);
+  const currentRating = currentStock?.rating || 0;
+  const currentPortfolioId = currentStock?.portfolioId;
   
   // Handle empty portfolio or no stock selected
   if (!selectedStock) {
@@ -130,6 +135,9 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
                 fiftyDayAverage={stock.fiftyDayAverage}
                 twoHundredDayAverage={stock.twoHundredDayAverage}
                 enterpriseValue={stock.enterpriseValue}
+                initialRating={currentRating}
+                portfolios={portfolios}
+                currentPortfolioId={currentPortfolioId}
               />
             )}
             <StockDetailsCard

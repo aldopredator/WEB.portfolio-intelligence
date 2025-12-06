@@ -8,6 +8,14 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import BusinessIcon from '@mui/icons-material/Business';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
+import toast from 'react-hot-toast';
 
 interface CompanyInfoCardProps {
   ticker: string;
@@ -34,6 +42,9 @@ interface CompanyInfoCardProps {
   fiftyDayAverage?: number | null;
   twoHundredDayAverage?: number | null;
   enterpriseValue?: number | null;
+  initialRating?: number;
+  portfolios?: Array<{ id: string; name: string; description?: string | null }>;
+  currentPortfolioId?: string | null;
 }
 
 export default function CompanyInfoCard({
@@ -61,7 +72,72 @@ export default function CompanyInfoCard({
   fiftyDayAverage,
   twoHundredDayAverage,
   enterpriseValue,
+  initialRating = 0,
+  portfolios = [],
+  currentPortfolioId,
 }: CompanyInfoCardProps) {
+  const [rating, setRating] = React.useState(initialRating);
+  const [hoveredRating, setHoveredRating] = React.useState(0);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const moveMenuOpen = Boolean(anchorEl);
+
+  // Update rating when initialRating changes
+  React.useEffect(() => {
+    setRating(initialRating);
+  }, [initialRating]);
+
+  const handleMoveClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMoveClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMoveToPortfolio = async (targetPortfolioId: string) => {
+    try {
+      const response = await fetch('/api/stock/move', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticker, targetPortfolioId }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message || 'Stock moved successfully');
+        // Reload the page to reflect changes
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        toast.error(data.error || 'Failed to move stock');
+      }
+    } catch (error) {
+      console.error('Error moving stock:', error);
+      toast.error('Failed to move stock');
+    } finally {
+      handleMoveClose();
+    }
+  };
+
+  const handleRatingClick = async (newRating: number) => {
+    try {
+      const response = await fetch('/api/stock/update-rating', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticker, rating: newRating }),
+      });
+
+      if (response.ok) {
+        setRating(newRating);
+        toast.success(`Rating updated to ${newRating} star${newRating !== 1 ? 's' : ''}`);
+      } else {
+        toast.error('Failed to update rating');
+      }
+    } catch (error) {
+      console.error('Error updating rating:', error);
+      toast.error('Failed to update rating');
+    }
+  };
   // Debug logging
   React.useEffect(() => {
     console.log('[CompanyInfoCard] Polygon data received:', {
@@ -76,6 +152,91 @@ export default function CompanyInfoCard({
   return (
     <Card variant="outlined" sx={{ height: '100%' }}>
       <CardContent>
+        {/* Star Rating Section */}
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center',
+          mb: 2,
+          pb: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+        }}>
+          <Stack direction="row" spacing={0.5} sx={{ mb: 2 }}>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <IconButton
+                key={star}
+                onClick={() => handleRatingClick(star)}
+                onMouseEnter={() => setHoveredRating(star)}
+                onMouseLeave={() => setHoveredRating(0)}
+                sx={{
+                  padding: 0.5,
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                  },
+                }}
+              >
+                {(hoveredRating >= star || (hoveredRating === 0 && rating >= star)) ? (
+                  <StarIcon 
+                    sx={{ 
+                      fontSize: 28,
+                      color: 'warning.main',
+                      transition: 'all 0.2s',
+                    }} 
+                  />
+                ) : (
+                  <StarBorderIcon 
+                    sx={{ 
+                      fontSize: 28,
+                      color: 'text.disabled',
+                      transition: 'all 0.2s',
+                    }} 
+                  />
+                )}
+              </IconButton>
+            ))}
+          </Stack>
+
+          {/* Move Button */}
+          {portfolios.length > 0 && (
+            <>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<DriveFileMoveIcon />}
+                onClick={handleMoveClick}
+                sx={{
+                  borderColor: 'primary.main',
+                  color: 'primary.main',
+                  '&:hover': {
+                    borderColor: 'primary.light',
+                    backgroundColor: 'primary.main',
+                    color: 'white',
+                  },
+                }}
+              >
+                Move to Portfolio
+              </Button>
+              <Menu
+                anchorEl={anchorEl}
+                open={moveMenuOpen}
+                onClose={handleMoveClose}
+              >
+                {portfolios
+                  .filter(p => p.id !== currentPortfolioId)
+                  .map((portfolio) => (
+                    <MenuItem 
+                      key={portfolio.id} 
+                      onClick={() => handleMoveToPortfolio(portfolio.id)}
+                    >
+                      {portfolio.name}
+                    </MenuItem>
+                  ))}
+              </Menu>
+            </>
+          )}
+        </Box>
+
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
           {logo ? (
             <Avatar
