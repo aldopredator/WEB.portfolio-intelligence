@@ -529,7 +529,18 @@ export default function CriteriaForm() {
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-slate-400 text-xs font-medium">Minimum</span>
-                        <span className="text-white font-mono font-bold text-sm">{criteria.minAvgDailyVolume.toFixed(0)}M</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max="1000"
+                            value={criteria.minAvgDailyVolume}
+                            onChange={(e) => setCriteria({ ...criteria, minAvgDailyVolume: parseFloat(e.target.value) || 0 })}
+                            disabled={!criteria.avgDailyVolumeEnabled}
+                            className="w-20 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white font-mono text-sm focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                          <span className="text-white font-mono font-bold text-sm">M</span>
+                        </div>
                       </div>
                       <div className="relative px-2">
                         <div className="relative h-8 flex items-center">
@@ -578,7 +589,18 @@ export default function CriteriaForm() {
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-slate-400 text-xs font-medium">Maximum</span>
-                        <span className="text-white font-mono font-bold text-sm">{criteria.maxAvgDailyVolume.toFixed(0)}M</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max="1000"
+                            value={criteria.maxAvgDailyVolume}
+                            onChange={(e) => setCriteria({ ...criteria, maxAvgDailyVolume: parseFloat(e.target.value) || 0 })}
+                            disabled={!criteria.avgDailyVolumeEnabled}
+                            className="w-20 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white font-mono text-sm focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                          <span className="text-white font-mono font-bold text-sm">M</span>
+                        </div>
                       </div>
                       <div className="relative px-2">
                         <div className="relative h-8 flex items-center">
