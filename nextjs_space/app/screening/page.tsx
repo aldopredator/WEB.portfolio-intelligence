@@ -99,6 +99,19 @@ export default async function ScreeningPage({
       passes.profitMargin = stockInfo.profit_margin >= CRITERIA.minProfitMargin;
     }
     
+    if (CRITERIA.priceToSalesEnabled && stockInfo.priceToSales !== undefined) {
+      passes.priceToSales = stockInfo.priceToSales >= CRITERIA.minPriceToSales && stockInfo.priceToSales <= CRITERIA.maxPriceToSales;
+    }
+    
+    if (CRITERIA.avgDailyVolumeEnabled && stockInfo.averageVolume !== undefined) {
+      const avgVolumeM = stockInfo.averageVolume / 1e6; // Convert to millions
+      passes.avgVolume = avgVolumeM >= CRITERIA.minAvgDailyVolume && avgVolumeM <= CRITERIA.maxAvgDailyVolume;
+    }
+    
+    if (CRITERIA.debtToEquityEnabled && stockInfo.debtToEquity !== undefined) {
+      passes.debtToEquity = stockInfo.debtToEquity <= CRITERIA.maxDebtToEquity;
+    }
+    
     if (CRITERIA.sentimentEnabled && CRITERIA.sentimentFilter !== 'all') {
       const sentiment = data && typeof data === 'object' && 'social_sentiment' in data ? data.social_sentiment : null;
       if (sentiment && typeof sentiment === 'object' && 'positive' in sentiment && 'neutral' in sentiment && 'negative' in sentiment) {
@@ -198,18 +211,39 @@ export default async function ScreeningPage({
             <div className="flex-1">
               <h3 className="text-sm font-semibold text-blue-400 mb-1">Active Screening Criteria</h3>
               <div className="flex flex-wrap items-center gap-3 text-xs">
-                <div className={`flex items-center gap-2 px-3 py-1 border rounded-lg ${
-                  CRITERIA.peEnabled ? 'border-emerald-500/30 bg-slate-900/50' : 'border-slate-800/50 bg-slate-900/30 opacity-50'
-                }`}>
-                  <span className="text-slate-400">P/E Ratio</span>
-                  <span className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPE}</span>
-                </div>
-                <div className={`flex items-center gap-2 px-3 py-1 border rounded-lg ${
-                  CRITERIA.pbEnabled ? 'border-emerald-500/30 bg-slate-900/50' : 'border-slate-800/50 bg-slate-900/30 opacity-50'
-                }`}>
-                  <span className="text-slate-400">P/B Ratio</span>
-                  <span className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPB}</span>
-                </div>
+                {CRITERIA.peEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-emerald-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">P/E Ratio</span>
+                    <span className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPE}</span>
+                  </div>
+                )}
+                {CRITERIA.pbEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-emerald-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">P/B Ratio</span>
+                    <span className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPB}</span>
+                  </div>
+                )}
+                
+                {CRITERIA.priceToSalesEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">P/S Range</span>
+                    <span className="text-white font-mono font-semibold">{CRITERIA.minPriceToSales} - {CRITERIA.maxPriceToSales}</span>
+                  </div>
+                )}
+                
+                {CRITERIA.avgDailyVolumeEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Avg Volume Range</span>
+                    <span className="text-white font-mono font-semibold">{CRITERIA.minAvgDailyVolume}M - {CRITERIA.maxAvgDailyVolume}M</span>
+                  </div>
+                )}
+                
+                {CRITERIA.debtToEquityEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Max Debt/Equity</span>
+                    <span className="text-white font-mono font-semibold">&lt; {CRITERIA.maxDebtToEquity}</span>
+                  </div>
+                )}
                 
                 {CRITERIA.marketCapEnabled && (
                   <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
@@ -246,23 +280,23 @@ export default async function ScreeningPage({
                   </div>
                 )}
                 
-                <div className={`flex items-center gap-2 px-3 py-1 border rounded-lg ${
-                  CRITERIA.sectorsEnabled ? 'border-red-500/30 bg-slate-900/50' : 'border-slate-800/50 bg-slate-900/30 opacity-50'
-                }`}>
-                  <span className="text-slate-400">Excluded Sectors</span>
-                  <span className="text-white font-mono font-semibold">
-                    {CRITERIA.excludeSectors.length > 0 ? CRITERIA.excludeSectors.join(', ') : 'None'}
-                  </span>
-                </div>
+                {CRITERIA.sectorsEnabled && CRITERIA.excludeSectors.length > 0 && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-red-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Excluded Sectors</span>
+                    <span className="text-white font-mono font-semibold">
+                      {CRITERIA.excludeSectors.join(', ')}
+                    </span>
+                  </div>
+                )}
                 
-                <div className={`flex items-center gap-2 px-3 py-1 border rounded-lg ${
-                  CRITERIA.countriesEnabled ? 'border-orange-500/30 bg-slate-900/50' : 'border-slate-800/50 bg-slate-900/30 opacity-50'
-                }`}>
-                  <span className="text-slate-400">Excluded Countries</span>
-                  <span className="text-white font-mono font-semibold">
-                    {CRITERIA.excludeCountries.length > 0 ? CRITERIA.excludeCountries.map(getCountryName).join(', ') : 'None'}
-                  </span>
-                </div>
+                {CRITERIA.countriesEnabled && CRITERIA.excludeCountries.length > 0 && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-orange-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Excluded Countries</span>
+                    <span className="text-white font-mono font-semibold">
+                      {CRITERIA.excludeCountries.map(getCountryName).join(', ')}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
