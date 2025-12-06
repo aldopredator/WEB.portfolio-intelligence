@@ -59,9 +59,9 @@ export interface ScreeningCriteria {
 
 export const DEFAULT_CRITERIA: ScreeningCriteria = {
   maxPE: 20,
-  peEnabled: true,
+  peEnabled: false,
   maxPB: 3,
-  pbEnabled: true,
+  pbEnabled: false,
   minMarketCap: 0,
   maxMarketCap: 5000,
   marketCapEnabled: false,
@@ -119,9 +119,9 @@ export const DEFAULT_CRITERIA: ScreeningCriteria = {
 export function parseCriteriaFromParams(searchParams: URLSearchParams): ScreeningCriteria {
   return {
     maxPE: parseFloat(searchParams.get('maxPE') || String(DEFAULT_CRITERIA.maxPE)),
-    peEnabled: searchParams.get('peEnabled') === 'true',
+    peEnabled: searchParams.has('peEnabled') ? searchParams.get('peEnabled') === 'true' : DEFAULT_CRITERIA.peEnabled,
     maxPB: parseFloat(searchParams.get('maxPB') || String(DEFAULT_CRITERIA.maxPB)),
-    pbEnabled: searchParams.get('pbEnabled') === 'true',
+    pbEnabled: searchParams.has('pbEnabled') ? searchParams.get('pbEnabled') === 'true' : DEFAULT_CRITERIA.pbEnabled,
     minMarketCap: parseFloat(searchParams.get('minMarketCap') || String(DEFAULT_CRITERIA.minMarketCap)),
     maxMarketCap: parseFloat(searchParams.get('maxMarketCap') || String(DEFAULT_CRITERIA.maxMarketCap)),
     marketCapEnabled: searchParams.get('marketCapEnabled') === 'true',
