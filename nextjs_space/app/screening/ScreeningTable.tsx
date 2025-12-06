@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
-type SortField = 'ticker' | 'sector' | 'portfolio' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'beta' | 'roe' | 'profitMargin' | 'sentiment' | 'matchScore';
+type SortField = 'ticker' | 'sector' | 'portfolio' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'beta' | 'roe' | 'profitMargin' | 'debtToEquity' | 'sentiment' | 'matchScore';
 type SortDirection = 'asc' | 'desc';
 
 interface Stock {
@@ -19,6 +19,7 @@ interface Stock {
   beta: string;
   roe: string;
   profitMargin: string;
+  debtToEquity: string;
   sentiment: string;
   matchScore: number;
 }
@@ -32,6 +33,7 @@ interface ScreeningTableProps {
     betaEnabled: boolean;
     roeEnabled: boolean;
     profitMarginEnabled: boolean;
+    debtToEquityEnabled: boolean;
     sentimentEnabled: boolean;
   };
 }
@@ -55,7 +57,7 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
       let bVal: any = b[sortField];
 
       // Convert string numbers to actual numbers for sorting
-      if (sortField === 'pe' || sortField === 'pb' || sortField === 'priceToSales' || sortField === 'beta' || sortField === 'roe' || sortField === 'profitMargin') {
+      if (sortField === 'pe' || sortField === 'pb' || sortField === 'priceToSales' || sortField === 'beta' || sortField === 'roe' || sortField === 'profitMargin' || sortField === 'debtToEquity') {
         aVal = aVal === 'N/A' ? -Infinity : parseFloat(aVal);
         bVal = bVal === 'N/A' ? -Infinity : parseFloat(bVal);
       } else if (sortField === 'marketCap') {
@@ -205,6 +207,17 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   </div>
                 </th>
               )}
+              {criteria.debtToEquityEnabled && (
+                <th 
+                  className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                  onClick={() => handleSort('debtToEquity')}
+                >
+                  <div className="flex items-center justify-end gap-2">
+                    Debt/Equity
+                    <SortIcon field="debtToEquity" />
+                  </div>
+                </th>
+              )}
               {criteria.sentimentEnabled && (
                 <th 
                   className="px-6 py-4 text-center text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
@@ -283,6 +296,11 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                 {criteria.profitMarginEnabled && (
                   <td className="px-6 py-5 text-right">
                     <span className="text-purple-400 font-mono font-bold text-lg">{stock.profitMargin}</span>
+                  </td>
+                )}
+                {criteria.debtToEquityEnabled && (
+                  <td className="px-6 py-5 text-right">
+                    <span className="text-purple-400 font-mono font-bold text-lg">{stock.debtToEquity}</span>
                   </td>
                 )}
                 {criteria.sentimentEnabled && (

@@ -169,10 +169,11 @@ export default async function ScreeningPage({
     const priceToSales = stockInfo.priceToSales?.toFixed(0);
     const marketCap = stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(0)}B` : null;
     const avgVolume = stockInfo.averageVolume ? `${(stockInfo.averageVolume / 1e6).toFixed(0)}M` : null;
-    const beta = stockInfo.beta?.toFixed(0);
+    const beta = stockInfo.beta?.toFixed(2);
     const roe = stockInfo.roe ? `${stockInfo.roe.toFixed(0)}%` : null;
     const profitMargin = stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(0)}%` : null;
-    const sentiment = data && typeof data === 'object' && 'sentiment_data' in data 
+    const debtToEquity = stockInfo.debtToEquity?.toFixed(0);
+    const sentiment = data && typeof data === 'object' && 'sentiment_data' in data
       ? (data.sentiment_data as any)?.overall_sentiment
       : null;
 
@@ -194,6 +195,7 @@ export default async function ScreeningPage({
       beta: beta || 'N/A',
       roe: roe || 'N/A',
       profitMargin: profitMargin || 'N/A',
+      debtToEquity: debtToEquity || 'N/A',
       sentiment: sentiment || 'N/A',
       matchScore,
     };
@@ -412,6 +414,7 @@ export default async function ScreeningPage({
               betaEnabled: CRITERIA.betaEnabled,
               roeEnabled: CRITERIA.roeEnabled,
               profitMarginEnabled: CRITERIA.profitMarginEnabled,
+              debtToEquityEnabled: CRITERIA.debtToEquityEnabled,
               sentimentEnabled: CRITERIA.sentimentEnabled,
             }}
           />
