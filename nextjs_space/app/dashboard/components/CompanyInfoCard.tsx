@@ -132,6 +132,8 @@ export default function CompanyInfoCard({
       if (response.ok) {
         setRating(newRating);
         toast.success(`Rating updated to ${newRating} star${newRating !== 1 ? 's' : ''}`);
+        // Reload after a short delay to persist rating in the stocks list
+        setTimeout(() => window.location.reload(), 500);
       } else {
         toast.error('Failed to update rating');
       }
@@ -392,9 +394,9 @@ export default function CompanyInfoCard({
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 Avg Annual Volume in %
               </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: (averageVolume10Day && enterpriseValue && floatShares && sharesOutstanding) ? 'text.primary' : 'text.disabled' }}>
-                {(averageVolume10Day && enterpriseValue && floatShares && sharesOutstanding)
-                  ? `${(((averageVolume10Day * 365) / (enterpriseValue * (floatShares / sharesOutstanding))) * 100).toFixed(2)}%`
+              <Typography variant="h6" sx={{ fontWeight: 700, color: (averageVolume10Day && floatShares && sharesOutstanding) ? 'text.primary' : 'text.disabled' }}>
+                {(averageVolume10Day && floatShares && sharesOutstanding)
+                  ? `${(((averageVolume10Day * 365) / (floatShares * sharesOutstanding)) * 100).toFixed(2)}%`
                   : 'N/A'}
               </Typography>
             </Box>

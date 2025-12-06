@@ -130,6 +130,41 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
     }
   };
 
+  const handleDeleteTicker = async (ticker: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent ticker selection when clicking delete
+    
+    if (!confirm(`Are you sure you want to delete ${ticker}?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/delete-ticker?ticker=${ticker}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSnackbarMessage(`✅ ${ticker} has been deleted successfully`);
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        
+        // Refresh the page after a short delay
+        setTimeout(() => {
+          const portfolioParam = selectedPortfolio ? `?portfolio=${selectedPortfolio.id}` : '';
+          window.location.href = `/${portfolioParam}`;
+        }, 1000);
+      } else {
+        throw new Error(data.error || 'Failed to delete ticker');
+      }
+    } catch (error) {
+      console.error('Error deleting ticker:', error);
+      setSnackbarMessage(`❌ Failed to delete ${ticker}. Please try again.`);
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
@@ -371,7 +406,7 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
                         }}
                       >
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <Box>
+                          <Box sx={{ flex: 1 }}>
                             <Typography sx={{ color: '#fff', fontWeight: 600, fontSize: '0.9rem' }}>
                               {stock.ticker}
                             </Typography>
@@ -379,17 +414,34 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
                               {stock.company}
                             </Typography>
                           </Box>
-                          {stock.change_percent !== undefined && (
-                            <Typography 
-                              sx={{ 
-                                color: stock.change_percent >= 0 ? '#4ade80' : '#f87171',
-                                fontWeight: 600,
-                                fontSize: '0.85rem'
-                              }}
-                            >
-                              {stock.change_percent >= 0 ? '+' : ''}{stock.change_percent.toFixed(2)}%
-                            </Typography>
-                          )}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            {stock.change_percent !== undefined && (
+                              <Typography 
+                                sx={{ 
+                                  color: stock.change_percent >= 0 ? '#4ade80' : '#f87171',
+                                  fontWeight: 600,
+                                  fontSize: '0.85rem'
+                                }}
+                              >
+                                {stock.change_percent >= 0 ? '+' : ''}{stock.change_percent.toFixed(2)}%
+                              </Typography>
+                            )}
+                            <Tooltip title={`Delete ${stock.ticker}`}>
+                              <IconButton
+                                size="small"
+                                onClick={(e) => handleDeleteTicker(stock.ticker, e)}
+                                sx={{
+                                  color: '#94a3b8',
+                                  '&:hover': {
+                                    color: '#f87171',
+                                    bgcolor: 'rgba(248, 113, 113, 0.1)',
+                                  },
+                                }}
+                              >
+                                <Trash2 size={16} />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
                         </Box>
                       </Box>
                     ))}
