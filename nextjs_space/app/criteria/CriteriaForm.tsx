@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, XCircle, TrendingUp, Ban, ArrowRight, Plus, Trash2, Save } from 'lucide-react';
+import { CheckCircle2, XCircle, TrendingUp, Ban, ArrowRight, Plus, Trash2, Save, Filter } from 'lucide-react';
 import { DEFAULT_CRITERIA, buildCriteriaURL, type ScreeningCriteria } from '@/lib/screening-criteria';
 
 const STORAGE_KEY = 'portfolio_screening_criteria';
@@ -159,6 +159,23 @@ export default function CriteriaForm() {
     setCriteria(prev => ({
       ...prev,
       excludeCountries: prev.excludeCountries.filter(c => c !== country),
+    }));
+  };
+
+  const addPortfolio = () => {
+    if (newPortfolio.trim() && !criteria.portfolioFilter.includes(newPortfolio.trim())) {
+      setCriteria(prev => ({
+        ...prev,
+        portfolioFilter: [...prev.portfolioFilter, newPortfolio.trim()],
+      }));
+      setNewPortfolio('');
+    }
+  };
+
+  const removePortfolio = (portfolio: string) => {
+    setCriteria(prev => ({
+      ...prev,
+      portfolioFilter: prev.portfolioFilter.filter(p => p !== portfolio),
     }));
   };
 
