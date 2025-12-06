@@ -75,7 +75,7 @@ export default function PriceHistoryChart({
           // Align benchmark data with the stock's date range
           const alignedBenchmark = dates.map(date => {
             const price = benchmarkMap.get(date);
-            return { date, price: price || 0 };
+            return { date, price: (price as number) || 0 };
           });
           
           setBenchmarkData(alignedBenchmark);
