@@ -1,7 +1,10 @@
 import { Suspense } from 'react';
 import type { StockInsightsData } from '@/lib/types';
 import { getStockData, STOCK_CONFIG } from '@/lib/stock-data';
+import { PrismaClient } from '@prisma/client';
 import DashboardClient from './DashboardClient';
+
+const prisma = new PrismaClient();
 
 // Force dynamic rendering - runs on every request for Polygon POC testing
 export const dynamic = 'force-dynamic';
@@ -15,6 +18,29 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const portfolioId = searchParams.portfolio || null;
   console.log('[DashboardPage] 🔍 Portfolio filter:', portfolioId ? portfolioId : 'ALL');
   const stockData = await getStockData(portfolioId);
+
+  // Fetch stock ratings from database
+  const dbStocks = await prisma.stock.findMany({
+    where: { 
+      isActive: true,
+      ...(portfolioId ? { portfolioId } : {}),
+    },
+    select: {
+      ticker: true,
+      rating: true,
+      portfolioId: true,
+    },
+  });
+
+  const stockRatings = dbStocks.reduce((acc, stock) => {
+    acc[stock.ticker] = {
+      rating: stock.rating || 0,
+      portfolioId: stock.portfolioId,
+    };
+    return acc;
+  }, {} as Record<string, { rating: number; portfolioId: string | null }>);
+
+  await prisma.$disconnect();
 
   // Debug: Check if Polygon data exists
   const googData = stockData.GOOG;
@@ -35,6 +61,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       ticker: ticker,
       company: config?.name || ticker,
       change_percent: stockInfo?.change_percent,
+      rating: stockRatings[ticker]?.rating || 0,
+      portfolioId: stockRatings[ticker]?.portfolioId || null,
     };
   });
   
