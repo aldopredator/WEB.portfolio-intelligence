@@ -105,9 +105,28 @@ export default function PriceHistoryChart({
     fetchBenchmarkData();
   }, [showBenchmark, data]);
 
-  // Calculate dynamic Y-axis range to emphasize price movements
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
+  // Calculate percentage change from first day for comparison
+  const stockPercentChanges = normalizedData.map((d, i) => {
+    if (i === 0) return 0;
+    return ((d.price - normalizedData[0].price) / normalizedData[0].price) * 100;
+  });
+
+  const benchmarkPercentChanges = benchmarkData.map((d, i) => {
+    if (i === 0 || !d.price) return 0;
+    return ((d.price - benchmarkData[0].price) / benchmarkData[0].price) * 100;
+  });
+
+  // Use percentage changes when showing benchmark, absolute prices otherwise
+  const chartData = showBenchmark && benchmarkData.length > 0 ? stockPercentChanges : prices;
+  const benchmarkChartData = showBenchmark && benchmarkData.length > 0 ? benchmarkPercentChanges : [];
+
+  // Calculate dynamic Y-axis range
+  const minPrice = showBenchmark 
+    ? Math.min(...stockPercentChanges, ...benchmarkPercentChanges)
+    : Math.min(...prices);
+  const maxPrice = showBenchmark
+    ? Math.max(...stockPercentChanges, ...benchmarkPercentChanges)
+    : Math.max(...prices);
   const priceRange = maxPrice - minPrice;
   const padding = priceRange * 0.1; // 10% padding
   const yMin = Math.floor(minPrice - padding);
@@ -276,7 +295,7 @@ export default function PriceHistoryChart({
             }
             label={
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Compare with CW8 benchmark {isLoadingBenchmark && '(Loading...)'}
+                Compare with CW8 benchmark (% change) {isLoadingBenchmark && '(Loading...)'}
               </Typography>
             }
           />
@@ -295,7 +314,7 @@ export default function PriceHistoryChart({
             {
               min: yMin,
               max: yMax,
-              valueFormatter: (value) => `${currencySymbol}${value.toFixed(0)}`,
+              valueFormatter: (value) => showBenchmark ? `${value.toFixed(1)}%` : `${currencySymbol}${value.toFixed(0)}`,
             },
           ]}
           series={[
@@ -305,7 +324,7 @@ export default function PriceHistoryChart({
               showMark: false,
               curve: 'linear',
               area: !showBenchmark,
-              data: prices,
+              data: chartData,
             },
             ...(showBenchmark && benchmarkData.length > 0
               ? [
@@ -315,7 +334,7 @@ export default function PriceHistoryChart({
                     showMark: false,
                     curve: 'linear' as const,
                     area: false,
-                    data: benchmarkData.map(d => d.price),
+                    data: benchmarkChartData,
                   },
                 ]
               : []),
