@@ -52,6 +52,21 @@ export default function PriceHistoryChart({
   const [benchmarkData, setBenchmarkData] = useState<Array<{ date: string; price: number }>>([]);
   const [isLoadingBenchmark, setIsLoadingBenchmark] = useState(false);
 
+  // Normalize data format (support both lowercase and uppercase field names)
+  const normalizedData = data.map(d => ({
+    date: 'date' in d ? d.date : d.Date,
+    price: 'price' in d ? d.price : d.Close,
+  }));
+
+  // Format dates as "Day Month" (e.g., "1 Nov", "15 Nov")
+  const dates = normalizedData.map((d) => {
+    const date = new Date(d.date);
+    const day = date.getDate();
+    const month = date.toLocaleDateString('en-US', { month: 'short' });
+    return `${day} ${month}`;
+  });
+  const prices = normalizedData.map((d) => d.price);
+
   // Fetch benchmark data when checkbox is checked
   useEffect(() => {
     if (!showBenchmark) {
@@ -67,15 +82,15 @@ export default function PriceHistoryChart({
           const stockData = await response.json();
           const priceHistory = stockData.price_history || [];
           
-          // Create a map for quick date lookups
+          // Create a map for quick date lookups (using raw dates from normalizedData)
           const benchmarkMap = new Map(
             priceHistory.map((d: any) => [d.date || d.Date, d.price || d.Close])
           );
           
           // Align benchmark data with the stock's date range
-          const alignedBenchmark = dates.map(date => {
-            const price = benchmarkMap.get(date);
-            return { date, price: (price as number) || 0 };
+          const alignedBenchmark = normalizedData.map(d => {
+            const price = benchmarkMap.get(d.date);
+            return { date: d.date, price: (price as number) || 0 };
           });
           
           setBenchmarkData(alignedBenchmark);
@@ -88,22 +103,7 @@ export default function PriceHistoryChart({
     };
 
     fetchBenchmarkData();
-  }, [showBenchmark, dates]);
-
-  // Normalize data format (support both lowercase and uppercase field names)
-  const normalizedData = data.map(d => ({
-    date: 'date' in d ? d.date : d.Date,
-    price: 'price' in d ? d.price : d.Close,
-  }));
-
-  // Format dates as "Day Month" (e.g., "1 Nov", "15 Nov")
-  const dates = normalizedData.map((d) => {
-    const date = new Date(d.date);
-    const day = date.getDate();
-    const month = date.toLocaleDateString('en-US', { month: 'short' });
-    return `${day} ${month}`;
-  });
-  const prices = normalizedData.map((d) => d.price);
+  }, [showBenchmark, data]);
 
   // Calculate dynamic Y-axis range to emphasize price movements
   const minPrice = Math.min(...prices);
