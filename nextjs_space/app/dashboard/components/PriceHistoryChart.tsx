@@ -82,16 +82,25 @@ export default function PriceHistoryChart({
           const stockData = await response.json();
           const priceHistory = stockData.price_history || [];
           
+          console.log('[PriceHistoryChart] CW8 data received:', priceHistory.length, 'data points');
+          console.log('[PriceHistoryChart] First CW8 point:', priceHistory[0]);
+          console.log('[PriceHistoryChart] Stock dates:', normalizedData.map(d => d.date).slice(0, 3));
+          
           // Create a map for quick date lookups (using raw dates from normalizedData)
           const benchmarkMap = new Map(
             priceHistory.map((d: any) => [d.date || d.Date, d.price || d.Close])
           );
+          
+          console.log('[PriceHistoryChart] Benchmark map keys sample:', Array.from(benchmarkMap.keys()).slice(0, 3));
           
           // Align benchmark data with the stock's date range
           const alignedBenchmark = normalizedData.map(d => {
             const price = benchmarkMap.get(d.date);
             return { date: d.date, price: (price as number) || 0 };
           });
+          
+          console.log('[PriceHistoryChart] Aligned benchmark data:', alignedBenchmark.slice(0, 3));
+          console.log('[PriceHistoryChart] Non-zero benchmark prices:', alignedBenchmark.filter(d => d.price > 0).length);
           
           setBenchmarkData(alignedBenchmark);
         }
