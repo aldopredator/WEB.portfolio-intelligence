@@ -161,9 +161,9 @@ export default async function ScreeningPage({
     const sector = companyProfile?.industry || stock.type;
     const pe = stockInfo.pe_ratio?.toFixed(0);
     const pb = stockInfo.pb_ratio?.toFixed(0);
-    const priceToSales = stockInfo.priceToSales?.toFixed(1);
+    const priceToSales = stockInfo.priceToSales?.toFixed(0);
     const marketCap = stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(0)}B` : null;
-    const avgVolume = stockInfo.averageVolume ? `${(stockInfo.averageVolume / 1e6).toFixed(1)}M` : null;
+    const avgVolume = stockInfo.averageVolume ? `${(stockInfo.averageVolume / 1e6).toFixed(0)}M` : null;
     const beta = stockInfo.beta?.toFixed(0);
     const roe = stockInfo.roe ? `${stockInfo.roe.toFixed(0)}%` : null;
     const profitMargin = stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(0)}%` : null;
