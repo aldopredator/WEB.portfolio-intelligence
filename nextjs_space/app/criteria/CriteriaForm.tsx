@@ -179,23 +179,6 @@ export default function CriteriaForm() {
     }));
   };
 
-  const addPortfolio = () => {
-    if (newPortfolio.trim() && !criteria.portfolioFilter.includes(newPortfolio.trim())) {
-      setCriteria(prev => ({
-        ...prev,
-        portfolioFilter: [...prev.portfolioFilter, newPortfolio.trim()],
-      }));
-      setNewPortfolio('');
-    }
-  };
-
-  const removePortfolio = (portfolio: string) => {
-    setCriteria(prev => ({
-      ...prev,
-      portfolioFilter: prev.portfolioFilter.filter(p => p !== portfolio),
-    }));
-  };
-
   return (
     <form onSubmit={handleSubmit}>
       {/* Action Buttons - Sticky at top */}
