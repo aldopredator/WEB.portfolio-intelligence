@@ -176,7 +176,7 @@ export default function CompanyInfoCard({
               fontWeight: 500,
             }}
           >
-            Rate this stock
+            Rate this stock (Current: {rating}, Initial: {initialRating})
           </Typography>
           <Stack direction="row" spacing={0.5} sx={{ mb: 2 }}>
             {[1, 2, 3, 4, 5].map((star) => (
