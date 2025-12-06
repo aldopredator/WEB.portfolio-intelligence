@@ -261,7 +261,7 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
                         }
                       }}
                     >
-                      <MenuItem value="all">
+                      <MenuItem value="all" disabled sx={{ color: 'text.disabled' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Package size={16} />
                           All Portfolios ({stocks.length} tickers)

@@ -217,6 +217,16 @@ export default function CompanyInfoCard({
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Avg Annual Volume in %
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: (averageVolume10Day && enterpriseValue && floatShares && sharesOutstanding) ? 'text.primary' : 'text.disabled' }}>
+                {(averageVolume10Day && enterpriseValue && floatShares && sharesOutstanding)
+                  ? `${(((averageVolume10Day * 365) / (enterpriseValue * (floatShares / sharesOutstanding))) * 100).toFixed(2)}%`
+                  : 'N/A'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 % Held by Insiders
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 700, color: heldPercentInsiders ? 'text.primary' : 'text.disabled' }}>

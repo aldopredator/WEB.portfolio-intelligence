@@ -31,11 +31,11 @@ export default function StockDetailsCard({
   debtToEquity,
 }: StockDetailsCardProps) {
   const valuationMetrics = [
+    { label: 'Total Debt/Equity', value: debtToEquity ? debtToEquity.toFixed(0) : 'N/A', rawValue: debtToEquity },
     { label: 'Price/Sales', value: priceToSales ? priceToSales.toFixed(0) : 'N/A', rawValue: priceToSales },
     { label: 'Trailing P/E', value: trailingPE ? trailingPE.toFixed(0) : 'N/A', rawValue: trailingPE },
-    { label: 'Price/Book', value: priceToBook ? priceToBook.toFixed(0) : 'N/A', rawValue: priceToBook },
     { label: 'Forward P/E', value: forwardPE ? forwardPE.toFixed(0) : 'N/A', rawValue: forwardPE },
-    { label: 'Total Debt/Equity', value: debtToEquity ? debtToEquity.toFixed(0) : 'N/A', rawValue: debtToEquity },
+    { label: 'Price/Book', value: priceToBook ? priceToBook.toFixed(0) : 'N/A', rawValue: priceToBook },
     { label: 'Enterprise Value/Revenue', value: enterpriseToRevenue ? enterpriseToRevenue.toFixed(0) : 'N/A', rawValue: enterpriseToRevenue },
     { label: 'Enterprise Value/EBITDA', value: enterpriseToEbitda ? enterpriseToEbitda.toFixed(0) : 'N/A', rawValue: enterpriseToEbitda },
   ];

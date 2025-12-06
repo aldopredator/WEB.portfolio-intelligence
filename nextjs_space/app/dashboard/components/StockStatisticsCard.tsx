@@ -28,7 +28,7 @@ export default function StockStatisticsCard({
 }: StockStatisticsCardProps) {
   const profitabilityMetrics = [
     { label: 'ROE', value: roe ? `${roe.toFixed(0)}%` : 'N/A', rawValue: roe },
-    { label: 'Return on Assets', value: returnOnAssets ? `${returnOnAssets.toFixed(0)}%` : 'N/A', rawValue: returnOnAssets },
+    { label: 'ROA', value: returnOnAssets ? `${returnOnAssets.toFixed(0)}%` : 'N/A', rawValue: returnOnAssets },
     { label: 'Profit Margin', value: profitMargin ? `${profitMargin.toFixed(0)}%` : 'N/A', rawValue: profitMargin },
   ];
 
