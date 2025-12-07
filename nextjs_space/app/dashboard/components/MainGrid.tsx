@@ -21,9 +21,10 @@ interface MainGridProps {
   selectedStock: string;
   stocks?: Array<{ ticker: string; company: string; change_percent?: number; rating?: number; portfolioId?: string | null }>;
   portfolios?: Array<{ id: string; name: string; description?: string | null }>;
+  onRatingUpdate?: (ticker: string, rating: number) => void;
 }
 
-export default function MainGrid({ stockData, selectedStock, stocks = [], portfolios = [] }: MainGridProps) {
+export default function MainGrid({ stockData, selectedStock, stocks = [], portfolios = [], onRatingUpdate }: MainGridProps) {
   const stockEntry = stockData[selectedStock];
   const currentStock = stocks.find(s => s.ticker === selectedStock);
   const currentRating = currentStock?.rating || 0;
@@ -145,6 +146,7 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
                 initialRating={currentRating}
                 portfolios={portfolios}
                 currentPortfolioId={currentPortfolioId}
+                onRatingUpdate={onRatingUpdate}
               />
             )}
             <StockDetailsCard

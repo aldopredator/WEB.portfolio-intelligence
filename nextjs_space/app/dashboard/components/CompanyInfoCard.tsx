@@ -46,6 +46,7 @@ interface CompanyInfoCardProps {
   initialRating?: number;
   portfolios?: Array<{ id: string; name: string; description?: string | null }>;
   currentPortfolioId?: string | null;
+  onRatingUpdate?: (ticker: string, rating: number) => void;
 }
 
 export default function CompanyInfoCard({
@@ -76,6 +77,7 @@ export default function CompanyInfoCard({
   initialRating = 0,
   portfolios = [],
   currentPortfolioId,
+  onRatingUpdate,
 }: CompanyInfoCardProps) {
   const [rating, setRating] = React.useState(initialRating);
   const [hoveredRating, setHoveredRating] = React.useState(0);
@@ -134,6 +136,10 @@ export default function CompanyInfoCard({
       if (response.ok) {
         setRating(newRating);
         toast.success(`Rating updated to ${newRating} star${newRating !== 1 ? 's' : ''}`);
+        // Update parent component state immediately
+        if (onRatingUpdate) {
+          onRatingUpdate(ticker, newRating);
+        }
       } else {
         toast.error('Failed to update rating');
       }
