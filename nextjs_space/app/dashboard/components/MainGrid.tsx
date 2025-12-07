@@ -29,6 +29,12 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
   const currentRating = currentStock?.rating || 0;
   const currentPortfolioId = currentStock?.portfolioId;
   
+  // Debug logging
+  console.log('[MainGrid] Selected stock:', selectedStock);
+  console.log('[MainGrid] Stocks array:', stocks);
+  console.log('[MainGrid] Current stock found:', currentStock);
+  console.log('[MainGrid] Current rating:', currentRating);
+  
   // Handle empty portfolio or no stock selected
   if (!selectedStock) {
     return (
