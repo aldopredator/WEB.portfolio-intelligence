@@ -17,10 +17,26 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch price history for the ticker (works for both stocks and benchmarks)
-    const priceHistory = await prisma.priceHistory.findMany({
+    console.log('[Price History API] Fetching price history for:', ticker);
+
+    // Find the stock first
+    const stock = await prisma.stock.findUnique({
       where: { ticker },
-      orderBy: { date: 'asc' },
+      select: { id: true },
+    });
+
+    if (!stock) {
+      return NextResponse.json(
+        { error: 'Stock not found' },
+        { status: 404 }
+      );
+    }
+
+    // Fetch price history for the stock
+    const priceHistory = await prisma.priceHistory.findMany({
+      where: { stockId: stock.id },
+      orderBy: { date: 'desc' },
+      take: 30,
       select: {
         date: true,
         price: true,

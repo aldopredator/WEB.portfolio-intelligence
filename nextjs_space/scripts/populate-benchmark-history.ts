@@ -8,6 +8,26 @@ async function populateBenchmarkHistory() {
   console.log(`[Benchmark] Fetching 30-day history for ${benchmarkTicker}...`);
   
   try {
+    // Ensure CW8 exists in Stock table
+    let stock = await prisma.stock.findUnique({
+      where: { ticker: benchmarkTicker },
+    });
+
+    if (!stock) {
+      console.log(`[Benchmark] Creating ${benchmarkTicker} stock entry...`);
+      stock = await prisma.stock.create({
+        data: {
+          ticker: benchmarkTicker,
+          company: 'Amundi MSCI World UCITS ETF',
+          type: 'ETF',
+          exchange: 'Euronext Paris',
+          isActive: true,
+        },
+      });
+    }
+
+    console.log(`[Benchmark] Stock ID for ${benchmarkTicker}: ${stock.id}`);
+    
     // Fetch CW8 data from your stock API
     const response = await fetch(`http://localhost:3000/api/stock?ticker=${benchmarkTicker}`);
     
@@ -27,14 +47,14 @@ async function populateBenchmarkHistory() {
     
     // Delete existing benchmark data
     await prisma.priceHistory.deleteMany({
-      where: { ticker: benchmarkTicker },
+      where: { stockId: stock.id },
     });
     
     console.log(`[Benchmark] Cleared existing ${benchmarkTicker} data`);
     
     // Insert new benchmark data
     const records = priceHistory.map((entry: any) => ({
-      ticker: benchmarkTicker,
+      stockId: stock.id,
       date: new Date(entry.date || entry.Date),
       price: parseFloat(entry.price || entry.Close),
       volume: entry.volume || entry.Volume ? parseFloat(entry.volume || entry.Volume) : null,
