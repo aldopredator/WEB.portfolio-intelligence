@@ -1351,10 +1351,10 @@ export default function CriteriaForm() {
                       <button
                         key={stars}
                         type="button"
-                        onClick={() => setCriteria({ ...criteria, ratingMin: stars, ratingMax: 5 })}
+                        onClick={() => setCriteria({ ...criteria, minRating: stars })}
                         disabled={!criteria.ratingEnabled}
                         className={`px-4 py-3 rounded-lg border-2 transition-all font-medium text-sm ${
-                          criteria.ratingMin === stars
+                          criteria.minRating === stars
                             ? 'bg-yellow-500/20 border-yellow-500 text-yellow-400'
                             : 'bg-slate-800/30 border-slate-700 text-slate-400 hover:bg-slate-800/50'
                         } ${!criteria.ratingEnabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
@@ -1364,10 +1364,10 @@ export default function CriteriaForm() {
                     ))}
                     <button
                       type="button"
-                      onClick={() => setCriteria({ ...criteria, ratingMin: 0, ratingMax: 5 })}
+                      onClick={() => setCriteria({ ...criteria, minRating: 0 })}
                       disabled={!criteria.ratingEnabled}
                       className={`px-4 py-3 rounded-lg border-2 transition-all font-medium text-sm ${
-                        criteria.ratingMin === 0
+                        criteria.minRating === 0
                           ? 'bg-blue-500/20 border-blue-500 text-blue-400'
                           : 'bg-slate-800/30 border-slate-700 text-slate-400 hover:bg-slate-800/50'
                       } ${!criteria.ratingEnabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
