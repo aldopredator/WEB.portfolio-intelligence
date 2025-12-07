@@ -188,7 +188,7 @@ export default function CompanyInfoCard({
               fontWeight: 500,
             }}
           >
-            Rate this stock (Current: {rating}, Initial: {initialRating})
+            Rate this stock
           </Typography>
           <Stack direction="row" spacing={0.5} sx={{ mb: 2 }}>
             {[1, 2, 3, 4, 5].map((star) => (
@@ -442,6 +442,16 @@ export default function CompanyInfoCard({
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Avg Annual Volume in % (10D)
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: (averageVolume10Day && floatShares) ? 'text.primary' : 'text.disabled' }}>
+                {(averageVolume10Day && floatShares)
+                  ? `${((averageVolume10Day * 250 / floatShares) * 100).toFixed(2)}%`
+                  : 'N/A'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 Avg Daily Volume (3M)
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 700, color: averageVolume3Month ? 'text.primary' : 'text.disabled' }}>
@@ -451,6 +461,16 @@ export default function CompanyInfoCard({
                     : averageVolume3Month >= 1e6
                     ? `${(averageVolume3Month / 1e6).toFixed(0)}M`
                     : averageVolume3Month.toLocaleString()
+                  : 'N/A'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Avg Annual Volume in % (10D)
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: (averageVolume10Day && floatShares) ? 'text.primary' : 'text.disabled' }}>
+                {(averageVolume10Day && floatShares)
+                  ? `${((averageVolume10Day * 250 / floatShares) * 100).toFixed(2)}%`
                   : 'N/A'}
               </Typography>
             </Box>

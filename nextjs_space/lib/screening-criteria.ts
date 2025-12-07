@@ -51,6 +51,8 @@ export interface ScreeningCriteria {
   avgDailyVolumeEnabled: boolean;
   sentimentFilter: 'all' | 'positive' | 'neutral' | 'negative';
   sentimentEnabled: boolean;
+  minRating: number;
+  ratingEnabled: boolean;
   portfolioFilter: string[];
   portfolioFilterEnabled: boolean;
   excludeSectors: string[];
@@ -111,6 +113,8 @@ export const DEFAULT_CRITERIA: ScreeningCriteria = {
   avgDailyVolumeEnabled: false,
   sentimentFilter: 'all',
   sentimentEnabled: false,
+  minRating: 0,
+  ratingEnabled: false,
   portfolioFilter: [],
   portfolioFilterEnabled: false,
   excludeSectors: ['Alcohol', 'Gambling'],
@@ -173,6 +177,8 @@ export function parseCriteriaFromParams(searchParams: URLSearchParams): Screenin
     avgDailyVolumeEnabled: searchParams.get('avgDailyVolumeEnabled') === 'true',
     sentimentFilter: (searchParams.get('sentimentFilter') as 'all' | 'positive' | 'neutral' | 'negative') || DEFAULT_CRITERIA.sentimentFilter,
     sentimentEnabled: searchParams.get('sentimentEnabled') === 'true',
+    minRating: parseFloat(searchParams.get('minRating') || String(DEFAULT_CRITERIA.minRating)),
+    ratingEnabled: searchParams.get('ratingEnabled') === 'true',
     portfolioFilter: searchParams.get('portfolioFilter')?.split(',').filter(s => s) || DEFAULT_CRITERIA.portfolioFilter,
     portfolioFilterEnabled: searchParams.get('portfolioFilterEnabled') === 'true',
     excludeSectors: searchParams.get('excludeSectors')?.split(',').filter(s => s) || DEFAULT_CRITERIA.excludeSectors,
@@ -236,6 +242,8 @@ export function buildCriteriaURL(criteria: ScreeningCriteria): string {
     avgDailyVolumeEnabled: String(criteria.avgDailyVolumeEnabled),
     sentimentFilter: criteria.sentimentFilter,
     sentimentEnabled: String(criteria.sentimentEnabled),
+    minRating: String(criteria.minRating),
+    ratingEnabled: String(criteria.ratingEnabled),
     portfolioFilter: criteria.portfolioFilter.join(','),
     portfolioFilterEnabled: String(criteria.portfolioFilterEnabled),
     excludeSectors: criteria.excludeSectors.join(','),

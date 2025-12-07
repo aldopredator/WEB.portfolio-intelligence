@@ -1317,6 +1317,67 @@ export default function CriteriaForm() {
                 </div>
               </div>
             </div>
+
+            {/* Rating (Stars) */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-0">
+                  <button
+                    type="button"
+                    onClick={() => setCriteria({ ...criteria, ratingEnabled: !criteria.ratingEnabled })}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
+                      criteria.ratingEnabled
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
+                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
+                    }`}
+                  >
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.ratingEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
+                  </button>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">Rating (Stars)</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                      criteria.ratingEnabled
+                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
+                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                    }`}>
+                      {criteria.ratingEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
+                  
+                  <div className="mt-1 grid grid-cols-3 gap-3">
+                    {[1, 2, 3, 4, 5].map((stars) => (
+                      <button
+                        key={stars}
+                        type="button"
+                        onClick={() => setCriteria({ ...criteria, ratingMin: stars, ratingMax: 5 })}
+                        disabled={!criteria.ratingEnabled}
+                        className={`px-4 py-3 rounded-lg border-2 transition-all font-medium text-sm ${
+                          criteria.ratingMin === stars
+                            ? 'bg-yellow-500/20 border-yellow-500 text-yellow-400'
+                            : 'bg-slate-800/30 border-slate-700 text-slate-400 hover:bg-slate-800/50'
+                        } ${!criteria.ratingEnabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      >
+                        {stars === 1 ? '⭐ 1+' : stars === 2 ? '⭐ 2+' : stars === 3 ? '⭐ 3+' : stars === 4 ? '⭐ 4+' : '⭐ 5'}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setCriteria({ ...criteria, ratingMin: 0, ratingMax: 5 })}
+                      disabled={!criteria.ratingEnabled}
+                      className={`px-4 py-3 rounded-lg border-2 transition-all font-medium text-sm ${
+                        criteria.ratingMin === 0
+                          ? 'bg-blue-500/20 border-blue-500 text-blue-400'
+                          : 'bg-slate-800/30 border-slate-700 text-slate-400 hover:bg-slate-800/50'
+                      } ${!criteria.ratingEnabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                    >
+                      🔄 All
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

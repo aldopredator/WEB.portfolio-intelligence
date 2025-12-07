@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
-type SortField = 'ticker' | 'sector' | 'portfolio' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'beta' | 'roe' | 'profitMargin' | 'debtToEquity' | 'sentiment' | 'matchScore';
+type SortField = 'ticker' | 'sector' | 'portfolio' | 'rating' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'beta' | 'roe' | 'profitMargin' | 'debtToEquity' | 'sentiment' | 'matchScore';
 type SortDirection = 'asc' | 'desc';
 
 interface Stock {
@@ -11,6 +11,7 @@ interface Stock {
   name: string;
   sector: string;
   portfolio: string;
+  rating: number;
   pe: string;
   pb: string;
   priceToSales: string;
@@ -57,7 +58,10 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
       let bVal: any = b[sortField];
 
       // Convert string numbers to actual numbers for sorting
-      if (sortField === 'pe' || sortField === 'pb' || sortField === 'priceToSales' || sortField === 'beta' || sortField === 'roe' || sortField === 'profitMargin' || sortField === 'debtToEquity') {
+      if (sortField === 'rating') {
+        aVal = a.rating;
+        bVal = b.rating;
+      } else if (sortField === 'pe' || sortField === 'pb' || sortField === 'priceToSales' || sortField === 'beta' || sortField === 'roe' || sortField === 'profitMargin' || sortField === 'debtToEquity') {
         aVal = aVal === 'N/A' ? -Infinity : parseFloat(aVal);
         bVal = bVal === 'N/A' ? -Infinity : parseFloat(bVal);
       } else if (sortField === 'marketCap') {
@@ -112,6 +116,15 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                 <div className="flex items-center gap-2">
                   Stock
                   <SortIcon field="ticker" />
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-center text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('rating')}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  Rating
+                  <SortIcon field="rating" />
                 </div>
               </th>
               <th 
@@ -255,6 +268,15 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   <div>
                     <div className="text-white font-bold text-lg">{stock.ticker}</div>
                     <div className="text-slate-400 text-sm mt-1">{stock.name}</div>
+                  </div>
+                </td>
+                <td className="px-6 py-5">
+                  <div className="flex items-center justify-center gap-0.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span key={star} className={star <= stock.rating ? 'text-yellow-400' : 'text-slate-600'}>
+                        {star <= stock.rating ? '★' : '☆'}
+                      </span>
+                    ))}
                   </div>
                 </td>
                 <td className="px-6 py-5">
