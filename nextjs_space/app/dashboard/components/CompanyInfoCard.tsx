@@ -156,6 +156,7 @@ export default function CompanyInfoCard({
       toast.error('Failed to update rating');
     }
   };
+
   // Debug logging
   React.useEffect(() => {
     console.log('[CompanyInfoCard] Polygon data received:', {
