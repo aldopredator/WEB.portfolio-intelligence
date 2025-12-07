@@ -135,6 +135,10 @@ export default async function ScreeningPage({
       }
     }
     
+    if (CRITERIA.ratingEnabled) {
+      passes.rating = (stock.rating || 0) >= CRITERIA.minRating;
+    }
+    
     if (CRITERIA.portfolioFilterEnabled && CRITERIA.portfolioFilter.length > 0) {
       const portfolioName = stock.portfolio?.name || '';
       passes.portfolio = CRITERIA.portfolioFilter.includes(portfolioName);
@@ -187,6 +191,7 @@ export default async function ScreeningPage({
       name: stock.company,
       sector,
       portfolio: stock.portfolio.name,
+      rating: stock.rating || 0,
       pe,
       pb,
       priceToSales,
@@ -416,6 +421,7 @@ export default async function ScreeningPage({
               profitMarginEnabled: CRITERIA.profitMarginEnabled,
               debtToEquityEnabled: CRITERIA.debtToEquityEnabled,
               sentimentEnabled: CRITERIA.sentimentEnabled,
+              ratingEnabled: CRITERIA.ratingEnabled,
             }}
           />
         </div>
