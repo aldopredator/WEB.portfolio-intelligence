@@ -134,8 +134,6 @@ export default function CompanyInfoCard({
       if (response.ok) {
         setRating(newRating);
         toast.success(`Rating updated to ${newRating} star${newRating !== 1 ? 's' : ''}`);
-        // Refresh server data to persist rating in stocks list
-        router.refresh();
       } else {
         toast.error('Failed to update rating');
       }
@@ -398,7 +396,7 @@ export default function CompanyInfoCard({
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 700, color: (averageVolume10Day && floatShares) ? 'text.primary' : 'text.disabled' }}>
                 {(averageVolume10Day && floatShares)
-                  ? `${((averageVolume10Day * 365 / floatShares) * 100).toFixed(2)}%`
+                  ? `${((averageVolume10Day / floatShares) * 100).toFixed(2)}%`
                   : 'N/A'}
               </Typography>
             </Box>

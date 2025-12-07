@@ -179,3 +179,34 @@ model Metrics {
 
     @@index([stockId])
 }
+
+// Benchmark data for comparison (e.g., CW8, S&P 500)
+model Benchmark {
+    id          String   @id @default(cuid())
+    ticker      String   @unique // e.g., 'CW8', 'SPY'
+    name        String   // e.g., 'Amundi MSCI World'
+    type        String   @default("ETF")
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    
+    // Relations
+    priceHistory BenchmarkPriceHistory[]
+    
+    @@index([ticker])
+}
+
+// Historical price data for benchmarks
+model BenchmarkPriceHistory {
+    id          String    @id @default(cuid())
+    benchmarkId String
+    benchmark   Benchmark @relation(fields: [benchmarkId], references: [id], onDelete: Cascade)
+    
+    date        DateTime
+    price       Float
+    volume      Float?
+    
+    createdAt   DateTime  @default(now())
+
+    @@unique([benchmarkId, date])
+    @@index([benchmarkId, date])
+}
