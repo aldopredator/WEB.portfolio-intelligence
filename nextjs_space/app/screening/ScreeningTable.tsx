@@ -36,6 +36,7 @@ interface ScreeningTableProps {
     profitMarginEnabled: boolean;
     debtToEquityEnabled: boolean;
     sentimentEnabled: boolean;
+    ratingEnabled: boolean;
   };
 }
 
