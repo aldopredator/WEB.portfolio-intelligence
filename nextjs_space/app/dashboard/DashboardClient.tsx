@@ -35,17 +35,34 @@ const theme = createTheme({
   },
 });
 
-function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
+function DashboardClientContent({ initialData, stocks: initialStocks }: DashboardClientProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const stockParam = searchParams.get('stock');
   const { selectedPortfolio, portfolios, selectPortfolio } = usePortfolio();
-  const [selectedStock, setSelectedStock] = React.useState(stocks[0]?.ticker || '');
+  const [selectedStock, setSelectedStock] = React.useState(initialStocks[0]?.ticker || '');
+  const [stocks, setStocks] = React.useState(initialStocks);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'info' | 'warning' | 'error'>('info');
   const [isAddingTicker, setIsAddingTicker] = React.useState(false);
   const [panelCollapsed, setPanelCollapsed] = React.useState(false);
+
+  // Sync stocks when initialStocks changes
+  React.useEffect(() => {
+    setStocks(initialStocks);
+  }, [initialStocks]);
+
+  // Callback to update rating in local state
+  const handleRatingUpdate = React.useCallback((ticker: string, newRating: number) => {
+    setStocks(prevStocks => 
+      prevStocks.map(stock => 
+        stock.ticker === ticker 
+          ? { ...stock, rating: newRating }
+          : stock
+      )
+    );
+  }, []);
 
   // Handle portfolio change
   const handlePortfolioChange = (portfolioId: string) => {
@@ -455,6 +472,7 @@ function DashboardClientContent({ initialData, stocks }: DashboardClientProps) {
               selectedStock={selectedStock} 
               stocks={stocks}
               portfolios={portfolios}
+              onRatingUpdate={handleRatingUpdate}
             />
           </Stack>
         </Box>
