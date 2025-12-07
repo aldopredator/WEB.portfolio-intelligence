@@ -87,8 +87,9 @@ export default function CompanyInfoCard({
 
   // Update rating when initialRating changes
   React.useEffect(() => {
+    console.log('[CompanyInfoCard] initialRating changed:', { ticker, from: rating, to: initialRating });
     setRating(initialRating);
-  }, [initialRating]);
+  }, [initialRating, ticker, rating]);
 
   const handleMoveClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -126,6 +127,7 @@ export default function CompanyInfoCard({
   };
 
   const handleRatingClick = async (newRating: number) => {
+    console.log('[CompanyInfoCard] Rating click:', { ticker, currentRating: rating, newRating });
     try {
       const response = await fetch('/api/stock/update-rating', {
         method: 'POST',
@@ -133,11 +135,15 @@ export default function CompanyInfoCard({
         body: JSON.stringify({ ticker, rating: newRating }),
       });
 
+      console.log('[CompanyInfoCard] API response:', response.ok);
+
       if (response.ok) {
+        console.log('[CompanyInfoCard] Setting rating to:', newRating);
         setRating(newRating);
         toast.success(`Rating updated to ${newRating} star${newRating !== 1 ? 's' : ''}`);
         // Update parent component state immediately
         if (onRatingUpdate) {
+          console.log('[CompanyInfoCard] Calling onRatingUpdate:', ticker, newRating);
           onRatingUpdate(ticker, newRating);
         }
       } else {
