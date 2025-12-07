@@ -34,6 +34,7 @@ interface CompanyInfoCardProps {
   floatShares?: number | null;
   averageVolume?: number | null;
   averageVolume10Day?: number | null;
+  averageVolume3Month?: number | null;
   sharesOutstanding?: number | null;
   totalEmployees?: number | null;
   heldPercentInsiders?: number | null;
@@ -65,6 +66,7 @@ export default function CompanyInfoCard({
   floatShares,
   averageVolume,
   averageVolume10Day,
+  averageVolume3Month,
   sharesOutstanding,
   totalEmployees,
   heldPercentInsiders,
@@ -221,6 +223,42 @@ export default function CompanyInfoCard({
                 )}
               </IconButton>
             ))}
+          </Stack>
+
+          {/* Rating Action Buttons */}
+          <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => {
+                toast.success(`Rating saved: ${rating} star${rating !== 1 ? 's' : ''}`);
+                window.location.reload();
+              }}
+              sx={{
+                bgcolor: 'success.main',
+                '&:hover': {
+                  bgcolor: 'success.dark',
+                },
+              }}
+            >
+              Save Rating
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => handleRatingClick(0)}
+              sx={{
+                borderColor: 'error.main',
+                color: 'error.main',
+                '&:hover': {
+                  borderColor: 'error.dark',
+                  bgcolor: 'error.main',
+                  color: 'white',
+                },
+              }}
+            >
+              Reset Rating
+            </Button>
           </Stack>
 
           {/* Move Button */}
@@ -404,11 +442,25 @@ export default function CompanyInfoCard({
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Avg Annual Volume in %
+                Avg Daily Volume (3M)
               </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: (averageVolume10Day && floatShares) ? 'text.primary' : 'text.disabled' }}>
-                {(averageVolume10Day && floatShares)
-                  ? `${((averageVolume10Day * 250 / floatShares) * 100).toFixed(2)}%`
+              <Typography variant="h6" sx={{ fontWeight: 700, color: averageVolume3Month ? 'text.primary' : 'text.disabled' }}>
+                {averageVolume3Month
+                  ? averageVolume3Month >= 1e9
+                    ? `${(averageVolume3Month / 1e9).toFixed(0)}B`
+                    : averageVolume3Month >= 1e6
+                    ? `${(averageVolume3Month / 1e6).toFixed(0)}M`
+                    : averageVolume3Month.toLocaleString()
+                  : 'N/A'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Avg Annual Volume in % (3M)
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: (averageVolume3Month && floatShares) ? 'text.primary' : 'text.disabled' }}>
+                {(averageVolume3Month && floatShares)
+                  ? `${((averageVolume3Month * 250 / floatShares) * 100).toFixed(2)}%`
                   : 'N/A'}
               </Typography>
             </Box>
