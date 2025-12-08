@@ -136,7 +136,14 @@ export default async function ScreeningPage({
     }
     
     if (CRITERIA.ratingEnabled) {
-      passes.rating = (stock.rating || 0) >= CRITERIA.minRating;
+      const stockRating = stock.rating || 0;
+      if (CRITERIA.minRating === -1) {
+        // Filter for "Not Rated" - rating must be 0
+        passes.rating = stockRating === 0;
+      } else {
+        // Filter for rated stocks - rating must be >= minRating
+        passes.rating = stockRating >= CRITERIA.minRating;
+      }
     }
     
     if (CRITERIA.portfolioFilterEnabled && CRITERIA.portfolioFilter.length > 0) {
@@ -181,28 +188,33 @@ export default async function ScreeningPage({
       ? (data.sentiment_data as any)?.overall_sentiment
       : null;
 
-    // Filter out stocks with any missing values in key data fields
-    if (!sector || !pe || !pb || !priceToSales || !marketCap || !avgVolume) {
-      return null;
-    }
+    // Calculate data completeness score for key fields
+    const keyFields = [sector, pe, pb, priceToSales, marketCap, avgVolume];
+    const availableFields = keyFields.filter(field => field !== null && field !== undefined).length;
+    const totalKeyFields = keyFields.length;
+    const dataCompletenessScore = Math.round((availableFields / totalKeyFields) * 100);
+    
+    // Adjust match score based on data completeness
+    // If stock passes criteria filters but has missing data, reduce match score proportionally
+    const adjustedMatchScore = Math.round((matchScore * dataCompletenessScore) / 100);
 
     return {
       ticker: stock.ticker,
       name: stock.company,
-      sector,
+      sector: sector || 'N/A',
       portfolio: stock.portfolio.name,
       rating: stock.rating || 0,
-      pe,
-      pb,
-      priceToSales,
-      marketCap,
-      avgVolume,
+      pe: pe || 'N/A',
+      pb: pb || 'N/A',
+      priceToSales: priceToSales || 'N/A',
+      marketCap: marketCap || 'N/A',
+      avgVolume: avgVolume || 'N/A',
       beta: beta || 'N/A',
       roe: roe || 'N/A',
       profitMargin: profitMargin || 'N/A',
       debtToEquity: debtToEquity || 'N/A',
       sentiment: sentiment || 'N/A',
-      matchScore,
+      matchScore: adjustedMatchScore,
     };
   }).filter((stock): stock is NonNullable<typeof stock> => stock !== null);
 
