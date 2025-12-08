@@ -172,7 +172,47 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
         </Box>
       )}
 
-      {/* Two Column Layout: Price Chart (larger) and Right Side Widgets (smaller) */}
+      {/* Middle Section: Price Chart (left) and Stock Statistics (right) */}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            lg: '2fr 1fr',
+          },
+          gap: 2,
+          mb: 2,
+        }}
+      >
+        {/* Price Chart */}
+        {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
+          <PriceHistoryChart
+            data={stock.price_movement_30_days}
+            ticker={selectedStock}
+            currentPrice={stock.current_price || 0}
+            priceChange={stock.change || 0}
+            priceChangePercent={stock.change_percent || 0}
+            weekLow52={stock.fiftyTwoWeekLow || stock['52_week_low']}
+            weekHigh52={stock.fiftyTwoWeekHigh || stock['52_week_high']}
+            volume={stock.volume}
+            fiftyDayAverage={stock.fiftyDayAverage}
+            twoHundredDayAverage={stock.twoHundredDayAverage}
+          />
+        )}
+        
+        {/* Stock Statistics */}
+        <ShareStatisticsCard
+          ticker={selectedStock}
+          sharesOutstanding={stock.sharesOutstanding}
+          floatShares={stock.floatShares}
+          averageVolume10Day={stock.averageVolume10Day}
+          averageVolume={stock.averageVolume}
+          heldPercentInsiders={stock.heldPercentInsiders}
+          heldPercentInstitutions={stock.heldPercentInstitutions}
+        />
+      </Box>
+
+      {/* Bottom Section: Earnings + Recommendations (left) and Social Sentiment (right) */}
       <Box
         sx={{
           display: 'grid',
@@ -183,36 +223,17 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
           gap: 2,
         }}
       >
-        {/* Block 1: Price Chart */}
-        <Box>
-          {/* Price History Chart with 52 Week Range */}
-          {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
-            <PriceHistoryChart
-              data={stock.price_movement_30_days}
-              ticker={selectedStock}
-              currentPrice={stock.current_price || 0}
-              priceChange={stock.change || 0}
-              priceChangePercent={stock.change_percent || 0}
-              weekLow52={stock.fiftyTwoWeekLow || stock['52_week_low']}
-              weekHigh52={stock.fiftyTwoWeekHigh || stock['52_week_high']}
-              volume={stock.volume}
-              fiftyDayAverage={stock.fiftyDayAverage}
-              twoHundredDayAverage={stock.twoHundredDayAverage}
-            />
-          )}
-        </Box>
-
-        {/* Block 2: Stock Statistics, Earnings, Recommendations, and Social Sentiment stacked */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <ShareStatisticsCard
-            ticker={selectedStock}
-            sharesOutstanding={stock.sharesOutstanding}
-            floatShares={stock.floatShares}
-            averageVolume10Day={stock.averageVolume10Day}
-            averageVolume={stock.averageVolume}
-            heldPercentInsiders={stock.heldPercentInsiders}
-            heldPercentInstitutions={stock.heldPercentInstitutions}
-          />
+        {/* Left: Earnings and Recommendations side by side */}
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              md: 'repeat(2, 1fr)',
+            },
+            gap: 2,
+          }}
+        >
           <EarningsSurprisesCard
             ticker={selectedStock}
             surprises={stockEntry.earnings_surprises || []}
@@ -221,11 +242,13 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
             ticker={selectedStock}
             trends={stockEntry.recommendation_trends || []}
           />
-          <SocialSentimentCard
-            ticker={selectedStock}
-            sentiment={stockEntry.social_sentiment}
-          />
         </Box>
+        
+        {/* Right: Social Sentiment */}
+        <SocialSentimentCard
+          ticker={selectedStock}
+          sentiment={stockEntry.social_sentiment}
+        />
       </Box>
 
       {/* Market News Section */}
