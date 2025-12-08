@@ -51,11 +51,6 @@ export default async function ScreeningPage({
   // Fetch stocks from database with portfolio information
   const dbStocks = await prisma.stock.findMany({
     where: { isActive: true },
-    include: {
-      portfolio: {
-        select: { name: true, id: true }
-      }
-    },
     select: {
       ticker: true,
       company: true,
@@ -63,7 +58,10 @@ export default async function ScreeningPage({
       rating: true,
       updatedAt: true,
       portfolio: {
-        select: { name: true, id: true }
+        select: { 
+          name: true,
+          id: true
+        }
       }
     }
   });
