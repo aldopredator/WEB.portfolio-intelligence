@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
-type SortField = 'ticker' | 'sector' | 'portfolio' | 'rating' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'beta' | 'roe' | 'profitMargin' | 'debtToEquity' | 'sentiment' | 'matchScore';
+type SortField = 'ticker' | 'sector' | 'portfolio' | 'rating' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'avgAnnualVolume10D' | 'avgAnnualVolume3M' | 'beta' | 'roe' | 'profitMargin' | 'debtToEquity' | 'sentiment' | 'matchScore';
 type SortDirection = 'asc' | 'desc';
 
 interface Stock {
@@ -17,6 +17,8 @@ interface Stock {
   priceToSales: string;
   marketCap: string;
   avgVolume: string;
+  avgAnnualVolume10D: string;
+  avgAnnualVolume3M: string;
   beta: string;
   roe: string;
   profitMargin: string;
@@ -37,6 +39,8 @@ interface ScreeningTableProps {
     debtToEquityEnabled: boolean;
     sentimentEnabled: boolean;
     ratingEnabled: boolean;
+    avgAnnualVolume10DEnabled: boolean;
+    avgAnnualVolume3MEnabled: boolean;
   };
 }
 
