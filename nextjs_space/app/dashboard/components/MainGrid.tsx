@@ -202,7 +202,7 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
           )}
         </Box>
 
-        {/* Block 2: Stock Statistics and Social Sentiment stacked */}
+        {/* Block 2: Stock Statistics, Earnings, Recommendations, and Social Sentiment stacked */}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <ShareStatisticsCard
             ticker={selectedStock}
@@ -213,6 +213,14 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
             heldPercentInsiders={stock.heldPercentInsiders}
             heldPercentInstitutions={stock.heldPercentInstitutions}
           />
+          <EarningsSurprisesCard
+            ticker={selectedStock}
+            surprises={stockEntry.earnings_surprises || []}
+          />
+          <RecommendationTrendsCard
+            ticker={selectedStock}
+            trends={stockEntry.recommendation_trends || []}
+          />
           <SocialSentimentCard
             ticker={selectedStock}
             sentiment={stockEntry.social_sentiment}
@@ -220,36 +228,12 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
         </Box>
       </Box>
 
-      {/* Earnings Surprises, Recommendation Trends, and Market News Section */}
+      {/* Market News Section */}
       <Box sx={{ mt: 3 }}>
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              lg: 'repeat(3, 1fr)',
-            },
-            gap: 2,
-          }}
-        >
-          {/* Earnings Surprises */}
-          <EarningsSurprisesCard
-            ticker={selectedStock}
-            surprises={stockEntry.earnings_surprises || []}
-          />
-
-          {/* Recommendation Trends */}
-          <RecommendationTrendsCard
-            ticker={selectedStock}
-            trends={stockEntry.recommendation_trends || []}
-          />
-
-          {/* Market News */}
-          <MarketNewsCard
-            ticker={selectedStock}
-            articles={stockEntry.latest_news || []}
-          />
-        </Box>
+        <MarketNewsCard
+          ticker={selectedStock}
+          articles={stockEntry.latest_news || []}
+        />
       </Box>
     </Box>
   );
