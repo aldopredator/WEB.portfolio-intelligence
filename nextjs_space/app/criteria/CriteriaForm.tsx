@@ -92,6 +92,7 @@ export default function CriteriaForm() {
           ...parsed,
           // Ensure arrays exist
           excludeSectors: Array.isArray(parsed.excludeSectors) ? parsed.excludeSectors : DEFAULT_CRITERIA.excludeSectors,
+          includeSectors: Array.isArray(parsed.includeSectors) ? parsed.includeSectors : DEFAULT_CRITERIA.includeSectors,
           excludeCountries: Array.isArray(parsed.excludeCountries) ? parsed.excludeCountries : DEFAULT_CRITERIA.excludeCountries,
           portfolioFilter: Array.isArray(parsed.portfolioFilter) ? parsed.portfolioFilter : DEFAULT_CRITERIA.portfolioFilter,
         };
@@ -142,6 +143,23 @@ export default function CriteriaForm() {
     setCriteria(prev => ({
       ...prev,
       excludeSectors: prev.excludeSectors.filter(s => s !== sector),
+    }));
+  };
+
+  const addIncludeSector = () => {
+    if (newSector.trim() && !criteria.includeSectors.includes(newSector.trim())) {
+      setCriteria(prev => ({
+        ...prev,
+        includeSectors: [...prev.includeSectors, newSector.trim()],
+      }));
+      setNewSector('');
+    }
+  };
+
+  const removeIncludeSector = (sector: string) => {
+    setCriteria(prev => ({
+      ...prev,
+      includeSectors: prev.includeSectors.filter(s => s !== sector),
     }));
   };
 
@@ -291,7 +309,7 @@ export default function CriteriaForm() {
           </div>
         </div>
 
-        {/* Financial Metrics - Merged Valuation and Additional Metrics */}
+        {/* Stock Metrics - Merged Valuation and Additional Metrics */}
         <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
           <div className="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border-b border-emerald-500/30 p-4">
             <div className="flex items-center gap-3">
@@ -299,7 +317,7 @@ export default function CriteriaForm() {
                 <TrendingUp className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Financial Metrics</h2>
+                <h2 className="text-xl font-bold text-white">Stock Metrics</h2>
               </div>
             </div>
           </div>
@@ -1697,6 +1715,167 @@ export default function CriteriaForm() {
               </div>
             </div>
 
+          </div>
+        </div>
+
+        {/* Sector Inclusion Filter */}
+        <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
+          <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-b border-green-500/30 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
+                <Filter className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-white">Sector Inclusion</h2>
+                <p className="text-slate-400 text-sm mt-1">Filter stocks to show only selected sectors</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCriteria({ ...criteria, includeSectorsEnabled: !criteria.includeSectorsEnabled })}
+                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                  criteria.includeSectorsEnabled
+                    ? 'bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20'
+                    : 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20'
+                }`}
+              >
+                {criteria.includeSectorsEnabled ? 'Enabled' : 'Disabled'}
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-4">
+            {/* Add New Sector */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <select
+                  value={newSector}
+                  onChange={(e) => setNewSector(e.target.value)}
+                  disabled={!criteria.includeSectorsEnabled}
+                  className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500/50 ${
+                    !criteria.includeSectorsEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <option value="">Select a sector to include...</option>
+                  {COMMON_SECTORS.map((sector) => (
+                    <option key={sector} value={sector} disabled={criteria.includeSectors.includes(sector)}>
+                      {sector}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={addIncludeSector}
+                  disabled={!criteria.includeSectorsEnabled || !newSector.trim()}
+                  className={`px-4 py-3 bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 rounded-lg text-green-400 font-medium transition-colors flex items-center gap-2 ${
+                    (!criteria.includeSectorsEnabled || !newSector.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <Plus className="w-4 h-4" />
+                  Add
+                </button>
+              </div>
+            </div>
+
+            {/* Included Sectors List */}
+            {criteria.includeSectors.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {criteria.includeSectors.map((sector) => (
+                  <div key={sector} className="bg-slate-950/50 border border-slate-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-400" />
+                    <span className="text-white text-sm font-medium">Sector: {sector}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeIncludeSector(sector)}
+                      disabled={!criteria.includeSectorsEnabled}
+                      className={`p-1 hover:bg-green-500/20 rounded text-green-400 transition-colors ${
+                        !criteria.includeSectorsEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-slate-400 text-sm italic text-center py-2">
+                No sectors selected. All sectors will be included when enabled.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Match Score Filter */}
+        <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border-b border-blue-500/30 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
+                <CheckCircle2 className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-white">Match Score Filter</h2>
+                <p className="text-slate-400 text-sm mt-1">Show only stocks above a certain match percentage</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCriteria({ ...criteria, matchScoreEnabled: !criteria.matchScoreEnabled })}
+                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                  criteria.matchScoreEnabled
+                    ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20'
+                    : 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20'
+                }`}
+              >
+                {criteria.matchScoreEnabled ? 'Enabled' : 'Disabled'}
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6">
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <div className="flex-1">
+                  <label className="text-white font-semibold text-sm mb-2 block">Minimum Match Score</label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={criteria.minMatchScore}
+                      onChange={(e) => setCriteria({ ...criteria, minMatchScore: parseFloat(e.target.value) || 0 })}
+                      disabled={!criteria.matchScoreEnabled}
+                      className={`w-24 px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                        !criteria.matchScoreEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    />
+                    <span className="text-slate-400 text-sm">%</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-blue-400">{criteria.minMatchScore}%</div>
+                  <div className="text-slate-400 text-xs mt-1">Minimum</div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value={criteria.minMatchScore}
+                  onChange={(e) => setCriteria({ ...criteria, minMatchScore: parseFloat(e.target.value) })}
+                  disabled={!criteria.matchScoreEnabled}
+                  className={`w-full h-3 bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-blue-500 [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-blue-500 [&::-moz-range-thumb]:cursor-pointer ${
+                    !criteria.matchScoreEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                />
+                <div className="flex justify-between text-xs text-slate-400">
+                  <span>0% (Show All)</span>
+                  <span>50% (Balanced)</span>
+                  <span>75% (Strict)</span>
+                  <span>100% (Perfect)</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

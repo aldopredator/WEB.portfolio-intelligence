@@ -53,7 +53,17 @@ export default async function ScreeningPage({
     where: { isActive: true },
     include: {
       portfolio: {
-        select: { name: true }
+        select: { name: true, id: true }
+      }
+    },
+    select: {
+      ticker: true,
+      company: true,
+      type: true,
+      rating: true,
+      updatedAt: true,
+      portfolio: {
+        select: { name: true, id: true }
       }
     }
   });
@@ -165,6 +175,12 @@ export default async function ScreeningPage({
       passes.sector = !CRITERIA.excludeSectors.includes(companyProfile.industry);
     }
     
+    if (CRITERIA.includeSectorsEnabled && companyProfile?.industry) {
+      if (CRITERIA.includeSectors.length > 0) {
+        passes.includeSector = CRITERIA.includeSectors.includes(companyProfile.industry);
+      }
+    }
+    
     if (CRITERIA.countriesEnabled && companyProfile?.country) {
       passes.country = !CRITERIA.excludeCountries.includes(companyProfile.country);
     }
@@ -172,6 +188,11 @@ export default async function ScreeningPage({
     const totalCriteria = Object.keys(passes).length;
     const passCount = Object.values(passes).filter(Boolean).length;
     const matchScore = totalCriteria > 0 ? Math.round((passCount / totalCriteria) * 100) : 100;
+
+    // Apply match score filter if enabled
+    if (CRITERIA.matchScoreEnabled && matchScore < CRITERIA.minMatchScore) {
+      return null;
+    }
 
     // Only include stocks that pass all enabled criteria
     if (matchScore < 100) {
@@ -219,7 +240,9 @@ export default async function ScreeningPage({
       name: stock.company,
       sector: sector || 'N/A',
       portfolio: stock.portfolio.name,
+      portfolioId: stock.portfolio.id,
       rating: stock.rating || 0,
+      updatedAt: stock.updatedAt,
       pe: pe || 'N/A',
       pb: pb || 'N/A',
       priceToSales: priceToSales || 'N/A',
@@ -342,6 +365,22 @@ export default async function ScreeningPage({
                     <span className="text-white font-mono font-semibold">
                       {CRITERIA.excludeSectors.join(', ')}
                     </span>
+                  </div>
+                )}
+                
+                {CRITERIA.includeSectorsEnabled && CRITERIA.includeSectors.length > 0 && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-green-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Include Only Sectors</span>
+                    <span className="text-white font-mono font-semibold">
+                      {CRITERIA.includeSectors.join(', ')}
+                    </span>
+                  </div>
+                )}
+                
+                {CRITERIA.matchScoreEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-blue-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Min Match Score</span>
+                    <span className="text-white font-mono font-semibold">&gt; {CRITERIA.minMatchScore}%</span>
                   </div>
                 )}
                 
@@ -540,6 +579,22 @@ export default async function ScreeningPage({
                     <CheckCircle2 className="w-3 h-3 text-red-400 flex-shrink-0" />
                     <span className="text-slate-400">Sector Exclusions:</span>
                     <span className="text-white font-semibold">Excludes stocks in the following sectors: {CRITERIA.excludeSectors.join(', ')}</span>
+                  </div>
+                )}
+                
+                {CRITERIA.includeSectorsEnabled && CRITERIA.includeSectors.length > 0 && (
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-green-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-green-400 flex-shrink-0" />
+                    <span className="text-slate-400">Sector Inclusion:</span>
+                    <span className="text-white font-semibold">Shows only stocks in: {CRITERIA.includeSectors.join(', ')}</span>
+                  </div>
+                )}
+                
+                {CRITERIA.matchScoreEnabled && (
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-blue-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-blue-400 flex-shrink-0" />
+                    <span className="text-slate-400">Match Score Filter:</span>
+                    <span className="text-white font-semibold">Shows only stocks with match score above {CRITERIA.minMatchScore}%</span>
                   </div>
                 )}
                 

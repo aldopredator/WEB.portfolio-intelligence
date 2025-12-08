@@ -63,8 +63,12 @@ export interface ScreeningCriteria {
   portfolioFilterEnabled: boolean;
   excludeSectors: string[];
   sectorsEnabled: boolean;
+  includeSectors: string[];
+  includeSectorsEnabled: boolean;
   excludeCountries: string[];
   countriesEnabled: boolean;
+  minMatchScore: number;
+  matchScoreEnabled: boolean;
 }
 
 export const DEFAULT_CRITERIA: ScreeningCriteria = {
@@ -131,8 +135,12 @@ export const DEFAULT_CRITERIA: ScreeningCriteria = {
   portfolioFilterEnabled: false,
   excludeSectors: ['Alcohol', 'Gambling'],
   sectorsEnabled: true,
+  includeSectors: [],
+  includeSectorsEnabled: false,
   excludeCountries: [],
   countriesEnabled: false,
+  minMatchScore: 50,
+  matchScoreEnabled: false,
 };
 
 // Parse criteria from URL search params
@@ -201,8 +209,12 @@ export function parseCriteriaFromParams(searchParams: URLSearchParams): Screenin
     portfolioFilterEnabled: searchParams.get('portfolioFilterEnabled') === 'true',
     excludeSectors: searchParams.get('excludeSectors')?.split(',').filter(s => s) || DEFAULT_CRITERIA.excludeSectors,
     sectorsEnabled: searchParams.get('sectorsEnabled') === 'true',
+    includeSectors: searchParams.get('includeSectors')?.split(',').filter(s => s) || DEFAULT_CRITERIA.includeSectors,
+    includeSectorsEnabled: searchParams.get('includeSectorsEnabled') === 'true',
     excludeCountries: searchParams.get('excludeCountries')?.split(',').filter(s => s) || DEFAULT_CRITERIA.excludeCountries,
     countriesEnabled: searchParams.get('countriesEnabled') === 'true',
+    minMatchScore: parseFloat(searchParams.get('minMatchScore') || String(DEFAULT_CRITERIA.minMatchScore)),
+    matchScoreEnabled: searchParams.get('matchScoreEnabled') === 'true',
   };
 }
 
@@ -272,8 +284,12 @@ export function buildCriteriaURL(criteria: ScreeningCriteria): string {
     portfolioFilterEnabled: String(criteria.portfolioFilterEnabled),
     excludeSectors: criteria.excludeSectors.join(','),
     sectorsEnabled: String(criteria.sectorsEnabled),
+    includeSectors: criteria.includeSectors.join(','),
+    includeSectorsEnabled: String(criteria.includeSectorsEnabled),
     excludeCountries: criteria.excludeCountries.join(','),
     countriesEnabled: String(criteria.countriesEnabled),
+    minMatchScore: String(criteria.minMatchScore),
+    matchScoreEnabled: String(criteria.matchScoreEnabled),
   });
   return `/screening?${params.toString()}`;
 }

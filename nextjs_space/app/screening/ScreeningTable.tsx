@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import Link from 'next/link';
+import { CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown, ExternalLink } from 'lucide-react';
 
-type SortField = 'ticker' | 'sector' | 'portfolio' | 'rating' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'avgAnnualVolume10D' | 'avgAnnualVolume3M' | 'beta' | 'roe' | 'profitMargin' | 'debtToEquity' | 'sentiment' | 'matchScore';
+type SortField = 'ticker' | 'sector' | 'portfolio' | 'rating' | 'updatedAt' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'avgAnnualVolume10D' | 'avgAnnualVolume3M' | 'beta' | 'roe' | 'profitMargin' | 'debtToEquity' | 'sentiment' | 'matchScore';
 type SortDirection = 'asc' | 'desc';
 
 interface Stock {
@@ -11,7 +12,9 @@ interface Stock {
   name: string;
   sector: string;
   portfolio: string;
+  portfolioId: string;
   rating: number;
+  updatedAt: Date;
   pe: string;
   pb: string;
   priceToSales: string;
@@ -48,6 +51,20 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
   const [sortField, setSortField] = useState<SortField>('matchScore');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
+  const formatDate = (date: Date) => {
+    const d = new Date(date);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+    return d.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+  };
+
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -66,6 +83,9 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
       if (sortField === 'rating') {
         aVal = a.rating;
         bVal = b.rating;
+      } else if (sortField === 'updatedAt') {
+        aVal = new Date(a.updatedAt).getTime();
+        bVal = new Date(b.updatedAt).getTime();
       } else if (sortField === 'pe' || sortField === 'pb' || sortField === 'priceToSales' || sortField === 'beta' || sortField === 'roe' || sortField === 'profitMargin' || sortField === 'debtToEquity') {
         aVal = aVal === 'N/A' ? -Infinity : parseFloat(aVal);
         bVal = bVal === 'N/A' ? -Infinity : parseFloat(bVal);
@@ -130,6 +150,15 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                 <div className="flex items-center justify-center gap-2">
                   Rating
                   <SortIcon field="rating" />
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-center text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('updatedAt')}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  Last Updated
+                  <SortIcon field="updatedAt" />
                 </div>
               </th>
               <th 
@@ -292,10 +321,18 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   </span>
                 </td>
                 <td className="px-6 py-5">
-                  <div>
-                    <div className="text-white font-bold text-lg">{stock.ticker}</div>
-                    <div className="text-slate-400 text-sm mt-1">{stock.name}</div>
-                  </div>
+                  <Link 
+                    href={`https://www.portfolio-intelligence.co.uk/?stock=${stock.ticker}&portfolio=${stock.portfolioId}`}
+                    className="group/link block hover:bg-slate-800/30 -mx-2 px-2 py-1 rounded-lg transition-all"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <div className="text-white font-bold text-lg group-hover/link:text-blue-400 transition-colors">{stock.ticker}</div>
+                        <div className="text-slate-400 text-sm mt-1">{stock.name}</div>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-slate-600 group-hover/link:text-blue-400 opacity-0 group-hover/link:opacity-100 transition-all" />
+                    </div>
+                  </Link>
                 </td>
                 <td className="px-6 py-5">
                   <div className="flex items-center justify-center gap-0.5">
@@ -304,6 +341,14 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                         {star <= stock.rating ? '★' : '☆'}
                       </span>
                     ))}
+                  </div>
+                </td>
+                <td className="px-6 py-5">
+                  <div className="text-center">
+                    <div className="text-slate-300 text-sm font-medium">{formatDate(stock.updatedAt)}</div>
+                    <div className="text-slate-500 text-xs mt-1">
+                      {new Date(stock.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </div>
                   </div>
                 </td>
                 <td className="px-6 py-5">
