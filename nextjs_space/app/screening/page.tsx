@@ -108,6 +108,16 @@ export default async function ScreeningPage({
       passes.avgVolume = avgVolumeM >= CRITERIA.minAvgDailyVolume && avgVolumeM <= CRITERIA.maxAvgDailyVolume;
     }
     
+    if (CRITERIA.avgAnnualVolume10DEnabled && stockInfo.averageVolume10Day !== undefined && stockInfo.floatShares !== undefined && stockInfo.floatShares > 0) {
+      const annualVolume10D = (stockInfo.averageVolume10Day * 250 / stockInfo.floatShares) * 100;
+      passes.avgAnnualVolume10D = annualVolume10D >= CRITERIA.minAvgAnnualVolume10D && annualVolume10D <= CRITERIA.maxAvgAnnualVolume10D;
+    }
+    
+    if (CRITERIA.avgAnnualVolume3MEnabled && stockInfo.averageVolume !== undefined && stockInfo.floatShares !== undefined && stockInfo.floatShares > 0) {
+      const annualVolume3M = (stockInfo.averageVolume * 250 / stockInfo.floatShares) * 100;
+      passes.avgAnnualVolume3M = annualVolume3M >= CRITERIA.minAvgAnnualVolume3M && annualVolume3M <= CRITERIA.maxAvgAnnualVolume3M;
+    }
+    
     if (CRITERIA.debtToEquityEnabled && stockInfo.debtToEquity !== undefined) {
       passes.debtToEquity = stockInfo.debtToEquity <= CRITERIA.maxDebtToEquity;
     }
@@ -259,6 +269,20 @@ export default async function ScreeningPage({
                   <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
                     <span className="text-slate-400">Avg Volume Range</span>
                     <span className="text-white font-mono font-semibold">{CRITERIA.minAvgDailyVolume}M - {CRITERIA.maxAvgDailyVolume}M</span>
+                  </div>
+                )}
+                
+                {CRITERIA.avgAnnualVolume10DEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Avg Annual Volume % (10D)</span>
+                    <span className="text-white font-mono font-semibold">{CRITERIA.minAvgAnnualVolume10D}% - {CRITERIA.maxAvgAnnualVolume10D}%</span>
+                  </div>
+                )}
+                
+                {CRITERIA.avgAnnualVolume3MEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Avg Annual Volume % (3M)</span>
+                    <span className="text-white font-mono font-semibold">{CRITERIA.minAvgAnnualVolume3M}% - {CRITERIA.maxAvgAnnualVolume3M}%</span>
                   </div>
                 )}
                 

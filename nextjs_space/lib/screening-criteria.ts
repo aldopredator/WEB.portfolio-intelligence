@@ -49,6 +49,12 @@ export interface ScreeningCriteria {
   minAvgDailyVolume: number;
   maxAvgDailyVolume: number;
   avgDailyVolumeEnabled: boolean;
+  minAvgAnnualVolume10D: number;
+  maxAvgAnnualVolume10D: number;
+  avgAnnualVolume10DEnabled: boolean;
+  minAvgAnnualVolume3M: number;
+  maxAvgAnnualVolume3M: number;
+  avgAnnualVolume3MEnabled: boolean;
   sentimentFilter: 'all' | 'positive' | 'neutral' | 'negative';
   sentimentEnabled: boolean;
   minRating: number;
@@ -111,6 +117,12 @@ export const DEFAULT_CRITERIA: ScreeningCriteria = {
   minAvgDailyVolume: 0,
   maxAvgDailyVolume: 1000,
   avgDailyVolumeEnabled: false,
+  minAvgAnnualVolume10D: 0,
+  maxAvgAnnualVolume10D: 5000,
+  avgAnnualVolume10DEnabled: false,
+  minAvgAnnualVolume3M: 0,
+  maxAvgAnnualVolume3M: 5000,
+  avgAnnualVolume3MEnabled: false,
   sentimentFilter: 'all',
   sentimentEnabled: false,
   minRating: 0,
@@ -175,6 +187,12 @@ export function parseCriteriaFromParams(searchParams: URLSearchParams): Screenin
     minAvgDailyVolume: parseFloat(searchParams.get('minAvgDailyVolume') || String(DEFAULT_CRITERIA.minAvgDailyVolume)),
     maxAvgDailyVolume: parseFloat(searchParams.get('maxAvgDailyVolume') || String(DEFAULT_CRITERIA.maxAvgDailyVolume)),
     avgDailyVolumeEnabled: searchParams.get('avgDailyVolumeEnabled') === 'true',
+    minAvgAnnualVolume10D: parseFloat(searchParams.get('minAvgAnnualVolume10D') || String(DEFAULT_CRITERIA.minAvgAnnualVolume10D)),
+    maxAvgAnnualVolume10D: parseFloat(searchParams.get('maxAvgAnnualVolume10D') || String(DEFAULT_CRITERIA.maxAvgAnnualVolume10D)),
+    avgAnnualVolume10DEnabled: searchParams.get('avgAnnualVolume10DEnabled') === 'true',
+    minAvgAnnualVolume3M: parseFloat(searchParams.get('minAvgAnnualVolume3M') || String(DEFAULT_CRITERIA.minAvgAnnualVolume3M)),
+    maxAvgAnnualVolume3M: parseFloat(searchParams.get('maxAvgAnnualVolume3M') || String(DEFAULT_CRITERIA.maxAvgAnnualVolume3M)),
+    avgAnnualVolume3MEnabled: searchParams.get('avgAnnualVolume3MEnabled') === 'true',
     sentimentFilter: (searchParams.get('sentimentFilter') as 'all' | 'positive' | 'neutral' | 'negative') || DEFAULT_CRITERIA.sentimentFilter,
     sentimentEnabled: searchParams.get('sentimentEnabled') === 'true',
     minRating: parseFloat(searchParams.get('minRating') || String(DEFAULT_CRITERIA.minRating)),
@@ -240,6 +258,12 @@ export function buildCriteriaURL(criteria: ScreeningCriteria): string {
     minAvgDailyVolume: String(criteria.minAvgDailyVolume),
     maxAvgDailyVolume: String(criteria.maxAvgDailyVolume),
     avgDailyVolumeEnabled: String(criteria.avgDailyVolumeEnabled),
+    minAvgAnnualVolume10D: String(criteria.minAvgAnnualVolume10D),
+    maxAvgAnnualVolume10D: String(criteria.maxAvgAnnualVolume10D),
+    avgAnnualVolume10DEnabled: String(criteria.avgAnnualVolume10DEnabled),
+    minAvgAnnualVolume3M: String(criteria.minAvgAnnualVolume3M),
+    maxAvgAnnualVolume3M: String(criteria.maxAvgAnnualVolume3M),
+    avgAnnualVolume3MEnabled: String(criteria.avgAnnualVolume3MEnabled),
     sentimentFilter: criteria.sentimentFilter,
     sentimentEnabled: String(criteria.sentimentEnabled),
     minRating: String(criteria.minRating),
