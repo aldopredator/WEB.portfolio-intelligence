@@ -190,6 +190,12 @@ export default async function ScreeningPage({
     const priceToSales = stockInfo.priceToSales?.toFixed(0);
     const marketCap = stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(0)}B` : null;
     const avgVolume = stockInfo.averageVolume ? `${(stockInfo.averageVolume / 1e6).toFixed(0)}M` : null;
+    const avgAnnualVolume10D = (stockInfo.averageVolume10Day && stockInfo.floatShares && stockInfo.floatShares > 0)
+      ? `${((stockInfo.averageVolume10Day * 250 / stockInfo.floatShares) * 100).toFixed(0)}%`
+      : null;
+    const avgAnnualVolume3M = (stockInfo.averageVolume && stockInfo.floatShares && stockInfo.floatShares > 0)
+      ? `${((stockInfo.averageVolume * 250 / stockInfo.floatShares) * 100).toFixed(0)}%`
+      : null;
     const beta = stockInfo.beta?.toFixed(2);
     const roe = stockInfo.roe ? `${stockInfo.roe.toFixed(0)}%` : null;
     const profitMargin = stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(0)}%` : null;
@@ -219,6 +225,8 @@ export default async function ScreeningPage({
       priceToSales: priceToSales || 'N/A',
       marketCap: marketCap || 'N/A',
       avgVolume: avgVolume || 'N/A',
+      avgAnnualVolume10D: avgAnnualVolume10D || 'N/A',
+      avgAnnualVolume3M: avgAnnualVolume3M || 'N/A',
       beta: beta || 'N/A',
       roe: roe || 'N/A',
       profitMargin: profitMargin || 'N/A',

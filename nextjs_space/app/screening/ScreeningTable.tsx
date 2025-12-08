@@ -188,6 +188,28 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   <SortIcon field="avgVolume" />
                 </div>
               </th>
+              {criteria.avgAnnualVolume10DEnabled && (
+                <th 
+                  className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                  onClick={() => handleSort('avgAnnualVolume10D')}
+                >
+                  <div className="flex items-center justify-end gap-2">
+                    Annual Vol % (10D)
+                    <SortIcon field="avgAnnualVolume10D" />
+                  </div>
+                </th>
+              )}
+              {criteria.avgAnnualVolume3MEnabled && (
+                <th 
+                  className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                  onClick={() => handleSort('avgAnnualVolume3M')}
+                >
+                  <div className="flex items-center justify-end gap-2">
+                    Annual Vol % (3M)
+                    <SortIcon field="avgAnnualVolume3M" />
+                  </div>
+                </th>
+              )}
               {criteria.betaEnabled && (
                 <th 
                   className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
@@ -306,6 +328,16 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                 <td className="px-6 py-5 text-right">
                   <span className="text-purple-400 font-mono font-bold text-lg">{stock.avgVolume}</span>
                 </td>
+                {criteria.avgAnnualVolume10DEnabled && (
+                  <td className="px-6 py-5 text-right">
+                    <span className="text-purple-400 font-mono font-bold text-lg">{stock.avgAnnualVolume10D}</span>
+                  </td>
+                )}
+                {criteria.avgAnnualVolume3MEnabled && (
+                  <td className="px-6 py-5 text-right">
+                    <span className="text-purple-400 font-mono font-bold text-lg">{stock.avgAnnualVolume3M}</span>
+                  </td>
+                )}
                 {criteria.betaEnabled && (
                   <td className="px-6 py-5 text-right">
                     <span className="text-purple-400 font-mono font-bold text-lg">{stock.beta}</span>
