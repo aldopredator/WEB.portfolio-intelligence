@@ -202,25 +202,38 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
           )}
         </Box>
 
-        {/* Block 2: Stock Statistics, Earnings, Recommendations, and Social Sentiment stacked */}
+        {/* Block 2: Right side widgets in grid layout */}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <ShareStatisticsCard
-            ticker={selectedStock}
-            sharesOutstanding={stock.sharesOutstanding}
-            floatShares={stock.floatShares}
-            averageVolume10Day={stock.averageVolume10Day}
-            averageVolume={stock.averageVolume}
-            heldPercentInsiders={stock.heldPercentInsiders}
-            heldPercentInstitutions={stock.heldPercentInstitutions}
-          />
-          <EarningsSurprisesCard
-            ticker={selectedStock}
-            surprises={stockEntry.earnings_surprises || []}
-          />
-          <RecommendationTrendsCard
-            ticker={selectedStock}
-            trends={stockEntry.recommendation_trends || []}
-          />
+          {/* Top Row: Stock Statistics, Earnings, Recommendations in a 1fr 1fr 1fr grid */}
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                md: 'repeat(3, 1fr)',
+              },
+              gap: 2,
+            }}
+          >
+            <ShareStatisticsCard
+              ticker={selectedStock}
+              sharesOutstanding={stock.sharesOutstanding}
+              floatShares={stock.floatShares}
+              averageVolume10Day={stock.averageVolume10Day}
+              averageVolume={stock.averageVolume}
+              heldPercentInsiders={stock.heldPercentInsiders}
+              heldPercentInstitutions={stock.heldPercentInstitutions}
+            />
+            <EarningsSurprisesCard
+              ticker={selectedStock}
+              surprises={stockEntry.earnings_surprises || []}
+            />
+            <RecommendationTrendsCard
+              ticker={selectedStock}
+              trends={stockEntry.recommendation_trends || []}
+            />
+          </Box>
+          {/* Bottom Row: Social Sentiment full width */}
           <SocialSentimentCard
             ticker={selectedStock}
             sentiment={stockEntry.social_sentiment}
