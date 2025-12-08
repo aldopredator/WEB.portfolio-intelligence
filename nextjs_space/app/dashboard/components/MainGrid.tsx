@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import PriceHistoryChart from './PriceHistoryChart';
 import StockDetailsCard from './StockDetailsCard';
 import StockStatisticsCard from './StockStatisticsCard';
+import ShareStatisticsCard from './ShareStatisticsCard';
 import SocialSentimentCard from './SocialSentimentCard';
 import CompanyInfoCard from './CompanyInfoCard';
 import MarketNewsCard from './MarketNewsCard';
@@ -166,6 +167,15 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
               profitMargin={stock.profit_margin}
               quarterlyRevenueGrowth={stock.quarterlyRevenueGrowth}
               quarterlyEarningsGrowth={stock.quarterlyEarningsGrowth}
+            />
+            <ShareStatisticsCard
+              ticker={selectedStock}
+              sharesOutstanding={stock.sharesOutstanding}
+              floatShares={stock.floatShares}
+              averageVolume10Day={stock.averageVolume10Day}
+              averageVolume={stock.averageVolume}
+              heldPercentInsiders={stock.heldPercentInsiders}
+              heldPercentInstitutions={stock.heldPercentInstitutions}
             />
           </Box>
         </Box>

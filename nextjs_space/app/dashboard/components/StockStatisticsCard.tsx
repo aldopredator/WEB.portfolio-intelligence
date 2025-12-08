@@ -33,8 +33,8 @@ export default function StockStatisticsCard({
   ];
 
   const growthMetrics = [
-    { label: 'Quarterly Revenue Growth (yoy)', value: quarterlyRevenueGrowth ? `${quarterlyRevenueGrowth.toFixed(0)}%` : 'N/A', rawValue: quarterlyRevenueGrowth },
-    { label: 'Quarterly Earnings Growth (yoy)', value: quarterlyEarningsGrowth ? `${quarterlyEarningsGrowth.toFixed(0)}%` : 'N/A', rawValue: quarterlyEarningsGrowth },
+    { label: 'Quarterly Revenue Growth', value: quarterlyRevenueGrowth ? `${quarterlyRevenueGrowth.toFixed(0)}%` : 'N/A', rawValue: quarterlyRevenueGrowth },
+    { label: 'Quarterly Earnings Growth', value: quarterlyEarningsGrowth ? `${quarterlyEarningsGrowth.toFixed(0)}%` : 'N/A', rawValue: quarterlyEarningsGrowth },
   ];
 
   return (
