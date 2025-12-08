@@ -104,7 +104,7 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
 
   return (
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
-      {/* Top row: Company Info and Stock Fundamentals */}
+      {/* Top row: Company Info, Stock Fundamentals, and Stock Statistics */}
       {stockEntry.company_profile && (
         <Box sx={{ mb: 3 }}>
           <Box
@@ -112,7 +112,7 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
               display: 'grid',
               gridTemplateColumns: {
                 xs: '1fr',
-                lg: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
               },
               gap: 2,
             }}
@@ -160,45 +160,40 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
               priceToBook={stock.priceToBook}
               debtToEquity={stock.debtToEquity || stock.debt_to_equity}
             />
+            <StockStatisticsCard
+              ticker={selectedStock}
+              roe={stock.roe}
+              returnOnAssets={stock.returnOnAssets}
+              profitMargin={stock.profit_margin}
+              quarterlyRevenueGrowth={stock.quarterlyRevenueGrowth}
+              quarterlyEarningsGrowth={stock.quarterlyEarningsGrowth}
+            />
+            <ShareStatisticsCard
+              ticker={selectedStock}
+              sharesOutstanding={stock.sharesOutstanding}
+              floatShares={stock.floatShares}
+              averageVolume10Day={stock.averageVolume10Day}
+              averageVolume={stock.averageVolume}
+              heldPercentInsiders={stock.heldPercentInsiders}
+              heldPercentInstitutions={stock.heldPercentInstitutions}
+            />
           </Box>
         </Box>
       )}
 
-      {/* Two Column Layout: Left side (Stock Stats + Share Stats) and Right side (Price Chart + Social Sentiment) */}
+      {/* Two Column Layout: Price Chart (larger) and Social Sentiment (smaller) */}
       <Box
         sx={{
           display: 'grid',
           gridTemplateColumns: {
             xs: '1fr',
-            lg: '1fr 1fr',
+            lg: '2fr 1fr',
           },
           gap: 2,
-          mb: 3,
         }}
       >
-        {/* Left Column: Stock Statistics and Share Statistics */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <StockStatisticsCard
-            ticker={selectedStock}
-            roe={stock.roe}
-            returnOnAssets={stock.returnOnAssets}
-            profitMargin={stock.profit_margin}
-            quarterlyRevenueGrowth={stock.quarterlyRevenueGrowth}
-            quarterlyEarningsGrowth={stock.quarterlyEarningsGrowth}
-          />
-          <ShareStatisticsCard
-            ticker={selectedStock}
-            sharesOutstanding={stock.sharesOutstanding}
-            floatShares={stock.floatShares}
-            averageVolume10Day={stock.averageVolume10Day}
-            averageVolume={stock.averageVolume}
-            heldPercentInsiders={stock.heldPercentInsiders}
-            heldPercentInstitutions={stock.heldPercentInstitutions}
-          />
-        </Box>
-
-        {/* Right Column: Price Chart and Social Sentiment */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {/* Block 1: Price Chart */}
+        <Box>
           {/* Price History Chart with 52 Week Range */}
           {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
             <PriceHistoryChart
@@ -214,6 +209,10 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
               twoHundredDayAverage={stock.twoHundredDayAverage}
             />
           )}
+        </Box>
+
+        {/* Block 2: Social Sentiment */}
+        <Box>
           <SocialSentimentCard
             ticker={selectedStock}
             sentiment={stockEntry.social_sentiment}
