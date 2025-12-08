@@ -840,6 +840,312 @@ export default function CriteriaForm() {
               </div>
             </div>
 
+            {/* Avg Annual Volume % (10D) */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-0">
+                  <button
+                    type="button"
+                    onClick={() => setCriteria({ ...criteria, avgAnnualVolume10DEnabled: !criteria.avgAnnualVolume10DEnabled })}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
+                      criteria.avgAnnualVolume10DEnabled
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
+                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
+                    }`}
+                  >
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.avgAnnualVolume10DEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
+                  </button>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">Avg Annual Volume % (10D)</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                      criteria.avgAnnualVolume10DEnabled
+                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
+                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                    }`}>
+                      {criteria.avgAnnualVolume10DEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
+                  
+                  <div className="mt-1 space-y-3">
+                    {/* Min Avg Annual Volume % (10D) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-slate-400 text-xs font-medium">Minimum</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max="5000"
+                            value={criteria.minAvgAnnualVolume10D}
+                            onChange={(e) => setCriteria({ ...criteria, minAvgAnnualVolume10D: parseFloat(e.target.value) || 0 })}
+                            disabled={!criteria.avgAnnualVolume10DEnabled}
+                            className="w-20 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white font-mono text-sm focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                          <span className="text-white font-mono font-bold text-sm">%</span>
+                        </div>
+                      </div>
+                      <div className="relative px-2">
+                        <div className="relative h-8 flex items-center">
+                          <div
+                            className="absolute left-0 right-0 h-3 rounded-full"
+                            style={{
+                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
+                              opacity: criteria.avgAnnualVolume10DEnabled ? 0.4 : 0.2,
+                            }}
+                          />
+                          <div
+                            className="absolute"
+                            style={{
+                              left: `${(criteria.minAvgAnnualVolume10D / 5000) * 100}%`,
+                              transform: 'translateX(-50%)',
+                              zIndex: 10,
+                            }}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                              criteria.avgAnnualVolume10DEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
+                            }`} />
+                          </div>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="5000"
+                          step="10"
+                          value={criteria.minAvgAnnualVolume10D}
+                          onChange={(e) => setCriteria({ ...criteria, minAvgAnnualVolume10D: parseFloat(e.target.value) })}
+                          disabled={!criteria.avgAnnualVolume10DEnabled}
+                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          style={{ zIndex: 20 }}
+                        />
+                        <div className="flex justify-between mt-2 text-xs text-slate-500">
+                          <span>0%</span>
+                          <span>1250%</span>
+                          <span>2500%</span>
+                          <span>3750%</span>
+                          <span>5000%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Max Avg Annual Volume % (10D) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-slate-400 text-xs font-medium">Maximum</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max="5000"
+                            value={criteria.maxAvgAnnualVolume10D}
+                            onChange={(e) => setCriteria({ ...criteria, maxAvgAnnualVolume10D: parseFloat(e.target.value) || 0 })}
+                            disabled={!criteria.avgAnnualVolume10DEnabled}
+                            className="w-20 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white font-mono text-sm focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                          <span className="text-white font-mono font-bold text-sm">%</span>
+                        </div>
+                      </div>
+                      <div className="relative px-2">
+                        <div className="relative h-8 flex items-center">
+                          <div
+                            className="absolute left-0 right-0 h-3 rounded-full"
+                            style={{
+                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
+                              opacity: criteria.avgAnnualVolume10DEnabled ? 0.4 : 0.2,
+                            }}
+                          />
+                          <div
+                            className="absolute"
+                            style={{
+                              left: `${(criteria.maxAvgAnnualVolume10D / 5000) * 100}%`,
+                              transform: 'translateX(-50%)',
+                              zIndex: 10,
+                            }}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                              criteria.avgAnnualVolume10DEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
+                            }`} />
+                          </div>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="5000"
+                          step="10"
+                          value={criteria.maxAvgAnnualVolume10D}
+                          onChange={(e) => setCriteria({ ...criteria, maxAvgAnnualVolume10D: parseFloat(e.target.value) })}
+                          disabled={!criteria.avgAnnualVolume10DEnabled}
+                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          style={{ zIndex: 20 }}
+                        />
+                        <div className="flex justify-between mt-2 text-xs text-slate-500">
+                          <span>0%</span>
+                          <span>1250%</span>
+                          <span>2500%</span>
+                          <span>3750%</span>
+                          <span>5000%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Avg Annual Volume % (3M) */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-0">
+                  <button
+                    type="button"
+                    onClick={() => setCriteria({ ...criteria, avgAnnualVolume3MEnabled: !criteria.avgAnnualVolume3MEnabled })}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
+                      criteria.avgAnnualVolume3MEnabled
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
+                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
+                    }`}
+                  >
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.avgAnnualVolume3MEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
+                  </button>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">Avg Annual Volume % (3M)</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                      criteria.avgAnnualVolume3MEnabled
+                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
+                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                    }`}>
+                      {criteria.avgAnnualVolume3MEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
+                  
+                  <div className="mt-1 space-y-3">
+                    {/* Min Avg Annual Volume % (3M) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-slate-400 text-xs font-medium">Minimum</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max="5000"
+                            value={criteria.minAvgAnnualVolume3M}
+                            onChange={(e) => setCriteria({ ...criteria, minAvgAnnualVolume3M: parseFloat(e.target.value) || 0 })}
+                            disabled={!criteria.avgAnnualVolume3MEnabled}
+                            className="w-20 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white font-mono text-sm focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                          <span className="text-white font-mono font-bold text-sm">%</span>
+                        </div>
+                      </div>
+                      <div className="relative px-2">
+                        <div className="relative h-8 flex items-center">
+                          <div
+                            className="absolute left-0 right-0 h-3 rounded-full"
+                            style={{
+                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
+                              opacity: criteria.avgAnnualVolume3MEnabled ? 0.4 : 0.2,
+                            }}
+                          />
+                          <div
+                            className="absolute"
+                            style={{
+                              left: `${(criteria.minAvgAnnualVolume3M / 5000) * 100}%`,
+                              transform: 'translateX(-50%)',
+                              zIndex: 10,
+                            }}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                              criteria.avgAnnualVolume3MEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
+                            }`} />
+                          </div>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="5000"
+                          step="10"
+                          value={criteria.minAvgAnnualVolume3M}
+                          onChange={(e) => setCriteria({ ...criteria, minAvgAnnualVolume3M: parseFloat(e.target.value) })}
+                          disabled={!criteria.avgAnnualVolume3MEnabled}
+                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          style={{ zIndex: 20 }}
+                        />
+                        <div className="flex justify-between mt-2 text-xs text-slate-500">
+                          <span>0%</span>
+                          <span>1250%</span>
+                          <span>2500%</span>
+                          <span>3750%</span>
+                          <span>5000%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Max Avg Annual Volume % (3M) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-slate-400 text-xs font-medium">Maximum</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max="5000"
+                            value={criteria.maxAvgAnnualVolume3M}
+                            onChange={(e) => setCriteria({ ...criteria, maxAvgAnnualVolume3M: parseFloat(e.target.value) || 0 })}
+                            disabled={!criteria.avgAnnualVolume3MEnabled}
+                            className="w-20 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white font-mono text-sm focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                          <span className="text-white font-mono font-bold text-sm">%</span>
+                        </div>
+                      </div>
+                      <div className="relative px-2">
+                        <div className="relative h-8 flex items-center">
+                          <div
+                            className="absolute left-0 right-0 h-3 rounded-full"
+                            style={{
+                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
+                              opacity: criteria.avgAnnualVolume3MEnabled ? 0.4 : 0.2,
+                            }}
+                          />
+                          <div
+                            className="absolute"
+                            style={{
+                              left: `${(criteria.maxAvgAnnualVolume3M / 5000) * 100}%`,
+                              transform: 'translateX(-50%)',
+                              zIndex: 10,
+                            }}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                              criteria.avgAnnualVolume3MEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
+                            }`} />
+                          </div>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="5000"
+                          step="10"
+                          value={criteria.maxAvgAnnualVolume3M}
+                          onChange={(e) => setCriteria({ ...criteria, maxAvgAnnualVolume3M: parseFloat(e.target.value) })}
+                          disabled={!criteria.avgAnnualVolume3MEnabled}
+                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          style={{ zIndex: 20 }}
+                        />
+                        <div className="flex justify-between mt-2 text-xs text-slate-500">
+                          <span>0%</span>
+                          <span>1250%</span>
+                          <span>2500%</span>
+                          <span>3750%</span>
+                          <span>5000%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Market Cap */}
             <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
               <div className="flex items-start gap-3">
