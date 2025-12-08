@@ -466,6 +466,8 @@ export default async function ScreeningPage({
               debtToEquityEnabled: CRITERIA.debtToEquityEnabled,
               sentimentEnabled: CRITERIA.sentimentEnabled,
               ratingEnabled: CRITERIA.ratingEnabled,
+              avgAnnualVolume10DEnabled: CRITERIA.avgAnnualVolume10DEnabled,
+              avgAnnualVolume3MEnabled: CRITERIA.avgAnnualVolume3MEnabled,
             }}
           />
         </div>
