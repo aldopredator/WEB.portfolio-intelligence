@@ -1,0 +1,61 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./nextjs_space
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'yarn'
+        cache-dependency-path: nextjs_space/yarn.lock
+    
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+    
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps chromium
+    
+    - name: Setup Environment Variables
+      run: |
+        cp .env.example .env.local || true
+        echo "DATABASE_URL=postgresql://test:test@localhost:5432/test" >> .env.local
+    
+    - name: Generate Prisma Client
+      run: npx prisma generate
+    
+    - name: Run Playwright tests
+      run: yarn test
+      env:
+        CI: true
+    
+    - name: Upload Playwright Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: nextjs_space/playwright-report/
+        retention-days: 30
+    
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: nextjs_space/test-results/
+        retention-days: 30
