@@ -46,6 +46,9 @@ const COMMON_TICKERS = [
   { symbol: 'V', name: 'Visa Inc.', exchange: 'NYSE', type: 'Equity' },
   { symbol: 'BE', name: 'Bloom Energy Corporation', exchange: 'NYSE', type: 'Equity' },
   { symbol: 'INTU', name: 'Intuit Inc.', exchange: 'NASDAQ', type: 'Equity' },
+  { symbol: 'PL', name: 'Planet Labs PBC', exchange: 'NYSE', type: 'Equity' },
+  { symbol: 'PLNT', name: 'Planet Fitness Inc.', exchange: 'NYSE', type: 'Equity' },
+  { symbol: 'PLAG', name: 'Planet Green Holdings Corp.', exchange: 'NYSE', type: 'Equity' },
   { symbol: 'CW8U.PA', name: 'Amundi MSCI World UCITS ETF', exchange: 'Euronext Paris', type: 'ETF' },
   { symbol: 'MWRL.L', name: 'Amundi Core MSCI World UCITS ETF', exchange: 'LSE', type: 'ETF' },
 ];
@@ -80,10 +83,11 @@ export async function GET(request: NextRequest) {
     try {
       console.log('[Search API] Trying Yahoo Finance...');
       const yahooResponse = await fetch(
-        `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0&enableFuzzyQuery=false`,
+        `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=20&newsCount=0&enableFuzzyQuery=true`,
         {
           headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/json',
           },
         }
       );
@@ -106,9 +110,10 @@ export async function GET(request: NextRequest) {
             region: quote.exch?.includes('NAS') || quote.exch?.includes('NYQ') ? 'United States' : undefined,
             currency: 'USD',
           }))
-          .slice(0, 10);
+          .slice(0, 15); // Return more results
 
         if (results.length > 0) {
+          console.log('[Search API] Returning Yahoo results:', results.length);
           return NextResponse.json({ results });
         }
       }
