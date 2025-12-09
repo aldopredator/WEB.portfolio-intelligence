@@ -7,8 +7,10 @@ import CardContent from '@mui/material/CardContent';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 import { LineChart } from '@mui/x-charts/LineChart';
 
 function AreaGradient({ color, id }: { color: string; id: string }) {
@@ -48,9 +50,34 @@ export default function PriceHistoryChart({
   twoHundredDayAverage,
 }: PriceHistoryChartProps) {
   const theme = useTheme();
-  const [showBenchmark, setShowBenchmark] = useState(false);
+  const [compareTicker, setCompareTicker] = useState<string>('');
+  const [availableTickers, setAvailableTickers] = useState<Array<{ ticker: string; company: string; portfolioName: string }>>([]);
   const [benchmarkData, setBenchmarkData] = useState<Array<{ date: string; price: number }>>([]);
   const [isLoadingBenchmark, setIsLoadingBenchmark] = useState(false);
+
+  // Fetch available tickers for comparison
+  useEffect(() => {
+    const fetchTickers = async () => {
+      try {
+        const response = await fetch('/api/stock');
+        if (response.ok) {
+          const data = await response.json();
+          const stocks = data.stocks || [];
+          const tickers = stocks
+            .filter((s: any) => s.ticker !== ticker && s.isActive) // Exclude current ticker
+            .map((s: any) => ({
+              ticker: s.ticker,
+              company: s.company,
+              portfolioName: s.portfolio?.name || 'No Portfolio',
+            }));
+          setAvailableTickers(tickers);
+        }
+      } catch (error) {
+        console.error('Error fetching tickers:', error);
+      }
+    };
+    fetchTickers();
+  }, [ticker]);
 
   // Normalize data format (support both lowercase and uppercase field names)
   const normalizedData = data.map(d => ({
@@ -67,9 +94,9 @@ export default function PriceHistoryChart({
   });
   const prices = normalizedData.map((d) => d.price);
 
-  // Fetch benchmark data when checkbox is checked
+  // Fetch benchmark data when compare ticker is selected
   useEffect(() => {
-    if (!showBenchmark) {
+    if (!compareTicker) {
       setBenchmarkData([]);
       return;
     }
@@ -77,23 +104,23 @@ export default function PriceHistoryChart({
     const fetchBenchmarkData = async () => {
       setIsLoadingBenchmark(true);
       try {
-        // Fetch all stocks and find CW8
+        // Fetch all stocks and find the selected comparison ticker
         const response = await fetch('/api/stock');
         if (response.ok) {
           const data = await response.json();
           const stocks = data.stocks || [];
-          const cw8Stock = stocks.find((s: any) => s.ticker === 'CW8');
+          const compareStock = stocks.find((s: any) => s.ticker === compareTicker);
           
-          if (!cw8Stock) {
-            console.warn('[PriceHistoryChart] CW8 not found in portfolio');
+          if (!compareStock) {
+            console.warn(`[PriceHistoryChart] ${compareTicker} not found in portfolio`);
             setBenchmarkData([]);
             return;
           }
           
-          const priceHistory = cw8Stock.priceHistory || [];
+          const priceHistory = compareStock.priceHistory || [];
           
-          console.log('[PriceHistoryChart] CW8 data received:', priceHistory.length, 'data points');
-          console.log('[PriceHistoryChart] First CW8 point:', priceHistory[0]);
+          console.log(`[PriceHistoryChart] ${compareTicker} data received:`, priceHistory.length, 'data points');
+          console.log(`[PriceHistoryChart] First ${compareTicker} point:`, priceHistory[0]);
           
           // Normalize benchmark data - priceHistory has { date, price } format
           const normalizedBenchmark = priceHistory.map((d: any) => ({
@@ -134,7 +161,7 @@ export default function PriceHistoryChart({
     };
 
     fetchBenchmarkData();
-  }, [showBenchmark, normalizedData.length]);
+  }, [compareTicker, normalizedData.length]);
 
   // Determine currency symbol ($ for USD, £ for GBP, € for EUR)
   const currencySymbol = '$'; // Default to USD, can be made dynamic based on ticker
@@ -145,8 +172,9 @@ export default function PriceHistoryChart({
   let benchmarkChartData: number[] = [];
   let yMin = Math.floor(Math.min(...prices) * 0.95);
   let yMax = Math.ceil(Math.max(...prices) * 1.05);
+  const showComparison = compareTicker && benchmarkData.length > 0;
 
-  if (showBenchmark && benchmarkData.length > 0) {
+  if (showComparison) {
     console.log('[PriceHistoryChart] Computing percentage changes');
     console.log('[PriceHistoryChart] Stock first price:', normalizedData[0]?.price);
     console.log('[PriceHistoryChart] Benchmark data length:', benchmarkData.length);
@@ -337,26 +365,41 @@ export default function PriceHistoryChart({
           </Stack>
         ) : null}
 
-        {/* Benchmark Comparison Checkbox */}
-        <Stack direction="row" alignItems="center" sx={{ mt: 2, mb: 1 }}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={showBenchmark}
-                onChange={(e) => setShowBenchmark(e.target.checked)}
-                sx={{ color: 'primary.main' }}
-              />
-            }
-            label={
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Compare with CW8 benchmark (% change) {isLoadingBenchmark && '(Loading...)'}
-              </Typography>
-            }
-          />
+        {/* Compare to Another Ticker Dropdown */}
+        <Stack direction="row" alignItems="center" spacing={2} sx={{ mt: 2, mb: 1 }}>
+          <FormControl size="small" sx={{ minWidth: 250 }}>
+            <InputLabel id="compare-ticker-label">Compare to</InputLabel>
+            <Select
+              labelId="compare-ticker-label"
+              value={compareTicker}
+              label="Compare to"
+              onChange={(e) => setCompareTicker(e.target.value)}
+              disabled={isLoadingBenchmark}
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {availableTickers.map((t) => (
+                <MenuItem key={t.ticker} value={t.ticker}>
+                  {t.ticker} - {t.company} ({t.portfolioName})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {isLoadingBenchmark && (
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              Loading...
+            </Typography>
+          )}
+          {compareTicker && (
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              (% change from first day)
+            </Typography>
+          )}
         </Stack>
 
         <LineChart
-          colors={showBenchmark && benchmarkData.length > 0 ? [theme.palette.primary.main, theme.palette.warning.main] : colorPalette}
+          colors={showComparison ? [theme.palette.primary.main, theme.palette.warning.main] : colorPalette}
           xAxis={[
             {
               scaleType: 'point',
@@ -368,7 +411,7 @@ export default function PriceHistoryChart({
             {
               min: yMin,
               max: yMax,
-              valueFormatter: (value) => showBenchmark 
+              valueFormatter: (value) => showComparison 
                 ? `${value.toFixed(1)}%` 
                 : `${currencySymbol}${value.toFixed(0)}`,
             },
@@ -379,14 +422,14 @@ export default function PriceHistoryChart({
               label: ticker,
               showMark: false,
               curve: 'linear',
-              area: !showBenchmark,
+              area: !showComparison,
               data: chartData,
             },
-            ...(showBenchmark && benchmarkChartData.length > 0
+            ...(showComparison && benchmarkChartData.length > 0
               ? [
                   {
                     id: 'benchmark',
-                    label: 'CW8',
+                    label: compareTicker,
                     showMark: false,
                     curve: 'linear' as const,
                     area: false,
@@ -399,7 +442,7 @@ export default function PriceHistoryChart({
           margin={{ left: 60, right: 20, top: 20, bottom: 20 }}
           slotProps={{
             legend: { 
-              hidden: !showBenchmark,
+              hidden: !showComparison,
               direction: 'row',
               position: { vertical: 'top', horizontal: 'middle' },
             },
