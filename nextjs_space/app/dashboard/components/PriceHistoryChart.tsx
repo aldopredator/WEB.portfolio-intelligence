@@ -63,8 +63,16 @@ export default function PriceHistoryChart({
         if (response.ok) {
           const data = await response.json();
           const stocks = data.stocks || [];
+          console.log('[PriceHistoryChart] All stocks fetched:', stocks.length);
+          console.log('[PriceHistoryChart] Stock tickers:', stocks.map((s: any) => s.ticker).join(', '));
           const tickers = stocks
-            .filter((s: any) => s.ticker !== ticker && s.isActive) // Exclude current ticker
+            .filter((s: any) => {
+              const isValid = s.ticker !== ticker && s.isActive;
+              if (!isValid && s.ticker === 'CW8U.PA') {
+                console.log('[PriceHistoryChart] CW8U.PA filtered out - ticker:', s.ticker, 'isActive:', s.isActive, 'current ticker:', ticker);
+              }
+              return isValid;
+            }) // Exclude current ticker
             .map((s: any) => ({
               ticker: s.ticker,
               company: s.company,
@@ -73,6 +81,8 @@ export default function PriceHistoryChart({
             .sort((a: { ticker: string; company: string; portfolioName: string }, b: { ticker: string; company: string; portfolioName: string }) => 
               a.ticker.localeCompare(b.ticker)
             ); // Sort alphabetically by ticker
+          console.log('[PriceHistoryChart] Available tickers for comparison:', tickers.length);
+          console.log('[PriceHistoryChart] Includes CW8U.PA?', tickers.some(t => t.ticker === 'CW8U.PA'));
           setAvailableTickers(tickers);
         }
       } catch (error) {
@@ -262,6 +272,57 @@ export default function PriceHistoryChart({
           </Stack>
         </Stack>
 
+        {/* Compare to Another Ticker Dropdown - Centered and Prominent */}
+        <Stack 
+          direction="row" 
+          alignItems="center" 
+          justifyContent="center"
+          spacing={2} 
+          sx={{ 
+            mt: 3, 
+            mb: 2,
+            p: 2,
+            backgroundColor: 'action.hover',
+            borderRadius: 1,
+          }}
+        >
+          <FormControl size="medium" sx={{ minWidth: 400 }}>
+            <InputLabel id="compare-ticker-label" sx={{ fontWeight: 600 }}>Compare to</InputLabel>
+            <Select
+              labelId="compare-ticker-label"
+              value={compareTicker}
+              label="Compare to"
+              onChange={(e) => setCompareTicker(e.target.value)}
+              disabled={isLoadingBenchmark}
+              sx={{ 
+                backgroundColor: 'background.paper',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderWidth: 2,
+                },
+              }}
+            >
+              <MenuItem value="">
+                <em>None - Show absolute price</em>
+              </MenuItem>
+              {availableTickers.map((t) => (
+                <MenuItem key={t.ticker} value={t.ticker}>
+                  <strong>{t.ticker}</strong> - {t.company} <Typography component="span" sx={{ color: 'text.secondary', ml: 1 }}>({t.portfolioName})</Typography>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {isLoadingBenchmark && (
+            <Typography variant="body2" sx={{ color: 'warning.main', fontWeight: 600 }}>
+              Loading...
+            </Typography>
+          )}
+          {compareTicker && (
+            <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 600 }}>
+              📊 % change comparison
+            </Typography>
+          )}
+        </Stack>
+
         {/* 52 Week Range and Volume Section */}
         {(weekLow52 !== undefined && weekHigh52 !== undefined) || volume !== undefined ? (
           <Stack spacing={2} sx={{ mt: 2, mb: 2 }}>
@@ -367,39 +428,6 @@ export default function PriceHistoryChart({
             )}
           </Stack>
         ) : null}
-
-        {/* Compare to Another Ticker Dropdown */}
-        <Stack direction="row" alignItems="center" spacing={2} sx={{ mt: 2, mb: 1 }}>
-          <FormControl size="small" sx={{ minWidth: 250 }}>
-            <InputLabel id="compare-ticker-label">Compare to</InputLabel>
-            <Select
-              labelId="compare-ticker-label"
-              value={compareTicker}
-              label="Compare to"
-              onChange={(e) => setCompareTicker(e.target.value)}
-              disabled={isLoadingBenchmark}
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              {availableTickers.map((t) => (
-                <MenuItem key={t.ticker} value={t.ticker}>
-                  {t.ticker} - {t.company} ({t.portfolioName})
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {isLoadingBenchmark && (
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              Loading...
-            </Typography>
-          )}
-          {compareTicker && (
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              (% change from first day)
-            </Typography>
-          )}
-        </Stack>
 
         <LineChart
           colors={showComparison ? [theme.palette.primary.main, theme.palette.warning.main] : colorPalette}
