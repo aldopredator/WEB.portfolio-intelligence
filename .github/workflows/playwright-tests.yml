@@ -11,6 +11,22 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     
+    # Service PostgreSQL pour les tests
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
     defaults:
       run:
         working-directory: ./nextjs_space
@@ -34,15 +50,28 @@ jobs:
     - name: Setup Environment Variables
       run: |
         cp .env.example .env.local || true
-        echo "DATABASE_URL=postgresql://test:test@localhost:5432/test" >> .env.local
+        # Utilise le secret GitHub si disponible, sinon la base de test locale
+        if [ -n "${{ secrets.PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL }}" ]; then
+          echo "PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL=${{ secrets.PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL }}" >> .env.local
+        else
+          echo "PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL=postgresql://test:test@localhost:5432/test" >> .env.local
+        fi
     
     - name: Generate Prisma Client
       run: npx prisma generate
+      env:
+        PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL: ${{ secrets.PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL || 'postgresql://test:test@localhost:5432/test' }}
+    
+    - name: Run Database Migrations
+      run: npx prisma migrate deploy
+      env:
+        PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL: ${{ secrets.PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL || 'postgresql://test:test@localhost:5432/test' }}
     
     - name: Run Playwright tests
       run: yarn test
       env:
         CI: true
+        PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL: ${{ secrets.PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL || 'postgresql://test:test@localhost:5432/test' }}
     
     - name: Upload Playwright Report
       uses: actions/upload-artifact@v4
