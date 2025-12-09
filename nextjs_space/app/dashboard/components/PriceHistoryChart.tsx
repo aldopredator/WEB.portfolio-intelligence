@@ -134,7 +134,7 @@ export default function PriceHistoryChart({
     };
 
     fetchBenchmarkData();
-  }, [showBenchmark, data]);
+  }, [showBenchmark, normalizedData.length]);
 
   // Determine currency symbol ($ for USD, £ for GBP, € for EUR)
   const currencySymbol = '$'; // Default to USD, can be made dynamic based on ticker
@@ -149,6 +149,7 @@ export default function PriceHistoryChart({
   if (showBenchmark && benchmarkData.length > 0) {
     console.log('[PriceHistoryChart] Computing percentage changes');
     console.log('[PriceHistoryChart] Stock first price:', normalizedData[0]?.price);
+    console.log('[PriceHistoryChart] Benchmark data length:', benchmarkData.length);
     
     // Calculate percentage change from first day for stock
     const stockFirstPrice = normalizedData[0]?.price || 1;
@@ -173,8 +174,13 @@ export default function PriceHistoryChart({
       return change;
     });
 
+    console.log('[PriceHistoryChart] Stock percent changes length:', stockPercentChanges.length);
+    console.log('[PriceHistoryChart] Benchmark percent changes length:', benchmarkPercentChanges.length);
+
     chartData = stockPercentChanges;
     benchmarkChartData = benchmarkPercentChanges;
+    
+    console.log('[PriceHistoryChart] Final benchmarkChartData length:', benchmarkChartData.length);
     
     const allChanges = [...stockPercentChanges, ...benchmarkPercentChanges.filter(c => c !== 0)];
     yMin = Math.floor(Math.min(...allChanges) * 1.1);
