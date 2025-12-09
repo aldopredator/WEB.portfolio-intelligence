@@ -43,6 +43,9 @@ const COMMON_TICKERS = [
   { symbol: 'QBTS', name: 'D-Wave Quantum Inc.', exchange: 'NYSE', type: 'Equity' },
   { symbol: 'RGTI', name: 'Rigetti Computing Inc.', exchange: 'NASDAQ', type: 'Equity' },
   { symbol: 'BXXX', name: 'BXX Holdings', exchange: 'NYSE', type: 'Equity' },
+  { symbol: 'V', name: 'Visa Inc.', exchange: 'NYSE', type: 'Equity' },
+  { symbol: 'BE', name: 'Bloom Energy Corporation', exchange: 'NYSE', type: 'Equity' },
+  { symbol: 'INTU', name: 'Intuit Inc.', exchange: 'NASDAQ', type: 'Equity' },
   { symbol: 'CW8U.PA', name: 'Amundi MSCI World UCITS ETF', exchange: 'Euronext Paris', type: 'ETF' },
   { symbol: 'MWRL.L', name: 'Amundi Core MSCI World UCITS ETF', exchange: 'LSE', type: 'ETF' },
 ];
@@ -72,12 +75,8 @@ export async function GET(request: NextRequest) {
 
     console.log('[Search API] Static results:', staticResults.length);
 
-    // If we found results in static database, return them
-    if (staticResults.length > 0) {
-      return NextResponse.json({ results: staticResults });
-    }
-
-    // Try Yahoo Finance for other tickers
+    // Try Yahoo Finance first (it has a much larger database)
+    // Only use static results as a fallback or to supplement Yahoo results
     try {
       console.log('[Search API] Trying Yahoo Finance...');
       const yahooResponse = await fetch(
@@ -115,6 +114,11 @@ export async function GET(request: NextRequest) {
       }
     } catch (yahooError) {
       console.error('[Search API] Yahoo Finance API error:', yahooError);
+    }
+
+    // If Yahoo didn't work, return static results if we have any
+    if (staticResults.length > 0) {
+      return NextResponse.json({ results: staticResults });
     }
 
     // Fallback: Try Alpha Vantage if API key is available
