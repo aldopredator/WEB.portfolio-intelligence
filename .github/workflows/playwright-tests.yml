@@ -67,6 +67,12 @@ jobs:
       env:
         PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL: ${{ secrets.PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL || 'postgresql://test:test@localhost:5432/test' }}
     
+    - name: Seed Test Database
+      run: npx tsx scripts/seed-portfolios.ts
+      env:
+        PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL: ${{ secrets.PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL || 'postgresql://test:test@localhost:5432/test' }}
+      continue-on-error: true
+    
     - name: Run Playwright tests
       run: yarn test
       env:
