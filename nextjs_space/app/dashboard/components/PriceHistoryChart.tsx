@@ -96,7 +96,7 @@ export default function PriceHistoryChart({
           
           // Create a map for quick date lookups (normalize dates to YYYY-MM-DD for comparison)
           const benchmarkMap = new Map(
-            normalizedBenchmark.map(d => {
+            normalizedBenchmark.map((d: { date: string; price: number }) => {
               const normalizedDate = new Date(d.date).toISOString().split('T')[0];
               return [normalizedDate, d.price];
             })
