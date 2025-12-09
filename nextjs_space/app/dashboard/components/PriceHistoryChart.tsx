@@ -141,7 +141,6 @@ export default function PriceHistoryChart({
 
     chartData = stockPercentChanges;
     benchmarkChartData = benchmarkPercentChanges;
-    yAxisLabel = 'Change (%)';
     
     const allChanges = [...stockPercentChanges, ...benchmarkPercentChanges];
     yMin = Math.floor(Math.min(...allChanges) * 1.1);
