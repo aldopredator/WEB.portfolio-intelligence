@@ -114,11 +114,13 @@ export default function PriceHistoryChart({
     fetchBenchmarkData();
   }, [showBenchmark, data]);
 
+  // Determine currency symbol ($ for USD, £ for GBP, € for EUR)
+  const currencySymbol = '$'; // Default to USD, can be made dynamic based on ticker
+
   // When comparing with benchmark, normalize both to percentage change from first value
   // This allows comparison regardless of absolute price differences
   let chartData = prices;
   let benchmarkChartData: number[] = [];
-  let yAxisLabel = `Price (${currencySymbol})`;
   let yMin = Math.floor(Math.min(...prices) * 0.95);
   let yMax = Math.ceil(Math.max(...prices) * 1.05);
 
@@ -153,9 +155,6 @@ export default function PriceHistoryChart({
   ];
 
   const isPositive = priceChange >= 0;
-
-  // Determine currency symbol ($ for USD, £ for GBP, € for EUR)
-  const currencySymbol = '$'; // Default to USD, can be made dynamic based on ticker
 
   return (
     <Card variant="outlined" sx={{ width: '100%' }}>
