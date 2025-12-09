@@ -114,32 +114,30 @@ export default function PriceHistoryChart({
     fetchBenchmarkData();
   }, [showBenchmark, data]);
 
-  // Calculate percentage change from first day for comparison
-  const stockPercentChanges = normalizedData.map((d, i) => {
-    if (i === 0) return 0;
-    return ((d.price - normalizedData[0].price) / normalizedData[0].price) * 100;
-  });
+  // Calculate min/max for each series separately when showing benchmark
+  const stockMin = Math.min(...prices);
+  const stockMax = Math.max(...prices);
+  const stockRange = stockMax - stockMin;
+  const stockPadding = stockRange * 0.1;
 
-  const benchmarkPercentChanges = benchmarkData.map((d, i) => {
-    if (i === 0 || !d.price) return 0;
-    return ((d.price - benchmarkData[0].price) / benchmarkData[0].price) * 100;
-  });
+  let benchmarkMin = 0;
+  let benchmarkMax = 0;
+  let benchmarkRange = 0;
+  let benchmarkPadding = 0;
 
-  // Use percentage changes when showing benchmark, absolute prices otherwise
-  const chartData = showBenchmark && benchmarkData.length > 0 ? stockPercentChanges : prices;
-  const benchmarkChartData = showBenchmark && benchmarkData.length > 0 ? benchmarkPercentChanges : [];
+  if (showBenchmark && benchmarkData.length > 0) {
+    const benchmarkPrices = benchmarkData.map(d => d.price).filter(p => p > 0);
+    benchmarkMin = Math.min(...benchmarkPrices);
+    benchmarkMax = Math.max(...benchmarkPrices);
+    benchmarkRange = benchmarkMax - benchmarkMin;
+    benchmarkPadding = benchmarkRange * 0.1;
+  }
 
-  // Calculate dynamic Y-axis range
-  const minPrice = showBenchmark 
-    ? Math.min(...stockPercentChanges, ...benchmarkPercentChanges)
-    : Math.min(...prices);
-  const maxPrice = showBenchmark
-    ? Math.max(...stockPercentChanges, ...benchmarkPercentChanges)
-    : Math.max(...prices);
-  const priceRange = maxPrice - minPrice;
-  const padding = priceRange * 0.1; // 10% padding
-  const yMin = Math.floor(minPrice - padding);
-  const yMax = Math.ceil(maxPrice + padding);
+  // Use actual prices for both series
+  const chartData = prices;
+  const benchmarkChartData = showBenchmark && benchmarkData.length > 0 
+    ? benchmarkData.map(d => d.price) 
+    : [];
 
   const colorPalette = [
     theme.palette.primary.light,
@@ -304,7 +302,7 @@ export default function PriceHistoryChart({
             }
             label={
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Compare with CW8 benchmark (% change) {isLoadingBenchmark && '(Loading...)'}
+                Compare with CW8 benchmark {isLoadingBenchmark && '(Loading...)'}
               </Typography>
             }
           />
@@ -319,13 +317,32 @@ export default function PriceHistoryChart({
               tickInterval: (index, i) => (i + 1) % 5 === 0,
             },
           ]}
-          yAxis={[
-            {
-              min: yMin,
-              max: yMax,
-              valueFormatter: (value) => showBenchmark ? `${value.toFixed(1)}%` : `${currencySymbol}${value.toFixed(0)}`,
-            },
-          ]}
+          yAxis={
+            showBenchmark && benchmarkData.length > 0
+              ? [
+                  // Left Y-axis for stock price
+                  {
+                    id: 'stockAxis',
+                    min: Math.floor(stockMin - stockPadding),
+                    max: Math.ceil(stockMax + stockPadding),
+                    valueFormatter: (value) => `${currencySymbol}${value.toFixed(0)}`,
+                  },
+                  // Right Y-axis for benchmark price
+                  {
+                    id: 'benchmarkAxis',
+                    min: Math.floor(benchmarkMin - benchmarkPadding),
+                    max: Math.ceil(benchmarkMax + benchmarkPadding),
+                    valueFormatter: (value) => `${currencySymbol}${value.toFixed(0)}`,
+                  },
+                ]
+              : [
+                  {
+                    min: Math.floor(stockMin - stockPadding),
+                    max: Math.ceil(stockMax + stockPadding),
+                    valueFormatter: (value) => `${currencySymbol}${value.toFixed(0)}`,
+                  },
+                ]
+          }
           series={[
             {
               id: 'price',
@@ -334,6 +351,7 @@ export default function PriceHistoryChart({
               curve: 'linear',
               area: !showBenchmark,
               data: chartData,
+              yAxisKey: showBenchmark ? 'stockAxis' : undefined,
             },
             ...(showBenchmark && benchmarkData.length > 0
               ? [
@@ -344,14 +362,20 @@ export default function PriceHistoryChart({
                     curve: 'linear' as const,
                     area: false,
                     data: benchmarkChartData,
+                    yAxisKey: 'benchmarkAxis' as const,
                   },
                 ]
               : []),
           ]}
           height={300}
-          margin={{ left: 50, right: 20, top: 20, bottom: 20 }}
+          margin={{ left: 60, right: 60, top: 20, bottom: 20 }}
           slotProps={{
-            legend: { hidden: !showBenchmark },
+            legend: { 
+              hidden: !showBenchmark,
+              direction: 'row',
+              position: { vertical: 'top', horizontal: 'middle' },
+              padding: 0,
+            },
           }}
           sx={{
             '& .MuiAreaElement-series-price': {
