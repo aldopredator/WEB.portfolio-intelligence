@@ -17,7 +17,9 @@ interface AlphaVantageSearchResult {
 
 interface YahooSearchResult {
   symbol: string;
-  name: string;
+  shortname?: string;
+  longname?: string;
+  name?: string; // Sometimes Yahoo uses this
   exch: string;
   type: string;
   exchDisp: string;
@@ -46,9 +48,6 @@ const COMMON_TICKERS = [
   { symbol: 'V', name: 'Visa Inc.', exchange: 'NYSE', type: 'Equity' },
   { symbol: 'BE', name: 'Bloom Energy Corporation', exchange: 'NYSE', type: 'Equity' },
   { symbol: 'INTU', name: 'Intuit Inc.', exchange: 'NASDAQ', type: 'Equity' },
-  { symbol: 'PL', name: 'Planet Labs PBC', exchange: 'NYSE', type: 'Equity' },
-  { symbol: 'PLNT', name: 'Planet Fitness Inc.', exchange: 'NYSE', type: 'Equity' },
-  { symbol: 'PLAG', name: 'Planet Green Holdings Corp.', exchange: 'NYSE', type: 'Equity' },
   { symbol: 'CW8U.PA', name: 'Amundi MSCI World UCITS ETF', exchange: 'Euronext Paris', type: 'ETF' },
   { symbol: 'MWRL.L', name: 'Amundi Core MSCI World UCITS ETF', exchange: 'LSE', type: 'ETF' },
 ];
@@ -101,16 +100,16 @@ export async function GET(request: NextRequest) {
         console.log('[Search API] Yahoo quotes found:', quotes.length);
         
         const results = quotes
-          .filter((q: YahooSearchResult) => q.symbol && q.name)
+          .filter((q: YahooSearchResult) => q.symbol && (q.shortname || q.longname || q.name))
           .map((quote: YahooSearchResult) => ({
             symbol: quote.symbol,
-            name: quote.name,
+            name: quote.shortname || quote.longname || quote.name || quote.symbol,
             exchange: quote.exchDisp || quote.exch || 'N/A',
             type: quote.typeDisp || quote.type || 'Equity',
             region: quote.exch?.includes('NAS') || quote.exch?.includes('NYQ') ? 'United States' : undefined,
             currency: 'USD',
           }))
-          .slice(0, 15); // Return more results
+          .slice(0, 15);
 
         if (results.length > 0) {
           console.log('[Search API] Returning Yahoo results:', results.length);
