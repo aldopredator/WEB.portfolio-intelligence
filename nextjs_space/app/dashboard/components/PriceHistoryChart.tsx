@@ -84,22 +84,34 @@ export default function PriceHistoryChart({
           
           console.log('[PriceHistoryChart] CW8 data received:', priceHistory.length, 'data points');
           console.log('[PriceHistoryChart] First CW8 point:', priceHistory[0]);
-          console.log('[PriceHistoryChart] Stock dates:', normalizedData.map(d => d.date).slice(0, 3));
           
-          // Create a map for quick date lookups (using raw dates from normalizedData)
+          // Normalize benchmark data (same as main stock data)
+          const normalizedBenchmark = priceHistory.map((d: any) => ({
+            date: ('date' in d ? d.date : d.Date) as string,
+            price: (('price' in d ? d.price : d.Close) || 0) as number,
+          }));
+          
+          console.log('[PriceHistoryChart] Normalized benchmark sample:', normalizedBenchmark.slice(0, 3));
+          console.log('[PriceHistoryChart] Stock dates sample:', normalizedData.slice(0, 3));
+          
+          // Create a map for quick date lookups (normalize dates to YYYY-MM-DD for comparison)
           const benchmarkMap = new Map(
-            priceHistory.map((d: any) => [d.date || d.Date, d.price || d.Close])
+            normalizedBenchmark.map(d => {
+              const normalizedDate = new Date(d.date).toISOString().split('T')[0];
+              return [normalizedDate, d.price];
+            })
           );
           
           console.log('[PriceHistoryChart] Benchmark map keys sample:', Array.from(benchmarkMap.keys()).slice(0, 3));
           
           // Align benchmark data with the stock's date range
           const alignedBenchmark = normalizedData.map(d => {
-            const price = benchmarkMap.get(d.date);
-            return { date: d.date, price: (price as number) || 0 };
+            const normalizedDate = new Date(d.date).toISOString().split('T')[0];
+            const price = benchmarkMap.get(normalizedDate) || 0;
+            return { date: d.date, price };
           });
           
-          console.log('[PriceHistoryChart] Aligned benchmark data:', alignedBenchmark.slice(0, 3));
+          console.log('[PriceHistoryChart] Aligned benchmark data sample:', alignedBenchmark.slice(0, 3));
           console.log('[PriceHistoryChart] Non-zero benchmark prices:', alignedBenchmark.filter(d => d.price > 0).length);
           
           setBenchmarkData(alignedBenchmark);
@@ -118,33 +130,47 @@ export default function PriceHistoryChart({
   const currencySymbol = '$'; // Default to USD, can be made dynamic based on ticker
 
   // When comparing with benchmark, normalize both to percentage change from first value
-  // This allows comparison regardless of absolute price differences
+  // This allows comparison regardless of absolute price differences (like Yahoo Finance)
   let chartData = prices;
   let benchmarkChartData: number[] = [];
   let yMin = Math.floor(Math.min(...prices) * 0.95);
   let yMax = Math.ceil(Math.max(...prices) * 1.05);
 
   if (showBenchmark && benchmarkData.length > 0) {
-    // Calculate percentage change from first day for both series
+    console.log('[PriceHistoryChart] Computing percentage changes');
+    console.log('[PriceHistoryChart] Stock first price:', normalizedData[0]?.price);
+    
+    // Calculate percentage change from first day for stock
+    const stockFirstPrice = normalizedData[0]?.price || 1;
     const stockPercentChanges = normalizedData.map((d, i) => {
-      if (i === 0 || normalizedData[0].price === 0) return 0;
-      return ((d.price - normalizedData[0].price) / normalizedData[0].price) * 100;
+      if (stockFirstPrice === 0) return 0;
+      const change = ((d.price - stockFirstPrice) / stockFirstPrice) * 100;
+      if (i < 3) console.log(`[PriceHistoryChart] Stock day ${i}: price=${d.price}, change=${change.toFixed(2)}%`);
+      return change;
     });
 
+    // Calculate percentage change from first day for benchmark
     const benchmarkPrices = benchmarkData.map(d => d.price);
-    const firstBenchmarkPrice = benchmarkPrices.find(p => p > 0) || benchmarkPrices[0];
+    const firstBenchmarkPrice = benchmarkPrices.find(p => p > 0) || 1;
+    
+    console.log('[PriceHistoryChart] Benchmark first non-zero price:', firstBenchmarkPrice);
+    console.log('[PriceHistoryChart] Benchmark prices sample:', benchmarkPrices.slice(0, 5));
     
     const benchmarkPercentChanges = benchmarkPrices.map((price, i) => {
-      if (i === 0 || firstBenchmarkPrice === 0 || price === 0) return 0;
-      return ((price - firstBenchmarkPrice) / firstBenchmarkPrice) * 100;
+      if (firstBenchmarkPrice === 0) return 0;
+      const change = price > 0 ? ((price - firstBenchmarkPrice) / firstBenchmarkPrice) * 100 : 0;
+      if (i < 3) console.log(`[PriceHistoryChart] Benchmark day ${i}: price=${price}, change=${change.toFixed(2)}%`);
+      return change;
     });
 
     chartData = stockPercentChanges;
     benchmarkChartData = benchmarkPercentChanges;
     
-    const allChanges = [...stockPercentChanges, ...benchmarkPercentChanges];
+    const allChanges = [...stockPercentChanges, ...benchmarkPercentChanges.filter(c => c !== 0)];
     yMin = Math.floor(Math.min(...allChanges) * 1.1);
     yMax = Math.ceil(Math.max(...allChanges) * 1.1);
+    
+    console.log('[PriceHistoryChart] Y-axis range:', yMin, 'to', yMax);
   }
 
   const colorPalette = [
