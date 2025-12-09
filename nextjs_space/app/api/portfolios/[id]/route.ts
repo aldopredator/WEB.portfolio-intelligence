@@ -50,15 +50,29 @@ export async function GET(
 
 /**
  * PUT /api/portfolios/[id]
- * Updates a portfolio's name and/or description
+ * Updates a portfolio's name, description, and/or lock status
  */
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { name, description } = await request.json();
+    const body = await request.json();
+    const { name, description, isLocked } = body;
     const { id } = params;
+
+    // If only updating lock status
+    if (isLocked !== undefined && name === undefined) {
+      const portfolio = await prisma.portfolio.update({
+        where: { id },
+        data: { isLocked }
+      });
+
+      return NextResponse.json({
+        success: true,
+        portfolio
+      });
+    }
 
     if (!name || name.trim() === '') {
       return NextResponse.json(
@@ -82,12 +96,18 @@ export async function PUT(
       );
     }
 
+    const updateData: any = {
+      name: name.trim(),
+      description: description?.trim() || null
+    };
+
+    if (isLocked !== undefined) {
+      updateData.isLocked = isLocked;
+    }
+
     const portfolio = await prisma.portfolio.update({
       where: { id },
-      data: {
-        name: name.trim(),
-        description: description?.trim() || null
-      }
+      data: updateData
     });
 
     return NextResponse.json({

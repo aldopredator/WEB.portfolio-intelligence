@@ -91,10 +91,18 @@ export default function CriteriaForm() {
           ...DEFAULT_CRITERIA,
           ...parsed,
           // Ensure arrays exist
-          excludeSectors: Array.isArray(parsed.excludeSectors) ? parsed.excludeSectors : DEFAULT_CRITERIA.excludeSectors,
-          includeSectors: Array.isArray(parsed.includeSectors) ? parsed.includeSectors : DEFAULT_CRITERIA.includeSectors,
-          excludeCountries: Array.isArray(parsed.excludeCountries) ? parsed.excludeCountries : DEFAULT_CRITERIA.excludeCountries,
+          sectorFilter: Array.isArray(parsed.sectorFilter) ? parsed.sectorFilter : 
+                        (Array.isArray(parsed.excludeSectors) ? parsed.excludeSectors : 
+                        (Array.isArray(parsed.includeSectors) ? parsed.includeSectors : DEFAULT_CRITERIA.sectorFilter)),
+          countryFilter: Array.isArray(parsed.countryFilter) ? parsed.countryFilter : 
+                         (Array.isArray(parsed.excludeCountries) ? parsed.excludeCountries : DEFAULT_CRITERIA.countryFilter),
           portfolioFilter: Array.isArray(parsed.portfolioFilter) ? parsed.portfolioFilter : DEFAULT_CRITERIA.portfolioFilter,
+          // Migrate old fields to new mode-based approach
+          sectorFilterMode: parsed.sectorFilterMode || 
+                           (parsed.includeSectorsEnabled ? 'include' : 
+                           (parsed.sectorsEnabled ? 'exclude' : 'disabled')),
+          countryFilterMode: parsed.countryFilterMode || 
+                            (parsed.countriesEnabled ? 'exclude' : 'disabled'),
         };
         setCriteria(loadedCriteria);
         
@@ -130,10 +138,10 @@ export default function CriteriaForm() {
   };
 
   const addSector = () => {
-    if (newSector.trim() && !criteria.excludeSectors.includes(newSector.trim())) {
+    if (newSector.trim() && !criteria.sectorFilter.includes(newSector.trim())) {
       setCriteria(prev => ({
         ...prev,
-        excludeSectors: [...prev.excludeSectors, newSector.trim()],
+        sectorFilter: [...prev.sectorFilter, newSector.trim()],
       }));
       setNewSector('');
     }
@@ -142,32 +150,25 @@ export default function CriteriaForm() {
   const removeSector = (sector: string) => {
     setCriteria(prev => ({
       ...prev,
-      excludeSectors: prev.excludeSectors.filter(s => s !== sector),
+      sectorFilter: prev.sectorFilter.filter(s => s !== sector),
     }));
   };
 
   const addIncludeSector = () => {
-    if (newSector.trim() && !criteria.includeSectors.includes(newSector.trim())) {
-      setCriteria(prev => ({
-        ...prev,
-        includeSectors: [...prev.includeSectors, newSector.trim()],
-      }));
-      setNewSector('');
-    }
+    // Deprecated - kept for backwards compatibility
+    addSector();
   };
 
   const removeIncludeSector = (sector: string) => {
-    setCriteria(prev => ({
-      ...prev,
-      includeSectors: prev.includeSectors.filter(s => s !== sector),
-    }));
+    // Deprecated - kept for backwards compatibility
+    removeSector(sector);
   };
 
   const addCountry = () => {
-    if (newCountry.trim() && !criteria.excludeCountries.includes(newCountry.trim())) {
+    if (newCountry.trim() && !criteria.countryFilter.includes(newCountry.trim())) {
       setCriteria(prev => ({
         ...prev,
-        excludeCountries: [...prev.excludeCountries, newCountry.trim()],
+        countryFilter: [...prev.countryFilter, newCountry.trim()],
       }));
       setNewCountry('');
     }
@@ -176,7 +177,7 @@ export default function CriteriaForm() {
   const removeCountry = (country: string) => {
     setCriteria(prev => ({
       ...prev,
-      excludeCountries: prev.excludeCountries.filter(c => c !== country),
+      countryFilter: prev.countryFilter.filter(c => c !== country),
     }));
   };
 
@@ -1887,19 +1888,17 @@ export default function CriteriaForm() {
                 <Ban className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-xl font-bold text-white">Sector Exclusions</h2>
+                <h2 className="text-xl font-bold text-white">Sector Filter</h2>
               </div>
-              <button
-                type="button"
-                onClick={() => setCriteria({ ...criteria, sectorsEnabled: !criteria.sectorsEnabled })}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                  criteria.sectorsEnabled
-                    ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20'
-                    : 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20'
-                }`}
+              <select
+                value={criteria.sectorFilterMode}
+                onChange={(e) => setCriteria({ ...criteria, sectorFilterMode: e.target.value as 'exclude' | 'include' | 'disabled' })}
+                className="px-4 py-2 rounded-lg text-sm font-medium border bg-slate-900/50 text-white border-slate-700 hover:bg-slate-800/50 transition-colors"
               >
-                {criteria.sectorsEnabled ? 'Enabled' : 'Disabled'}
-              </button>
+                <option value="disabled">Disabled</option>
+                <option value="exclude">Exclude</option>
+                <option value="include">Include Only</option>
+              </select>
             </div>
           </div>
 
@@ -1910,14 +1909,14 @@ export default function CriteriaForm() {
                 <select
                   value={newSector}
                   onChange={(e) => setNewSector(e.target.value)}
-                  disabled={!criteria.sectorsEnabled}
+                  disabled={criteria.sectorFilterMode === 'disabled'}
                   className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500/50 ${
-                    !criteria.sectorsEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                    criteria.sectorFilterMode === 'disabled' ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
-                  <option value="">Select a sector to exclude...</option>
+                  <option value="">Select a sector to {criteria.sectorFilterMode === 'exclude' ? 'exclude' : 'include'}...</option>
                   {COMMON_SECTORS.map((sector) => (
-                    <option key={sector} value={sector} disabled={criteria.excludeSectors.includes(sector)}>
+                    <option key={sector} value={sector} disabled={criteria.sectorFilter.includes(sector)}>
                       {sector}
                     </option>
                   ))}
@@ -1925,9 +1924,12 @@ export default function CriteriaForm() {
                 <button
                   type="button"
                   onClick={addSector}
-                  disabled={!criteria.sectorsEnabled || !newSector.trim()}
-                  className={`px-4 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg text-red-400 font-medium transition-colors flex items-center gap-2 ${
-                    (!criteria.sectorsEnabled || !newSector.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                  disabled={criteria.sectorFilterMode === 'disabled' || !newSector.trim()}
+                  className={`px-4 py-3 ${
+                    criteria.sectorFilterMode === 'include' ? 'bg-green-500/10 hover:bg-green-500/20 border-green-500/20 text-green-400' :
+                    'bg-red-500/10 hover:bg-red-500/20 border-red-500/20 text-red-400'
+                  } border rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                    (criteria.sectorFilterMode === 'disabled' || !newSector.trim()) ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
                   <Plus className="w-4 h-4" />
@@ -1936,17 +1938,21 @@ export default function CriteriaForm() {
               </div>
             </div>
 
-            {/* Excluded Sectors List */}
-            {criteria.excludeSectors.length > 0 ? (
+            {/* Sectors List */}
+            {criteria.sectorFilter.length > 0 ? (
               <div className="flex flex-wrap gap-2">
-                {criteria.excludeSectors.map((sector) => (
+                {criteria.sectorFilter.map((sector) => (
                   <div key={sector} className="bg-slate-950/50 border border-slate-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
-                    <XCircle className="w-4 h-4 text-red-400" />
+                    {criteria.sectorFilterMode === 'exclude' ? (
+                      <XCircle className="w-4 h-4 text-red-400" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4 text-green-400" />
+                    )}
                     <span className="text-white text-sm font-medium">Sector: {sector}</span>
                     <button
                       type="button"
                       onClick={() => removeSector(sector)}
-                      disabled={!criteria.sectorsEnabled}
+                      disabled={criteria.sectorFilterMode === 'disabled'}
                       className={`p-1 hover:bg-red-500/20 rounded text-red-400 transition-colors ${
                         !criteria.sectorsEnabled ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
@@ -1968,19 +1974,17 @@ export default function CriteriaForm() {
                 <Ban className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-xl font-bold text-white">Country Exclusions</h2>
+                <h2 className="text-xl font-bold text-white">Country Filter</h2>
               </div>
-              <button
-                type="button"
-                onClick={() => setCriteria({ ...criteria, countriesEnabled: !criteria.countriesEnabled })}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                  criteria.countriesEnabled
-                    ? 'bg-orange-500/10 text-orange-400 border-orange-500/20 hover:bg-orange-500/20'
-                    : 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20'
-                }`}
+              <select
+                value={criteria.countryFilterMode}
+                onChange={(e) => setCriteria({ ...criteria, countryFilterMode: e.target.value as 'exclude' | 'include' | 'disabled' })}
+                className="px-4 py-2 rounded-lg text-sm font-medium border bg-slate-900/50 text-white border-slate-700 hover:bg-slate-800/50 transition-colors"
               >
-                {criteria.countriesEnabled ? 'Enabled' : 'Disabled'}
-              </button>
+                <option value="disabled">Disabled</option>
+                <option value="exclude">Exclude</option>
+                <option value="include">Include Only</option>
+              </select>
             </div>
           </div>
 
@@ -1991,14 +1995,14 @@ export default function CriteriaForm() {
                 <select
                   value={newCountry}
                   onChange={(e) => setNewCountry(e.target.value)}
-                  disabled={!criteria.countriesEnabled}
+                  disabled={criteria.countryFilterMode === 'disabled'}
                   className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 ${
-                    !criteria.countriesEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                    criteria.countryFilterMode === 'disabled' ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
-                  <option value="">Select a country to exclude...</option>
+                  <option value="">Select a country to {criteria.countryFilterMode === 'exclude' ? 'exclude' : 'include'}...</option>
                   {COMMON_COUNTRIES.map((country) => (
-                    <option key={country.code} value={country.code} disabled={criteria.excludeCountries.includes(country.code)}>
+                    <option key={country.code} value={country.code} disabled={criteria.countryFilter.includes(country.code)}>
                       {country.name}
                     </option>
                   ))}
@@ -2006,9 +2010,12 @@ export default function CriteriaForm() {
                 <button
                   type="button"
                   onClick={addCountry}
-                  disabled={!criteria.countriesEnabled || !newCountry.trim()}
-                  className={`px-4 py-3 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 rounded-lg text-orange-400 font-medium transition-colors flex items-center gap-2 ${
-                    (!criteria.countriesEnabled || !newCountry.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                  disabled={criteria.countryFilterMode === 'disabled' || !newCountry.trim()}
+                  className={`px-4 py-3 ${
+                    criteria.countryFilterMode === 'include' ? 'bg-green-500/10 hover:bg-green-500/20 border-green-500/20 text-green-400' :
+                    'bg-orange-500/10 hover:bg-orange-500/20 border-orange-500/20 text-orange-400'
+                  } border rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                    (criteria.countryFilterMode === 'disabled' || !newCountry.trim()) ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
                   <Plus className="w-4 h-4" />
@@ -2017,20 +2024,24 @@ export default function CriteriaForm() {
               </div>
             </div>
 
-            {/* Excluded Countries List */}
-            {criteria.excludeCountries.length > 0 ? (
+            {/* Countries List */}
+            {criteria.countryFilter.length > 0 ? (
               <div className="flex flex-wrap gap-2">
-                {criteria.excludeCountries.map((countryCode) => {
+                {criteria.countryFilter.map((countryCode) => {
                   const country = COMMON_COUNTRIES.find(c => c.code === countryCode);
                   const displayName = country ? country.name : countryCode;
                   return (
                     <div key={countryCode} className="bg-slate-950/50 border border-slate-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
-                      <XCircle className="w-4 h-4 text-orange-400" />
+                      {criteria.countryFilterMode === 'exclude' ? (
+                        <XCircle className="w-4 h-4 text-orange-400" />
+                      ) : (
+                        <CheckCircle2 className="w-4 h-4 text-green-400" />
+                      )}
                       <span className="text-white text-sm font-medium">{displayName}</span>
                       <button
                         type="button"
                         onClick={() => removeCountry(countryCode)}
-                        disabled={!criteria.countriesEnabled}
+                        disabled={criteria.countryFilterMode === 'disabled'}
                         className={`p-1 hover:bg-orange-500/20 rounded text-orange-400 transition-colors ${
                           !criteria.countriesEnabled ? 'opacity-50 cursor-not-allowed' : ''
                         }`}

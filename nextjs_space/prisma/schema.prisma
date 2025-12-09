@@ -14,6 +14,7 @@ model Portfolio {
     id          String   @id @default(cuid())
     name        String   @unique
     description String?
+    isLocked    Boolean  @default(false) // Prevent deletion of tickers from dashboard when locked
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
     
@@ -34,6 +35,7 @@ model Stock {
     currency    String?  @default("USD")
     isActive    Boolean  @default(true) // Whether the stock is in the user's portfolio
     rating      Int?     @default(0) // User's discretionary rating (0-5 stars)
+    ratingUpdatedAt DateTime? // Last time the rating was updated
     addedAt     DateTime @default(now())
     updatedAt   DateTime @updatedAt
     
