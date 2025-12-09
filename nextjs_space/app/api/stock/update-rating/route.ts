@@ -27,7 +27,10 @@ export async function POST(request: NextRequest) {
     // Update the stock rating
     const updatedStock = await prisma.stock.update({
       where: { ticker },
-      data: { rating },
+      data: { 
+        rating,
+        ratingUpdatedAt: new Date(),
+      },
     });
 
     await prisma.$disconnect();

@@ -61,12 +61,10 @@ export interface ScreeningCriteria {
   ratingEnabled: boolean;
   portfolioFilter: string[];
   portfolioFilterEnabled: boolean;
-  excludeSectors: string[];
-  sectorsEnabled: boolean;
-  includeSectors: string[];
-  includeSectorsEnabled: boolean;
-  excludeCountries: string[];
-  countriesEnabled: boolean;
+  sectorFilterMode: 'exclude' | 'include' | 'disabled';
+  sectorFilter: string[];
+  countryFilterMode: 'exclude' | 'include' | 'disabled';
+  countryFilter: string[];
   minMatchScore: number;
   matchScoreEnabled: boolean;
 }
@@ -133,12 +131,10 @@ export const DEFAULT_CRITERIA: ScreeningCriteria = {
   ratingEnabled: false,
   portfolioFilter: [],
   portfolioFilterEnabled: false,
-  excludeSectors: ['Alcohol', 'Gambling'],
-  sectorsEnabled: true,
-  includeSectors: [],
-  includeSectorsEnabled: false,
-  excludeCountries: [],
-  countriesEnabled: false,
+  sectorFilterMode: 'exclude',
+  sectorFilter: ['Alcohol', 'Gambling'],
+  countryFilterMode: 'disabled',
+  countryFilter: [],
   minMatchScore: 50,
   matchScoreEnabled: false,
 };
@@ -207,12 +203,10 @@ export function parseCriteriaFromParams(searchParams: URLSearchParams): Screenin
     ratingEnabled: searchParams.get('ratingEnabled') === 'true',
     portfolioFilter: searchParams.get('portfolioFilter')?.split(',').filter(s => s) || DEFAULT_CRITERIA.portfolioFilter,
     portfolioFilterEnabled: searchParams.get('portfolioFilterEnabled') === 'true',
-    excludeSectors: searchParams.get('excludeSectors')?.split(',').filter(s => s) || DEFAULT_CRITERIA.excludeSectors,
-    sectorsEnabled: searchParams.get('sectorsEnabled') === 'true',
-    includeSectors: searchParams.get('includeSectors')?.split(',').filter(s => s) || DEFAULT_CRITERIA.includeSectors,
-    includeSectorsEnabled: searchParams.get('includeSectorsEnabled') === 'true',
-    excludeCountries: searchParams.get('excludeCountries')?.split(',').filter(s => s) || DEFAULT_CRITERIA.excludeCountries,
-    countriesEnabled: searchParams.get('countriesEnabled') === 'true',
+    sectorFilterMode: (searchParams.get('sectorFilterMode') as 'exclude' | 'include' | 'disabled') || DEFAULT_CRITERIA.sectorFilterMode,
+    sectorFilter: searchParams.get('sectorFilter')?.split(',').filter(s => s) || DEFAULT_CRITERIA.sectorFilter,
+    countryFilterMode: (searchParams.get('countryFilterMode') as 'exclude' | 'include' | 'disabled') || DEFAULT_CRITERIA.countryFilterMode,
+    countryFilter: searchParams.get('countryFilter')?.split(',').filter(s => s) || DEFAULT_CRITERIA.countryFilter,
     minMatchScore: parseFloat(searchParams.get('minMatchScore') || String(DEFAULT_CRITERIA.minMatchScore)),
     matchScoreEnabled: searchParams.get('matchScoreEnabled') === 'true',
   };
@@ -282,12 +276,10 @@ export function buildCriteriaURL(criteria: ScreeningCriteria): string {
     ratingEnabled: String(criteria.ratingEnabled),
     portfolioFilter: criteria.portfolioFilter.join(','),
     portfolioFilterEnabled: String(criteria.portfolioFilterEnabled),
-    excludeSectors: criteria.excludeSectors.join(','),
-    sectorsEnabled: String(criteria.sectorsEnabled),
-    includeSectors: criteria.includeSectors.join(','),
-    includeSectorsEnabled: String(criteria.includeSectorsEnabled),
-    excludeCountries: criteria.excludeCountries.join(','),
-    countriesEnabled: String(criteria.countriesEnabled),
+    sectorFilterMode: criteria.sectorFilterMode,
+    sectorFilter: criteria.sectorFilter.join(','),
+    countryFilterMode: criteria.countryFilterMode,
+    countryFilter: criteria.countryFilter.join(','),
     minMatchScore: String(criteria.minMatchScore),
     matchScoreEnabled: String(criteria.matchScoreEnabled),
   });

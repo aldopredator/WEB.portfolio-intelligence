@@ -8,15 +8,44 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Typography, Paper, Snackbar, Alert, Select, MenuItem, FormControl, InputLabel, Chip, IconButton, Tooltip } from '@mui/material';
-import { Package, ChevronRight, Trash2 } from 'lucide-react';
+import { Package, ChevronRight, Trash2, Lock } from 'lucide-react';
 import MainGrid from './components/MainGrid';
 import TickerSearch from '../components/TickerSearch';
 import type { StockInsightsData } from '@/lib/types';
 import { usePortfolio } from '@/lib/portfolio-context';
 
+// Helper function to format relative dates
+function formatRelativeDate(date: Date | null): string {
+  if (!date) return 'Never';
+  
+  const now = new Date();
+  const diff = now.getTime() - new Date(date).getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor(diff / (1000 * 60));
+  
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days === 0) return 'Today';
+  if (days === 1) return 'Yesterday';
+  if (days < 7) return `${days}d ago`;
+  if (days < 30) return `${Math.floor(days / 7)}w ago`;
+  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
+  return `${Math.floor(days / 365)}y ago`;
+}
+
 interface DashboardClientProps {
   initialData: StockInsightsData;
-  stocks: Array<{ ticker: string; company: string; change_percent?: number; rating?: number; portfolioId?: string | null }>;
+  stocks: Array<{ 
+    ticker: string; 
+    company: string; 
+    change_percent?: number; 
+    rating?: number; 
+    ratingUpdatedAt?: Date | null; 
+    portfolioId?: string | null;
+    isLocked?: boolean;
+  }>;
 }
 
 const theme = createTheme({
@@ -147,8 +176,15 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
     }
   };
 
-  const handleDeleteTicker = async (ticker: string, e: React.MouseEvent) => {
+  const handleDeleteTicker = async (ticker: string, isLocked: boolean, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent ticker selection when clicking delete
+    
+    if (isLocked) {
+      setSnackbarMessage(`❌ Cannot delete ${ticker}. This portfolio is locked. Please unlock it in the Portfolios tab first.`);
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      return;
+    }
     
     if (!confirm(`Are you sure you want to delete ${ticker}?`)) {
       return;
@@ -424,12 +460,24 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
                       >
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                           <Box sx={{ flex: 1 }}>
-                            <Typography sx={{ color: '#fff', fontWeight: 600, fontSize: '0.9rem' }}>
-                              {stock.ticker}
-                            </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <Typography sx={{ color: '#fff', fontWeight: 600, fontSize: '0.9rem' }}>
+                                {stock.ticker}
+                              </Typography>
+                              {stock.isLocked && (
+                                <Tooltip title="Portfolio is locked">
+                                  <Lock size={12} className="text-amber-500" />
+                                </Tooltip>
+                              )}
+                            </Box>
                             <Typography sx={{ color: '#94a3b8', fontSize: '0.75rem', mt: 0.25 }}>
                               {stock.company}
                             </Typography>
+                            {stock.ratingUpdatedAt && (
+                              <Typography sx={{ color: '#64748b', fontSize: '0.65rem', mt: 0.25, fontStyle: 'italic' }}>
+                                Rated {formatRelativeDate(stock.ratingUpdatedAt)}
+                              </Typography>
+                            )}
                           </Box>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             {stock.change_percent !== undefined && (
@@ -443,16 +491,18 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
                                 {stock.change_percent >= 0 ? '+' : ''}{stock.change_percent.toFixed(2)}%
                               </Typography>
                             )}
-                            <Tooltip title={`Delete ${stock.ticker}`}>
+                            <Tooltip title={stock.isLocked ? `Portfolio locked - unlock in Portfolios tab` : `Delete ${stock.ticker}`}>
                               <IconButton
                                 size="small"
-                                onClick={(e) => handleDeleteTicker(stock.ticker, e)}
+                                onClick={(e) => handleDeleteTicker(stock.ticker, stock.isLocked || false, e)}
+                                disabled={stock.isLocked}
                                 sx={{
-                                  color: '#94a3b8',
+                                  color: stock.isLocked ? '#64748b' : '#94a3b8',
                                   '&:hover': {
-                                    color: '#f87171',
-                                    bgcolor: 'rgba(248, 113, 113, 0.1)',
+                                    color: stock.isLocked ? '#64748b' : '#f87171',
+                                    bgcolor: stock.isLocked ? 'transparent' : 'rgba(248, 113, 113, 0.1)',
                                   },
+                                  cursor: stock.isLocked ? 'not-allowed' : 'pointer',
                                 }}
                               >
                                 <Trash2 size={16} />

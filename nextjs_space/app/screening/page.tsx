@@ -169,31 +169,29 @@ export default async function ScreeningPage({
       passes.portfolio = CRITERIA.portfolioFilter.includes(portfolioName);
     }
     
-    if (CRITERIA.sectorsEnabled && companyProfile?.industry) {
-      passes.sector = !CRITERIA.excludeSectors.includes(companyProfile.industry);
-    }
-    
-    if (CRITERIA.includeSectorsEnabled && companyProfile?.industry) {
-      if (CRITERIA.includeSectors.length > 0) {
-        passes.includeSector = CRITERIA.includeSectors.includes(companyProfile.industry);
+    if (CRITERIA.sectorFilterMode !== 'disabled' && companyProfile?.industry) {
+      if (CRITERIA.sectorFilterMode === 'exclude') {
+        passes.sector = !CRITERIA.sectorFilter.includes(companyProfile.industry);
+      } else if (CRITERIA.sectorFilterMode === 'include' && CRITERIA.sectorFilter.length > 0) {
+        passes.sector = CRITERIA.sectorFilter.includes(companyProfile.industry);
       }
     }
     
-    if (CRITERIA.countriesEnabled && companyProfile?.country) {
-      passes.country = !CRITERIA.excludeCountries.includes(companyProfile.country);
+    if (CRITERIA.countryFilterMode !== 'disabled' && companyProfile?.country) {
+      if (CRITERIA.countryFilterMode === 'exclude') {
+        passes.country = !CRITERIA.countryFilter.includes(companyProfile.country);
+      } else if (CRITERIA.countryFilterMode === 'include' && CRITERIA.countryFilter.length > 0) {
+        passes.country = CRITERIA.countryFilter.includes(companyProfile.country);
+      }
     }
 
     const totalCriteria = Object.keys(passes).length;
     const passCount = Object.values(passes).filter(Boolean).length;
     const matchScore = totalCriteria > 0 ? Math.round((passCount / totalCriteria) * 100) : 100;
 
-    // Apply match score filter if enabled
-    if (CRITERIA.matchScoreEnabled && matchScore < CRITERIA.minMatchScore) {
-      return null;
-    }
-
-    // Only include stocks that pass all enabled criteria
-    if (matchScore < 100) {
+    // Apply match score filter if enabled, otherwise require 100% match
+    const requiredMatchScore = CRITERIA.matchScoreEnabled ? CRITERIA.minMatchScore : 100;
+    if (matchScore < requiredMatchScore) {
       return null;
     }
 
@@ -357,20 +355,20 @@ export default async function ScreeningPage({
                   </div>
                 )}
                 
-                {CRITERIA.sectorsEnabled && CRITERIA.excludeSectors.length > 0 && (
+                {CRITERIA.sectorFilterMode === 'exclude' && CRITERIA.sectorFilter.length > 0 && (
                   <div className="flex items-center gap-2 px-3 py-1 border border-red-500/30 bg-slate-900/50 rounded-lg">
                     <span className="text-slate-400">Excluded Sectors</span>
                     <span className="text-white font-mono font-semibold">
-                      {CRITERIA.excludeSectors.join(', ')}
+                      {CRITERIA.sectorFilter.join(', ')}
                     </span>
                   </div>
                 )}
                 
-                {CRITERIA.includeSectorsEnabled && CRITERIA.includeSectors.length > 0 && (
+                {CRITERIA.sectorFilterMode === 'include' && CRITERIA.sectorFilter.length > 0 && (
                   <div className="flex items-center gap-2 px-3 py-1 border border-green-500/30 bg-slate-900/50 rounded-lg">
                     <span className="text-slate-400">Include Only Sectors</span>
                     <span className="text-white font-mono font-semibold">
-                      {CRITERIA.includeSectors.join(', ')}
+                      {CRITERIA.sectorFilter.join(', ')}
                     </span>
                   </div>
                 )}
@@ -382,11 +380,20 @@ export default async function ScreeningPage({
                   </div>
                 )}
                 
-                {CRITERIA.countriesEnabled && CRITERIA.excludeCountries.length > 0 && (
+                {CRITERIA.countryFilterMode === 'exclude' && CRITERIA.countryFilter.length > 0 && (
                   <div className="flex items-center gap-2 px-3 py-1 border border-orange-500/30 bg-slate-900/50 rounded-lg">
                     <span className="text-slate-400">Excluded Countries</span>
                     <span className="text-white font-mono font-semibold">
-                      {CRITERIA.excludeCountries.map(getCountryName).join(', ')}
+                      {CRITERIA.countryFilter.map(getCountryName).join(', ')}
+                    </span>
+                  </div>
+                )}
+                
+                {CRITERIA.countryFilterMode === 'include' && CRITERIA.countryFilter.length > 0 && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-green-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Include Only Countries</span>
+                    <span className="text-white font-mono font-semibold">
+                      {CRITERIA.countryFilter.map(getCountryName).join(', ')}
                     </span>
                   </div>
                 )}

@@ -28,17 +28,25 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     select: {
       ticker: true,
       rating: true,
+      ratingUpdatedAt: true,
       portfolioId: true,
+      portfolio: {
+        select: {
+          isLocked: true,
+        },
+      },
     },
   });
 
   const stockRatings = dbStocks.reduce((acc, stock) => {
     acc[stock.ticker] = {
       rating: stock.rating || 0,
+      ratingUpdatedAt: stock.ratingUpdatedAt,
       portfolioId: stock.portfolioId,
+      isLocked: stock.portfolio?.isLocked || false,
     };
     return acc;
-  }, {} as Record<string, { rating: number; portfolioId: string | null }>);
+  }, {} as Record<string, { rating: number; ratingUpdatedAt: Date | null; portfolioId: string | null; isLocked: boolean }>);
 
   await prisma.$disconnect();
 
@@ -62,7 +70,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       company: config?.name || ticker,
       change_percent: stockInfo?.change_percent,
       rating: stockRatings[ticker]?.rating || 0,
+      ratingUpdatedAt: stockRatings[ticker]?.ratingUpdatedAt || null,
       portfolioId: stockRatings[ticker]?.portfolioId || null,
+      isLocked: stockRatings[ticker]?.isLocked || false,
     };
   });
   
