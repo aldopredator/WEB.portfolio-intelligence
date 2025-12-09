@@ -1719,92 +1719,6 @@ export default function CriteriaForm() {
           </div>
         </div>
 
-        {/* Sector Inclusion Filter */}
-        <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-b border-green-500/30 p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
-                <Filter className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-xl font-bold text-white">Sector Inclusion</h2>
-                <p className="text-slate-400 text-sm mt-1">Filter stocks to show only selected sectors</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setCriteria({ ...criteria, includeSectorsEnabled: !criteria.includeSectorsEnabled })}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                  criteria.includeSectorsEnabled
-                    ? 'bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20'
-                    : 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20'
-                }`}
-              >
-                {criteria.includeSectorsEnabled ? 'Enabled' : 'Disabled'}
-              </button>
-            </div>
-          </div>
-
-          <div className="p-6 space-y-4">
-            {/* Add New Sector */}
-            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
-              <div className="flex items-center gap-3">
-                <select
-                  value={newSector}
-                  onChange={(e) => setNewSector(e.target.value)}
-                  disabled={!criteria.includeSectorsEnabled}
-                  className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500/50 ${
-                    !criteria.includeSectorsEnabled ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  <option value="">Select a sector to include...</option>
-                  {COMMON_SECTORS.map((sector) => (
-                    <option key={sector} value={sector} disabled={criteria.includeSectors.includes(sector)}>
-                      {sector}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  onClick={addIncludeSector}
-                  disabled={!criteria.includeSectorsEnabled || !newSector.trim()}
-                  className={`px-4 py-3 bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 rounded-lg text-green-400 font-medium transition-colors flex items-center gap-2 ${
-                    (!criteria.includeSectorsEnabled || !newSector.trim()) ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  <Plus className="w-4 h-4" />
-                  Add
-                </button>
-              </div>
-            </div>
-
-            {/* Included Sectors List */}
-            {criteria.includeSectors.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {criteria.includeSectors.map((sector) => (
-                  <div key={sector} className="bg-slate-950/50 border border-slate-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-400" />
-                    <span className="text-white text-sm font-medium">Sector: {sector}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeIncludeSector(sector)}
-                      disabled={!criteria.includeSectorsEnabled}
-                      className={`p-1 hover:bg-green-500/20 rounded text-green-400 transition-colors ${
-                        !criteria.includeSectorsEnabled ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-slate-400 text-sm italic text-center py-2">
-                No sectors selected. All sectors will be included when enabled.
-              </div>
-            )}
-          </div>
-        </div>
-
         {/* Match Score Filter */}
         <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
           <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border-b border-blue-500/30 p-4">
@@ -1954,7 +1868,7 @@ export default function CriteriaForm() {
                       onClick={() => removeSector(sector)}
                       disabled={criteria.sectorFilterMode === 'disabled'}
                       className={`p-1 hover:bg-red-500/20 rounded text-red-400 transition-colors ${
-                        !criteria.sectorsEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                        criteria.sectorFilterMode === 'disabled' ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -2043,7 +1957,7 @@ export default function CriteriaForm() {
                         onClick={() => removeCountry(countryCode)}
                         disabled={criteria.countryFilterMode === 'disabled'}
                         className={`p-1 hover:bg-orange-500/20 rounded text-orange-400 transition-colors ${
-                          !criteria.countriesEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                          criteria.countryFilterMode === 'disabled' ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                       >
                         <Trash2 className="w-4 h-4" />

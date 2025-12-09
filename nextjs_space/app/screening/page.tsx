@@ -579,19 +579,19 @@ export default async function ScreeningPage({
                     <span className="text-white font-semibold capitalize">Filters stocks with {CRITERIA.sentimentFilter} social sentiment</span>
                   </div>
                 )}
-                {CRITERIA.sectorsEnabled && CRITERIA.excludeSectors.length > 0 && (
+                {CRITERIA.sectorFilterMode === 'exclude' && CRITERIA.sectorFilter.length > 0 && (
                   <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-red-500/30">
                     <CheckCircle2 className="w-3 h-3 text-red-400 flex-shrink-0" />
                     <span className="text-slate-400">Sector Exclusions:</span>
-                    <span className="text-white font-semibold">Excludes stocks in the following sectors: {CRITERIA.excludeSectors.join(', ')}</span>
+                    <span className="text-white font-semibold">Excludes stocks in the following sectors: {CRITERIA.sectorFilter.join(', ')}</span>
                   </div>
                 )}
                 
-                {CRITERIA.includeSectorsEnabled && CRITERIA.includeSectors.length > 0 && (
+                {CRITERIA.sectorFilterMode === 'include' && CRITERIA.sectorFilter.length > 0 && (
                   <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-green-500/30">
                     <CheckCircle2 className="w-3 h-3 text-green-400 flex-shrink-0" />
                     <span className="text-slate-400">Sector Inclusion:</span>
-                    <span className="text-white font-semibold">Shows only stocks in: {CRITERIA.includeSectors.join(', ')}</span>
+                    <span className="text-white font-semibold">Shows only stocks in: {CRITERIA.sectorFilter.join(', ')}</span>
                   </div>
                 )}
                 
@@ -603,17 +603,25 @@ export default async function ScreeningPage({
                   </div>
                 )}
                 
-                {CRITERIA.countriesEnabled && CRITERIA.excludeCountries.length > 0 && (
+                {CRITERIA.countryFilterMode === 'exclude' && CRITERIA.countryFilter.length > 0 && (
                   <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-orange-500/30">
                     <CheckCircle2 className="w-3 h-3 text-orange-400 flex-shrink-0" />
                     <span className="text-slate-400">Country Exclusions:</span>
-                    <span className="text-white font-semibold">Excludes stocks from the following countries: {CRITERIA.excludeCountries.map(getCountryName).join(', ')}</span>
+                    <span className="text-white font-semibold">Excludes stocks from the following countries: {CRITERIA.countryFilter.map(getCountryName).join(', ')}</span>
+                  </div>
+                )}
+                
+                {CRITERIA.countryFilterMode === 'include' && CRITERIA.countryFilter.length > 0 && (
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-green-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-green-400 flex-shrink-0" />
+                    <span className="text-slate-400">Country Inclusion:</span>
+                    <span className="text-white font-semibold">Shows only stocks from: {CRITERIA.countryFilter.map(getCountryName).join(', ')}</span>
                   </div>
                 )}
               </div>
               {!CRITERIA.peEnabled && !CRITERIA.pbEnabled && !CRITERIA.marketCapEnabled && !CRITERIA.betaEnabled && 
                !CRITERIA.roeEnabled && !CRITERIA.profitMarginEnabled && !CRITERIA.sentimentEnabled && 
-               !CRITERIA.sectorsEnabled && !CRITERIA.countriesEnabled && (
+               CRITERIA.sectorFilterMode === 'disabled' && CRITERIA.countryFilterMode === 'disabled' && (
                 <p className="text-slate-400 text-xs italic">No criteria currently enabled. All stocks will be shown.</p>
               )}
             </div>
