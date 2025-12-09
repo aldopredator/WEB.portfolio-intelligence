@@ -108,11 +108,11 @@ export default function PriceHistoryChart({
           const alignedBenchmark = normalizedData.map(d => {
             const normalizedDate = new Date(d.date).toISOString().split('T')[0];
             const price = benchmarkMap.get(normalizedDate) || 0;
-            return { date: d.date, price };
+            return { date: d.date, price: price as number };
           });
           
           console.log('[PriceHistoryChart] Aligned benchmark data sample:', alignedBenchmark.slice(0, 3));
-          console.log('[PriceHistoryChart] Non-zero benchmark prices:', alignedBenchmark.filter(d => d.price > 0).length);
+          console.log('[PriceHistoryChart] Non-zero benchmark prices:', alignedBenchmark.filter((d: { date: string; price: number }) => d.price > 0).length);
           
           setBenchmarkData(alignedBenchmark);
         }
