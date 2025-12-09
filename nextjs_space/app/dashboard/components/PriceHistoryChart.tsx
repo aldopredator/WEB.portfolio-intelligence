@@ -82,7 +82,7 @@ export default function PriceHistoryChart({
               a.ticker.localeCompare(b.ticker)
             ); // Sort alphabetically by ticker
           console.log('[PriceHistoryChart] Available tickers for comparison:', tickers.length);
-          console.log('[PriceHistoryChart] Includes CW8U.PA?', tickers.some(t => t.ticker === 'CW8U.PA'));
+          console.log('[PriceHistoryChart] Includes CW8U.PA?', tickers.some((t: { ticker: string; company: string; portfolioName: string }) => t.ticker === 'CW8U.PA'));
           setAvailableTickers(tickers);
         }
       } catch (error) {
