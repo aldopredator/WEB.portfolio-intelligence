@@ -69,7 +69,8 @@ export default function PriceHistoryChart({
               ticker: s.ticker,
               company: s.company,
               portfolioName: s.portfolio?.name || 'No Portfolio',
-            }));
+            }))
+            .sort((a, b) => a.ticker.localeCompare(b.ticker)); // Sort alphabetically by ticker
           setAvailableTickers(tickers);
         }
       } catch (error) {
