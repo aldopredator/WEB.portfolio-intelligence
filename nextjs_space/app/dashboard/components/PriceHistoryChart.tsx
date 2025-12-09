@@ -77,18 +77,28 @@ export default function PriceHistoryChart({
     const fetchBenchmarkData = async () => {
       setIsLoadingBenchmark(true);
       try {
-        const response = await fetch('/api/stock?ticker=CW8');
+        // Fetch all stocks and find CW8
+        const response = await fetch('/api/stock');
         if (response.ok) {
-          const stockData = await response.json();
-          const priceHistory = stockData.price_history || [];
+          const data = await response.json();
+          const stocks = data.stocks || [];
+          const cw8Stock = stocks.find((s: any) => s.ticker === 'CW8');
+          
+          if (!cw8Stock) {
+            console.warn('[PriceHistoryChart] CW8 not found in portfolio');
+            setBenchmarkData([]);
+            return;
+          }
+          
+          const priceHistory = cw8Stock.priceHistory || [];
           
           console.log('[PriceHistoryChart] CW8 data received:', priceHistory.length, 'data points');
           console.log('[PriceHistoryChart] First CW8 point:', priceHistory[0]);
           
-          // Normalize benchmark data (same as main stock data)
+          // Normalize benchmark data - priceHistory has { date, price } format
           const normalizedBenchmark = priceHistory.map((d: any) => ({
-            date: ('date' in d ? d.date : d.Date) as string,
-            price: (('price' in d ? d.price : d.Close) || 0) as number,
+            date: d.date instanceof Date ? d.date.toISOString().split('T')[0] : d.date,
+            price: d.price || 0,
           }));
           
           console.log('[PriceHistoryChart] Normalized benchmark sample:', normalizedBenchmark.slice(0, 3));
@@ -97,7 +107,7 @@ export default function PriceHistoryChart({
           // Create a map for quick date lookups (normalize dates to YYYY-MM-DD for comparison)
           const benchmarkMap = new Map(
             normalizedBenchmark.map((d: { date: string; price: number }) => {
-              const normalizedDate = new Date(d.date).toISOString().split('T')[0];
+              const normalizedDate = typeof d.date === 'string' ? d.date.split('T')[0] : d.date;
               return [normalizedDate, d.price];
             })
           );
@@ -106,7 +116,7 @@ export default function PriceHistoryChart({
           
           // Align benchmark data with the stock's date range
           const alignedBenchmark = normalizedData.map(d => {
-            const normalizedDate = new Date(d.date).toISOString().split('T')[0];
+            const normalizedDate = typeof d.date === 'string' ? d.date.split('T')[0] : new Date(d.date).toISOString().split('T')[0];
             const price = benchmarkMap.get(normalizedDate) || 0;
             return { date: d.date, price: price as number };
           });
