@@ -19,15 +19,36 @@ export async function DELETE(request: NextRequest) {
 
     console.log('[Delete Ticker API] Deleting ticker:', ticker);
 
-    // Check if ticker exists
+    // Check if ticker exists and get portfolio info
     const existingStock = await prisma.stock.findUnique({
       where: { ticker },
+      include: {
+        portfolio: {
+          select: {
+            id: true,
+            name: true,
+            isLocked: true,
+          }
+        }
+      }
     });
 
     if (!existingStock) {
       return NextResponse.json(
         { error: 'Ticker not found' },
         { status: 404 }
+      );
+    }
+
+    // Check if the portfolio is locked
+    if (existingStock.portfolio?.isLocked) {
+      return NextResponse.json(
+        { 
+          error: `Cannot delete ${ticker}. The portfolio "${existingStock.portfolio.name}" is locked. Please unlock it in the Portfolios tab first.`,
+          isLocked: true,
+          portfolioName: existingStock.portfolio.name
+        },
+        { status: 403 }
       );
     }
 

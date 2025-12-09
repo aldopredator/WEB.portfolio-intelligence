@@ -179,6 +179,8 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
   const handleDeleteTicker = async (ticker: string, isLocked: boolean, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent ticker selection when clicking delete
     
+    console.log('[DashboardClient] Delete attempt:', { ticker, isLocked });
+    
     if (isLocked) {
       setSnackbarMessage(`❌ Cannot delete ${ticker}. This portfolio is locked. Please unlock it in the Portfolios tab first.`);
       setSnackbarSeverity('error');

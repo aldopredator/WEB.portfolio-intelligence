@@ -48,6 +48,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     return acc;
   }, {} as Record<string, { rating: number; ratingUpdatedAt: Date | null; portfolioId: string | null; isLocked: boolean }>);
 
+  console.log('[DashboardPage] 📊 Stock ratings with lock status:', JSON.stringify(
+    Object.entries(stockRatings).map(([ticker, data]) => ({ 
+      ticker, 
+      portfolioId: data.portfolioId, 
+      isLocked: data.isLocked 
+    })), 
+    null, 2
+  ));
+
   await prisma.$disconnect();
 
   // Debug: Check if Polygon data exists
