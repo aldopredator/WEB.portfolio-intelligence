@@ -55,6 +55,13 @@ export default function PriceHistoryChart({
   const [benchmarkData, setBenchmarkData] = useState<Array<{ date: string; price: number }>>([]);
   const [isLoadingBenchmark, setIsLoadingBenchmark] = useState(false);
 
+  // Reset comparison when ticker changes
+  useEffect(() => {
+    setCompareTicker('');
+    setAvailableTickers([]);
+    setBenchmarkData([]);
+  }, [ticker]);
+
   // Fetch available tickers for comparison (only from BENCHMARK portfolio)
   useEffect(() => {
     const fetchTickers = async () => {
@@ -94,8 +101,8 @@ export default function PriceHistoryChart({
           setAvailableTickers(tickers);
           
           // Set first benchmark ticker as default if available
-          if (tickers.length > 0 && !compareTicker && ticker !== tickers[0].ticker) {
-            console.log(`[PriceHistoryChart] Setting ${tickers[0].ticker} as default comparison`);
+          if (tickers.length > 0) {
+            console.log(`[PriceHistoryChart] Auto-selecting ${tickers[0].ticker} as default comparison`);
             setCompareTicker(tickers[0].ticker);
           }
         } else {
