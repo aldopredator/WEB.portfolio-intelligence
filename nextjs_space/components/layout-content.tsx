@@ -1,24 +1,10 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import { SidebarNavigation } from '@/components/sidebar-navigation';
 import { GlobalHeader } from '@/components/global-header';
 import { PortfolioProvider } from '@/lib/portfolio-context';
 
 export function LayoutContent({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isAuthPage = pathname === '/login' || pathname === '/signup';
-
-  if (isAuthPage) {
-    // Simplified layout for auth pages
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        {children}
-      </div>
-    );
-  }
-
-  // Full layout with navigation for authenticated pages
   return (
     <PortfolioProvider>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
