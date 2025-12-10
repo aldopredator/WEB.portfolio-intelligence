@@ -320,9 +320,14 @@ export default function PriceHistoryChart({
               <MenuItem value="">
                 <em>None - Show absolute price</em>
               </MenuItem>
+              {availableTickers.length === 0 && (
+                <MenuItem disabled>
+                  <em>No benchmarks found - Add tickers to "BENCHMARK" portfolio</em>
+                </MenuItem>
+              )}
               {availableTickers.map((t) => (
                 <MenuItem key={t.ticker} value={t.ticker}>
-                  <strong>{t.ticker}</strong> - {t.company} <Typography component="span" sx={{ color: 'text.secondary', ml: 1 }}>({t.portfolioName})</Typography>
+                  <strong>{t.ticker}</strong> - {t.company}
                 </MenuItem>
               ))}
             </Select>
