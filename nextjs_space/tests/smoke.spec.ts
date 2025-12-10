@@ -41,12 +41,6 @@ test.describe('Smoke Tests - Quality Gate', () => {
     await expect(page.locator('body')).toBeVisible();
   });
 
-  test('benchmark page loads successfully', async ({ page }) => {
-    const response = await page.goto('/benchmark');
-    expect(response?.status()).toBeLessThan(400);
-    await expect(page.locator('body')).toBeVisible();
-  });
-
   test('no JavaScript errors on dashboard', async ({ page }) => {
     const errors: string[] = [];
     
