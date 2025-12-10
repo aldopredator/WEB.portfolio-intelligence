@@ -1,21 +1,31 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import Link from 'next/link';
+import { CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown, ExternalLink } from 'lucide-react';
 
-type SortField = 'ticker' | 'sector' | 'pe' | 'pb' | 'marketCap' | 'beta' | 'roe' | 'profitMargin' | 'sentiment' | 'matchScore';
+type SortField = 'ticker' | 'sector' | 'portfolio' | 'rating' | 'updatedAt' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'avgAnnualVolume10D' | 'avgAnnualVolume3M' | 'beta' | 'roe' | 'profitMargin' | 'debtToEquity' | 'sentiment' | 'matchScore';
 type SortDirection = 'asc' | 'desc';
 
 interface Stock {
   ticker: string;
   name: string;
   sector: string;
+  portfolio: string;
+  portfolioId: string;
+  rating: number;
+  updatedAt: Date;
   pe: string;
   pb: string;
+  priceToSales: string;
   marketCap: string;
+  avgVolume: string;
+  avgAnnualVolume10D: string;
+  avgAnnualVolume3M: string;
   beta: string;
   roe: string;
   profitMargin: string;
+  debtToEquity: string;
   sentiment: string;
   matchScore: number;
 }
@@ -29,13 +39,31 @@ interface ScreeningTableProps {
     betaEnabled: boolean;
     roeEnabled: boolean;
     profitMarginEnabled: boolean;
+    debtToEquityEnabled: boolean;
     sentimentEnabled: boolean;
+    ratingEnabled: boolean;
+    avgAnnualVolume10DEnabled: boolean;
+    avgAnnualVolume3MEnabled: boolean;
   };
 }
 
 export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps) {
   const [sortField, setSortField] = useState<SortField>('matchScore');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+
+  const formatDate = (date: Date) => {
+    const d = new Date(date);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+    return d.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+  };
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -52,12 +80,21 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
       let bVal: any = b[sortField];
 
       // Convert string numbers to actual numbers for sorting
-      if (sortField === 'pe' || sortField === 'pb' || sortField === 'beta' || sortField === 'roe' || sortField === 'profitMargin') {
+      if (sortField === 'rating') {
+        aVal = a.rating;
+        bVal = b.rating;
+      } else if (sortField === 'updatedAt') {
+        aVal = new Date(a.updatedAt).getTime();
+        bVal = new Date(b.updatedAt).getTime();
+      } else if (sortField === 'pe' || sortField === 'pb' || sortField === 'priceToSales' || sortField === 'beta' || sortField === 'roe' || sortField === 'profitMargin' || sortField === 'debtToEquity') {
         aVal = aVal === 'N/A' ? -Infinity : parseFloat(aVal);
         bVal = bVal === 'N/A' ? -Infinity : parseFloat(bVal);
       } else if (sortField === 'marketCap') {
         aVal = aVal === 'N/A' ? -Infinity : parseFloat(aVal.replace(/[$B]/g, ''));
         bVal = bVal === 'N/A' ? -Infinity : parseFloat(bVal.replace(/[$B]/g, ''));
+      } else if (sortField === 'avgVolume') {
+        aVal = aVal === 'N/A' ? -Infinity : parseFloat(aVal.replace(/[M]/g, ''));
+        bVal = bVal === 'N/A' ? -Infinity : parseFloat(bVal.replace(/[M]/g, ''));
       } else if (sortField === 'matchScore') {
         aVal = a.matchScore;
         bVal = b.matchScore;
@@ -88,8 +125,14 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
         <table className="w-full">
           <thead>
             <tr className="bg-gradient-to-r from-slate-950/50 to-slate-900/50 border-b border-slate-800/50">
-              <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
-                Logo
+              <th 
+                className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('portfolio')}
+              >
+                <div className="flex items-center gap-2">
+                  Portfolio
+                  <SortIcon field="portfolio" />
+                </div>
               </th>
               <th 
                 className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
@@ -98,6 +141,24 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                 <div className="flex items-center gap-2">
                   Stock
                   <SortIcon field="ticker" />
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-center text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('rating')}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  Rating
+                  <SortIcon field="rating" />
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-center text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('updatedAt')}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  Last Updated
+                  <SortIcon field="updatedAt" />
                 </div>
               </th>
               <th 
@@ -115,7 +176,7 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   onClick={() => handleSort('pe')}
                 >
                   <div className="flex items-center justify-end gap-2">
-                    P/E Ratio
+                    P/E
                     <SortIcon field="pe" />
                   </div>
                 </th>
@@ -126,11 +187,20 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   onClick={() => handleSort('pb')}
                 >
                   <div className="flex items-center justify-end gap-2">
-                    P/B Ratio
+                    P/B
                     <SortIcon field="pb" />
                   </div>
                 </th>
               )}
+              <th 
+                className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('priceToSales')}
+              >
+                <div className="flex items-center justify-end gap-2">
+                  P/S
+                  <SortIcon field="priceToSales" />
+                </div>
+              </th>
               {criteria.marketCapEnabled && (
                 <th 
                   className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
@@ -139,6 +209,37 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   <div className="flex items-center justify-end gap-2">
                     Market Cap
                     <SortIcon field="marketCap" />
+                  </div>
+                </th>
+              )}
+              <th 
+                className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('avgVolume')}
+              >
+                <div className="flex items-center justify-end gap-2">
+                  Avg Volume
+                  <SortIcon field="avgVolume" />
+                </div>
+              </th>
+              {criteria.avgAnnualVolume10DEnabled && (
+                <th 
+                  className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                  onClick={() => handleSort('avgAnnualVolume10D')}
+                >
+                  <div className="flex items-center justify-end gap-2">
+                    Annual Vol % (10D)
+                    <SortIcon field="avgAnnualVolume10D" />
+                  </div>
+                </th>
+              )}
+              {criteria.avgAnnualVolume3MEnabled && (
+                <th 
+                  className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                  onClick={() => handleSort('avgAnnualVolume3M')}
+                >
+                  <div className="flex items-center justify-end gap-2">
+                    Annual Vol % (3M)
+                    <SortIcon field="avgAnnualVolume3M" />
                   </div>
                 </th>
               )}
@@ -175,6 +276,17 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   </div>
                 </th>
               )}
+              {criteria.debtToEquityEnabled && (
+                <th 
+                  className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                  onClick={() => handleSort('debtToEquity')}
+                >
+                  <div className="flex items-center justify-end gap-2">
+                    Debt/Equity
+                    <SortIcon field="debtToEquity" />
+                  </div>
+                </th>
+              )}
               {criteria.sentimentEnabled && (
                 <th 
                   className="px-6 py-4 text-center text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
@@ -204,23 +316,39 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                 className="hover:bg-slate-800/30 transition-all group"
               >
                 <td className="px-6 py-5">
-                  <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden">
-                    <img 
-                      src={`/logos/${stock.ticker}.svg`} 
-                      alt={stock.ticker}
-                      className="w-8 h-8 object-contain"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        target.parentElement!.innerHTML = `<span class="text-slate-400 font-bold text-sm">${stock.ticker.substring(0, 3)}</span>`;
-                      }}
-                    />
+                  <span className="inline-block px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-400 text-xs font-medium">
+                    {stock.portfolio}
+                  </span>
+                </td>
+                <td className="px-6 py-5">
+                  <Link 
+                    href={`https://www.portfolio-intelligence.co.uk/?stock=${stock.ticker}&portfolio=${stock.portfolioId}`}
+                    className="group/link block hover:bg-slate-800/30 -mx-2 px-2 py-1 rounded-lg transition-all"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <div className="text-white font-bold text-lg group-hover/link:text-blue-400 transition-colors">{stock.ticker}</div>
+                        <div className="text-slate-400 text-sm mt-1">{stock.name}</div>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-slate-600 group-hover/link:text-blue-400 opacity-0 group-hover/link:opacity-100 transition-all" />
+                    </div>
+                  </Link>
+                </td>
+                <td className="px-6 py-5">
+                  <div className="flex items-center justify-center gap-0.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span key={star} className={star <= stock.rating ? 'text-yellow-400' : 'text-slate-600'}>
+                        {star <= stock.rating ? '★' : '☆'}
+                      </span>
+                    ))}
                   </div>
                 </td>
                 <td className="px-6 py-5">
-                  <div>
-                    <div className="text-white font-bold text-lg">{stock.ticker}</div>
-                    <div className="text-slate-400 text-sm mt-1">{stock.name}</div>
+                  <div className="text-center">
+                    <div className="text-slate-300 text-sm font-medium">{formatDate(stock.updatedAt)}</div>
+                    <div className="text-slate-500 text-xs mt-1">
+                      {new Date(stock.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </div>
                   </div>
                 </td>
                 <td className="px-6 py-5">
@@ -238,9 +366,25 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                     <span className="text-emerald-400 font-mono font-bold text-lg">{stock.pb}</span>
                   </td>
                 )}
+                <td className="px-6 py-5 text-right">
+                  <span className="text-emerald-400 font-mono font-bold text-lg">{stock.priceToSales}</span>
+                </td>
                 {criteria.marketCapEnabled && (
                   <td className="px-6 py-5 text-right">
                     <span className="text-purple-400 font-mono font-bold text-lg">{stock.marketCap}</span>
+                  </td>
+                )}
+                <td className="px-6 py-5 text-right">
+                  <span className="text-purple-400 font-mono font-bold text-lg">{stock.avgVolume}</span>
+                </td>
+                {criteria.avgAnnualVolume10DEnabled && (
+                  <td className="px-6 py-5 text-right">
+                    <span className="text-purple-400 font-mono font-bold text-lg">{stock.avgAnnualVolume10D}</span>
+                  </td>
+                )}
+                {criteria.avgAnnualVolume3MEnabled && (
+                  <td className="px-6 py-5 text-right">
+                    <span className="text-purple-400 font-mono font-bold text-lg">{stock.avgAnnualVolume3M}</span>
                   </td>
                 )}
                 {criteria.betaEnabled && (
@@ -256,6 +400,11 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                 {criteria.profitMarginEnabled && (
                   <td className="px-6 py-5 text-right">
                     <span className="text-purple-400 font-mono font-bold text-lg">{stock.profitMargin}</span>
+                  </td>
+                )}
+                {criteria.debtToEquityEnabled && (
+                  <td className="px-6 py-5 text-right">
+                    <span className="text-purple-400 font-mono font-bold text-lg">{stock.debtToEquity}</span>
                   </td>
                 )}
                 {criteria.sentimentEnabled && (

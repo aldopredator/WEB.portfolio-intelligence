@@ -1,11 +1,14 @@
 import { CheckCircle2, Filter, Info, AlertTriangle } from 'lucide-react';
 import { PageHeader } from '@/components/page-header';
-import { getStockData, STOCK_CONFIG } from '@/lib/stock-data';
+import { getStockData } from '@/lib/stock-data';
 import { parseCriteriaFromParams } from '@/lib/screening-criteria';
 import ScreeningClient from './ScreeningClient';
 import ScreeningTable from './ScreeningTable';
+import { PrismaClient } from '@prisma/client';
 
-export const revalidate = 1800; // 30 minutes
+const prisma = new PrismaClient();
+
+export const revalidate = 0; // Revalidate on every request to show latest portfolio names
 
 // Country code to name mapping (matches Finnhub API format)
 const COUNTRY_NAMES: Record<string, string> = {
@@ -45,12 +48,30 @@ export default async function ScreeningPage({
   // Parse criteria from URL parameters (or use defaults)
   const CRITERIA = parseCriteriaFromParams(new URLSearchParams(searchParams as Record<string, string>));
   
+  // Fetch stocks from database with portfolio information
+  const dbStocks = await prisma.stock.findMany({
+    where: { isActive: true },
+    select: {
+      ticker: true,
+      company: true,
+      type: true,
+      rating: true,
+      updatedAt: true,
+      portfolio: {
+        select: { 
+          name: true,
+          id: true
+        }
+      }
+    }
+  });
+  
   // Fetch real stock data
-  const stockData = await getStockData();
+  const allStockData = await getStockData();
   
   // Build screening results from real data with actual filtering
-  const recommendedStocks = STOCK_CONFIG.map((config) => {
-    const data = stockData[config.ticker];
+  const recommendedStocks = dbStocks.map((stock) => {
+    const data: any = allStockData[stock.ticker];
     const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
     const companyProfile = data && typeof data === 'object' && 'company_profile' in data ? data.company_profile : null;
     
@@ -86,6 +107,29 @@ export default async function ScreeningPage({
       passes.profitMargin = stockInfo.profit_margin >= CRITERIA.minProfitMargin;
     }
     
+    if (CRITERIA.priceToSalesEnabled && stockInfo.priceToSales !== undefined) {
+      passes.priceToSales = stockInfo.priceToSales >= CRITERIA.minPriceToSales && stockInfo.priceToSales <= CRITERIA.maxPriceToSales;
+    }
+    
+    if (CRITERIA.avgDailyVolumeEnabled && stockInfo.averageVolume !== undefined) {
+      const avgVolumeM = stockInfo.averageVolume / 1e6; // Convert to millions
+      passes.avgVolume = avgVolumeM >= CRITERIA.minAvgDailyVolume && avgVolumeM <= CRITERIA.maxAvgDailyVolume;
+    }
+    
+    if (CRITERIA.avgAnnualVolume10DEnabled && stockInfo.averageVolume10Day !== undefined && stockInfo.floatShares !== undefined && stockInfo.floatShares > 0) {
+      const annualVolume10D = (stockInfo.averageVolume10Day * 250 / stockInfo.floatShares) * 100;
+      passes.avgAnnualVolume10D = annualVolume10D >= CRITERIA.minAvgAnnualVolume10D && annualVolume10D <= CRITERIA.maxAvgAnnualVolume10D;
+    }
+    
+    if (CRITERIA.avgAnnualVolume3MEnabled && stockInfo.averageVolume !== undefined && stockInfo.floatShares !== undefined && stockInfo.floatShares > 0) {
+      const annualVolume3M = (stockInfo.averageVolume * 250 / stockInfo.floatShares) * 100;
+      passes.avgAnnualVolume3M = annualVolume3M >= CRITERIA.minAvgAnnualVolume3M && annualVolume3M <= CRITERIA.maxAvgAnnualVolume3M;
+    }
+    
+    if (CRITERIA.debtToEquityEnabled && stockInfo.debtToEquity !== undefined) {
+      passes.debtToEquity = stockInfo.debtToEquity <= CRITERIA.maxDebtToEquity;
+    }
+    
     if (CRITERIA.sentimentEnabled && CRITERIA.sentimentFilter !== 'all') {
       const sentiment = data && typeof data === 'object' && 'social_sentiment' in data ? data.social_sentiment : null;
       if (sentiment && typeof sentiment === 'object' && 'positive' in sentiment && 'neutral' in sentiment && 'negative' in sentiment) {
@@ -109,180 +153,266 @@ export default async function ScreeningPage({
       }
     }
     
-    if (CRITERIA.sectorsEnabled) {
-      passes.sector = !CRITERIA.excludeSectors.includes(config.sector);
+    if (CRITERIA.ratingEnabled) {
+      const stockRating = stock.rating || 0;
+      if (CRITERIA.minRating === -1) {
+        // Filter for "Not Rated" - rating must be 0
+        passes.rating = stockRating === 0;
+      } else {
+        // Filter for rated stocks - rating must be >= minRating
+        passes.rating = stockRating >= CRITERIA.minRating;
+      }
     }
     
-    if (CRITERIA.countriesEnabled && companyProfile?.country) {
-      passes.country = !CRITERIA.excludeCountries.includes(companyProfile.country);
+    if (CRITERIA.portfolioFilterEnabled && CRITERIA.portfolioFilter.length > 0) {
+      const portfolioName = stock.portfolio?.name || '';
+      passes.portfolio = CRITERIA.portfolioFilter.includes(portfolioName);
+    }
+    
+    if (CRITERIA.sectorFilterMode !== 'disabled' && companyProfile?.industry) {
+      if (CRITERIA.sectorFilterMode === 'exclude') {
+        passes.sector = !CRITERIA.sectorFilter.includes(companyProfile.industry);
+      } else if (CRITERIA.sectorFilterMode === 'include' && CRITERIA.sectorFilter.length > 0) {
+        passes.sector = CRITERIA.sectorFilter.includes(companyProfile.industry);
+      }
+    }
+    
+    if (CRITERIA.countryFilterMode !== 'disabled' && companyProfile?.country) {
+      if (CRITERIA.countryFilterMode === 'exclude') {
+        passes.country = !CRITERIA.countryFilter.includes(companyProfile.country);
+      } else if (CRITERIA.countryFilterMode === 'include' && CRITERIA.countryFilter.length > 0) {
+        passes.country = CRITERIA.countryFilter.includes(companyProfile.country);
+      }
     }
 
     const totalCriteria = Object.keys(passes).length;
     const passCount = Object.values(passes).filter(Boolean).length;
     const matchScore = totalCriteria > 0 ? Math.round((passCount / totalCriteria) * 100) : 100;
 
-    // Only include stocks that pass all enabled criteria
-    if (matchScore < 100) {
+    // Apply match score filter if enabled, otherwise require 100% match
+    const requiredMatchScore = CRITERIA.matchScoreEnabled ? CRITERIA.minMatchScore : 100;
+    if (matchScore < requiredMatchScore) {
       return null;
     }
 
+    // Filter out stocks with missing portfolio assignment
+    if (!stock.portfolio?.name) {
+      return null;
+    }
+
+    // Build the initial stock data object
+    const sector = companyProfile?.industry || stock.type;
+    const pe = stockInfo.pe_ratio?.toFixed(0);
+    const pb = stockInfo.pb_ratio?.toFixed(0);
+    const priceToSales = stockInfo.priceToSales?.toFixed(0);
+    const marketCap = stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(0)}B` : null;
+    const avgVolume = stockInfo.averageVolume ? `${(stockInfo.averageVolume / 1e6).toFixed(0)}M` : null;
+    const avgAnnualVolume10D = (stockInfo.averageVolume10Day && stockInfo.floatShares && stockInfo.floatShares > 0)
+      ? `${((stockInfo.averageVolume10Day * 250 / stockInfo.floatShares) * 100).toFixed(0)}%`
+      : null;
+    const avgAnnualVolume3M = (stockInfo.averageVolume && stockInfo.floatShares && stockInfo.floatShares > 0)
+      ? `${((stockInfo.averageVolume * 250 / stockInfo.floatShares) * 100).toFixed(0)}%`
+      : null;
+    const beta = stockInfo.beta?.toFixed(2);
+    const roe = stockInfo.roe ? `${stockInfo.roe.toFixed(0)}%` : null;
+    const profitMargin = stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(0)}%` : null;
+    const debtToEquity = stockInfo.debtToEquity?.toFixed(0);
+    const sentiment = data && typeof data === 'object' && 'sentiment_data' in data
+      ? (data.sentiment_data as any)?.overall_sentiment
+      : null;
+
+    // Calculate data completeness score for key fields
+    const keyFields = [sector, pe, pb, priceToSales, marketCap, avgVolume];
+    const availableFields = keyFields.filter(field => field !== null && field !== undefined).length;
+    const totalKeyFields = keyFields.length;
+    const dataCompletenessScore = Math.round((availableFields / totalKeyFields) * 100);
+    
+    // Adjust match score based on data completeness
+    // If stock passes criteria filters but has missing data, reduce match score proportionally
+    const adjustedMatchScore = Math.round((matchScore * dataCompletenessScore) / 100);
+
     return {
-      ticker: config.ticker,
-      name: config.name,
-      sector: config.sector,
-      pe: stockInfo.pe_ratio?.toFixed(0) || 'N/A',
-      pb: stockInfo.pb_ratio?.toFixed(0) || 'N/A',
-      marketCap: stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(0)}B` : 'N/A',
-      beta: stockInfo.beta?.toFixed(0) || 'N/A',
-      roe: stockInfo.roe ? `${stockInfo.roe.toFixed(0)}%` : 'N/A',
-      profitMargin: stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(0)}%` : 'N/A',
-      sentiment: data && typeof data === 'object' && 'sentiment_data' in data 
-        ? (data.sentiment_data as any)?.overall_sentiment || 'N/A'
-        : 'N/A',
-      matchScore,
+      ticker: stock.ticker,
+      name: stock.company,
+      sector: sector || 'N/A',
+      portfolio: stock.portfolio.name,
+      portfolioId: stock.portfolio.id,
+      rating: stock.rating || 0,
+      updatedAt: stock.updatedAt,
+      pe: pe || 'N/A',
+      pb: pb || 'N/A',
+      priceToSales: priceToSales || 'N/A',
+      marketCap: marketCap || 'N/A',
+      avgVolume: avgVolume || 'N/A',
+      avgAnnualVolume10D: avgAnnualVolume10D || 'N/A',
+      avgAnnualVolume3M: avgAnnualVolume3M || 'N/A',
+      beta: beta || 'N/A',
+      roe: roe || 'N/A',
+      profitMargin: profitMargin || 'N/A',
+      debtToEquity: debtToEquity || 'N/A',
+      sentiment: sentiment || 'N/A',
+      matchScore: adjustedMatchScore,
     };
   }).filter((stock): stock is NonNullable<typeof stock> => stock !== null);
+
+  await prisma.$disconnect();
 
   return (
     <ScreeningClient>
       <main className="min-h-screen">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         {/* Active Criteria Display */}
-        <div className="mb-6 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-800/30 rounded-xl p-6 backdrop-blur-sm">
-          <div className="flex items-start gap-4">
+        <div className="mb-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-800/30 rounded-lg px-4 py-2 backdrop-blur-sm">
+          <div className="flex items-center gap-3">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center border border-blue-500/20">
-                <Info className="w-5 h-5 text-blue-400" />
+              <div className="w-6 h-6 bg-blue-500/10 rounded-lg flex items-center justify-center border border-blue-500/20">
+                <Info className="w-3 h-3 text-blue-400" />
               </div>
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-blue-400 mb-3">Active Screening Criteria</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                <div className={`bg-slate-900/50 border rounded-lg p-3 ${
-                  CRITERIA.peEnabled ? 'border-emerald-500/30' : 'border-slate-800/50 opacity-50'
-                }`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-slate-400">P/E Ratio</p>
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      CRITERIA.peEnabled ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-500/10 text-slate-500'
-                    }`}>
-                      {CRITERIA.peEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
+              <h3 className="text-sm font-semibold text-blue-400 mb-1">Active Screening Criteria</h3>
+              <div className="flex flex-wrap items-center gap-3 text-xs">
+                {CRITERIA.peEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-emerald-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">P/E Ratio</span>
+                    <span className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPE}</span>
                   </div>
-                  <p className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPE}</p>
-                </div>
-                <div className={`bg-slate-900/50 border rounded-lg p-3 ${
-                  CRITERIA.pbEnabled ? 'border-emerald-500/30' : 'border-slate-800/50 opacity-50'
-                }`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-slate-400">P/B Ratio</p>
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      CRITERIA.pbEnabled ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-500/10 text-slate-500'
-                    }`}>
-                      {CRITERIA.pbEnabled ? 'Enabled' : 'Disabled'}
-                    </span>
+                )}
+                {CRITERIA.pbEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-emerald-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">P/B Ratio</span>
+                    <span className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPB}</span>
                   </div>
-                  <p className="text-white font-mono font-semibold">&lt; {CRITERIA.maxPB}</p>
-                </div>
+                )}
+                
+                {CRITERIA.priceToSalesEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">P/S Range</span>
+                    <span className="text-white font-mono font-semibold">{CRITERIA.minPriceToSales} - {CRITERIA.maxPriceToSales}</span>
+                  </div>
+                )}
+                
+                {CRITERIA.avgDailyVolumeEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Avg Volume Range</span>
+                    <span className="text-white font-mono font-semibold">{CRITERIA.minAvgDailyVolume}M - {CRITERIA.maxAvgDailyVolume}M</span>
+                  </div>
+                )}
+                
+                {CRITERIA.avgAnnualVolume10DEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Avg Annual Volume % (10D)</span>
+                    <span className="text-white font-mono font-semibold">{CRITERIA.minAvgAnnualVolume10D}% - {CRITERIA.maxAvgAnnualVolume10D}%</span>
+                  </div>
+                )}
+                
+                {CRITERIA.avgAnnualVolume3MEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Avg Annual Volume % (3M)</span>
+                    <span className="text-white font-mono font-semibold">{CRITERIA.minAvgAnnualVolume3M}% - {CRITERIA.maxAvgAnnualVolume3M}%</span>
+                  </div>
+                )}
+                
+                {CRITERIA.debtToEquityEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Max Debt/Equity</span>
+                    <span className="text-white font-mono font-semibold">&lt; {CRITERIA.maxDebtToEquity}</span>
+                  </div>
+                )}
                 
                 {CRITERIA.marketCapEnabled && (
-                  <div className="bg-slate-900/50 border border-purple-500/30 rounded-lg p-3 col-span-1 md:col-span-2">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-slate-400">Market Cap Range</p>
-                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400">
-                        Enabled
-                      </span>
-                    </div>
-                    <p className="text-white font-mono font-semibold">${CRITERIA.minMarketCap}B - ${CRITERIA.maxMarketCap}B</p>
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Market Cap Range</span>
+                    <span className="text-white font-mono font-semibold">${CRITERIA.minMarketCap}B - ${CRITERIA.maxMarketCap}B</span>
                   </div>
                 )}
                 
                 {CRITERIA.betaEnabled && (
-                  <div className="bg-slate-900/50 border border-purple-500/30 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-slate-400">Beta Range</p>
-                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400">
-                        Enabled
-                      </span>
-                    </div>
-                    <p className="text-white font-mono font-semibold">{CRITERIA.minBeta.toFixed(2)} - {CRITERIA.maxBeta.toFixed(2)}</p>
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Beta Range</span>
+                    <span className="text-white font-mono font-semibold">{CRITERIA.minBeta.toFixed(2)} - {CRITERIA.maxBeta.toFixed(2)}</span>
                   </div>
                 )}
                 
                 {CRITERIA.roeEnabled && (
-                  <div className="bg-slate-900/50 border border-purple-500/30 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-slate-400">Min ROE</p>
-                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400">
-                        Enabled
-                      </span>
-                    </div>
-                    <p className="text-white font-mono font-semibold">&gt; {CRITERIA.minROE}%</p>
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Min ROE</span>
+                    <span className="text-white font-mono font-semibold">&gt; {CRITERIA.minROE}%</span>
                   </div>
                 )}
                 
                 {CRITERIA.profitMarginEnabled && (
-                  <div className="bg-slate-900/50 border border-purple-500/30 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-slate-400">Min Profit Margin</p>
-                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400">
-                        Enabled
-                      </span>
-                    </div>
-                    <p className="text-white font-mono font-semibold">&gt; {CRITERIA.minProfitMargin}%</p>
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Min Profit Margin</span>
+                    <span className="text-white font-mono font-semibold">&gt; {CRITERIA.minProfitMargin}%</span>
                   </div>
                 )}
                 
                 {CRITERIA.sentimentEnabled && (
-                  <div className="bg-slate-900/50 border border-purple-500/30 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-slate-400">Sentiment Filter</p>
-                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400">
-                        Enabled
-                      </span>
-                    </div>
-                    <p className="text-white font-mono font-semibold capitalize">{CRITERIA.sentimentFilter}</p>
+                  <div className="flex items-center gap-2 px-3 py-1 border border-purple-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Sentiment Filter</span>
+                    <span className="text-white font-mono font-semibold capitalize">{CRITERIA.sentimentFilter}</span>
                   </div>
                 )}
                 
-                <div className={`bg-slate-900/50 border rounded-lg p-3 col-span-1 md:col-span-2 ${
-                  CRITERIA.sectorsEnabled ? 'border-red-500/30' : 'border-slate-800/50 opacity-50'
-                }`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-slate-400">Excluded Sectors</p>
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      CRITERIA.sectorsEnabled ? 'bg-red-500/10 text-red-400' : 'bg-slate-500/10 text-slate-500'
-                    }`}>
-                      {CRITERIA.sectorsEnabled ? 'Enabled' : 'Disabled'}
+                {CRITERIA.sectorFilterMode === 'exclude' && CRITERIA.sectorFilter.length > 0 && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-red-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Excluded Sectors</span>
+                    <span className="text-white font-mono font-semibold">
+                      {CRITERIA.sectorFilter.join(', ')}
                     </span>
                   </div>
-                  <p className="text-white font-mono font-semibold">
-                    {CRITERIA.excludeSectors.length > 0 ? CRITERIA.excludeSectors.join(', ') : 'None'}
-                  </p>
-                </div>
+                )}
                 
-                <div className={`bg-slate-900/50 border rounded-lg p-3 col-span-1 md:col-span-2 ${
-                  CRITERIA.countriesEnabled ? 'border-orange-500/30' : 'border-slate-800/50 opacity-50'
-                }`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-slate-400">Excluded Countries</p>
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      CRITERIA.countriesEnabled ? 'bg-orange-500/10 text-orange-400' : 'bg-slate-500/10 text-slate-500'
-                    }`}>
-                      {CRITERIA.countriesEnabled ? 'Enabled' : 'Disabled'}
+                {CRITERIA.sectorFilterMode === 'include' && CRITERIA.sectorFilter.length > 0 && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-green-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Include Only Sectors</span>
+                    <span className="text-white font-mono font-semibold">
+                      {CRITERIA.sectorFilter.join(', ')}
                     </span>
                   </div>
-                  <p className="text-white font-mono font-semibold">
-                    {CRITERIA.excludeCountries.length > 0 ? CRITERIA.excludeCountries.map(getCountryName).join(', ') : 'None'}
-                  </p>
-                </div>
+                )}
+                
+                {CRITERIA.matchScoreEnabled && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-blue-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Min Match Score</span>
+                    <span className="text-white font-mono font-semibold">&gt; {CRITERIA.minMatchScore}%</span>
+                  </div>
+                )}
+                
+                {CRITERIA.countryFilterMode === 'exclude' && CRITERIA.countryFilter.length > 0 && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-orange-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Excluded Countries</span>
+                    <span className="text-white font-mono font-semibold">
+                      {CRITERIA.countryFilter.map(getCountryName).join(', ')}
+                    </span>
+                  </div>
+                )}
+                
+                {CRITERIA.countryFilterMode === 'include' && CRITERIA.countryFilter.length > 0 && (
+                  <div className="flex items-center gap-2 px-3 py-1 border border-green-500/30 bg-slate-900/50 rounded-lg">
+                    <span className="text-slate-400">Include Only Countries</span>
+                    <span className="text-white font-mono font-semibold">
+                      {CRITERIA.countryFilter.map(getCountryName).join(', ')}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
         {/* Stock Cards Grid (Mobile-friendly alternative to table) */}
-        <div className="lg:hidden space-y-4 mb-8">
+        <div className="lg:hidden mb-6">
+          <div className="flex items-center justify-between mb-4 px-2">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+              <span className="text-slate-300 text-sm font-medium">
+                {recommendedStocks.length} {recommendedStocks.length === 1 ? 'stock' : 'stocks'} match your criteria
+              </span>
+            </div>
+          </div>
+          <div className="space-y-4">
           {recommendedStocks.map((stock) => (
             <div
               key={stock.ticker}
@@ -355,10 +485,19 @@ export default async function ScreeningPage({
               </div>
             </div>
           ))}
+          </div>
         </div>
 
         {/* Stock Table (Desktop) */}
         <div className="hidden lg:block mb-8">
+          <div className="flex items-center justify-between mb-4 px-2">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+              <span className="text-slate-300 text-sm font-medium">
+                {recommendedStocks.length} {recommendedStocks.length === 1 ? 'stock' : 'stocks'} match your criteria
+              </span>
+            </div>
+          </div>
           <ScreeningTable 
             stocks={recommendedStocks} 
             criteria={{
@@ -368,130 +507,122 @@ export default async function ScreeningPage({
               betaEnabled: CRITERIA.betaEnabled,
               roeEnabled: CRITERIA.roeEnabled,
               profitMarginEnabled: CRITERIA.profitMarginEnabled,
+              debtToEquityEnabled: CRITERIA.debtToEquityEnabled,
               sentimentEnabled: CRITERIA.sentimentEnabled,
+              ratingEnabled: CRITERIA.ratingEnabled,
+              avgAnnualVolume10DEnabled: CRITERIA.avgAnnualVolume10DEnabled,
+              avgAnnualVolume3MEnabled: CRITERIA.avgAnnualVolume3MEnabled,
             }}
           />
         </div>
 
         {/* Methodology Card */}
-        <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-800/30 rounded-xl p-6 backdrop-blur-sm mb-6">
-          <div className="flex gap-4">
+        <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-800/30 rounded-lg px-4 py-2 backdrop-blur-sm mb-6">
+          <div className="flex items-center gap-3">
             <div className="flex-shrink-0">
-              <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center border border-blue-500/20">
-                <Info className="w-6 h-6 text-blue-400" />
+              <div className="w-6 h-6 bg-blue-500/10 rounded-lg flex items-center justify-center border border-blue-500/20">
+                <Info className="w-3 h-3 text-blue-400" />
               </div>
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-bold text-blue-400 mb-3">Screening Methodology</h3>
-              <p className="text-slate-300 leading-relaxed mb-4">
+              <h3 className="text-sm font-bold text-blue-400 mb-1">Screening Methodology</h3>
+              <p className="text-slate-300 text-xs leading-relaxed mb-2">
                 Your customized screening criteria filter stocks based on the following parameters:
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-wrap items-center gap-2 text-xs">
                 {CRITERIA.peEnabled && (
-                  <div className="p-4 bg-slate-950/50 rounded-lg border border-emerald-500/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      </div>
-                      <h4 className="text-white font-semibold">P/E Ratio Threshold</h4>
-                    </div>
-                    <p className="text-slate-400 text-sm">Filters stocks with P/E ratio less than {CRITERIA.maxPE}</p>
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-emerald-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                    <span className="text-slate-400">P/E Ratio Threshold:</span>
+                    <span className="text-white font-semibold">Filters stocks with P/E ratio less than {CRITERIA.maxPE}</span>
                   </div>
                 )}
                 {CRITERIA.pbEnabled && (
-                  <div className="p-4 bg-slate-950/50 rounded-lg border border-emerald-500/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      </div>
-                      <h4 className="text-white font-semibold">P/B Ratio Threshold</h4>
-                    </div>
-                    <p className="text-slate-400 text-sm">Filters stocks with P/B ratio less than {CRITERIA.maxPB}</p>
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-emerald-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                    <span className="text-slate-400">P/B Ratio Threshold:</span>
+                    <span className="text-white font-semibold">Filters stocks with P/B ratio less than {CRITERIA.maxPB}</span>
                   </div>
                 )}
                 {CRITERIA.marketCapEnabled && (
-                  <div className="p-4 bg-slate-950/50 rounded-lg border border-purple-500/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center">
-                        <CheckCircle2 className="w-4 h-4 text-purple-400" />
-                      </div>
-                      <h4 className="text-white font-semibold">Market Cap Range</h4>
-                    </div>
-                    <p className="text-slate-400 text-sm">Filters stocks with market cap between ${CRITERIA.minMarketCap}B and ${CRITERIA.maxMarketCap}B</p>
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-purple-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-purple-400 flex-shrink-0" />
+                    <span className="text-slate-400">Market Cap Range:</span>
+                    <span className="text-white font-semibold">Filters stocks with market cap between ${CRITERIA.minMarketCap}B and ${CRITERIA.maxMarketCap}B</span>
                   </div>
                 )}
                 {CRITERIA.betaEnabled && (
-                  <div className="p-4 bg-slate-950/50 rounded-lg border border-purple-500/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center">
-                        <CheckCircle2 className="w-4 h-4 text-purple-400" />
-                      </div>
-                      <h4 className="text-white font-semibold">Beta Range</h4>
-                    </div>
-                    <p className="text-slate-400 text-sm">Filters stocks with beta between {CRITERIA.minBeta.toFixed(2)} and {CRITERIA.maxBeta.toFixed(2)}</p>
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-purple-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-purple-400 flex-shrink-0" />
+                    <span className="text-slate-400">Beta Range:</span>
+                    <span className="text-white font-semibold">Filters stocks with beta between {CRITERIA.minBeta.toFixed(2)} and {CRITERIA.maxBeta.toFixed(2)}</span>
                   </div>
                 )}
                 {CRITERIA.roeEnabled && (
-                  <div className="p-4 bg-slate-950/50 rounded-lg border border-purple-500/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center">
-                        <CheckCircle2 className="w-4 h-4 text-purple-400" />
-                      </div>
-                      <h4 className="text-white font-semibold">ROE Minimum</h4>
-                    </div>
-                    <p className="text-slate-400 text-sm">Filters stocks with ROE greater than {CRITERIA.minROE}%</p>
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-purple-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-purple-400 flex-shrink-0" />
+                    <span className="text-slate-400">ROE Minimum:</span>
+                    <span className="text-white font-semibold">Filters stocks with ROE greater than {CRITERIA.minROE}%</span>
                   </div>
                 )}
                 {CRITERIA.profitMarginEnabled && (
-                  <div className="p-4 bg-slate-950/50 rounded-lg border border-purple-500/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center">
-                        <CheckCircle2 className="w-4 h-4 text-purple-400" />
-                      </div>
-                      <h4 className="text-white font-semibold">Profit Margin Minimum</h4>
-                    </div>
-                    <p className="text-slate-400 text-sm">Filters stocks with profit margin greater than {CRITERIA.minProfitMargin}%</p>
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-purple-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-purple-400 flex-shrink-0" />
+                    <span className="text-slate-400">Profit Margin Minimum:</span>
+                    <span className="text-white font-semibold">Filters stocks with profit margin greater than {CRITERIA.minProfitMargin}%</span>
                   </div>
                 )}
                 {CRITERIA.sentimentEnabled && (
-                  <div className="p-4 bg-slate-950/50 rounded-lg border border-purple-500/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center">
-                        <CheckCircle2 className="w-4 h-4 text-purple-400" />
-                      </div>
-                      <h4 className="text-white font-semibold">Sentiment Filter</h4>
-                    </div>
-                    <p className="text-slate-400 text-sm capitalize">Filters stocks with {CRITERIA.sentimentFilter} social sentiment</p>
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-purple-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-purple-400 flex-shrink-0" />
+                    <span className="text-slate-400">Sentiment Filter:</span>
+                    <span className="text-white font-semibold capitalize">Filters stocks with {CRITERIA.sentimentFilter} social sentiment</span>
                   </div>
                 )}
-                {CRITERIA.sectorsEnabled && CRITERIA.excludeSectors.length > 0 && (
-                  <div className="p-4 bg-slate-950/50 rounded-lg border border-red-500/30 col-span-1 md:col-span-2">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center">
-                        <CheckCircle2 className="w-4 h-4 text-red-400" />
-                      </div>
-                      <h4 className="text-white font-semibold">Sector Exclusions</h4>
-                    </div>
-                    <p className="text-slate-400 text-sm">Excludes stocks in the following sectors: {CRITERIA.excludeSectors.join(', ')}</p>
+                {CRITERIA.sectorFilterMode === 'exclude' && CRITERIA.sectorFilter.length > 0 && (
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-red-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-red-400 flex-shrink-0" />
+                    <span className="text-slate-400">Sector Exclusions:</span>
+                    <span className="text-white font-semibold">Excludes stocks in the following sectors: {CRITERIA.sectorFilter.join(', ')}</span>
                   </div>
                 )}
                 
-                {CRITERIA.countriesEnabled && CRITERIA.excludeCountries.length > 0 && (
-                  <div className="p-4 bg-slate-950/50 rounded-lg border border-orange-500/30 col-span-1 md:col-span-2">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 bg-orange-500/10 rounded-lg flex items-center justify-center">
-                        <CheckCircle2 className="w-4 h-4 text-orange-400" />
-                      </div>
-                      <h4 className="text-white font-semibold">Country Exclusions</h4>
-                    </div>
-                    <p className="text-slate-400 text-sm">Excludes stocks from the following countries: {CRITERIA.excludeCountries.map(getCountryName).join(', ')}</p>
+                {CRITERIA.sectorFilterMode === 'include' && CRITERIA.sectorFilter.length > 0 && (
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-green-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-green-400 flex-shrink-0" />
+                    <span className="text-slate-400">Sector Inclusion:</span>
+                    <span className="text-white font-semibold">Shows only stocks in: {CRITERIA.sectorFilter.join(', ')}</span>
+                  </div>
+                )}
+                
+                {CRITERIA.matchScoreEnabled && (
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-blue-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-blue-400 flex-shrink-0" />
+                    <span className="text-slate-400">Match Score Filter:</span>
+                    <span className="text-white font-semibold">Shows only stocks with match score above {CRITERIA.minMatchScore}%</span>
+                  </div>
+                )}
+                
+                {CRITERIA.countryFilterMode === 'exclude' && CRITERIA.countryFilter.length > 0 && (
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-orange-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-orange-400 flex-shrink-0" />
+                    <span className="text-slate-400">Country Exclusions:</span>
+                    <span className="text-white font-semibold">Excludes stocks from the following countries: {CRITERIA.countryFilter.map(getCountryName).join(', ')}</span>
+                  </div>
+                )}
+                
+                {CRITERIA.countryFilterMode === 'include' && CRITERIA.countryFilter.length > 0 && (
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-950/50 rounded border border-green-500/30">
+                    <CheckCircle2 className="w-3 h-3 text-green-400 flex-shrink-0" />
+                    <span className="text-slate-400">Country Inclusion:</span>
+                    <span className="text-white font-semibold">Shows only stocks from: {CRITERIA.countryFilter.map(getCountryName).join(', ')}</span>
                   </div>
                 )}
               </div>
               {!CRITERIA.peEnabled && !CRITERIA.pbEnabled && !CRITERIA.marketCapEnabled && !CRITERIA.betaEnabled && 
                !CRITERIA.roeEnabled && !CRITERIA.profitMarginEnabled && !CRITERIA.sentimentEnabled && 
-               !CRITERIA.sectorsEnabled && !CRITERIA.countriesEnabled && (
-                <p className="text-slate-400 text-sm italic">No criteria currently enabled. All stocks will be shown.</p>
+               CRITERIA.sectorFilterMode === 'disabled' && CRITERIA.countryFilterMode === 'disabled' && (
+                <p className="text-slate-400 text-xs italic">No criteria currently enabled. All stocks will be shown.</p>
               )}
             </div>
           </div>

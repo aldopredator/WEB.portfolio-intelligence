@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import type { StockInsightsData } from '@/lib/types';
 import { fetchAndScoreSentiment } from '@/lib/sentiment';
-import { fetchFinnhubMetrics, fetchBalanceSheet, fetchCompanyProfile } from '@/lib/finnhub-metrics';
+import { fetchFinnhubMetrics, fetchBalanceSheet, fetchCompanyProfile, fetchEarningsSurprises, fetchRecommendationTrends, fetchCompanyNews } from '@/lib/finnhub-metrics';
 import { fetchPolygonStockStats } from '@/lib/polygon';
 import { getPolygonCached, setPolygonCached, getNextTickerToFetch } from '@/lib/polygon-cache';
 import { isRecord } from '@/lib/utils';
@@ -17,14 +17,23 @@ export let STOCK_CONFIG: Array<{ ticker: string; name: string; sector: string }>
 /**
  * Fetch and enrich stock data from database
  * This is the single source of truth for stock data across the application
+ * @param portfolioId - Optional portfolio ID to filter stocks
  */
-export async function getStockData(): Promise<StockInsightsData> {
+export async function getStockData(portfolioId?: string | null): Promise<StockInsightsData> {
   try {
     console.log('[STOCK-DATA] 📊 Fetching stock data from database...');
+    if (portfolioId) {
+      console.log(`[STOCK-DATA] 🎯 Filtering by portfolio ID: ${portfolioId}`);
+    } else {
+      console.log('[STOCK-DATA] 📋 Fetching ALL active stocks (no portfolio filter)');
+    }
     
     // Fetch all active stocks with their related data
     const stocks = await prisma.stock.findMany({
-      where: { isActive: true },
+      where: { 
+        isActive: true,
+        ...(portfolioId ? { portfolioId } : {}),
+      },
       include: {
         stockData: true,
         priceHistory: {
@@ -41,7 +50,10 @@ export async function getStockData(): Promise<StockInsightsData> {
       },
     });
 
-    console.log(`[STOCK-DATA] Found ${stocks.length} active stocks in database`);
+    console.log(`[STOCK-DATA] ✅ Found ${stocks.length} active stocks in database`);
+    if (stocks.length > 0) {
+      console.log(`[STOCK-DATA] 📋 Tickers: ${stocks.map((s: any) => s.ticker).join(', ')}`);
+    }
 
     // Update STOCK_CONFIG dynamically
     STOCK_CONFIG = stocks.map((stock: any) => ({
@@ -130,6 +142,24 @@ export async function getStockData(): Promise<StockInsightsData> {
         const polygonStats = await fetchPolygonStockStats(ticker);
         if (polygonStats && isRecord(stockEntry) && stockEntry.stock_data) {
           Object.assign(stockEntry.stock_data, polygonStats);
+        }
+
+        // Fetch earnings surprises
+        const earningsSurprises = await fetchEarningsSurprises(ticker);
+        if (earningsSurprises && isRecord(stockEntry)) {
+          stockEntry.earnings_surprises = earningsSurprises as any;
+        }
+
+        // Fetch recommendation trends
+        const recommendationTrends = await fetchRecommendationTrends(ticker);
+        if (recommendationTrends && isRecord(stockEntry)) {
+          stockEntry.recommendation_trends = recommendationTrends as any;
+        }
+
+        // Fetch company news
+        const news = await fetchCompanyNews(ticker, 10);
+        if (news && news.length > 0 && isRecord(stockEntry)) {
+          stockEntry.latest_news = news as any;
         }
       } catch (error) {
         console.error(`Error enriching ${ticker}:`, error);

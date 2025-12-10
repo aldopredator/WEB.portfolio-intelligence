@@ -1,0 +1,357 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e5]:
+        - img [ref=e7]
+        - generic [ref=e9]:
+          - heading "Portfolio Intelligence" [level=1] [ref=e10]
+          - paragraph [ref=e11]: Solutions
+    - complementary [ref=e12]:
+      - navigation [ref=e13]:
+        - link "Dashboard Stock insights & analytics" [ref=e14] [cursor=pointer]:
+          - /url: /?portfolio=cmirgdwtm00092gdpj701hwwy
+          - img [ref=e15]
+          - generic [ref=e17]:
+            - paragraph [ref=e18]: Dashboard
+            - paragraph [ref=e19]: Stock insights & analytics
+        - link "Portfolios Manage your portfolios" [ref=e20] [cursor=pointer]:
+          - /url: /portfolios
+          - img [ref=e21]
+          - generic [ref=e24]:
+            - paragraph [ref=e25]: Portfolios
+            - paragraph [ref=e26]: Manage your portfolios
+        - link "Screening Stock screening results" [ref=e27] [cursor=pointer]:
+          - /url: /screening
+          - img [ref=e28]
+          - generic [ref=e30]:
+            - paragraph [ref=e31]: Screening
+            - paragraph [ref=e32]: Stock screening results
+        - button "Collapse" [ref=e33] [cursor=pointer]:
+          - img [ref=e34]
+          - generic [ref=e36]: Collapse
+    - main [ref=e39]:
+      - generic [ref=e40]:
+        - generic [ref=e42]:
+          - generic [ref=e44] [cursor=pointer]:
+            - img [ref=e45]
+            - paragraph [ref=e47]: Collapse
+          - generic [ref=e48]:
+            - generic [ref=e49]:
+              - generic [ref=e50]: Portfolio Filter
+              - generic [ref=e51]:
+                - combobox [ref=e52] [cursor=pointer]:
+                  - generic [ref=e53]:
+                    - img [ref=e54]
+                    - text: BARCLAYS
+                - textbox: cmirgdwtm00092gdpj701hwwy
+                - img
+                - group:
+                  - generic: Portfolio Filter
+            - generic [ref=e59]: Showing 8 tickers from BARCLAYS
+            - generic [ref=e60]:
+              - heading "Rating" [level=6] [ref=e61]
+              - generic [ref=e62]:
+                - generic [ref=e63] [cursor=pointer]: ☆ Not Rated
+                - generic [ref=e64] [cursor=pointer]: ⭐ 1+
+                - generic [ref=e65] [cursor=pointer]: ⭐ 2+
+                - generic [ref=e66] [cursor=pointer]: ⭐ 3+
+                - generic [ref=e67] [cursor=pointer]: ⭐ 4+
+                - generic [ref=e68] [cursor=pointer]: ⭐ 5
+                - generic [ref=e69] [cursor=pointer]: 🔄 All
+          - generic [ref=e70]:
+            - heading "Search Tickers" [level=6] [ref=e71]
+            - generic [ref=e75]:
+              - img [ref=e77]
+              - textbox "Search by ticker or company name..." [ref=e80]
+              - group
+          - generic [ref=e81]:
+            - heading "Tickers (8)" [level=6] [ref=e82]
+            - generic:
+              - generic [ref=e84] [cursor=pointer]:
+                - generic [ref=e85]:
+                  - paragraph [ref=e87]: AMZN
+                  - paragraph [ref=e88]: Amazon.com Inc. (AMZN)
+                - generic [ref=e89]:
+                  - paragraph [ref=e90]: +1.56%
+                  - button "Delete AMZN" [ref=e91]:
+                    - img [ref=e92]
+              - generic [ref=e96] [cursor=pointer]:
+                - generic [ref=e97]:
+                  - paragraph [ref=e99]: BRK-B
+                  - paragraph [ref=e100]: Berkshire Hathaway Inc. (BRK-B)
+                - generic [ref=e101]:
+                  - paragraph [ref=e102]: +0.45%
+                  - button "Delete BRK-B" [ref=e103]:
+                    - img [ref=e104]
+              - generic [ref=e108] [cursor=pointer]:
+                - generic [ref=e109]:
+                  - paragraph [ref=e111]: GOOG
+                  - paragraph [ref=e112]: Alphabet Inc.
+                - generic [ref=e113]:
+                  - paragraph [ref=e114]: +0.00%
+                  - button "Delete GOOG" [ref=e115]:
+                    - img [ref=e116]
+              - generic [ref=e120] [cursor=pointer]:
+                - generic [ref=e121]:
+                  - paragraph [ref=e123]: IDXX
+                  - paragraph [ref=e124]: IDEXX Laboratories Inc. (IDXX)
+                - generic [ref=e125]:
+                  - paragraph [ref=e126]: +0.24%
+                  - button "Delete IDXX" [ref=e127]:
+                    - img [ref=e128]
+              - generic [ref=e132] [cursor=pointer]:
+                - generic [ref=e133]:
+                  - paragraph [ref=e135]: ISRG
+                  - paragraph [ref=e136]: Intuitive Surgical Inc. (ISRG)
+                - generic [ref=e137]:
+                  - paragraph [ref=e138]: +1.18%
+                  - button "Delete ISRG" [ref=e139]:
+                    - img [ref=e140]
+              - generic [ref=e144] [cursor=pointer]:
+                - generic [ref=e145]:
+                  - paragraph [ref=e147]: NFLX
+                  - paragraph [ref=e148]: Netflix Inc. (NFLX)
+                - generic [ref=e149]:
+                  - paragraph [ref=e150]: "-0.83%"
+                  - button "Delete NFLX" [ref=e151]:
+                    - img [ref=e152]
+              - generic [ref=e156] [cursor=pointer]:
+                - generic [ref=e157]:
+                  - paragraph [ref=e159]: NVDA
+                  - paragraph [ref=e160]: Nvidia Corporation (NVDA)
+                - generic [ref=e161]:
+                  - paragraph [ref=e162]: +2.56%
+                  - button "Delete NVDA" [ref=e163]:
+                    - img [ref=e164]
+              - generic [ref=e168] [cursor=pointer]:
+                - generic [ref=e169]:
+                  - paragraph [ref=e171]: TSLA
+                  - paragraph [ref=e172]: Tesla, Inc. (TSLA)
+                - generic [ref=e173]:
+                  - paragraph [ref=e174]: +2.39%
+                  - button "Delete TSLA" [ref=e175]:
+                    - img [ref=e176]
+        - generic [ref=e179]:
+          - generic [ref=e181]:
+            - generic [ref=e183]:
+              - generic [ref=e184]:
+                - paragraph [ref=e185]: Rate this stock
+                - generic [ref=e186]:
+                  - button [ref=e187] [cursor=pointer]:
+                    - img [ref=e188]
+                  - button [ref=e190] [cursor=pointer]:
+                    - img [ref=e191]
+                  - button [ref=e193] [cursor=pointer]:
+                    - img [ref=e194]
+                  - button [ref=e196] [cursor=pointer]:
+                    - img [ref=e197]
+                  - button [ref=e199] [cursor=pointer]:
+                    - img [ref=e200]
+                - generic [ref=e202]:
+                  - button "Save Rating" [ref=e203] [cursor=pointer]
+                  - button "Reset Rating" [ref=e204] [cursor=pointer]
+                - button "Transfer to Other Portfolio" [ref=e205] [cursor=pointer]:
+                  - img [ref=e207]
+                  - text: Transfer to Other Portfolio
+              - generic [ref=e209]:
+                - img [ref=e211]
+                - generic [ref=e213]:
+                  - heading "NVDA" [level=5] [ref=e214]
+                  - paragraph [ref=e215]: NVDA
+              - generic [ref=e216]:
+                - generic [ref=e217]:
+                  - paragraph [ref=e218]: Total Employees
+                  - heading "36,000" [level=6] [ref=e219]
+                - generic [ref=e220]:
+                  - paragraph [ref=e221]: Market Cap (Enterprise Value)
+                  - heading "Loading..." [level=6] [ref=e222]
+            - generic [ref=e224]:
+              - generic [ref=e225]:
+                - img [ref=e226]
+                - heading "Stock Multipliers" [level=2] [ref=e228]
+              - generic [ref=e229]:
+                - generic [ref=e230]: STOCK MULTIPLIERS
+                - generic [ref=e231]:
+                  - generic [ref=e232]:
+                    - paragraph [ref=e233]: Total Debt/Equity
+                    - generic [ref=e234]:
+                      - paragraph [ref=e235]: N/A
+                      - generic [ref=e236]: ❓
+                  - generic [ref=e237]:
+                    - paragraph [ref=e238]: Price/Sales
+                    - generic [ref=e239]:
+                      - paragraph [ref=e240]: N/A
+                      - generic [ref=e241]: ❓
+                  - generic [ref=e242]:
+                    - paragraph [ref=e243]: Trailing P/E
+                    - generic [ref=e244]:
+                      - paragraph [ref=e245]: N/A
+                      - generic [ref=e246]: ❓
+                  - generic [ref=e247]:
+                    - paragraph [ref=e248]: Forward P/E
+                    - generic [ref=e249]:
+                      - paragraph [ref=e250]: N/A
+                      - generic [ref=e251]: ❓
+                  - generic [ref=e252]:
+                    - paragraph [ref=e253]: Price/Book
+                    - generic [ref=e254]:
+                      - paragraph [ref=e255]: N/A
+                      - generic [ref=e256]: ❓
+                  - generic [ref=e257]:
+                    - paragraph [ref=e258]: Enterprise Value/Revenue
+                    - generic [ref=e259]:
+                      - paragraph [ref=e260]: N/A
+                      - generic [ref=e261]: ❓
+                  - generic [ref=e262]:
+                    - paragraph [ref=e263]: Enterprise Value/EBITDA
+                    - generic [ref=e264]:
+                      - paragraph [ref=e265]: N/A
+                      - generic [ref=e266]: ❓
+            - generic [ref=e268]:
+              - generic [ref=e269]:
+                - img [ref=e270]
+                - heading "Stock Ratios" [level=2] [ref=e272]
+              - generic [ref=e273]:
+                - generic [ref=e274]: PROFITABILITY
+                - generic [ref=e275]:
+                  - generic [ref=e276]:
+                    - paragraph [ref=e277]: ROE
+                    - generic [ref=e278]:
+                      - paragraph [ref=e279]: N/A
+                      - generic [ref=e280]: ❓
+                  - generic [ref=e281]:
+                    - paragraph [ref=e282]: ROA
+                    - generic [ref=e283]:
+                      - paragraph [ref=e284]: N/A
+                      - generic [ref=e285]: ❓
+                  - generic [ref=e286]:
+                    - paragraph [ref=e287]: Profit Margin
+                    - generic [ref=e288]:
+                      - paragraph [ref=e289]: N/A
+                      - generic [ref=e290]: ❓
+              - separator [ref=e291]
+              - generic [ref=e292]:
+                - generic [ref=e293]: GROWTH
+                - generic [ref=e294]:
+                  - generic [ref=e295]:
+                    - paragraph [ref=e296]: Quarterly Revenue Growth
+                    - generic [ref=e297]:
+                      - paragraph [ref=e298]: N/A
+                      - generic [ref=e299]: ❓
+                  - generic [ref=e300]:
+                    - paragraph [ref=e301]: Quarterly Earnings Growth
+                    - generic [ref=e302]:
+                      - paragraph [ref=e303]: N/A
+                      - generic [ref=e304]: ❓
+          - generic [ref=e305]:
+            - generic [ref=e307]:
+              - generic [ref=e309]:
+                - paragraph [ref=e310]: $140
+                - generic [ref=e312]: +2.56%
+              - generic [ref=e313]:
+                - generic [ref=e314]:
+                  - generic [ref=e315]: Compare to
+                  - generic [ref=e316]:
+                    - combobox "Compare to" [ref=e317] [cursor=pointer]:
+                      - strong [ref=e318]: CW8U.PA
+                      - text: "- Amundi MSCI World Swap UCITS ET"
+                    - textbox: CW8U.PA
+                    - img
+                    - group:
+                      - generic: Compare to
+                - paragraph [ref=e319]: 📊 % change comparison
+              - generic [ref=e321]:
+                - paragraph [ref=e322]: 52 Week Range
+                - generic [ref=e323]:
+                  - paragraph [ref=e324]: $112
+                  - generic [ref=e329]: $140.00
+                  - paragraph [ref=e330]: $168
+              - img [ref=e332]:
+                - generic [ref=e339]:
+                  - generic [ref=e341]: 4 Nov
+                  - generic [ref=e343]: 11 Nov
+                  - generic [ref=e345]: 18 Nov
+                  - generic [ref=e347]: 25 Nov
+                - generic [ref=e348]:
+                  - generic [ref=e350]: "-15.0%"
+                  - generic [ref=e352]: "-10.0%"
+                  - generic [ref=e354]: "-5.0%"
+                  - generic [ref=e356]: 0.0%
+                - generic [ref=e357]:
+                  - generic [ref=e358]:
+                    - generic: NVDA
+                  - generic [ref=e359]:
+                    - generic: CW8U.PA
+            - generic [ref=e361]:
+              - generic [ref=e362]:
+                - img [ref=e363]
+                - heading "Stock Statistics" [level=2] [ref=e365]
+              - generic [ref=e366]:
+                - generic [ref=e367]:
+                  - paragraph [ref=e368]: Shares Outstanding
+                  - heading "24B" [level=6] [ref=e369]
+                - generic [ref=e370]:
+                  - paragraph [ref=e371]: Float Shares
+                  - heading "N/A" [level=6] [ref=e372]
+                - generic [ref=e373]:
+                  - paragraph [ref=e374]: Float %
+                  - heading "N/A" [level=6] [ref=e375]
+                - generic [ref=e376]:
+                  - paragraph [ref=e377]: Avg Daily Volume (10D)
+                  - heading "N/A" [level=6] [ref=e378]
+                - generic [ref=e379]:
+                  - paragraph [ref=e380]: Avg Annual Volume in % (10D)
+                  - heading "N/A" [level=6] [ref=e381]
+                - generic [ref=e382]:
+                  - paragraph [ref=e383]: Avg Daily Volume (3M)
+                  - heading "N/A" [level=6] [ref=e384]
+                - generic [ref=e385]:
+                  - paragraph [ref=e386]: Avg Annual Volume in % (3M)
+                  - heading "N/A" [level=6] [ref=e387]
+                - generic [ref=e388]:
+                  - paragraph [ref=e389]: "% Held by Insiders"
+                  - heading "N/A" [level=6] [ref=e390]
+                - generic [ref=e391]:
+                  - paragraph [ref=e392]: "% Held by Institutions"
+                  - heading "N/A" [level=6] [ref=e393]
+          - generic [ref=e394]:
+            - generic [ref=e395]:
+              - generic [ref=e397]:
+                - generic [ref=e398]:
+                  - img [ref=e399]
+                  - heading "Earnings Surprises" [level=2] [ref=e401]
+                - paragraph [ref=e402]: No earnings surprise data available
+              - generic [ref=e404]:
+                - generic [ref=e405]:
+                  - img [ref=e406]
+                  - heading "Recommendation Trends" [level=2] [ref=e408]
+                - paragraph [ref=e409]: No recommendation trend data available
+            - generic [ref=e411]:
+              - generic [ref=e412]:
+                - img [ref=e413]
+                - heading "Social Sentiment" [level=2] [ref=e419]
+              - img [ref=e422]
+              - generic [ref=e429]:
+                - generic [ref=e430]:
+                  - heading "85%" [level=5] [ref=e433]
+                  - text: Positive
+                - generic [ref=e434]:
+                  - heading "10%" [level=5] [ref=e437]
+                  - text: Neutral
+                - generic [ref=e438]:
+                  - heading "5%" [level=5] [ref=e441]
+                  - text: Negative
+          - generic [ref=e444]:
+            - generic [ref=e445]:
+              - img [ref=e446]
+              - heading "Market News" [level=2] [ref=e448]
+            - paragraph [ref=e449]: No recent news available for NVDA
+    - contentinfo [ref=e450]:
+      - generic [ref=e452]:
+        - img [ref=e455]
+        - paragraph [ref=e458]: "Investment Disclaimer: This information is for educational and informational purposes only and should not be considered as financial advice, investment recommendations, or an offer to buy or sell securities. Past performance does not guarantee future results. Always conduct thorough due diligence and consult with a qualified financial advisor before making any investment decisions."
+  - alert [ref=e459]
+```

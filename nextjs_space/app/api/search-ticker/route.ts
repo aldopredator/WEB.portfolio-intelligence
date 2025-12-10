@@ -17,7 +17,9 @@ interface AlphaVantageSearchResult {
 
 interface YahooSearchResult {
   symbol: string;
-  name: string;
+  shortname?: string;
+  longname?: string;
+  name?: string; // Sometimes Yahoo uses this
   exch: string;
   type: string;
   exchDisp: string;
@@ -43,6 +45,9 @@ const COMMON_TICKERS = [
   { symbol: 'QBTS', name: 'D-Wave Quantum Inc.', exchange: 'NYSE', type: 'Equity' },
   { symbol: 'RGTI', name: 'Rigetti Computing Inc.', exchange: 'NASDAQ', type: 'Equity' },
   { symbol: 'BXXX', name: 'BXX Holdings', exchange: 'NYSE', type: 'Equity' },
+  { symbol: 'V', name: 'Visa Inc.', exchange: 'NYSE', type: 'Equity' },
+  { symbol: 'BE', name: 'Bloom Energy Corporation', exchange: 'NYSE', type: 'Equity' },
+  { symbol: 'INTU', name: 'Intuit Inc.', exchange: 'NASDAQ', type: 'Equity' },
   { symbol: 'CW8U.PA', name: 'Amundi MSCI World UCITS ETF', exchange: 'Euronext Paris', type: 'ETF' },
   { symbol: 'MWRL.L', name: 'Amundi Core MSCI World UCITS ETF', exchange: 'LSE', type: 'ETF' },
 ];
@@ -72,19 +77,16 @@ export async function GET(request: NextRequest) {
 
     console.log('[Search API] Static results:', staticResults.length);
 
-    // If we found results in static database, return them
-    if (staticResults.length > 0) {
-      return NextResponse.json({ results: staticResults });
-    }
-
-    // Try Yahoo Finance for other tickers
+    // Try Yahoo Finance first (it has a much larger database)
+    // Only use static results as a fallback or to supplement Yahoo results
     try {
       console.log('[Search API] Trying Yahoo Finance...');
       const yahooResponse = await fetch(
-        `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0&enableFuzzyQuery=false`,
+        `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=20&newsCount=0&enableFuzzyQuery=true`,
         {
           headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/json',
           },
         }
       );
@@ -98,23 +100,29 @@ export async function GET(request: NextRequest) {
         console.log('[Search API] Yahoo quotes found:', quotes.length);
         
         const results = quotes
-          .filter((q: YahooSearchResult) => q.symbol && q.name)
+          .filter((q: YahooSearchResult) => q.symbol && (q.shortname || q.longname || q.name))
           .map((quote: YahooSearchResult) => ({
             symbol: quote.symbol,
-            name: quote.name,
+            name: quote.shortname || quote.longname || quote.name || quote.symbol,
             exchange: quote.exchDisp || quote.exch || 'N/A',
             type: quote.typeDisp || quote.type || 'Equity',
             region: quote.exch?.includes('NAS') || quote.exch?.includes('NYQ') ? 'United States' : undefined,
             currency: 'USD',
           }))
-          .slice(0, 10);
+          .slice(0, 15);
 
         if (results.length > 0) {
+          console.log('[Search API] Returning Yahoo results:', results.length);
           return NextResponse.json({ results });
         }
       }
     } catch (yahooError) {
       console.error('[Search API] Yahoo Finance API error:', yahooError);
+    }
+
+    // If Yahoo didn't work, return static results if we have any
+    if (staticResults.length > 0) {
+      return NextResponse.json({ results: staticResults });
     }
 
     // Fallback: Try Alpha Vantage if API key is available
@@ -155,11 +163,11 @@ export async function GET(request: NextRequest) {
     const fallbackResults = [
       { 
         symbol: query.toUpperCase(), 
-        name: `${query.toUpperCase()} - Search externally`, 
-        exchange: 'Unknown', 
+        name: query.toUpperCase(), 
+        exchange: '', 
         type: 'Equity', 
-        region: 'Unknown',
-        currency: 'USD'
+        region: '',
+        currency: ''
       },
     ];
 

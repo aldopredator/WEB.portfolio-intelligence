@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import PriceHistoryChart from './PriceHistoryChart';
 import StockDetailsCard from './StockDetailsCard';
 import StockStatisticsCard from './StockStatisticsCard';
+import ShareStatisticsCard from './ShareStatisticsCard';
 import SocialSentimentCard from './SocialSentimentCard';
 import CompanyInfoCard from './CompanyInfoCard';
 import MarketNewsCard from './MarketNewsCard';
@@ -19,13 +20,57 @@ import type { StockInsightsData } from '@/lib/types';
 interface MainGridProps {
   stockData: StockInsightsData;
   selectedStock: string;
+  stocks?: Array<{ ticker: string; company: string; change_percent?: number; rating?: number; portfolioId?: string | null }>;
+  portfolios?: Array<{ id: string; name: string; description?: string | null }>;
+  onRatingUpdate?: (ticker: string, rating: number) => void;
 }
 
-export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
+export default function MainGrid({ stockData, selectedStock, stocks = [], portfolios = [], onRatingUpdate }: MainGridProps) {
   const stockEntry = stockData[selectedStock];
+  const currentStock = stocks.find(s => s.ticker === selectedStock);
+  const currentRating = currentStock?.rating || 0;
+  const currentPortfolioId = currentStock?.portfolioId;
+  
+  // Debug logging
+  console.log('[MainGrid] Selected stock:', selectedStock);
+  console.log('[MainGrid] Stocks array:', stocks);
+  console.log('[MainGrid] Current stock found:', currentStock);
+  console.log('[MainGrid] Current rating:', currentRating);
+  
+  // Handle empty portfolio or no stock selected
+  if (!selectedStock) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        minHeight: '400px',
+        flexDirection: 'column',
+        gap: 2
+      }}>
+        <Typography variant="h5" sx={{ color: '#94a3b8' }}>
+          No stock selected
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#64748b' }}>
+          Select a ticker from the list or add a new one to get started
+        </Typography>
+      </Box>
+    );
+  }
   
   if (!stockEntry || typeof stockEntry === 'string') {
-    return <Typography>No data available for {selectedStock}</Typography>;
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        minHeight: '400px'
+      }}>
+        <Typography sx={{ color: '#94a3b8' }}>
+          No data available for {selectedStock}
+        </Typography>
+      </Box>
+    );
   }
 
   const stock = stockEntry.stock_data;
@@ -74,6 +119,7 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
           >
             {stockEntry.company_profile && (
               <CompanyInfoCard
+                key={selectedStock}
                 ticker={selectedStock}
                 companyName={stockEntry.company_profile.name}
                 logo={stockEntry.company_profile.logo}
@@ -98,6 +144,10 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
                 fiftyDayAverage={stock.fiftyDayAverage}
                 twoHundredDayAverage={stock.twoHundredDayAverage}
                 enterpriseValue={stock.enterpriseValue}
+                initialRating={currentRating}
+                portfolios={portfolios}
+                currentPortfolioId={currentPortfolioId}
+                onRatingUpdate={onRatingUpdate}
               />
             )}
             <StockDetailsCard
@@ -122,7 +172,47 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
         </Box>
       )}
 
-      {/* Two Column Layout: Price Chart (larger) and Social Sentiment (smaller) */}
+      {/* Middle Section: Price Chart (left) and Stock Statistics (right) */}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            lg: '2fr 1fr',
+          },
+          gap: 2,
+          mb: 2,
+        }}
+      >
+        {/* Price Chart */}
+        {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
+          <PriceHistoryChart
+            data={stock.price_movement_30_days}
+            ticker={selectedStock}
+            currentPrice={stock.current_price || 0}
+            priceChange={stock.change || 0}
+            priceChangePercent={stock.change_percent || 0}
+            weekLow52={stock.fiftyTwoWeekLow || stock['52_week_low']}
+            weekHigh52={stock.fiftyTwoWeekHigh || stock['52_week_high']}
+            volume={stock.volume}
+            fiftyDayAverage={stock.fiftyDayAverage}
+            twoHundredDayAverage={stock.twoHundredDayAverage}
+          />
+        )}
+        
+        {/* Stock Statistics */}
+        <ShareStatisticsCard
+          ticker={selectedStock}
+          sharesOutstanding={stock.sharesOutstanding}
+          floatShares={stock.floatShares}
+          averageVolume10Day={stock.averageVolume10Day}
+          averageVolume={stock.averageVolume}
+          heldPercentInsiders={stock.heldPercentInsiders}
+          heldPercentInstitutions={stock.heldPercentInstitutions}
+        />
+      </Box>
+
+      {/* Bottom Section: Earnings + Recommendations (left) and Social Sentiment (right) */}
       <Box
         sx={{
           display: 'grid',
@@ -133,83 +223,41 @@ export default function MainGrid({ stockData, selectedStock }: MainGridProps) {
           gap: 2,
         }}
       >
-        {/* Block 1: Price Chart */}
-        <Box>
-          {/* Price History Chart with 52 Week Range */}
-          {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
-            <PriceHistoryChart
-              data={stock.price_movement_30_days}
-              ticker={selectedStock}
-              currentPrice={stock.current_price || 0}
-              priceChange={stock.change || 0}
-              priceChangePercent={stock.change_percent || 0}
-              weekLow52={stock.fiftyTwoWeekLow || stock['52_week_low']}
-              weekHigh52={stock.fiftyTwoWeekHigh || stock['52_week_high']}
-              volume={stock.volume}
-              fiftyDayAverage={stock.fiftyDayAverage}
-              twoHundredDayAverage={stock.twoHundredDayAverage}
-            />
-          )}
-        </Box>
-
-        {/* Block 2: Social Sentiment */}
-        <Box>
-          <SocialSentimentCard
+        {/* Left: Earnings and Recommendations side by side */}
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              md: 'repeat(2, 1fr)',
+            },
+            gap: 2,
+          }}
+        >
+          <EarningsSurprisesCard
             ticker={selectedStock}
-            sentiment={stockEntry.social_sentiment}
+            surprises={stockEntry.earnings_surprises || []}
+          />
+          <RecommendationTrendsCard
+            ticker={selectedStock}
+            trends={stockEntry.recommendation_trends || []}
           />
         </Box>
+        
+        {/* Right: Social Sentiment */}
+        <SocialSentimentCard
+          ticker={selectedStock}
+          sentiment={stockEntry.social_sentiment}
+        />
       </Box>
 
-      {/* Earnings Surprises, Recommendation Trends, and Market News Section */}
-      {(stockEntry.earnings_surprises && stockEntry.earnings_surprises.length > 0) ||
-        (stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0) ||
-        (stockEntry.latest_news && stockEntry.latest_news.length > 0) ? (
-        <Box sx={{ mt: 3 }}>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: '1fr',
-                lg: 'repeat(3, 1fr)',
-              },
-              gap: 2,
-            }}
-          >
-            {/* Earnings Surprises */}
-            {stockEntry.earnings_surprises && stockEntry.earnings_surprises.length > 0 && (
-              <EarningsSurprisesCard
-                ticker={selectedStock}
-                surprises={stockEntry.earnings_surprises}
-              />
-            )}
-
-            {/* Recommendation Trends */}
-            {stockEntry.recommendation_trends && stockEntry.recommendation_trends.length > 0 && (
-              <RecommendationTrendsCard
-                ticker={selectedStock}
-                trends={stockEntry.recommendation_trends}
-              />
-            )}
-
-            {/* Earnings Calendar */}
-            {stockEntry.earnings_calendar && stockEntry.earnings_calendar.length > 0 && (
-              <EarningsCalendarCard
-                ticker={selectedStock}
-                earnings={stockEntry.earnings_calendar}
-              />
-            )}
-
-            {/* Market News */}
-            {stockEntry.latest_news && stockEntry.latest_news.length > 0 && (
-              <MarketNewsCard
-                ticker={selectedStock}
-                articles={stockEntry.latest_news}
-              />
-            )}
-          </Box>
-        </Box>
-      ) : null}
+      {/* Market News Section */}
+      <Box sx={{ mt: 3 }}>
+        <MarketNewsCard
+          ticker={selectedStock}
+          articles={stockEntry.latest_news || []}
+        />
+      </Box>
     </Box>
   );
 }

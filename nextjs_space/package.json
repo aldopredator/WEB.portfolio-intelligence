@@ -3,9 +3,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && prisma db push --accept-data-loss && next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report",
     "postinstall": "prisma generate",
     "diagnose": "powershell -ExecutionPolicy Bypass -File ./scripts/diagnose.ps1",
     "clear-cache": "powershell -ExecutionPolicy Bypass -File ./scripts/clear-cache.ps1"
@@ -15,6 +19,7 @@
   },
   "devDependencies": {
     "@next/swc-wasm-nodejs": "13.5.1",
+    "@playwright/test": "^1.57.0",
     "@types/node": "20.6.2",
     "@types/react": "18.2.22",
     "@types/react-dom": "18.2.7",
