@@ -66,11 +66,13 @@ export default function PriceHistoryChart({
           const stocks = data.stocks || [];
           console.log('[PriceHistoryChart] All stocks fetched:', stocks.length);
           console.log('[PriceHistoryChart] Stock tickers:', stocks.map((s: any) => s.ticker).join(', '));
+          console.log('[PriceHistoryChart] Current viewing ticker:', ticker);
+          
           const tickers = stocks
             .filter((s: any) => {
               const isValid = s.ticker !== ticker && s.isActive;
-              if (!isValid && s.ticker === 'CW8U.PA') {
-                console.log('[PriceHistoryChart] CW8U.PA filtered out - ticker:', s.ticker, 'isActive:', s.isActive, 'current ticker:', ticker);
+              if (s.ticker === 'CW8U.PA') {
+                console.log('[PriceHistoryChart] CW8U.PA check - ticker:', s.ticker, 'isActive:', s.isActive, 'current ticker:', ticker, 'will include:', isValid);
               }
               return isValid;
             }) // Exclude current ticker
@@ -82,9 +84,19 @@ export default function PriceHistoryChart({
             .sort((a: { ticker: string; company: string; portfolioName: string }, b: { ticker: string; company: string; portfolioName: string }) => 
               a.ticker.localeCompare(b.ticker)
             ); // Sort alphabetically by ticker
+          
           console.log('[PriceHistoryChart] Available tickers for comparison:', tickers.length);
-          console.log('[PriceHistoryChart] Includes CW8U.PA?', tickers.some((t: { ticker: string; company: string; portfolioName: string }) => t.ticker === 'CW8U.PA'));
+          console.log('[PriceHistoryChart] Tickers list:', tickers.map(t => t.ticker).join(', '));
+          const hasCW8 = tickers.some((t: { ticker: string; company: string; portfolioName: string }) => t.ticker === 'CW8U.PA');
+          console.log('[PriceHistoryChart] Includes CW8U.PA?', hasCW8);
+          
           setAvailableTickers(tickers);
+          
+          // Set CW8U.PA as default if available and no comparison is active
+          if (hasCW8 && !compareTicker && ticker !== 'CW8U.PA') {
+            console.log('[PriceHistoryChart] Setting CW8U.PA as default comparison');
+            setCompareTicker('CW8U.PA');
+          }
         }
       } catch (error) {
         console.error('Error fetching tickers:', error);
