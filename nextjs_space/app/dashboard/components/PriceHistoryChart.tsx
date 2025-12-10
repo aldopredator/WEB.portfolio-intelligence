@@ -55,71 +55,48 @@ export default function PriceHistoryChart({
   const [benchmarkData, setBenchmarkData] = useState<Array<{ date: string; price: number }>>([]);
   const [isLoadingBenchmark, setIsLoadingBenchmark] = useState(false);
 
-  // Fetch available tickers for comparison
+  // Fetch available tickers for comparison (only from BENCHMARK portfolio)
   useEffect(() => {
     const fetchTickers = async () => {
       try {
-        // Always fetch ALL stocks (no portfolio filter) for comparison dropdown
+        // Fetch ALL stocks to find the BENCHMARK portfolio
         const response = await fetch('/api/stock?portfolioId=all');
         if (response.ok) {
           const data = await response.json();
           const stocks = data.stocks || [];
-          console.log('[PriceHistoryChart] ===== DEBUG START =====');
-          console.log('[PriceHistoryChart] API Response success:', response.status);
-          console.log('[PriceHistoryChart] Total stocks fetched:', stocks.length);
-          console.log('[PriceHistoryChart] Current viewing ticker:', ticker);
-          console.log('[PriceHistoryChart] All stock tickers:', stocks.map((s: any) => s.ticker).sort().join(', '));
           
-          // Debug CW8U.PA specifically
-          const cw8Stock = stocks.find((s: any) => s.ticker === 'CW8U.PA');
-          if (cw8Stock) {
-            console.log('[PriceHistoryChart] CW8U.PA FOUND in API response:', {
-              ticker: cw8Stock.ticker,
-              company: cw8Stock.company,
-              isActive: cw8Stock.isActive,
-              portfolioId: cw8Stock.portfolioId,
-              portfolioName: cw8Stock.portfolio?.name,
-            });
-          } else {
-            console.log('[PriceHistoryChart] CW8U.PA NOT FOUND in API response!');
-            console.log('[PriceHistoryChart] Searching for similar tickers...');
-            const similar = stocks.filter((s: any) => s.ticker.includes('CW8') || s.ticker.includes('cw8'));
-            console.log('[PriceHistoryChart] Similar tickers found:', similar.map((s: any) => s.ticker));
-          }
+          console.log('[PriceHistoryChart] Filtering for BENCHMARK portfolio only');
           
+          // Filter to only show stocks from BENCHMARK portfolio
           const tickers = stocks
             .filter((s: any) => {
+              const isBenchmark = s.portfolio?.name === 'BENCHMARK';
               const excludeSelf = s.ticker !== ticker;
               const isActive = s.isActive === true;
-              const isValid = excludeSelf && isActive;
+              const isValid = isBenchmark && excludeSelf && isActive;
               
-              if (s.ticker === 'CW8U.PA' || s.ticker.includes('CW8')) {
-                console.log(`[PriceHistoryChart] Filtering ${s.ticker}: excludeSelf=${excludeSelf}, isActive=${isActive}, RESULT=${isValid}`);
-              }
+              console.log(`[PriceHistoryChart] ${s.ticker}: portfolio="${s.portfolio?.name}", excludeSelf=${excludeSelf}, isActive=${isActive}, INCLUDE=${isValid}`);
               
               return isValid;
             })
             .map((s: any) => ({
               ticker: s.ticker,
               company: s.company || 'Unknown Company',
-              portfolioName: s.portfolio?.name || 'No Portfolio',
+              portfolioName: 'BENCHMARK',
             }))
             .sort((a: { ticker: string; company: string; portfolioName: string }, b: { ticker: string; company: string; portfolioName: string }) => 
               a.ticker.localeCompare(b.ticker)
             );
           
-          console.log('[PriceHistoryChart] After filtering - Available tickers:', tickers.length);
-          console.log('[PriceHistoryChart] Filtered tickers:', tickers.map((t: { ticker: string; company: string; portfolioName: string }) => t.ticker).join(', '));
-          const hasCW8 = tickers.some((t: { ticker: string; company: string; portfolioName: string }) => t.ticker === 'CW8U.PA');
-          console.log('[PriceHistoryChart] CW8U.PA in final list?', hasCW8);
-          console.log('[PriceHistoryChart] ===== DEBUG END =====');
+          console.log('[PriceHistoryChart] BENCHMARK tickers available:', tickers.length);
+          console.log('[PriceHistoryChart] Tickers:', tickers.map((t: { ticker: string; company: string; portfolioName: string }) => t.ticker).join(', '));
           
           setAvailableTickers(tickers);
           
-          // Set CW8U.PA as default if available and no comparison is active
-          if (hasCW8 && !compareTicker && ticker !== 'CW8U.PA') {
-            console.log('[PriceHistoryChart] Setting CW8U.PA as default comparison');
-            setCompareTicker('CW8U.PA');
+          // Set first benchmark ticker as default if available
+          if (tickers.length > 0 && !compareTicker && ticker !== tickers[0].ticker) {
+            console.log(`[PriceHistoryChart] Setting ${tickers[0].ticker} as default comparison`);
+            setCompareTicker(tickers[0].ticker);
           }
         } else {
           console.error('[PriceHistoryChart] API request failed:', response.status, response.statusText);
