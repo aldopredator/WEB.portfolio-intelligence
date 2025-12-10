@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
 import {
   BarChart3,
   ListChecks,
@@ -13,7 +14,9 @@ import {
   Menu,
   X,
   Briefcase,
-  Package
+  Package,
+  LogOut,
+  User
 } from 'lucide-react';
 import { usePortfolio } from '@/lib/portfolio-context';
 import {
@@ -29,6 +32,7 @@ export function SidebarNavigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const { selectedPortfolio, portfolios, selectPortfolio } = usePortfolio();
+  const { data: session } = useSession() || {};
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: BarChart3, description: 'Stock insights & analytics' },
@@ -132,6 +136,44 @@ export function SidebarNavigation() {
           )}
         </button>
       </nav>
+
+      {/* User Profile Section */}
+      {!collapsed && session?.user && (
+        <div className="p-4 border-t border-slate-800/50">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
+              {session.user.name?.[0] || session.user.email?.[0] || 'U'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">
+                {session.user.name || 'User'}
+              </p>
+              <p className="text-xs text-slate-400 truncate">
+                {session.user.email}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            className="w-full flex items-center gap-2 px-4 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="text-sm">Sign Out</span>
+          </button>
+        </div>
+      )}
+
+      {collapsed && session?.user && (
+        <div className="p-4 border-t border-slate-800/50 flex justify-center">
+          <button
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors"
+            title="Sign Out"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
+        </div>
+      )}
     </>
   );
 
