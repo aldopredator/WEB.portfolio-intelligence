@@ -19,6 +19,11 @@ export async function POST(request: NextRequest) {
     // Verify the target portfolio exists
     const targetPortfolio = await prisma.portfolio.findUnique({
       where: { id: targetPortfolioId },
+      select: {
+        id: true,
+        name: true,
+        userId: true
+      }
     });
 
     if (!targetPortfolio) {

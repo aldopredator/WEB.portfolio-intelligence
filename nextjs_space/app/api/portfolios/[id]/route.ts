@@ -33,7 +33,16 @@ export async function PUT(
 
     // Verify ownership
     const portfolio = await prisma.portfolio.findUnique({
-      where: { id }
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        isLocked: true,
+        userId: true,
+        createdAt: true,
+        updatedAt: true
+      }
     });
 
     if (!portfolio || portfolio.userId !== session.user.id) {
@@ -103,7 +112,9 @@ export async function DELETE(
     // Check if portfolio exists and verify ownership
     const portfolio = await prisma.portfolio.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        userId: true,
         _count: {
           select: { stocks: true }
         }
