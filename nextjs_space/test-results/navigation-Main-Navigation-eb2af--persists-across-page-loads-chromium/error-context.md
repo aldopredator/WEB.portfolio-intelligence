@@ -1,0 +1,1673 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e5]:
+        - img [ref=e7]
+        - generic [ref=e9]:
+          - heading "Portfolio Intelligence" [level=1] [ref=e10]
+          - paragraph [ref=e11]: Solutions
+    - complementary [ref=e12]:
+      - navigation [ref=e13]:
+        - link "Dashboard Stock insights & analytics" [ref=e14] [cursor=pointer]:
+          - /url: /?portfolio=cmirgdwtm00092gdpj701hwwy
+          - img [ref=e15]
+          - generic [ref=e17]:
+            - paragraph [ref=e18]: Dashboard
+            - paragraph [ref=e19]: Stock insights & analytics
+        - link "Portfolios Manage your portfolios" [ref=e20] [cursor=pointer]:
+          - /url: /portfolios
+          - img [ref=e21]
+          - generic [ref=e24]:
+            - paragraph [ref=e25]: Portfolios
+            - paragraph [ref=e26]: Manage your portfolios
+        - link "Screening Stock screening results" [ref=e27] [cursor=pointer]:
+          - /url: /screening
+          - img [ref=e28]
+          - generic [ref=e30]:
+            - paragraph [ref=e31]: Screening
+            - paragraph [ref=e32]: Stock screening results
+        - button "Collapse" [ref=e33] [cursor=pointer]:
+          - img [ref=e34]
+          - generic [ref=e36]: Collapse
+    - main [ref=e39]:
+      - generic [ref=e40]:
+        - generic [ref=e42]:
+          - generic [ref=e44] [cursor=pointer]:
+            - img [ref=e45]
+            - paragraph [ref=e47]: Collapse
+          - generic [ref=e48]:
+            - generic [ref=e49]:
+              - generic [ref=e50]: Portfolio Filter
+              - generic [ref=e51]:
+                - combobox [ref=e52] [cursor=pointer]:
+                  - generic [ref=e53]:
+                    - img [ref=e54]
+                    - text: BARCLAYS
+                - textbox: cmirgdwtm00092gdpj701hwwy
+                - img
+                - group:
+                  - generic: Portfolio Filter
+            - generic [ref=e59]: Showing 183 tickers from BARCLAYS
+            - generic [ref=e60]:
+              - heading "Rating" [level=6] [ref=e61]
+              - generic [ref=e62]:
+                - generic [ref=e63] [cursor=pointer]: ☆ Not Rated
+                - generic [ref=e64] [cursor=pointer]: ⭐ 1+
+                - generic [ref=e65] [cursor=pointer]: ⭐ 2+
+                - generic [ref=e66] [cursor=pointer]: ⭐ 3+
+                - generic [ref=e67] [cursor=pointer]: ⭐ 4+
+                - generic [ref=e68] [cursor=pointer]: ⭐ 5
+                - generic [ref=e69] [cursor=pointer]: 🔄 All
+          - generic [ref=e70]:
+            - heading "Search Tickers" [level=6] [ref=e71]
+            - generic [ref=e75]:
+              - img [ref=e77]
+              - textbox "Search by ticker or company name..." [ref=e80]
+              - group
+          - generic [ref=e81]:
+            - heading "Tickers (183)" [level=6] [ref=e82]
+            - generic:
+              - generic [ref=e84] [cursor=pointer]:
+                - generic [ref=e85]:
+                  - paragraph [ref=e87]: AAL
+                  - paragraph [ref=e88]: AAL
+                  - paragraph [ref=e89]: Rated 4m ago
+                - generic [ref=e90]:
+                  - paragraph [ref=e91]: +0.00%
+                  - button "Delete AAL" [ref=e92]:
+                    - img [ref=e93]
+              - generic [ref=e97] [cursor=pointer]:
+                - generic [ref=e98]:
+                  - paragraph [ref=e100]: AAPL
+                  - paragraph [ref=e101]: Apple Inc.
+                - generic [ref=e102]:
+                  - paragraph [ref=e103]: +0.00%
+                  - button "Delete AAPL" [ref=e104]:
+                    - img [ref=e105]
+              - generic [ref=e109] [cursor=pointer]:
+                - generic [ref=e110]:
+                  - paragraph [ref=e112]: ABBV
+                  - paragraph [ref=e113]: ABBV
+                  - paragraph [ref=e114]: Rated 4m ago
+                - generic [ref=e115]:
+                  - paragraph [ref=e116]: +0.00%
+                  - button "Delete ABBV" [ref=e117]:
+                    - img [ref=e118]
+              - generic [ref=e122] [cursor=pointer]:
+                - generic [ref=e123]:
+                  - paragraph [ref=e125]: ABCL
+                  - paragraph [ref=e126]: ABCL
+                - generic [ref=e127]:
+                  - paragraph [ref=e128]: +0.00%
+                  - button "Delete ABCL" [ref=e129]:
+                    - img [ref=e130]
+              - generic [ref=e134] [cursor=pointer]:
+                - generic [ref=e135]:
+                  - paragraph [ref=e137]: ABNB
+                  - paragraph [ref=e138]: ABNB
+                - generic [ref=e139]:
+                  - paragraph [ref=e140]: +0.00%
+                  - button "Delete ABNB" [ref=e141]:
+                    - img [ref=e142]
+              - generic [ref=e146] [cursor=pointer]:
+                - generic [ref=e147]:
+                  - paragraph [ref=e149]: ABSI
+                  - paragraph [ref=e150]: ABSI
+                - generic [ref=e151]:
+                  - paragraph [ref=e152]: +0.00%
+                  - button "Delete ABSI" [ref=e153]:
+                    - img [ref=e154]
+              - generic [ref=e158] [cursor=pointer]:
+                - generic [ref=e159]:
+                  - paragraph [ref=e161]: ABT
+                  - paragraph [ref=e162]: ABT
+                - generic [ref=e163]:
+                  - paragraph [ref=e164]: +0.00%
+                  - button "Delete ABT" [ref=e165]:
+                    - img [ref=e166]
+              - generic [ref=e170] [cursor=pointer]:
+                - generic [ref=e171]:
+                  - generic [ref=e172]:
+                    - paragraph [ref=e173]: ACI
+                    - img "Portfolio is locked" [ref=e174]
+                  - paragraph [ref=e177]: Albertsons Companies, Inc.
+                - generic [ref=e178]:
+                  - paragraph [ref=e179]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e181] [cursor=pointer]:
+                - generic [ref=e182]:
+                  - paragraph [ref=e184]: ACMR
+                  - paragraph [ref=e185]: ACMR
+                - generic [ref=e186]:
+                  - paragraph [ref=e187]: +0.00%
+                  - button "Delete ACMR" [ref=e188]:
+                    - img [ref=e189]
+              - generic [ref=e193] [cursor=pointer]:
+                - generic [ref=e194]:
+                  - paragraph [ref=e196]: ADBE
+                  - paragraph [ref=e197]: ADBE
+                - generic [ref=e198]:
+                  - paragraph [ref=e199]: +0.00%
+                  - button "Delete ADBE" [ref=e200]:
+                    - img [ref=e201]
+              - generic [ref=e205] [cursor=pointer]:
+                - generic [ref=e206]:
+                  - paragraph [ref=e208]: ADP
+                  - paragraph [ref=e209]: ADP
+                - generic [ref=e210]:
+                  - paragraph [ref=e211]: +0.00%
+                  - button "Delete ADP" [ref=e212]:
+                    - img [ref=e213]
+              - generic [ref=e217] [cursor=pointer]:
+                - generic [ref=e218]:
+                  - paragraph [ref=e220]: ADPT
+                  - paragraph [ref=e221]: ADPT
+                - generic [ref=e222]:
+                  - paragraph [ref=e223]: +0.00%
+                  - button "Delete ADPT" [ref=e224]:
+                    - img [ref=e225]
+              - generic [ref=e229] [cursor=pointer]:
+                - generic [ref=e230]:
+                  - paragraph [ref=e232]: AEC
+                  - paragraph [ref=e233]: AEC
+                - generic [ref=e234]:
+                  - paragraph [ref=e235]: +0.00%
+                  - button "Delete AEC" [ref=e236]:
+                    - img [ref=e237]
+              - generic [ref=e241] [cursor=pointer]:
+                - generic [ref=e242]:
+                  - paragraph [ref=e244]: AEP
+                  - paragraph [ref=e245]: AEP
+                - generic [ref=e246]:
+                  - paragraph [ref=e247]: +0.00%
+                  - button "Delete AEP" [ref=e248]:
+                    - img [ref=e249]
+              - generic [ref=e253] [cursor=pointer]:
+                - generic [ref=e254]:
+                  - paragraph [ref=e256]: AIRB
+                  - paragraph [ref=e257]: AIRB - Search externally
+                - generic [ref=e258]:
+                  - paragraph [ref=e259]: +0.00%
+                  - button "Delete AIRB" [ref=e260]:
+                    - img [ref=e261]
+              - generic [ref=e265] [cursor=pointer]:
+                - generic [ref=e266]:
+                  - paragraph [ref=e268]: AIRBUS
+                  - paragraph [ref=e269]: AIRBUS - Search externally
+                - generic [ref=e270]:
+                  - paragraph [ref=e271]: +0.00%
+                  - button "Delete AIRBUS" [ref=e272]:
+                    - img [ref=e273]
+              - generic [ref=e277] [cursor=pointer]:
+                - generic [ref=e278]:
+                  - generic [ref=e279]:
+                    - paragraph [ref=e280]: AKAM
+                    - img "Portfolio is locked" [ref=e281]
+                  - paragraph [ref=e284]: Akamai Technologies, Inc.
+                  - paragraph [ref=e285]: Rated 3h ago
+                - generic [ref=e286]:
+                  - paragraph [ref=e287]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e289] [cursor=pointer]:
+                - generic [ref=e290]:
+                  - generic [ref=e291]:
+                    - paragraph [ref=e292]: ALAB
+                    - img "Portfolio is locked" [ref=e293]
+                  - paragraph [ref=e296]: Astera Labs, Inc.
+                - generic [ref=e297]:
+                  - paragraph [ref=e298]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e300] [cursor=pointer]:
+                - generic [ref=e301]:
+                  - generic [ref=e302]:
+                    - paragraph [ref=e303]: ALGN
+                    - img "Portfolio is locked" [ref=e304]
+                  - paragraph [ref=e307]: Align Technology, Inc.
+                - generic [ref=e308]:
+                  - paragraph [ref=e309]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e311] [cursor=pointer]:
+                - generic [ref=e312]:
+                  - paragraph [ref=e314]: AMAT
+                  - paragraph [ref=e315]: AMAT
+                - generic [ref=e316]:
+                  - paragraph [ref=e317]: +0.00%
+                  - button "Delete AMAT" [ref=e318]:
+                    - img [ref=e319]
+              - generic [ref=e323] [cursor=pointer]:
+                - generic [ref=e324]:
+                  - paragraph [ref=e326]: AMC
+                  - paragraph [ref=e327]: AMC
+                - generic [ref=e328]:
+                  - paragraph [ref=e329]: +0.00%
+                  - button "Delete AMC" [ref=e330]:
+                    - img [ref=e331]
+              - generic [ref=e335] [cursor=pointer]:
+                - generic [ref=e336]:
+                  - paragraph [ref=e338]: AMRX
+                  - paragraph [ref=e339]: AMRX
+                - generic [ref=e340]:
+                  - paragraph [ref=e341]: +0.00%
+                  - button "Delete AMRX" [ref=e342]:
+                    - img [ref=e343]
+              - generic [ref=e347] [cursor=pointer]:
+                - generic [ref=e348]:
+                  - generic [ref=e349]:
+                    - paragraph [ref=e350]: AMRZ
+                    - img "Portfolio is locked" [ref=e351]
+                  - paragraph [ref=e354]: Amrize Ltd
+                  - paragraph [ref=e355]: Rated 1h ago
+                - generic [ref=e356]:
+                  - paragraph [ref=e357]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e359] [cursor=pointer]:
+                - generic [ref=e360]:
+                  - generic [ref=e361]:
+                    - paragraph [ref=e362]: AMZN
+                    - img "Portfolio is locked" [ref=e363]
+                  - paragraph [ref=e366]: Amazon.com Inc. (AMZN)
+                  - paragraph [ref=e367]: Rated 1h ago
+                - generic [ref=e368]:
+                  - paragraph [ref=e369]: +1.56%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e371] [cursor=pointer]:
+                - generic [ref=e372]:
+                  - paragraph [ref=e374]: ANET
+                  - paragraph [ref=e375]: ANET
+                - generic [ref=e376]:
+                  - paragraph [ref=e377]: +0.00%
+                  - button "Delete ANET" [ref=e378]:
+                    - img [ref=e379]
+              - generic [ref=e383] [cursor=pointer]:
+                - generic [ref=e384]:
+                  - paragraph [ref=e386]: ANF
+                  - paragraph [ref=e387]: ANF
+                - generic [ref=e388]:
+                  - paragraph [ref=e389]: +0.00%
+                  - button "Delete ANF" [ref=e390]:
+                    - img [ref=e391]
+              - generic [ref=e395] [cursor=pointer]:
+                - generic [ref=e396]:
+                  - paragraph [ref=e398]: APH
+                  - paragraph [ref=e399]: APH
+                - generic [ref=e400]:
+                  - paragraph [ref=e401]: +0.00%
+                  - button "Delete APH" [ref=e402]:
+                    - img [ref=e403]
+              - generic [ref=e407] [cursor=pointer]:
+                - generic [ref=e408]:
+                  - paragraph [ref=e410]: ARE
+                  - paragraph [ref=e411]: ARE
+                - generic [ref=e412]:
+                  - paragraph [ref=e413]: +0.00%
+                  - button "Delete ARE" [ref=e414]:
+                    - img [ref=e415]
+              - generic [ref=e419] [cursor=pointer]:
+                - generic [ref=e420]:
+                  - paragraph [ref=e422]: ASML
+                  - paragraph [ref=e423]: ASML
+                - generic [ref=e424]:
+                  - paragraph [ref=e425]: +0.00%
+                  - button "Delete ASML" [ref=e426]:
+                    - img [ref=e427]
+              - generic [ref=e431] [cursor=pointer]:
+                - generic [ref=e432]:
+                  - paragraph [ref=e434]: ASTS
+                  - paragraph [ref=e435]: ASTS
+                - generic [ref=e436]:
+                  - paragraph [ref=e437]: +0.00%
+                  - button "Delete ASTS" [ref=e438]:
+                    - img [ref=e439]
+              - generic [ref=e443] [cursor=pointer]:
+                - generic [ref=e444]:
+                  - paragraph [ref=e446]: ATR
+                  - paragraph [ref=e447]: ATR
+                  - paragraph [ref=e448]: Rated 2m ago
+                - generic [ref=e449]:
+                  - paragraph [ref=e450]: +0.00%
+                  - button "Delete ATR" [ref=e451]:
+                    - img [ref=e452]
+              - generic [ref=e456] [cursor=pointer]:
+                - generic [ref=e457]:
+                  - paragraph [ref=e459]: AVGO
+                  - paragraph [ref=e460]: AVGO
+                - generic [ref=e461]:
+                  - paragraph [ref=e462]: +0.00%
+                  - button "Delete AVGO" [ref=e463]:
+                    - img [ref=e464]
+              - generic [ref=e468] [cursor=pointer]:
+                - generic [ref=e469]:
+                  - paragraph [ref=e471]: AZN
+                  - paragraph [ref=e472]: AZN - Search externally
+                - generic [ref=e473]:
+                  - paragraph [ref=e474]: +0.00%
+                  - button "Delete AZN" [ref=e475]:
+                    - img [ref=e476]
+              - generic [ref=e480] [cursor=pointer]:
+                - generic [ref=e481]:
+                  - paragraph [ref=e483]: BA
+                  - paragraph [ref=e484]: BA
+                - generic [ref=e485]:
+                  - paragraph [ref=e486]: +0.00%
+                  - button "Delete BA" [ref=e487]:
+                    - img [ref=e488]
+              - generic [ref=e492] [cursor=pointer]:
+                - generic [ref=e493]:
+                  - paragraph [ref=e495]: BAC
+                  - paragraph [ref=e496]: BAC
+                - generic [ref=e497]:
+                  - paragraph [ref=e498]: +0.00%
+                  - button "Delete BAC" [ref=e499]:
+                    - img [ref=e500]
+              - generic [ref=e504] [cursor=pointer]:
+                - generic [ref=e505]:
+                  - generic [ref=e506]:
+                    - paragraph [ref=e507]: BE
+                    - img "Portfolio is locked" [ref=e508]
+                  - paragraph [ref=e511]: Bloom Energy Corporation
+                  - paragraph [ref=e512]: Rated 1h ago
+                - generic [ref=e513]:
+                  - paragraph [ref=e514]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e516] [cursor=pointer]:
+                - generic [ref=e517]:
+                  - paragraph [ref=e519]: BEAM
+                  - paragraph [ref=e520]: BEAM
+                - generic [ref=e521]:
+                  - paragraph [ref=e522]: +0.00%
+                  - button "Delete BEAM" [ref=e523]:
+                    - img [ref=e524]
+              - generic [ref=e528] [cursor=pointer]:
+                - generic [ref=e529]:
+                  - paragraph [ref=e531]: BHP
+                  - paragraph [ref=e532]: BHP
+                - generic [ref=e533]:
+                  - paragraph [ref=e534]: +0.00%
+                  - button "Delete BHP" [ref=e535]:
+                    - img [ref=e536]
+              - generic [ref=e540] [cursor=pointer]:
+                - generic [ref=e541]:
+                  - paragraph [ref=e543]: BKSY
+                  - paragraph [ref=e544]: BKSY
+                - generic [ref=e545]:
+                  - paragraph [ref=e546]: +0.00%
+                  - button "Delete BKSY" [ref=e547]:
+                    - img [ref=e548]
+              - generic [ref=e552] [cursor=pointer]:
+                - generic [ref=e553]:
+                  - paragraph [ref=e555]: BLK
+                  - paragraph [ref=e556]: BLK
+                - generic [ref=e557]:
+                  - paragraph [ref=e558]: +0.00%
+                  - button "Delete BLK" [ref=e559]:
+                    - img [ref=e560]
+              - generic [ref=e564] [cursor=pointer]:
+                - generic [ref=e565]:
+                  - generic [ref=e566]:
+                    - paragraph [ref=e567]: BMRN
+                    - img "Portfolio is locked" [ref=e568]
+                  - paragraph [ref=e571]: BioMarin Pharmaceutical Inc.
+                - generic [ref=e572]:
+                  - paragraph [ref=e573]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e575] [cursor=pointer]:
+                - generic [ref=e576]:
+                  - paragraph [ref=e578]: BOEI
+                  - paragraph [ref=e579]: BOEI - Search externally
+                - generic [ref=e580]:
+                  - paragraph [ref=e581]: +0.00%
+                  - button "Delete BOEI" [ref=e582]:
+                    - img [ref=e583]
+              - generic [ref=e587] [cursor=pointer]:
+                - generic [ref=e588]:
+                  - generic [ref=e589]:
+                    - paragraph [ref=e590]: BRK-B
+                    - img "Portfolio is locked" [ref=e591]
+                  - paragraph [ref=e594]: Berkshire Hathaway Inc. (BRK-B)
+                - generic [ref=e595]:
+                  - paragraph [ref=e596]: +0.45%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e598] [cursor=pointer]:
+                - generic [ref=e599]:
+                  - paragraph [ref=e601]: BRKB
+                  - paragraph [ref=e602]: BRKB
+                - generic [ref=e603]:
+                  - paragraph [ref=e604]: +0.00%
+                  - button "Delete BRKB" [ref=e605]:
+                    - img [ref=e606]
+              - generic [ref=e610] [cursor=pointer]:
+                - generic [ref=e611]:
+                  - paragraph [ref=e613]: CAT
+                  - paragraph [ref=e614]: CAT
+                - generic [ref=e615]:
+                  - paragraph [ref=e616]: +0.00%
+                  - button "Delete CAT" [ref=e617]:
+                    - img [ref=e618]
+              - generic [ref=e622] [cursor=pointer]:
+                - generic [ref=e623]:
+                  - paragraph [ref=e625]: CB
+                  - paragraph [ref=e626]: CB
+                - generic [ref=e627]:
+                  - paragraph [ref=e628]: +0.00%
+                  - button "Delete CB" [ref=e629]:
+                    - img [ref=e630]
+              - generic [ref=e634] [cursor=pointer]:
+                - generic [ref=e635]:
+                  - generic [ref=e636]:
+                    - paragraph [ref=e637]: CCK
+                    - img "Portfolio is locked" [ref=e638]
+                  - paragraph [ref=e641]: Crown Holdings, Inc.
+                  - paragraph [ref=e642]: Rated 5h ago
+                - generic [ref=e643]:
+                  - paragraph [ref=e644]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e646] [cursor=pointer]:
+                - generic [ref=e647]:
+                  - paragraph [ref=e649]: CD
+                  - paragraph [ref=e650]: CD
+                - generic [ref=e651]:
+                  - paragraph [ref=e652]: +0.00%
+                  - button "Delete CD" [ref=e653]:
+                    - img [ref=e654]
+              - generic [ref=e658] [cursor=pointer]:
+                - generic [ref=e659]:
+                  - paragraph [ref=e661]: CDNS
+                  - paragraph [ref=e662]: CDNS
+                  - paragraph [ref=e663]: Rated 1h ago
+                - generic [ref=e664]:
+                  - paragraph [ref=e665]: +0.00%
+                  - button "Delete CDNS" [ref=e666]:
+                    - img [ref=e667]
+              - generic [ref=e671] [cursor=pointer]:
+                - generic [ref=e672]:
+                  - paragraph [ref=e674]: CDTX
+                  - paragraph [ref=e675]: CDTX
+                - generic [ref=e676]:
+                  - paragraph [ref=e677]: +0.00%
+                  - button "Delete CDTX" [ref=e678]:
+                    - img [ref=e679]
+              - generic [ref=e683] [cursor=pointer]:
+                - generic [ref=e684]:
+                  - generic [ref=e685]:
+                    - paragraph [ref=e686]: CIEN
+                    - img "Portfolio is locked" [ref=e687]
+                  - paragraph [ref=e690]: Ciena Corporation
+                  - paragraph [ref=e691]: Rated 5h ago
+                - generic [ref=e692]:
+                  - paragraph [ref=e693]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e695] [cursor=pointer]:
+                - generic [ref=e696]:
+                  - paragraph [ref=e698]: CMCSA
+                  - paragraph [ref=e699]: CMCSA
+                - generic [ref=e700]:
+                  - paragraph [ref=e701]: +0.00%
+                  - button "Delete CMCSA" [ref=e702]:
+                    - img [ref=e703]
+              - generic [ref=e707] [cursor=pointer]:
+                - generic [ref=e708]:
+                  - paragraph [ref=e710]: CMG
+                  - paragraph [ref=e711]: CMG
+                  - paragraph [ref=e712]: Rated Yesterday
+                - generic [ref=e713]:
+                  - paragraph [ref=e714]: +0.00%
+                  - button "Delete CMG" [ref=e715]:
+                    - img [ref=e716]
+              - generic [ref=e720] [cursor=pointer]:
+                - generic [ref=e721]:
+                  - paragraph [ref=e723]: COHR
+                  - paragraph [ref=e724]: COHR
+                - generic [ref=e725]:
+                  - paragraph [ref=e726]: +0.00%
+                  - button "Delete COHR" [ref=e727]:
+                    - img [ref=e728]
+              - generic [ref=e732] [cursor=pointer]:
+                - generic [ref=e733]:
+                  - paragraph [ref=e735]: COLL
+                  - paragraph [ref=e736]: COLL
+                - generic [ref=e737]:
+                  - paragraph [ref=e738]: +0.00%
+                  - button "Delete COLL" [ref=e739]:
+                    - img [ref=e740]
+              - generic [ref=e744] [cursor=pointer]:
+                - generic [ref=e745]:
+                  - paragraph [ref=e747]: COST
+                  - paragraph [ref=e748]: COST
+                  - paragraph [ref=e749]: Rated Yesterday
+                - generic [ref=e750]:
+                  - paragraph [ref=e751]: +0.00%
+                  - button "Delete COST" [ref=e752]:
+                    - img [ref=e753]
+              - generic [ref=e757] [cursor=pointer]:
+                - generic [ref=e758]:
+                  - paragraph [ref=e760]: COSTCO
+                  - paragraph [ref=e761]: COSTCO - Search externally
+                - generic [ref=e762]:
+                  - paragraph [ref=e763]: +0.00%
+                  - button "Delete COSTCO" [ref=e764]:
+                    - img [ref=e765]
+              - generic [ref=e769] [cursor=pointer]:
+                - generic [ref=e770]:
+                  - generic [ref=e771]:
+                    - paragraph [ref=e772]: CPT
+                    - img "Portfolio is locked" [ref=e773]
+                  - paragraph [ref=e776]: Camden Property Trust
+                  - paragraph [ref=e777]: Rated 5h ago
+                - generic [ref=e778]:
+                  - paragraph [ref=e779]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e781] [cursor=pointer]:
+                - generic [ref=e782]:
+                  - generic [ref=e783]:
+                    - paragraph [ref=e784]: CRDO
+                    - img "Portfolio is locked" [ref=e785]
+                  - paragraph [ref=e788]: CRDO
+                  - paragraph [ref=e789]: Rated 1h ago
+                - generic [ref=e790]:
+                  - paragraph [ref=e791]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e793] [cursor=pointer]:
+                - generic [ref=e794]:
+                  - paragraph [ref=e796]: CRM
+                  - paragraph [ref=e797]: CRM
+                - generic [ref=e798]:
+                  - paragraph [ref=e799]: +0.00%
+                  - button "Delete CRM" [ref=e800]:
+                    - img [ref=e801]
+              - generic [ref=e805] [cursor=pointer]:
+                - generic [ref=e806]:
+                  - paragraph [ref=e808]: CRSP
+                  - paragraph [ref=e809]: CRSP
+                - generic [ref=e810]:
+                  - paragraph [ref=e811]: +0.00%
+                  - button "Delete CRSP" [ref=e812]:
+                    - img [ref=e813]
+              - generic [ref=e817] [cursor=pointer]:
+                - generic [ref=e818]:
+                  - generic [ref=e819]:
+                    - paragraph [ref=e820]: CRWV
+                    - img "Portfolio is locked" [ref=e821]
+                  - paragraph [ref=e824]: CRWV
+                  - paragraph [ref=e825]: Rated 1h ago
+                - generic [ref=e826]:
+                  - paragraph [ref=e827]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e829] [cursor=pointer]:
+                - generic [ref=e830]:
+                  - paragraph [ref=e832]: CW8U.PA
+                  - paragraph [ref=e833]: Amundi MSCI World Swap UCITS ET
+                - generic [ref=e834]:
+                  - paragraph [ref=e835]: +0.00%
+                  - button "Delete CW8U.PA" [ref=e836]:
+                    - img [ref=e837]
+              - generic [ref=e841] [cursor=pointer]:
+                - generic [ref=e842]:
+                  - paragraph [ref=e844]: DASH
+                  - paragraph [ref=e845]: DASH
+                  - paragraph [ref=e846]: Rated 23h ago
+                - generic [ref=e847]:
+                  - paragraph [ref=e848]: +0.00%
+                  - button "Delete DASH" [ref=e849]:
+                    - img [ref=e850]
+              - generic [ref=e854] [cursor=pointer]:
+                - generic [ref=e855]:
+                  - paragraph [ref=e857]: DELL
+                  - paragraph [ref=e858]: DELL
+                  - paragraph [ref=e859]: Rated 1h ago
+                - generic [ref=e860]:
+                  - paragraph [ref=e861]: +0.00%
+                  - button "Delete DELL" [ref=e862]:
+                    - img [ref=e863]
+              - generic [ref=e867] [cursor=pointer]:
+                - generic [ref=e868]:
+                  - paragraph [ref=e870]: DLR
+                  - paragraph [ref=e871]: DLR
+                  - paragraph [ref=e872]: Rated Yesterday
+                - generic [ref=e873]:
+                  - paragraph [ref=e874]: +0.00%
+                  - button "Delete DLR" [ref=e875]:
+                    - img [ref=e876]
+              - generic [ref=e880] [cursor=pointer]:
+                - generic [ref=e881]:
+                  - paragraph [ref=e883]: DOCN
+                  - paragraph [ref=e884]: DOCN
+                  - paragraph [ref=e885]: Rated 1h ago
+                - generic [ref=e886]:
+                  - paragraph [ref=e887]: +0.00%
+                  - button "Delete DOCN" [ref=e888]:
+                    - img [ref=e889]
+              - generic [ref=e893] [cursor=pointer]:
+                - generic [ref=e894]:
+                  - paragraph [ref=e896]: DOCU
+                  - paragraph [ref=e897]: DOCU
+                  - paragraph [ref=e898]: Rated Yesterday
+                - generic [ref=e899]:
+                  - paragraph [ref=e900]: +0.00%
+                  - button "Delete DOCU" [ref=e901]:
+                    - img [ref=e902]
+              - generic [ref=e906] [cursor=pointer]:
+                - generic [ref=e907]:
+                  - paragraph [ref=e909]: DSVSF
+                  - paragraph [ref=e910]: DSVSF
+                  - paragraph [ref=e911]: Rated 22h ago
+                - generic [ref=e912]:
+                  - paragraph [ref=e913]: +0.00%
+                  - button "Delete DSVSF" [ref=e914]:
+                    - img [ref=e915]
+              - generic [ref=e919] [cursor=pointer]:
+                - generic [ref=e920]:
+                  - paragraph [ref=e922]: DUOL
+                  - paragraph [ref=e923]: DUOL
+                - generic [ref=e924]:
+                  - paragraph [ref=e925]: +0.00%
+                  - button "Delete DUOL" [ref=e926]:
+                    - img [ref=e927]
+              - generic [ref=e931] [cursor=pointer]:
+                - generic [ref=e932]:
+                  - generic [ref=e933]:
+                    - paragraph [ref=e934]: DVA
+                    - img "Portfolio is locked" [ref=e935]
+                  - paragraph [ref=e938]: DaVita Inc.
+                - generic [ref=e939]:
+                  - paragraph [ref=e940]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e942] [cursor=pointer]:
+                - generic [ref=e943]:
+                  - paragraph [ref=e945]: EA
+                  - paragraph [ref=e946]: EA
+                - generic [ref=e947]:
+                  - paragraph [ref=e948]: +0.00%
+                  - button "Delete EA" [ref=e949]:
+                    - img [ref=e950]
+              - generic [ref=e954] [cursor=pointer]:
+                - generic [ref=e955]:
+                  - paragraph [ref=e957]: EQR
+                  - paragraph [ref=e958]: EQR
+                - generic [ref=e959]:
+                  - paragraph [ref=e960]: +0.00%
+                  - button "Delete EQR" [ref=e961]:
+                    - img [ref=e962]
+              - generic [ref=e966] [cursor=pointer]:
+                - generic [ref=e967]:
+                  - paragraph [ref=e969]: EXEL
+                  - paragraph [ref=e970]: EXEL
+                - generic [ref=e971]:
+                  - paragraph [ref=e972]: +0.00%
+                  - button "Delete EXEL" [ref=e973]:
+                    - img [ref=e974]
+              - generic [ref=e978] [cursor=pointer]:
+                - generic [ref=e979]:
+                  - generic [ref=e980]:
+                    - paragraph [ref=e981]: FDS
+                    - img "Portfolio is locked" [ref=e982]
+                  - paragraph [ref=e985]: FactSet Research Systems Inc.
+                - generic [ref=e986]:
+                  - paragraph [ref=e987]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e989] [cursor=pointer]:
+                - generic [ref=e990]:
+                  - generic [ref=e991]:
+                    - paragraph [ref=e992]: FIX
+                    - img "Portfolio is locked" [ref=e993]
+                  - paragraph [ref=e996]: Comfort Systems USA, Inc.
+                  - paragraph [ref=e997]: Rated 1h ago
+                - generic [ref=e998]:
+                  - paragraph [ref=e999]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1001] [cursor=pointer]:
+                - generic [ref=e1002]:
+                  - generic [ref=e1003]:
+                    - paragraph [ref=e1004]: FLEX
+                    - img "Portfolio is locked" [ref=e1005]
+                  - paragraph [ref=e1008]: Flex Ltd.
+                - generic [ref=e1009]:
+                  - paragraph [ref=e1010]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1012] [cursor=pointer]:
+                - generic [ref=e1013]:
+                  - paragraph [ref=e1015]: FLY
+                  - paragraph [ref=e1016]: FLY
+                - generic [ref=e1017]:
+                  - paragraph [ref=e1018]: +0.00%
+                  - button "Delete FLY" [ref=e1019]:
+                    - img [ref=e1020]
+              - generic [ref=e1024] [cursor=pointer]:
+                - generic [ref=e1025]:
+                  - paragraph [ref=e1027]: GEHC
+                  - paragraph [ref=e1028]: GEHC
+                - generic [ref=e1029]:
+                  - paragraph [ref=e1030]: +0.00%
+                  - button "Delete GEHC" [ref=e1031]:
+                    - img [ref=e1032]
+              - generic [ref=e1036] [cursor=pointer]:
+                - generic [ref=e1037]:
+                  - paragraph [ref=e1039]: GEV
+                  - paragraph [ref=e1040]: GEV
+                  - paragraph [ref=e1041]: Rated 22h ago
+                - generic [ref=e1042]:
+                  - paragraph [ref=e1043]: +0.00%
+                  - button "Delete GEV" [ref=e1044]:
+                    - img [ref=e1045]
+              - generic [ref=e1049] [cursor=pointer]:
+                - generic [ref=e1050]:
+                  - paragraph [ref=e1052]: GGG
+                  - paragraph [ref=e1053]: GGG
+                  - paragraph [ref=e1054]: Rated Yesterday
+                - generic [ref=e1055]:
+                  - paragraph [ref=e1056]: +0.00%
+                  - button "Delete GGG" [ref=e1057]:
+                    - img [ref=e1058]
+              - generic [ref=e1062] [cursor=pointer]:
+                - generic [ref=e1063]:
+                  - paragraph [ref=e1065]: GLE.PA
+                  - paragraph [ref=e1066]: SOCIETE GENERALE
+                  - paragraph [ref=e1067]: Rated 22h ago
+                - generic [ref=e1068]:
+                  - paragraph [ref=e1069]: +0.00%
+                  - button "Delete GLE.PA" [ref=e1070]:
+                    - img [ref=e1071]
+              - generic [ref=e1075] [cursor=pointer]:
+                - generic [ref=e1076]:
+                  - generic [ref=e1077]:
+                    - paragraph [ref=e1078]: GOOG
+                    - img "Portfolio is locked" [ref=e1079]
+                  - paragraph [ref=e1082]: Alphabet Inc.
+                  - paragraph [ref=e1083]: Rated Yesterday
+                - generic [ref=e1084]:
+                  - paragraph [ref=e1085]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1087] [cursor=pointer]:
+                - generic [ref=e1088]:
+                  - paragraph [ref=e1090]: GOOGL
+                  - paragraph [ref=e1091]: Alphabet Inc. Class A (GOOGL)
+                - generic [ref=e1092]:
+                  - paragraph [ref=e1093]: "-0.62%"
+                  - button "Delete GOOGL" [ref=e1094]:
+                    - img [ref=e1095]
+              - generic [ref=e1099] [cursor=pointer]:
+                - generic [ref=e1100]:
+                  - paragraph [ref=e1102]: GRMN
+                  - paragraph [ref=e1103]: GRMN
+                  - paragraph [ref=e1104]: Rated 1h ago
+                - generic [ref=e1105]:
+                  - paragraph [ref=e1106]: +0.00%
+                  - button "Delete GRMN" [ref=e1107]:
+                    - img [ref=e1108]
+              - generic [ref=e1112] [cursor=pointer]:
+                - generic [ref=e1113]:
+                  - paragraph [ref=e1115]: HD
+                  - paragraph [ref=e1116]: HD
+                - generic [ref=e1117]:
+                  - paragraph [ref=e1118]: +0.00%
+                  - button "Delete HD" [ref=e1119]:
+                    - img [ref=e1120]
+              - generic [ref=e1124] [cursor=pointer]:
+                - generic [ref=e1125]:
+                  - paragraph [ref=e1127]: HDB
+                  - paragraph [ref=e1128]: HDB
+                - generic [ref=e1129]:
+                  - paragraph [ref=e1130]: +0.00%
+                  - button "Delete HDB" [ref=e1131]:
+                    - img [ref=e1132]
+              - generic [ref=e1136] [cursor=pointer]:
+                - generic [ref=e1137]:
+                  - paragraph [ref=e1139]: HMC
+                  - paragraph [ref=e1140]: HMC
+                - generic [ref=e1141]:
+                  - paragraph [ref=e1142]: +0.00%
+                  - button "Delete HMC" [ref=e1143]:
+                    - img [ref=e1144]
+              - generic [ref=e1148] [cursor=pointer]:
+                - generic [ref=e1149]:
+                  - paragraph [ref=e1151]: IBM
+                  - paragraph [ref=e1152]: IBM - Search externally
+                  - paragraph [ref=e1153]: Rated Yesterday
+                - generic [ref=e1154]:
+                  - paragraph [ref=e1155]: +0.00%
+                  - button "Delete IBM" [ref=e1156]:
+                    - img [ref=e1157]
+              - generic [ref=e1161] [cursor=pointer]:
+                - generic [ref=e1162]:
+                  - paragraph [ref=e1164]: IBN
+                  - paragraph [ref=e1165]: IBN
+                - generic [ref=e1166]:
+                  - paragraph [ref=e1167]: +0.00%
+                  - button "Delete IBN" [ref=e1168]:
+                    - img [ref=e1169]
+              - generic [ref=e1173] [cursor=pointer]:
+                - generic [ref=e1174]:
+                  - paragraph [ref=e1176]: IDCC
+                  - paragraph [ref=e1177]: IDCC
+                  - paragraph [ref=e1178]: Rated 1h ago
+                - generic [ref=e1179]:
+                  - paragraph [ref=e1180]: +0.00%
+                  - button "Delete IDCC" [ref=e1181]:
+                    - img [ref=e1182]
+              - generic [ref=e1186] [cursor=pointer]:
+                - generic [ref=e1187]:
+                  - generic [ref=e1188]:
+                    - paragraph [ref=e1189]: IDXX
+                    - img "Portfolio is locked" [ref=e1190]
+                  - paragraph [ref=e1193]: IDEXX Laboratories Inc. (IDXX)
+                  - paragraph [ref=e1194]: Rated 16h ago
+                - generic [ref=e1195]:
+                  - paragraph [ref=e1196]: +0.24%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1198] [cursor=pointer]:
+                - generic [ref=e1199]:
+                  - paragraph [ref=e1201]: IHG
+                  - paragraph [ref=e1202]: IHG
+                - generic [ref=e1203]:
+                  - paragraph [ref=e1204]: +0.00%
+                  - button "Delete IHG" [ref=e1205]:
+                    - img [ref=e1206]
+              - generic [ref=e1210] [cursor=pointer]:
+                - generic [ref=e1211]:
+                  - paragraph [ref=e1213]: III
+                  - paragraph [ref=e1214]: Information Services Group, Inc.
+                - generic [ref=e1215]:
+                  - paragraph [ref=e1216]: +0.00%
+                  - button "Delete III" [ref=e1217]:
+                    - img [ref=e1218]
+              - generic [ref=e1222] [cursor=pointer]:
+                - generic [ref=e1223]:
+                  - paragraph [ref=e1225]: ILMN
+                  - paragraph [ref=e1226]: ILMN
+                - generic [ref=e1227]:
+                  - paragraph [ref=e1228]: +0.00%
+                  - button "Delete ILMN" [ref=e1229]:
+                    - img [ref=e1230]
+              - generic [ref=e1234] [cursor=pointer]:
+                - generic [ref=e1235]:
+                  - generic [ref=e1236]:
+                    - paragraph [ref=e1237]: INSM
+                    - img "Portfolio is locked" [ref=e1238]
+                  - paragraph [ref=e1241]: Insmed Incorporated
+                - generic [ref=e1242]:
+                  - paragraph [ref=e1243]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1245] [cursor=pointer]:
+                - generic [ref=e1246]:
+                  - paragraph [ref=e1248]: INTC
+                  - paragraph [ref=e1249]: INTC
+                  - paragraph [ref=e1250]: Rated 22h ago
+                - generic [ref=e1251]:
+                  - paragraph [ref=e1252]: +0.00%
+                  - button "Delete INTC" [ref=e1253]:
+                    - img [ref=e1254]
+              - generic [ref=e1258] [cursor=pointer]:
+                - generic [ref=e1259]:
+                  - generic [ref=e1260]:
+                    - paragraph [ref=e1261]: IONQ
+                    - img "Portfolio is locked" [ref=e1262]
+                  - paragraph [ref=e1265]: IONQ - Search externally
+                - generic [ref=e1266]:
+                  - paragraph [ref=e1267]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1269] [cursor=pointer]:
+                - generic [ref=e1270]:
+                  - generic [ref=e1271]:
+                    - paragraph [ref=e1272]: ISRG
+                    - img "Portfolio is locked" [ref=e1273]
+                  - paragraph [ref=e1276]: Intuitive Surgical Inc. (ISRG)
+                - generic [ref=e1277]:
+                  - paragraph [ref=e1278]: +1.18%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1280] [cursor=pointer]:
+                - generic [ref=e1281]:
+                  - paragraph [ref=e1283]: JAZZ
+                  - paragraph [ref=e1284]: JAZZ
+                - generic [ref=e1285]:
+                  - paragraph [ref=e1286]: +0.00%
+                  - button "Delete JAZZ" [ref=e1287]:
+                    - img [ref=e1288]
+              - generic [ref=e1292] [cursor=pointer]:
+                - generic [ref=e1293]:
+                  - paragraph [ref=e1295]: KO
+                  - paragraph [ref=e1296]: KO
+                - generic [ref=e1297]:
+                  - paragraph [ref=e1298]: +0.00%
+                  - button "Delete KO" [ref=e1299]:
+                    - img [ref=e1300]
+              - generic [ref=e1304] [cursor=pointer]:
+                - generic [ref=e1305]:
+                  - paragraph [ref=e1307]: KSS
+                  - paragraph [ref=e1308]: KSS
+                - generic [ref=e1309]:
+                  - paragraph [ref=e1310]: +0.00%
+                  - button "Delete KSS" [ref=e1311]:
+                    - img [ref=e1312]
+              - generic [ref=e1316] [cursor=pointer]:
+                - generic [ref=e1317]:
+                  - paragraph [ref=e1319]: LIN
+                  - paragraph [ref=e1320]: LIN
+                - generic [ref=e1321]:
+                  - paragraph [ref=e1322]: +0.00%
+                  - button "Delete LIN" [ref=e1323]:
+                    - img [ref=e1324]
+              - generic [ref=e1328] [cursor=pointer]:
+                - generic [ref=e1329]:
+                  - paragraph [ref=e1331]: LLY
+                  - paragraph [ref=e1332]: LLY
+                  - paragraph [ref=e1333]: Rated Yesterday
+                - generic [ref=e1334]:
+                  - paragraph [ref=e1335]: +0.00%
+                  - button "Delete LLY" [ref=e1336]:
+                    - img [ref=e1337]
+              - generic [ref=e1341] [cursor=pointer]:
+                - generic [ref=e1342]:
+                  - paragraph [ref=e1344]: LRCX
+                  - paragraph [ref=e1345]: LRCX
+                  - paragraph [ref=e1346]: Rated 1h ago
+                - generic [ref=e1347]:
+                  - paragraph [ref=e1348]: +0.00%
+                  - button "Delete LRCX" [ref=e1349]:
+                    - img [ref=e1350]
+              - generic [ref=e1354] [cursor=pointer]:
+                - generic [ref=e1355]:
+                  - paragraph [ref=e1357]: LULU
+                  - paragraph [ref=e1358]: LULU
+                - generic [ref=e1359]:
+                  - paragraph [ref=e1360]: +0.00%
+                  - button "Delete LULU" [ref=e1361]:
+                    - img [ref=e1362]
+              - generic [ref=e1366] [cursor=pointer]:
+                - generic [ref=e1367]:
+                  - paragraph [ref=e1369]: MAR
+                  - paragraph [ref=e1370]: MAR
+                  - paragraph [ref=e1371]: Rated Yesterday
+                - generic [ref=e1372]:
+                  - paragraph [ref=e1373]: +0.00%
+                  - button "Delete MAR" [ref=e1374]:
+                    - img [ref=e1375]
+              - generic [ref=e1379] [cursor=pointer]:
+                - generic [ref=e1380]:
+                  - paragraph [ref=e1382]: MC.PA
+                  - paragraph [ref=e1383]: MC.PA
+                  - paragraph [ref=e1384]: Rated 22h ago
+                - generic [ref=e1385]:
+                  - paragraph [ref=e1386]: +0.00%
+                  - button "Delete MC.PA" [ref=e1387]:
+                    - img [ref=e1388]
+              - generic [ref=e1392] [cursor=pointer]:
+                - generic [ref=e1393]:
+                  - paragraph [ref=e1395]: MCD
+                  - paragraph [ref=e1396]: MCD
+                - generic [ref=e1397]:
+                  - paragraph [ref=e1398]: +0.00%
+                  - button "Delete MCD" [ref=e1399]:
+                    - img [ref=e1400]
+              - generic [ref=e1404] [cursor=pointer]:
+                - generic [ref=e1405]:
+                  - paragraph [ref=e1407]: MCO
+                  - paragraph [ref=e1408]: MCO
+                  - paragraph [ref=e1409]: Rated 1h ago
+                - generic [ref=e1410]:
+                  - paragraph [ref=e1411]: +0.00%
+                  - button "Delete MCO" [ref=e1412]:
+                    - img [ref=e1413]
+              - generic [ref=e1417] [cursor=pointer]:
+                - generic [ref=e1418]:
+                  - paragraph [ref=e1420]: MDALF
+                  - paragraph [ref=e1421]: MDALF
+                  - paragraph [ref=e1422]: Rated Yesterday
+                - generic [ref=e1423]:
+                  - paragraph [ref=e1424]: +0.00%
+                  - button "Delete MDALF" [ref=e1425]:
+                    - img [ref=e1426]
+              - generic [ref=e1430] [cursor=pointer]:
+                - generic [ref=e1431]:
+                  - paragraph [ref=e1433]: MMM
+                  - paragraph [ref=e1434]: MMM
+                - generic [ref=e1435]:
+                  - paragraph [ref=e1436]: +0.00%
+                  - button "Delete MMM" [ref=e1437]:
+                    - img [ref=e1438]
+              - generic [ref=e1442] [cursor=pointer]:
+                - generic [ref=e1443]:
+                  - generic [ref=e1444]:
+                    - paragraph [ref=e1445]: MOH
+                    - img "Portfolio is locked" [ref=e1446]
+                  - paragraph [ref=e1449]: Molina Healthcare Inc
+                - generic [ref=e1450]:
+                  - paragraph [ref=e1451]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1453] [cursor=pointer]:
+                - generic [ref=e1454]:
+                  - paragraph [ref=e1456]: MRK
+                  - paragraph [ref=e1457]: MRK
+                - generic [ref=e1458]:
+                  - paragraph [ref=e1459]: +0.00%
+                  - button "Delete MRK" [ref=e1460]:
+                    - img [ref=e1461]
+              - generic [ref=e1465] [cursor=pointer]:
+                - generic [ref=e1466]:
+                  - paragraph [ref=e1468]: MRVL
+                  - paragraph [ref=e1469]: MRVL
+                  - paragraph [ref=e1470]: Rated Yesterday
+                - generic [ref=e1471]:
+                  - paragraph [ref=e1472]: +0.00%
+                  - button "Delete MRVL" [ref=e1473]:
+                    - img [ref=e1474]
+              - generic [ref=e1478] [cursor=pointer]:
+                - generic [ref=e1479]:
+                  - paragraph [ref=e1481]: MSFT
+                  - paragraph [ref=e1482]: Microsoft Corporation
+                  - paragraph [ref=e1483]: Rated 1h ago
+                - generic [ref=e1484]:
+                  - paragraph [ref=e1485]: +0.00%
+                  - button "Delete MSFT" [ref=e1486]:
+                    - img [ref=e1487]
+              - generic [ref=e1491] [cursor=pointer]:
+                - generic [ref=e1492]:
+                  - paragraph [ref=e1494]: MTD
+                  - paragraph [ref=e1495]: MTD
+                - generic [ref=e1496]:
+                  - paragraph [ref=e1497]: +0.00%
+                  - button "Delete MTD" [ref=e1498]:
+                    - img [ref=e1499]
+              - generic [ref=e1503] [cursor=pointer]:
+                - generic [ref=e1504]:
+                  - paragraph [ref=e1506]: MWRL.L
+                  - paragraph [ref=e1507]: AMUNDI ETF ICAV AMUNDI CORE MSC
+                - generic [ref=e1508]:
+                  - paragraph [ref=e1509]: +0.00%
+                  - button "Delete MWRL.L" [ref=e1510]:
+                    - img [ref=e1511]
+              - generic [ref=e1515] [cursor=pointer]:
+                - generic [ref=e1516]:
+                  - paragraph [ref=e1518]: NEE
+                  - paragraph [ref=e1519]: NEE
+                - generic [ref=e1520]:
+                  - paragraph [ref=e1521]: +0.00%
+                  - button "Delete NEE" [ref=e1522]:
+                    - img [ref=e1523]
+              - generic [ref=e1527] [cursor=pointer]:
+                - generic [ref=e1528]:
+                  - paragraph [ref=e1530]: NEM
+                  - paragraph [ref=e1531]: NEM
+                  - paragraph [ref=e1532]: Rated 1h ago
+                - generic [ref=e1533]:
+                  - paragraph [ref=e1534]: +0.00%
+                  - button "Delete NEM" [ref=e1535]:
+                    - img [ref=e1536]
+              - generic [ref=e1540] [cursor=pointer]:
+                - generic [ref=e1541]:
+                  - generic [ref=e1542]:
+                    - paragraph [ref=e1543]: NFLX
+                    - img "Portfolio is locked" [ref=e1544]
+                  - paragraph [ref=e1547]: Netflix Inc. (NFLX)
+                  - paragraph [ref=e1548]: Rated Yesterday
+                - generic [ref=e1549]:
+                  - paragraph [ref=e1550]: "-0.83%"
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1552] [cursor=pointer]:
+                - generic [ref=e1553]:
+                  - paragraph [ref=e1555]: NKE
+                  - paragraph [ref=e1556]: Nike Inc.
+                - generic [ref=e1557]:
+                  - paragraph [ref=e1558]: +0.00%
+                  - button "Delete NKE" [ref=e1559]:
+                    - img [ref=e1560]
+              - generic [ref=e1564] [cursor=pointer]:
+                - generic [ref=e1565]:
+                  - paragraph [ref=e1567]: NOW
+                  - paragraph [ref=e1568]: NOW
+                  - paragraph [ref=e1569]: Rated 1h ago
+                - generic [ref=e1570]:
+                  - paragraph [ref=e1571]: +0.00%
+                  - button "Delete NOW" [ref=e1572]:
+                    - img [ref=e1573]
+              - generic [ref=e1577] [cursor=pointer]:
+                - generic [ref=e1578]:
+                  - paragraph [ref=e1580]: NTLA
+                  - paragraph [ref=e1581]: NTLA
+                - generic [ref=e1582]:
+                  - paragraph [ref=e1583]: +0.00%
+                  - button "Delete NTLA" [ref=e1584]:
+                    - img [ref=e1585]
+              - generic [ref=e1589] [cursor=pointer]:
+                - generic [ref=e1590]:
+                  - generic [ref=e1591]:
+                    - paragraph [ref=e1592]: NVDA
+                    - img "Portfolio is locked" [ref=e1593]
+                  - paragraph [ref=e1596]: Nvidia Corporation (NVDA)
+                  - paragraph [ref=e1597]: Rated 1h ago
+                - generic [ref=e1598]:
+                  - paragraph [ref=e1599]: +2.56%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1601] [cursor=pointer]:
+                - generic [ref=e1602]:
+                  - generic [ref=e1603]:
+                    - paragraph [ref=e1604]: OC
+                    - img "Portfolio is locked" [ref=e1605]
+                  - paragraph [ref=e1608]: Owens Corning Inc
+                - generic [ref=e1609]:
+                  - paragraph [ref=e1610]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1612] [cursor=pointer]:
+                - generic [ref=e1613]:
+                  - paragraph [ref=e1615]: ODD
+                  - paragraph [ref=e1616]: ODD
+                - generic [ref=e1617]:
+                  - paragraph [ref=e1618]: +0.00%
+                  - button "Delete ODD" [ref=e1619]:
+                    - img [ref=e1620]
+              - generic [ref=e1624] [cursor=pointer]:
+                - generic [ref=e1625]:
+                  - generic [ref=e1626]:
+                    - paragraph [ref=e1627]: OKLO
+                    - img "Portfolio is locked" [ref=e1628]
+                  - paragraph [ref=e1631]: Oklo Inc.
+                - generic [ref=e1632]:
+                  - paragraph [ref=e1633]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1635] [cursor=pointer]:
+                - generic [ref=e1636]:
+                  - paragraph [ref=e1638]: ONDS
+                  - paragraph [ref=e1639]: ONDS
+                - generic [ref=e1640]:
+                  - paragraph [ref=e1641]: +0.00%
+                  - button "Delete ONDS" [ref=e1642]:
+                    - img [ref=e1643]
+              - generic [ref=e1647] [cursor=pointer]:
+                - generic [ref=e1648]:
+                  - paragraph [ref=e1650]: ORACLE
+                  - paragraph [ref=e1651]: ORACLE - Search externally
+                - generic [ref=e1652]:
+                  - paragraph [ref=e1653]: +0.00%
+                  - button "Delete ORACLE" [ref=e1654]:
+                    - img [ref=e1655]
+              - generic [ref=e1659] [cursor=pointer]:
+                - generic [ref=e1660]:
+                  - paragraph [ref=e1662]: PAM
+                  - paragraph [ref=e1663]: PAM
+                - generic [ref=e1664]:
+                  - paragraph [ref=e1665]: +0.00%
+                  - button "Delete PAM" [ref=e1666]:
+                    - img [ref=e1667]
+              - generic [ref=e1671] [cursor=pointer]:
+                - generic [ref=e1672]:
+                  - paragraph [ref=e1674]: PAYO
+                  - paragraph [ref=e1675]: PAYO
+                - generic [ref=e1676]:
+                  - paragraph [ref=e1677]: +0.00%
+                  - button "Delete PAYO" [ref=e1678]:
+                    - img [ref=e1679]
+              - generic [ref=e1683] [cursor=pointer]:
+                - generic [ref=e1684]:
+                  - paragraph [ref=e1686]: PG
+                  - paragraph [ref=e1687]: PG
+                - generic [ref=e1688]:
+                  - paragraph [ref=e1689]: +0.00%
+                  - button "Delete PG" [ref=e1690]:
+                    - img [ref=e1691]
+              - generic [ref=e1695] [cursor=pointer]:
+                - generic [ref=e1696]:
+                  - paragraph [ref=e1698]: PLTR
+                  - paragraph [ref=e1699]: Palantir Technologies Inc. (PLTR)
+                  - paragraph [ref=e1700]: Rated 23h ago
+                - generic [ref=e1701]:
+                  - paragraph [ref=e1702]: +4.64%
+                  - button "Delete PLTR" [ref=e1703]:
+                    - img [ref=e1704]
+              - generic [ref=e1708] [cursor=pointer]:
+                - generic [ref=e1709]:
+                  - generic [ref=e1710]:
+                    - paragraph [ref=e1711]: POOL
+                    - img "Portfolio is locked" [ref=e1712]
+                  - paragraph [ref=e1715]: Pool Corporation
+                - generic [ref=e1716]:
+                  - paragraph [ref=e1717]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1719] [cursor=pointer]:
+                - generic [ref=e1720]:
+                  - paragraph [ref=e1722]: QBTS
+                  - paragraph [ref=e1723]: D-Wave Quantum Inc. (QBTS)
+                - generic [ref=e1724]:
+                  - paragraph [ref=e1725]: "-3.33%"
+                  - button "Delete QBTS" [ref=e1726]:
+                    - img [ref=e1727]
+              - generic [ref=e1731] [cursor=pointer]:
+                - generic [ref=e1732]:
+                  - paragraph [ref=e1734]: QCOM
+                  - paragraph [ref=e1735]: QCOM
+                - generic [ref=e1736]:
+                  - paragraph [ref=e1737]: +0.00%
+                  - button "Delete QCOM" [ref=e1738]:
+                    - img [ref=e1739]
+              - generic [ref=e1743] [cursor=pointer]:
+                - generic [ref=e1744]:
+                  - paragraph [ref=e1746]: QLYS
+                  - paragraph [ref=e1747]: QLYS
+                  - paragraph [ref=e1748]: Rated 1h ago
+                - generic [ref=e1749]:
+                  - paragraph [ref=e1750]: +0.00%
+                  - button "Delete QLYS" [ref=e1751]:
+                    - img [ref=e1752]
+              - generic [ref=e1756] [cursor=pointer]:
+                - generic [ref=e1757]:
+                  - paragraph [ref=e1759]: QS
+                  - paragraph [ref=e1760]: QS
+                - generic [ref=e1761]:
+                  - paragraph [ref=e1762]: +0.00%
+                  - button "Delete QS" [ref=e1763]:
+                    - img [ref=e1764]
+              - generic [ref=e1768] [cursor=pointer]:
+                - generic [ref=e1769]:
+                  - paragraph [ref=e1771]: QUBT
+                  - paragraph [ref=e1772]: QUBT
+                - generic [ref=e1773]:
+                  - paragraph [ref=e1774]: +0.00%
+                  - button "Delete QUBT" [ref=e1775]:
+                    - img [ref=e1776]
+              - generic [ref=e1780] [cursor=pointer]:
+                - generic [ref=e1781]:
+                  - paragraph [ref=e1783]: RDW
+                  - paragraph [ref=e1784]: RDW
+                - generic [ref=e1785]:
+                  - paragraph [ref=e1786]: +0.00%
+                  - button "Delete RDW" [ref=e1787]:
+                    - img [ref=e1788]
+              - generic [ref=e1792] [cursor=pointer]:
+                - generic [ref=e1793]:
+                  - paragraph [ref=e1795]: REXR
+                  - paragraph [ref=e1796]: REXR
+                  - paragraph [ref=e1797]: Rated Yesterday
+                - generic [ref=e1798]:
+                  - paragraph [ref=e1799]: +0.00%
+                  - button "Delete REXR" [ref=e1800]:
+                    - img [ref=e1801]
+              - generic [ref=e1805] [cursor=pointer]:
+                - generic [ref=e1806]:
+                  - paragraph [ref=e1808]: RGTI
+                  - paragraph [ref=e1809]: Rigetti Computing Inc. (RGTI)
+                - generic [ref=e1810]:
+                  - paragraph [ref=e1811]: +1.77%
+                  - button "Delete RGTI" [ref=e1812]:
+                    - img [ref=e1813]
+              - generic [ref=e1817] [cursor=pointer]:
+                - generic [ref=e1818]:
+                  - paragraph [ref=e1820]: RIO
+                  - paragraph [ref=e1821]: RIO - Search externally
+                - generic [ref=e1822]:
+                  - paragraph [ref=e1823]: +0.00%
+                  - button "Delete RIO" [ref=e1824]:
+                    - img [ref=e1825]
+              - generic [ref=e1829] [cursor=pointer]:
+                - generic [ref=e1830]:
+                  - paragraph [ref=e1832]: RKLB
+                  - paragraph [ref=e1833]: RKLB
+                - generic [ref=e1834]:
+                  - paragraph [ref=e1835]: +0.00%
+                  - button "Delete RKLB" [ref=e1836]:
+                    - img [ref=e1837]
+              - generic [ref=e1841] [cursor=pointer]:
+                - generic [ref=e1842]:
+                  - paragraph [ref=e1844]: RTX
+                  - paragraph [ref=e1845]: RTX
+                - generic [ref=e1846]:
+                  - paragraph [ref=e1847]: +0.00%
+                  - button "Delete RTX" [ref=e1848]:
+                    - img [ref=e1849]
+              - generic [ref=e1853] [cursor=pointer]:
+                - generic [ref=e1854]:
+                  - generic [ref=e1855]:
+                    - paragraph [ref=e1856]: RVTY
+                    - img "Portfolio is locked" [ref=e1857]
+                  - paragraph [ref=e1860]: Revvity, Inc.
+                - generic [ref=e1861]:
+                  - paragraph [ref=e1862]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1864] [cursor=pointer]:
+                - generic [ref=e1865]:
+                  - paragraph [ref=e1867]: RXRX
+                  - paragraph [ref=e1868]: RXRX
+                - generic [ref=e1869]:
+                  - paragraph [ref=e1870]: +0.00%
+                  - button "Delete RXRX" [ref=e1871]:
+                    - img [ref=e1872]
+              - generic [ref=e1876] [cursor=pointer]:
+                - generic [ref=e1877]:
+                  - paragraph [ref=e1879]: SAP
+                  - paragraph [ref=e1880]: SAP
+                  - paragraph [ref=e1881]: Rated 1h ago
+                - generic [ref=e1882]:
+                  - paragraph [ref=e1883]: +0.00%
+                  - button "Delete SAP" [ref=e1884]:
+                    - img [ref=e1885]
+              - generic [ref=e1889] [cursor=pointer]:
+                - generic [ref=e1890]:
+                  - generic [ref=e1891]:
+                    - paragraph [ref=e1892]: SATS
+                    - img "Portfolio is locked" [ref=e1893]
+                  - paragraph [ref=e1896]: EchoStar Corporation
+                  - paragraph [ref=e1897]: Rated 5h ago
+                - generic [ref=e1898]:
+                  - paragraph [ref=e1899]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e1901] [cursor=pointer]:
+                - generic [ref=e1902]:
+                  - paragraph [ref=e1904]: SHOP
+                  - paragraph [ref=e1905]: SHOP
+                  - paragraph [ref=e1906]: Rated 23h ago
+                - generic [ref=e1907]:
+                  - paragraph [ref=e1908]: +0.00%
+                  - button "Delete SHOP" [ref=e1909]:
+                    - img [ref=e1910]
+              - generic [ref=e1914] [cursor=pointer]:
+                - generic [ref=e1915]:
+                  - paragraph [ref=e1917]: SIEGY
+                  - paragraph [ref=e1918]: SIEGY
+                - generic [ref=e1919]:
+                  - paragraph [ref=e1920]: +0.00%
+                  - button "Delete SIEGY" [ref=e1921]:
+                    - img [ref=e1922]
+              - generic [ref=e1926] [cursor=pointer]:
+                - generic [ref=e1927]:
+                  - paragraph [ref=e1929]: SMNEY
+                  - paragraph [ref=e1930]: SMNEY
+                  - paragraph [ref=e1931]: Rated 23h ago
+                - generic [ref=e1932]:
+                  - paragraph [ref=e1933]: +0.00%
+                  - button "Delete SMNEY" [ref=e1934]:
+                    - img [ref=e1935]
+              - generic [ref=e1939] [cursor=pointer]:
+                - generic [ref=e1940]:
+                  - paragraph [ref=e1942]: SNDK
+                  - paragraph [ref=e1943]: SNDK
+                - generic [ref=e1944]:
+                  - paragraph [ref=e1945]: +0.00%
+                  - button "Delete SNDK" [ref=e1946]:
+                    - img [ref=e1947]
+              - generic [ref=e1951] [cursor=pointer]:
+                - generic [ref=e1952]:
+                  - paragraph [ref=e1954]: SNPS
+                  - paragraph [ref=e1955]: SNPS
+                  - paragraph [ref=e1956]: Rated Yesterday
+                - generic [ref=e1957]:
+                  - paragraph [ref=e1958]: +0.00%
+                  - button "Delete SNPS" [ref=e1959]:
+                    - img [ref=e1960]
+              - generic [ref=e1964] [cursor=pointer]:
+                - generic [ref=e1965]:
+                  - paragraph [ref=e1967]: SOLV
+                  - paragraph [ref=e1968]: SOLV
+                - generic [ref=e1969]:
+                  - paragraph [ref=e1970]: +0.00%
+                  - button "Delete SOLV" [ref=e1971]:
+                    - img [ref=e1972]
+              - generic [ref=e1976] [cursor=pointer]:
+                - generic [ref=e1977]:
+                  - paragraph [ref=e1979]: SPGI
+                  - paragraph [ref=e1980]: SPGI
+                  - paragraph [ref=e1981]: Rated 1h ago
+                - generic [ref=e1982]:
+                  - paragraph [ref=e1983]: +0.00%
+                  - button "Delete SPGI" [ref=e1984]:
+                    - img [ref=e1985]
+              - generic [ref=e1989] [cursor=pointer]:
+                - generic [ref=e1990]:
+                  - paragraph [ref=e1992]: SPIR
+                  - paragraph [ref=e1993]: SPIR
+                - generic [ref=e1994]:
+                  - paragraph [ref=e1995]: +0.00%
+                  - button "Delete SPIR" [ref=e1996]:
+                    - img [ref=e1997]
+              - generic [ref=e2001] [cursor=pointer]:
+                - generic [ref=e2002]:
+                  - paragraph [ref=e2004]: SU.PA
+                  - paragraph [ref=e2005]: SCHNEIDER ELECTRIC SE
+                  - paragraph [ref=e2006]: Rated 22h ago
+                - generic [ref=e2007]:
+                  - paragraph [ref=e2008]: +0.00%
+                  - button "Delete SU.PA" [ref=e2009]:
+                    - img [ref=e2010]
+              - generic [ref=e2014] [cursor=pointer]:
+                - generic [ref=e2015]:
+                  - paragraph [ref=e2017]: SYK
+                  - paragraph [ref=e2018]: SYK
+                  - paragraph [ref=e2019]: Rated Yesterday
+                - generic [ref=e2020]:
+                  - paragraph [ref=e2021]: +0.00%
+                  - button "Delete SYK" [ref=e2022]:
+                    - img [ref=e2023]
+              - generic [ref=e2027] [cursor=pointer]:
+                - generic [ref=e2028]:
+                  - generic [ref=e2029]:
+                    - paragraph [ref=e2030]: TAP
+                    - img "Portfolio is locked" [ref=e2031]
+                  - paragraph [ref=e2034]: Molson Coors Beverage Company
+                - generic [ref=e2035]:
+                  - paragraph [ref=e2036]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e2038] [cursor=pointer]:
+                - generic [ref=e2039]:
+                  - paragraph [ref=e2041]: TEM
+                  - paragraph [ref=e2042]: TEM
+                - generic [ref=e2043]:
+                  - paragraph [ref=e2044]: +0.00%
+                  - button "Delete TEM" [ref=e2045]:
+                    - img [ref=e2046]
+              - generic [ref=e2050] [cursor=pointer]:
+                - generic [ref=e2051]:
+                  - paragraph [ref=e2053]: timestamp
+                  - paragraph [ref=e2054]: timestamp
+                - button "Delete timestamp" [ref=e2056]:
+                  - img [ref=e2057]
+              - generic [ref=e2061] [cursor=pointer]:
+                - generic [ref=e2062]:
+                  - paragraph [ref=e2064]: TJX
+                  - paragraph [ref=e2065]: TJX
+                - generic [ref=e2066]:
+                  - paragraph [ref=e2067]: +0.00%
+                  - button "Delete TJX" [ref=e2068]:
+                    - img [ref=e2069]
+              - generic [ref=e2073] [cursor=pointer]:
+                - generic [ref=e2074]:
+                  - paragraph [ref=e2076]: TMDX
+                  - paragraph [ref=e2077]: TMDX
+                  - paragraph [ref=e2078]: Rated Yesterday
+                - generic [ref=e2079]:
+                  - paragraph [ref=e2080]: +0.00%
+                  - button "Delete TMDX" [ref=e2081]:
+                    - img [ref=e2082]
+              - generic [ref=e2086] [cursor=pointer]:
+                - generic [ref=e2087]:
+                  - paragraph [ref=e2089]: TMO
+                  - paragraph [ref=e2090]: TMO
+                  - paragraph [ref=e2091]: Rated Yesterday
+                - generic [ref=e2092]:
+                  - paragraph [ref=e2093]: +0.00%
+                  - button "Delete TMO" [ref=e2094]:
+                    - img [ref=e2095]
+              - generic [ref=e2099] [cursor=pointer]:
+                - generic [ref=e2100]:
+                  - paragraph [ref=e2102]: TRU
+                  - paragraph [ref=e2103]: TRU
+                  - paragraph [ref=e2104]: Rated Yesterday
+                - generic [ref=e2105]:
+                  - paragraph [ref=e2106]: +0.00%
+                  - button "Delete TRU" [ref=e2107]:
+                    - img [ref=e2108]
+              - generic [ref=e2112] [cursor=pointer]:
+                - generic [ref=e2113]:
+                  - generic [ref=e2114]:
+                    - paragraph [ref=e2115]: TSLA
+                    - img "Portfolio is locked" [ref=e2116]
+                  - paragraph [ref=e2119]: Tesla, Inc. (TSLA)
+                - generic [ref=e2120]:
+                  - paragraph [ref=e2121]: +2.39%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e2123] [cursor=pointer]:
+                - generic [ref=e2124]:
+                  - paragraph [ref=e2126]: TSM
+                  - paragraph [ref=e2127]: TSM
+                  - paragraph [ref=e2128]: Rated 1h ago
+                - generic [ref=e2129]:
+                  - paragraph [ref=e2130]: +0.00%
+                  - button "Delete TSM" [ref=e2131]:
+                    - img [ref=e2132]
+              - generic [ref=e2136] [cursor=pointer]:
+                - generic [ref=e2137]:
+                  - paragraph [ref=e2139]: TTMI
+                  - paragraph [ref=e2140]: TTMI
+                  - paragraph [ref=e2141]: Rated Yesterday
+                - generic [ref=e2142]:
+                  - paragraph [ref=e2143]: +0.00%
+                  - button "Delete TTMI" [ref=e2144]:
+                    - img [ref=e2145]
+              - generic [ref=e2149] [cursor=pointer]:
+                - generic [ref=e2150]:
+                  - paragraph [ref=e2152]: UBER
+                  - paragraph [ref=e2153]: UBER
+                  - paragraph [ref=e2154]: Rated 1h ago
+                - generic [ref=e2155]:
+                  - paragraph [ref=e2156]: +0.00%
+                  - button "Delete UBER" [ref=e2157]:
+                    - img [ref=e2158]
+              - generic [ref=e2162] [cursor=pointer]:
+                - generic [ref=e2163]:
+                  - paragraph [ref=e2165]: UBS
+                  - paragraph [ref=e2166]: UBS
+                - generic [ref=e2167]:
+                  - paragraph [ref=e2168]: +0.00%
+                  - button "Delete UBS" [ref=e2169]:
+                    - img [ref=e2170]
+              - generic [ref=e2174] [cursor=pointer]:
+                - generic [ref=e2175]:
+                  - generic [ref=e2176]:
+                    - paragraph [ref=e2177]: UHAL
+                    - img "Portfolio is locked" [ref=e2178]
+                  - paragraph [ref=e2181]: U-Haul Holding Company
+                  - paragraph [ref=e2182]: Rated 5h ago
+                - generic [ref=e2183]:
+                  - paragraph [ref=e2184]: +0.00%
+                  - button "Portfolio locked - unlock in Portfolios tab" [disabled]:
+                    - img
+              - generic [ref=e2186] [cursor=pointer]:
+                - generic [ref=e2187]:
+                  - paragraph [ref=e2189]: UPS
+                  - paragraph [ref=e2190]: UPS
+                - generic [ref=e2191]:
+                  - paragraph [ref=e2192]: +0.00%
+                  - button "Delete UPS" [ref=e2193]:
+                    - img [ref=e2194]
+              - generic [ref=e2198] [cursor=pointer]:
+                - generic [ref=e2199]:
+                  - paragraph [ref=e2201]: USPY.L
+                  - paragraph [ref=e2202]: LEGAL & GENERAL UCITS ETF PUBLI
+                - generic [ref=e2203]:
+                  - paragraph [ref=e2204]: +0.00%
+                  - button "Delete USPY.L" [ref=e2205]:
+                    - img [ref=e2206]
+              - generic [ref=e2210] [cursor=pointer]:
+                - generic [ref=e2211]:
+                  - paragraph [ref=e2213]: VERI
+                  - paragraph [ref=e2214]: VERI
+                - generic [ref=e2215]:
+                  - paragraph [ref=e2216]: +0.00%
+                  - button "Delete VERI" [ref=e2217]:
+                    - img [ref=e2218]
+              - generic [ref=e2222] [cursor=pointer]:
+                - generic [ref=e2223]:
+                  - paragraph [ref=e2225]: VKTX
+                  - paragraph [ref=e2226]: Viking Therapeutics, Inc.
+                  - paragraph [ref=e2227]: Rated 17h ago
+                - generic [ref=e2228]:
+                  - paragraph [ref=e2229]: +0.00%
+                  - button "Delete VKTX" [ref=e2230]:
+                    - img [ref=e2231]
+              - generic [ref=e2235] [cursor=pointer]:
+                - generic [ref=e2236]:
+                  - paragraph [ref=e2238]: VRT
+                  - paragraph [ref=e2239]: VRT
+                  - paragraph [ref=e2240]: Rated 1h ago
+                - generic [ref=e2241]:
+                  - paragraph [ref=e2242]: +0.00%
+                  - button "Delete VRT" [ref=e2243]:
+                    - img [ref=e2244]
+              - generic [ref=e2248] [cursor=pointer]:
+                - generic [ref=e2249]:
+                  - paragraph [ref=e2251]: VSCO
+                  - paragraph [ref=e2252]: VSCO
+                - generic [ref=e2253]:
+                  - paragraph [ref=e2254]: +0.00%
+                  - button "Delete VSCO" [ref=e2255]:
+                    - img [ref=e2256]
+              - generic [ref=e2260] [cursor=pointer]:
+                - generic [ref=e2261]:
+                  - paragraph [ref=e2263]: WALMART
+                  - paragraph [ref=e2264]: WALMART - Search externally
+                - generic [ref=e2265]:
+                  - paragraph [ref=e2266]: +0.00%
+                  - button "Delete WALMART" [ref=e2267]:
+                    - img [ref=e2268]
+              - generic [ref=e2272] [cursor=pointer]:
+                - generic [ref=e2273]:
+                  - paragraph [ref=e2275]: WELL
+                  - paragraph [ref=e2276]: WELL
+                - generic [ref=e2277]:
+                  - paragraph [ref=e2278]: +0.00%
+                  - button "Delete WELL" [ref=e2279]:
+                    - img [ref=e2280]
+              - generic [ref=e2284] [cursor=pointer]:
+                - generic [ref=e2285]:
+                  - paragraph [ref=e2287]: WISE
+                  - paragraph [ref=e2288]: WISE
+                - generic [ref=e2289]:
+                  - paragraph [ref=e2290]: +0.00%
+                  - button "Delete WISE" [ref=e2291]:
+                    - img [ref=e2292]
+              - generic [ref=e2296] [cursor=pointer]:
+                - generic [ref=e2297]:
+                  - paragraph [ref=e2299]: WMT
+                  - paragraph [ref=e2300]: WMT
+                  - paragraph [ref=e2301]: Rated Yesterday
+                - generic [ref=e2302]:
+                  - paragraph [ref=e2303]: +0.00%
+                  - button "Delete WMT" [ref=e2304]:
+                    - img [ref=e2305]
+        - paragraph [ref=e2309]: No data available for timestamp
+    - contentinfo [ref=e2310]:
+      - generic [ref=e2312]:
+        - img [ref=e2315]
+        - paragraph [ref=e2318]: "Investment Disclaimer: This information is for educational and informational purposes only and should not be considered as financial advice, investment recommendations, or an offer to buy or sell securities. Past performance does not guarantee future results. Always conduct thorough due diligence and consult with a qualified financial advisor before making any investment decisions."
+  - alert [ref=e2319]
+```

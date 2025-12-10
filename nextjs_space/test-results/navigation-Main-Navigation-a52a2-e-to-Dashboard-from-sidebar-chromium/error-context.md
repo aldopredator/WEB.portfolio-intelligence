@@ -1,0 +1,143 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e5]:
+        - img [ref=e7]
+        - generic [ref=e9]:
+          - heading "Portfolio Intelligence" [level=1] [ref=e10]
+          - paragraph [ref=e11]: Solutions
+    - complementary [ref=e12]:
+      - navigation [ref=e13]:
+        - link "Dashboard Stock insights & analytics" [active] [ref=e14] [cursor=pointer]:
+          - /url: /?portfolio=cmirgdwtm00092gdpj701hwwy
+          - img [ref=e15]
+          - generic [ref=e17]:
+            - paragraph [ref=e18]: Dashboard
+            - paragraph [ref=e19]: Stock insights & analytics
+        - link "Portfolios Manage your portfolios" [ref=e20] [cursor=pointer]:
+          - /url: /portfolios
+          - img [ref=e21]
+          - generic [ref=e24]:
+            - paragraph [ref=e25]: Portfolios
+            - paragraph [ref=e26]: Manage your portfolios
+        - link "Screening Stock screening results" [ref=e27] [cursor=pointer]:
+          - /url: /screening
+          - img [ref=e28]
+          - generic [ref=e30]:
+            - paragraph [ref=e31]: Screening
+            - paragraph [ref=e32]: Stock screening results
+        - button "Collapse" [ref=e33] [cursor=pointer]:
+          - img [ref=e34]
+          - generic [ref=e36]: Collapse
+    - main [ref=e39]:
+      - generic [ref=e40]:
+        - generic [ref=e42]:
+          - generic [ref=e44] [cursor=pointer]:
+            - img [ref=e45]
+            - paragraph [ref=e47]: Collapse
+          - generic [ref=e48]:
+            - generic [ref=e49]:
+              - generic [ref=e50]: Portfolio Filter
+              - generic [ref=e51]:
+                - combobox [ref=e52] [cursor=pointer]:
+                  - generic [ref=e53]:
+                    - img [ref=e54]
+                    - text: BARCLAYS
+                - textbox: cmirgdwtm00092gdpj701hwwy
+                - img
+                - group:
+                  - generic: Portfolio Filter
+            - generic [ref=e59]: Showing 8 tickers from BARCLAYS
+            - generic [ref=e60]:
+              - heading "Rating" [level=6] [ref=e61]
+              - generic [ref=e62]:
+                - generic [ref=e63] [cursor=pointer]: ☆ Not Rated
+                - generic [ref=e64] [cursor=pointer]: ⭐ 1+
+                - generic [ref=e65] [cursor=pointer]: ⭐ 2+
+                - generic [ref=e66] [cursor=pointer]: ⭐ 3+
+                - generic [ref=e67] [cursor=pointer]: ⭐ 4+
+                - generic [ref=e68] [cursor=pointer]: ⭐ 5
+                - generic [ref=e69] [cursor=pointer]: 🔄 All
+          - generic [ref=e70]:
+            - heading "Search Tickers" [level=6] [ref=e71]
+            - generic [ref=e75]:
+              - img [ref=e77]
+              - textbox "Search by ticker or company name..." [ref=e80]
+              - group
+          - generic [ref=e81]:
+            - heading "Tickers (8)" [level=6] [ref=e82]
+            - generic:
+              - generic [ref=e84] [cursor=pointer]:
+                - generic [ref=e85]:
+                  - paragraph [ref=e87]: AMZN
+                  - paragraph [ref=e88]: Amazon.com Inc. (AMZN)
+                - generic [ref=e89]:
+                  - paragraph [ref=e90]: +1.56%
+                  - button "Delete AMZN" [ref=e91]:
+                    - img [ref=e92]
+              - generic [ref=e96] [cursor=pointer]:
+                - generic [ref=e97]:
+                  - paragraph [ref=e99]: BRK-B
+                  - paragraph [ref=e100]: Berkshire Hathaway Inc. (BRK-B)
+                - generic [ref=e101]:
+                  - paragraph [ref=e102]: +0.45%
+                  - button "Delete BRK-B" [ref=e103]:
+                    - img [ref=e104]
+              - generic [ref=e108] [cursor=pointer]:
+                - generic [ref=e109]:
+                  - paragraph [ref=e111]: GOOG
+                  - paragraph [ref=e112]: Alphabet Inc.
+                - generic [ref=e113]:
+                  - paragraph [ref=e114]: +0.00%
+                  - button "Delete GOOG" [ref=e115]:
+                    - img [ref=e116]
+              - generic [ref=e120] [cursor=pointer]:
+                - generic [ref=e121]:
+                  - paragraph [ref=e123]: IDXX
+                  - paragraph [ref=e124]: IDEXX Laboratories Inc. (IDXX)
+                - generic [ref=e125]:
+                  - paragraph [ref=e126]: +0.24%
+                  - button "Delete IDXX" [ref=e127]:
+                    - img [ref=e128]
+              - generic [ref=e132] [cursor=pointer]:
+                - generic [ref=e133]:
+                  - paragraph [ref=e135]: ISRG
+                  - paragraph [ref=e136]: Intuitive Surgical Inc. (ISRG)
+                - generic [ref=e137]:
+                  - paragraph [ref=e138]: +1.18%
+                  - button "Delete ISRG" [ref=e139]:
+                    - img [ref=e140]
+              - generic [ref=e144] [cursor=pointer]:
+                - generic [ref=e145]:
+                  - paragraph [ref=e147]: NFLX
+                  - paragraph [ref=e148]: Netflix Inc. (NFLX)
+                - generic [ref=e149]:
+                  - paragraph [ref=e150]: "-0.83%"
+                  - button "Delete NFLX" [ref=e151]:
+                    - img [ref=e152]
+              - generic [ref=e156] [cursor=pointer]:
+                - generic [ref=e157]:
+                  - paragraph [ref=e159]: NVDA
+                  - paragraph [ref=e160]: Nvidia Corporation (NVDA)
+                - generic [ref=e161]:
+                  - paragraph [ref=e162]: +2.56%
+                  - button "Delete NVDA" [ref=e163]:
+                    - img [ref=e164]
+              - generic [ref=e168] [cursor=pointer]:
+                - generic [ref=e169]:
+                  - paragraph [ref=e171]: TSLA
+                  - paragraph [ref=e172]: Tesla, Inc. (TSLA)
+                - generic [ref=e173]:
+                  - paragraph [ref=e174]: +2.39%
+                  - button "Delete TSLA" [ref=e175]:
+                    - img [ref=e176]
+        - paragraph [ref=e180]: No data available for MCO
+    - contentinfo [ref=e181]:
+      - generic [ref=e183]:
+        - img [ref=e186]
+        - paragraph [ref=e189]: "Investment Disclaimer: This information is for educational and informational purposes only and should not be considered as financial advice, investment recommendations, or an offer to buy or sell securities. Past performance does not guarantee future results. Always conduct thorough due diligence and consult with a qualified financial advisor before making any investment decisions."
+  - alert [ref=e190]
+```
