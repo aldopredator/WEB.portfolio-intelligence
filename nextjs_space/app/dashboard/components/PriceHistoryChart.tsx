@@ -87,7 +87,7 @@ export default function PriceHistoryChart({
           setAvailableTickers(tickers);
           
           // Auto-select CW8U.PA as default if available, otherwise first ticker
-          const cw8Ticker = tickers.find(t => t.ticker === 'CW8U.PA');
+          const cw8Ticker = tickers.find((t: { ticker: string; company: string; portfolioName: string }) => t.ticker === 'CW8U.PA');
           if (cw8Ticker) {
             setCompareTicker('CW8U.PA');
           } else if (tickers.length > 0) {
