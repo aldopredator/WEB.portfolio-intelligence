@@ -76,6 +76,7 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'info' | 'warning' | 'error'>('info');
   const [isAddingTicker, setIsAddingTicker] = React.useState(false);
   const [panelCollapsed, setPanelCollapsed] = React.useState(false);
+  const [ratingFilter, setRatingFilter] = React.useState<number>(0); // 0 = All, -1 = Not Rated, 1-5 = min stars
 
   // Sync stocks when initialStocks changes
   React.useEffect(() => {
@@ -382,6 +383,92 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
                       }}
                     />
                   )}
+                  
+                  {/* Rating Filter */}
+                  <Box sx={{ mt: 2 }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        color: '#94a3b8',
+                        mb: 1,
+                        fontSize: '0.875rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      Rating
+                    </Typography>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1 }}>
+                      <Box
+                        onClick={() => setRatingFilter(-1)}
+                        sx={{
+                          px: 1.5,
+                          py: 1,
+                          borderRadius: 1.5,
+                          border: '2px solid',
+                          borderColor: ratingFilter === -1 ? '#6b7280' : 'rgba(148, 163, 184, 0.2)',
+                          bgcolor: ratingFilter === -1 ? 'rgba(107, 114, 128, 0.2)' : 'rgba(30, 41, 59, 0.3)',
+                          color: ratingFilter === -1 ? '#9ca3af' : '#64748b',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          textAlign: 'center',
+                          fontSize: '0.875rem',
+                          fontWeight: 500,
+                          '&:hover': {
+                            bgcolor: ratingFilter === -1 ? 'rgba(107, 114, 128, 0.3)' : 'rgba(30, 41, 59, 0.5)',
+                          }
+                        }}
+                      >
+                        ☆ Not Rated
+                      </Box>
+                      {[1, 2, 3, 4, 5].map((stars) => (
+                        <Box
+                          key={stars}
+                          onClick={() => setRatingFilter(stars)}
+                          sx={{
+                            px: 1.5,
+                            py: 1,
+                            borderRadius: 1.5,
+                            border: '2px solid',
+                            borderColor: ratingFilter === stars ? '#eab308' : 'rgba(148, 163, 184, 0.2)',
+                            bgcolor: ratingFilter === stars ? 'rgba(234, 179, 8, 0.2)' : 'rgba(30, 41, 59, 0.3)',
+                            color: ratingFilter === stars ? '#facc15' : '#64748b',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            textAlign: 'center',
+                            fontSize: '0.875rem',
+                            fontWeight: 500,
+                            '&:hover': {
+                              bgcolor: ratingFilter === stars ? 'rgba(234, 179, 8, 0.3)' : 'rgba(30, 41, 59, 0.5)',
+                            }
+                          }}
+                        >
+                          {stars === 1 ? '⭐ 1+' : stars === 2 ? '⭐ 2+' : stars === 3 ? '⭐ 3+' : stars === 4 ? '⭐ 4+' : '⭐ 5'}
+                        </Box>
+                      ))}
+                      <Box
+                        onClick={() => setRatingFilter(0)}
+                        sx={{
+                          px: 1.5,
+                          py: 1,
+                          borderRadius: 1.5,
+                          border: '2px solid',
+                          borderColor: ratingFilter === 0 ? '#3b82f6' : 'rgba(148, 163, 184, 0.2)',
+                          bgcolor: ratingFilter === 0 ? 'rgba(59, 130, 246, 0.2)' : 'rgba(30, 41, 59, 0.3)',
+                          color: ratingFilter === 0 ? '#60a5fa' : '#64748b',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          textAlign: 'center',
+                          fontSize: '0.875rem',
+                          fontWeight: 500,
+                          '&:hover': {
+                            bgcolor: ratingFilter === 0 ? 'rgba(59, 130, 246, 0.3)' : 'rgba(30, 41, 59, 0.5)',
+                          }
+                        }}
+                      >
+                        🔄 All
+                      </Box>
+                    </Box>
+                  </Box>
                 </Box>
 
                 {/* Search Tickers */}
@@ -437,10 +524,21 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
                       fontWeight: 600,
                     }}
                   >
-                    Tickers ({stocks.length})
+                    Tickers ({stocks.filter(stock => {
+                      if (ratingFilter === 0) return true; // All
+                      if (ratingFilter === -1) return !stock.rating || stock.rating === 0; // Not Rated
+                      return (stock.rating || 0) >= ratingFilter; // Min stars
+                    }).length})
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, overflowY: 'auto', flex: 1, pr: 1 }}>
-                    {[...stocks].sort((a, b) => a.ticker.localeCompare(b.ticker)).map((stock) => (
+                    {[...stocks]
+                      .filter(stock => {
+                        if (ratingFilter === 0) return true; // All
+                        if (ratingFilter === -1) return !stock.rating || stock.rating === 0; // Not Rated
+                        return (stock.rating || 0) >= ratingFilter; // Min stars
+                      })
+                      .sort((a, b) => a.ticker.localeCompare(b.ticker))
+                      .map((stock) => (
                       <Box
                         key={stock.ticker}
                         onClick={() => {
