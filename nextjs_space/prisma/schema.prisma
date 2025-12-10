@@ -1,6 +1,7 @@
 generator client {
     provider = "prisma-client-js"
     binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/stock_picking_agent/nextjs_space/node_modules/.prisma/client"
 }
 
 datasource db {
@@ -64,6 +65,7 @@ model Portfolio {
     id          String   @id @default(cuid())
     name        String
     description String?
+    isLocked    Boolean  @default(false) // Whether portfolio can be modified
     userId      String
     user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     createdAt   DateTime @default(now())
@@ -79,16 +81,18 @@ model Portfolio {
 
 // Core stock/ticker information
 model Stock {
-    id          String   @id @default(cuid())
-    ticker      String   @unique
-    company     String
-    type        String?  // 'Equity', 'ETF', etc.
-    exchange    String?  // 'NASDAQ', 'NYSE', etc.
-    region      String?  // 'United States', etc.
-    currency    String?  @default("USD")
-    isActive    Boolean  @default(true) // Whether the stock is in the user's portfolio
-    addedAt     DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    id              String   @id @default(cuid())
+    ticker          String   @unique
+    company         String
+    type            String?  // 'Equity', 'ETF', etc.
+    exchange        String?  // 'NASDAQ', 'NYSE', etc.
+    region          String?  // 'United States', etc.
+    currency        String?  @default("USD")
+    isActive        Boolean  @default(true) // Whether the stock is in the user's portfolio
+    rating          Float?   // User's rating (1-5 stars)
+    ratingUpdatedAt DateTime? // When rating was last updated
+    addedAt         DateTime @default(now())
+    updatedAt       DateTime @updatedAt
     
     // Portfolio relationship
     portfolioId String?
