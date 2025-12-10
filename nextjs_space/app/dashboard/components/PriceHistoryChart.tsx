@@ -62,51 +62,34 @@ export default function PriceHistoryChart({
     setBenchmarkData([]);
   }, [ticker]);
 
-  // Fetch available tickers for comparison (only from BENCHMARK portfolio)
+  // Fetch available tickers for comparison (all portfolios)
   useEffect(() => {
     const fetchTickers = async () => {
       try {
-        // Fetch ALL stocks to find the BENCHMARK portfolio
+        // Fetch ALL stocks for comparison dropdown
         const response = await fetch('/api/stock?portfolioId=all');
         if (response.ok) {
           const data = await response.json();
           const stocks = data.stocks || [];
           
-          console.log('[PriceHistoryChart] Filtering for BENCHMARK portfolio only');
-          
-          // Filter to only show stocks from BENCHMARK portfolio
+          // Show all stocks from all portfolios (excluding current ticker)
           const tickers = stocks
-            .filter((s: any) => {
-              const isBenchmark = s.portfolio?.name === 'BENCHMARK';
-              const excludeSelf = s.ticker !== ticker;
-              const isActive = s.isActive === true;
-              const isValid = isBenchmark && excludeSelf && isActive;
-              
-              console.log(`[PriceHistoryChart] ${s.ticker}: portfolio="${s.portfolio?.name}", excludeSelf=${excludeSelf}, isActive=${isActive}, INCLUDE=${isValid}`);
-              
-              return isValid;
-            })
+            .filter((s: any) => s.ticker !== ticker && s.isActive === true)
             .map((s: any) => ({
               ticker: s.ticker,
               company: s.company || 'Unknown Company',
-              portfolioName: 'BENCHMARK',
+              portfolioName: s.portfolio?.name || 'Unknown',
             }))
             .sort((a: { ticker: string; company: string; portfolioName: string }, b: { ticker: string; company: string; portfolioName: string }) => 
               a.ticker.localeCompare(b.ticker)
             );
           
-          console.log('[PriceHistoryChart] BENCHMARK tickers available:', tickers.length);
-          console.log('[PriceHistoryChart] Tickers:', tickers.map((t: { ticker: string; company: string; portfolioName: string }) => t.ticker).join(', '));
-          
           setAvailableTickers(tickers);
           
-          // Set first benchmark ticker as default if available
+          // Auto-select first ticker as default if available
           if (tickers.length > 0) {
-            console.log(`[PriceHistoryChart] Auto-selecting ${tickers[0].ticker} as default comparison`);
             setCompareTicker(tickers[0].ticker);
           }
-        } else {
-          console.error('[PriceHistoryChart] API request failed:', response.status, response.statusText);
         }
       } catch (error) {
         console.error('[PriceHistoryChart] Error fetching tickers:', error);
