@@ -21,8 +21,7 @@ export async function POST(request: NextRequest) {
       where: { id: targetPortfolioId },
       select: {
         id: true,
-        name: true,
-        userId: true
+        name: true
       }
     });
 

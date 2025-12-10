@@ -1,27 +1,13 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 /**
  * GET /api/portfolios
- * Returns all portfolios for the authenticated user with stock counts
+ * Returns all portfolios with stock counts
  */
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     const portfolios = await prisma.portfolio.findMany({
-      where: {
-        userId: session.user.id
-      },
       include: {
         _count: {
           select: { stocks: true }
@@ -55,19 +41,10 @@ export async function GET() {
 
 /**
  * POST /api/portfolios
- * Creates a new portfolio for the authenticated user
+ * Creates a new portfolio
  */
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     const { name, description } = await request.json();
 
     if (!name || name.trim() === '') {
@@ -77,17 +54,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if user already has a portfolio with this name
+    // Check if portfolio with this name already exists
     const existingPortfolio = await prisma.portfolio.findFirst({
       where: { 
-        name: name.trim(),
-        userId: session.user.id
+        name: name.trim()
       }
     });
 
     if (existingPortfolio) {
       return NextResponse.json(
-        { success: false, error: 'You already have a portfolio with this name' },
+        { success: false, error: 'A portfolio with this name already exists' },
         { status: 409 }
       );
     }
@@ -95,8 +71,7 @@ export async function POST(request: Request) {
     const portfolio = await prisma.portfolio.create({
       data: {
         name: name.trim(),
-        description: description?.trim() || null,
-        userId: session.user.id
+        description: description?.trim() || null
       }
     });
 

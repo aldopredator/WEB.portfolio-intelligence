@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 /**
@@ -12,15 +10,6 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     const { name, description } = await request.json();
     const { id } = params;
 
@@ -31,39 +20,29 @@ export async function PUT(
       );
     }
 
-    // Verify ownership
+    // Check if portfolio exists
     const portfolio = await prisma.portfolio.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        isLocked: true,
-        userId: true,
-        createdAt: true,
-        updatedAt: true
-      }
+      where: { id }
     });
 
-    if (!portfolio || portfolio.userId !== session.user.id) {
+    if (!portfolio) {
       return NextResponse.json(
-        { success: false, error: 'Portfolio not found or access denied' },
+        { success: false, error: 'Portfolio not found' },
         { status: 404 }
       );
     }
 
-    // Check if another portfolio of the same user with this name exists
+    // Check if another portfolio with this name exists
     const existingPortfolio = await prisma.portfolio.findFirst({
       where: {
         name: name.trim(),
-        userId: session.user.id,
         id: { not: id }
       }
     });
 
     if (existingPortfolio) {
       return NextResponse.json(
-        { success: false, error: 'You already have a portfolio with this name' },
+        { success: false, error: 'A portfolio with this name already exists' },
         { status: 409 }
       );
     }
@@ -98,23 +77,13 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     const { id } = params;
 
-    // Check if portfolio exists and verify ownership
+    // Check if portfolio exists
     const portfolio = await prisma.portfolio.findUnique({
       where: { id },
       select: {
         id: true,
-        userId: true,
         _count: {
           select: { stocks: true }
         }
@@ -125,13 +94,6 @@ export async function DELETE(
       return NextResponse.json(
         { success: false, error: 'Portfolio not found' },
         { status: 404 }
-      );
-    }
-
-    if (portfolio.userId !== session.user.id) {
-      return NextResponse.json(
-        { success: false, error: 'Access denied' },
-        { status: 403 }
       );
     }
 
