@@ -49,19 +49,31 @@ export interface ScreeningCriteria {
   minAvgDailyVolume: number;
   maxAvgDailyVolume: number;
   avgDailyVolumeEnabled: boolean;
+  minAvgAnnualVolume10D: number;
+  maxAvgAnnualVolume10D: number;
+  avgAnnualVolume10DEnabled: boolean;
+  minAvgAnnualVolume3M: number;
+  maxAvgAnnualVolume3M: number;
+  avgAnnualVolume3MEnabled: boolean;
   sentimentFilter: 'all' | 'positive' | 'neutral' | 'negative';
   sentimentEnabled: boolean;
-  excludeSectors: string[];
-  sectorsEnabled: boolean;
-  excludeCountries: string[];
-  countriesEnabled: boolean;
+  minRating: number;
+  ratingEnabled: boolean;
+  portfolioFilter: string[];
+  portfolioFilterEnabled: boolean;
+  sectorFilterMode: 'exclude' | 'include' | 'disabled';
+  sectorFilter: string[];
+  countryFilterMode: 'exclude' | 'include' | 'disabled';
+  countryFilter: string[];
+  minMatchScore: number;
+  matchScoreEnabled: boolean;
 }
 
 export const DEFAULT_CRITERIA: ScreeningCriteria = {
   maxPE: 20,
-  peEnabled: true,
+  peEnabled: false,
   maxPB: 3,
-  pbEnabled: true,
+  pbEnabled: false,
   minMarketCap: 0,
   maxMarketCap: 5000,
   marketCapEnabled: false,
@@ -107,21 +119,33 @@ export const DEFAULT_CRITERIA: ScreeningCriteria = {
   minAvgDailyVolume: 0,
   maxAvgDailyVolume: 1000,
   avgDailyVolumeEnabled: false,
+  minAvgAnnualVolume10D: 0,
+  maxAvgAnnualVolume10D: 5000,
+  avgAnnualVolume10DEnabled: false,
+  minAvgAnnualVolume3M: 0,
+  maxAvgAnnualVolume3M: 5000,
+  avgAnnualVolume3MEnabled: false,
   sentimentFilter: 'all',
   sentimentEnabled: false,
-  excludeSectors: ['Alcohol', 'Gambling'],
-  sectorsEnabled: true,
-  excludeCountries: [],
-  countriesEnabled: false,
+  minRating: 0,
+  ratingEnabled: false,
+  portfolioFilter: [],
+  portfolioFilterEnabled: false,
+  sectorFilterMode: 'exclude',
+  sectorFilter: ['Alcohol', 'Gambling'],
+  countryFilterMode: 'disabled',
+  countryFilter: [],
+  minMatchScore: 50,
+  matchScoreEnabled: false,
 };
 
 // Parse criteria from URL search params
 export function parseCriteriaFromParams(searchParams: URLSearchParams): ScreeningCriteria {
   return {
     maxPE: parseFloat(searchParams.get('maxPE') || String(DEFAULT_CRITERIA.maxPE)),
-    peEnabled: searchParams.get('peEnabled') === 'true',
+    peEnabled: searchParams.has('peEnabled') ? searchParams.get('peEnabled') === 'true' : DEFAULT_CRITERIA.peEnabled,
     maxPB: parseFloat(searchParams.get('maxPB') || String(DEFAULT_CRITERIA.maxPB)),
-    pbEnabled: searchParams.get('pbEnabled') === 'true',
+    pbEnabled: searchParams.has('pbEnabled') ? searchParams.get('pbEnabled') === 'true' : DEFAULT_CRITERIA.pbEnabled,
     minMarketCap: parseFloat(searchParams.get('minMarketCap') || String(DEFAULT_CRITERIA.minMarketCap)),
     maxMarketCap: parseFloat(searchParams.get('maxMarketCap') || String(DEFAULT_CRITERIA.maxMarketCap)),
     marketCapEnabled: searchParams.get('marketCapEnabled') === 'true',
@@ -167,12 +191,24 @@ export function parseCriteriaFromParams(searchParams: URLSearchParams): Screenin
     minAvgDailyVolume: parseFloat(searchParams.get('minAvgDailyVolume') || String(DEFAULT_CRITERIA.minAvgDailyVolume)),
     maxAvgDailyVolume: parseFloat(searchParams.get('maxAvgDailyVolume') || String(DEFAULT_CRITERIA.maxAvgDailyVolume)),
     avgDailyVolumeEnabled: searchParams.get('avgDailyVolumeEnabled') === 'true',
+    minAvgAnnualVolume10D: parseFloat(searchParams.get('minAvgAnnualVolume10D') || String(DEFAULT_CRITERIA.minAvgAnnualVolume10D)),
+    maxAvgAnnualVolume10D: parseFloat(searchParams.get('maxAvgAnnualVolume10D') || String(DEFAULT_CRITERIA.maxAvgAnnualVolume10D)),
+    avgAnnualVolume10DEnabled: searchParams.get('avgAnnualVolume10DEnabled') === 'true',
+    minAvgAnnualVolume3M: parseFloat(searchParams.get('minAvgAnnualVolume3M') || String(DEFAULT_CRITERIA.minAvgAnnualVolume3M)),
+    maxAvgAnnualVolume3M: parseFloat(searchParams.get('maxAvgAnnualVolume3M') || String(DEFAULT_CRITERIA.maxAvgAnnualVolume3M)),
+    avgAnnualVolume3MEnabled: searchParams.get('avgAnnualVolume3MEnabled') === 'true',
     sentimentFilter: (searchParams.get('sentimentFilter') as 'all' | 'positive' | 'neutral' | 'negative') || DEFAULT_CRITERIA.sentimentFilter,
     sentimentEnabled: searchParams.get('sentimentEnabled') === 'true',
-    excludeSectors: searchParams.get('excludeSectors')?.split(',').filter(s => s) || DEFAULT_CRITERIA.excludeSectors,
-    sectorsEnabled: searchParams.get('sectorsEnabled') === 'true',
-    excludeCountries: searchParams.get('excludeCountries')?.split(',').filter(s => s) || DEFAULT_CRITERIA.excludeCountries,
-    countriesEnabled: searchParams.get('countriesEnabled') === 'true',
+    minRating: parseFloat(searchParams.get('minRating') || String(DEFAULT_CRITERIA.minRating)),
+    ratingEnabled: searchParams.get('ratingEnabled') === 'true',
+    portfolioFilter: searchParams.get('portfolioFilter')?.split(',').filter(s => s) || DEFAULT_CRITERIA.portfolioFilter,
+    portfolioFilterEnabled: searchParams.get('portfolioFilterEnabled') === 'true',
+    sectorFilterMode: (searchParams.get('sectorFilterMode') as 'exclude' | 'include' | 'disabled') || DEFAULT_CRITERIA.sectorFilterMode,
+    sectorFilter: searchParams.get('sectorFilter')?.split(',').filter(s => s) || DEFAULT_CRITERIA.sectorFilter,
+    countryFilterMode: (searchParams.get('countryFilterMode') as 'exclude' | 'include' | 'disabled') || DEFAULT_CRITERIA.countryFilterMode,
+    countryFilter: searchParams.get('countryFilter')?.split(',').filter(s => s) || DEFAULT_CRITERIA.countryFilter,
+    minMatchScore: parseFloat(searchParams.get('minMatchScore') || String(DEFAULT_CRITERIA.minMatchScore)),
+    matchScoreEnabled: searchParams.get('matchScoreEnabled') === 'true',
   };
 }
 
@@ -228,12 +264,24 @@ export function buildCriteriaURL(criteria: ScreeningCriteria): string {
     minAvgDailyVolume: String(criteria.minAvgDailyVolume),
     maxAvgDailyVolume: String(criteria.maxAvgDailyVolume),
     avgDailyVolumeEnabled: String(criteria.avgDailyVolumeEnabled),
+    minAvgAnnualVolume10D: String(criteria.minAvgAnnualVolume10D),
+    maxAvgAnnualVolume10D: String(criteria.maxAvgAnnualVolume10D),
+    avgAnnualVolume10DEnabled: String(criteria.avgAnnualVolume10DEnabled),
+    minAvgAnnualVolume3M: String(criteria.minAvgAnnualVolume3M),
+    maxAvgAnnualVolume3M: String(criteria.maxAvgAnnualVolume3M),
+    avgAnnualVolume3MEnabled: String(criteria.avgAnnualVolume3MEnabled),
     sentimentFilter: criteria.sentimentFilter,
     sentimentEnabled: String(criteria.sentimentEnabled),
-    excludeSectors: criteria.excludeSectors.join(','),
-    sectorsEnabled: String(criteria.sectorsEnabled),
-    excludeCountries: criteria.excludeCountries.join(','),
-    countriesEnabled: String(criteria.countriesEnabled),
+    minRating: String(criteria.minRating),
+    ratingEnabled: String(criteria.ratingEnabled),
+    portfolioFilter: criteria.portfolioFilter.join(','),
+    portfolioFilterEnabled: String(criteria.portfolioFilterEnabled),
+    sectorFilterMode: criteria.sectorFilterMode,
+    sectorFilter: criteria.sectorFilter.join(','),
+    countryFilterMode: criteria.countryFilterMode,
+    countryFilter: criteria.countryFilter.join(','),
+    minMatchScore: String(criteria.minMatchScore),
+    matchScoreEnabled: String(criteria.matchScoreEnabled),
   });
   return `/screening?${params.toString()}`;
 }

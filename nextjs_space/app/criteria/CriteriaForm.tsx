@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, XCircle, TrendingUp, Ban, ArrowRight, Plus, Trash2, Save } from 'lucide-react';
+import { CheckCircle2, XCircle, TrendingUp, Ban, ArrowRight, Plus, Trash2, Save, Filter } from 'lucide-react';
 import { DEFAULT_CRITERIA, buildCriteriaURL, type ScreeningCriteria } from '@/lib/screening-criteria';
 
 const STORAGE_KEY = 'portfolio_screening_criteria';
@@ -60,7 +60,25 @@ export default function CriteriaForm() {
   const [criteria, setCriteria] = useState<ScreeningCriteria>(DEFAULT_CRITERIA);
   const [newSector, setNewSector] = useState('');
   const [newCountry, setNewCountry] = useState('');
+  const [newPortfolio, setNewPortfolio] = useState('');
+  const [portfolios, setPortfolios] = useState<{ id: string; name: string }[]>([]);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Fetch portfolios
+  useEffect(() => {
+    async function fetchPortfolios() {
+      try {
+        const res = await fetch('/api/portfolios');
+        if (res.ok) {
+          const data = await res.json();
+          setPortfolios(data.portfolios || []);
+        }
+      } catch (e) {
+        console.error('Failed to fetch portfolios:', e);
+      }
+    }
+    fetchPortfolios();
+  }, []);
 
   // Load saved criteria from localStorage on mount and auto-apply
   useEffect(() => {
@@ -73,8 +91,18 @@ export default function CriteriaForm() {
           ...DEFAULT_CRITERIA,
           ...parsed,
           // Ensure arrays exist
-          excludeSectors: Array.isArray(parsed.excludeSectors) ? parsed.excludeSectors : DEFAULT_CRITERIA.excludeSectors,
-          excludeCountries: Array.isArray(parsed.excludeCountries) ? parsed.excludeCountries : DEFAULT_CRITERIA.excludeCountries,
+          sectorFilter: Array.isArray(parsed.sectorFilter) ? parsed.sectorFilter : 
+                        (Array.isArray(parsed.excludeSectors) ? parsed.excludeSectors : 
+                        (Array.isArray(parsed.includeSectors) ? parsed.includeSectors : DEFAULT_CRITERIA.sectorFilter)),
+          countryFilter: Array.isArray(parsed.countryFilter) ? parsed.countryFilter : 
+                         (Array.isArray(parsed.excludeCountries) ? parsed.excludeCountries : DEFAULT_CRITERIA.countryFilter),
+          portfolioFilter: Array.isArray(parsed.portfolioFilter) ? parsed.portfolioFilter : DEFAULT_CRITERIA.portfolioFilter,
+          // Migrate old fields to new mode-based approach
+          sectorFilterMode: parsed.sectorFilterMode || 
+                           (parsed.includeSectorsEnabled ? 'include' : 
+                           (parsed.sectorsEnabled ? 'exclude' : 'disabled')),
+          countryFilterMode: parsed.countryFilterMode || 
+                            (parsed.countriesEnabled ? 'exclude' : 'disabled'),
         };
         setCriteria(loadedCriteria);
         
@@ -105,14 +133,15 @@ export default function CriteriaForm() {
     setCriteria(DEFAULT_CRITERIA);
     setNewSector('');
     setNewCountry('');
+    setNewPortfolio('');
     localStorage.removeItem(STORAGE_KEY);
   };
 
   const addSector = () => {
-    if (newSector.trim() && !criteria.excludeSectors.includes(newSector.trim())) {
+    if (newSector.trim() && !criteria.sectorFilter.includes(newSector.trim())) {
       setCriteria(prev => ({
         ...prev,
-        excludeSectors: [...prev.excludeSectors, newSector.trim()],
+        sectorFilter: [...prev.sectorFilter, newSector.trim()],
       }));
       setNewSector('');
     }
@@ -121,15 +150,25 @@ export default function CriteriaForm() {
   const removeSector = (sector: string) => {
     setCriteria(prev => ({
       ...prev,
-      excludeSectors: prev.excludeSectors.filter(s => s !== sector),
+      sectorFilter: prev.sectorFilter.filter(s => s !== sector),
     }));
   };
 
+  const addIncludeSector = () => {
+    // Deprecated - kept for backwards compatibility
+    addSector();
+  };
+
+  const removeIncludeSector = (sector: string) => {
+    // Deprecated - kept for backwards compatibility
+    removeSector(sector);
+  };
+
   const addCountry = () => {
-    if (newCountry.trim() && !criteria.excludeCountries.includes(newCountry.trim())) {
+    if (newCountry.trim() && !criteria.countryFilter.includes(newCountry.trim())) {
       setCriteria(prev => ({
         ...prev,
-        excludeCountries: [...prev.excludeCountries, newCountry.trim()],
+        countryFilter: [...prev.countryFilter, newCountry.trim()],
       }));
       setNewCountry('');
     }
@@ -138,7 +177,24 @@ export default function CriteriaForm() {
   const removeCountry = (country: string) => {
     setCriteria(prev => ({
       ...prev,
-      excludeCountries: prev.excludeCountries.filter(c => c !== country),
+      countryFilter: prev.countryFilter.filter(c => c !== country),
+    }));
+  };
+
+  const addPortfolio = () => {
+    if (newPortfolio.trim() && !criteria.portfolioFilter.includes(newPortfolio.trim())) {
+      setCriteria(prev => ({
+        ...prev,
+        portfolioFilter: [...prev.portfolioFilter, newPortfolio.trim()],
+      }));
+      setNewPortfolio('');
+    }
+  };
+
+  const removePortfolio = (portfolio: string) => {
+    setCriteria(prev => ({
+      ...prev,
+      portfolioFilter: prev.portfolioFilter.filter(p => p !== portfolio),
     }));
   };
 
@@ -173,7 +229,88 @@ export default function CriteriaForm() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 mb-4">
-        {/* Financial Metrics - Merged Valuation and Additional Metrics */}
+        {/* Portfolio Filter */}
+        <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border-b border-blue-500/30 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
+                <Filter className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-white">Portfolio Filter</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCriteria({ ...criteria, portfolioFilterEnabled: !criteria.portfolioFilterEnabled })}
+                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                  criteria.portfolioFilterEnabled
+                    ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20'
+                    : 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20'
+                }`}
+              >
+                {criteria.portfolioFilterEnabled ? 'Enabled' : 'Disabled'}
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-4">
+            {/* Add Portfolio */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <select
+                  value={newPortfolio}
+                  onChange={(e) => setNewPortfolio(e.target.value)}
+                  disabled={!criteria.portfolioFilterEnabled}
+                  className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                    !criteria.portfolioFilterEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <option value="">Select a portfolio to filter...</option>
+                  {portfolios.map((portfolio) => (
+                    <option key={portfolio.id} value={portfolio.name} disabled={criteria.portfolioFilter.includes(portfolio.name)}>
+                      {portfolio.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={addPortfolio}
+                  disabled={!criteria.portfolioFilterEnabled || !newPortfolio.trim()}
+                  className={`px-4 py-3 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-lg text-blue-400 font-medium transition-colors flex items-center gap-2 ${
+                    (!criteria.portfolioFilterEnabled || !newPortfolio.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <Plus className="w-4 h-4" />
+                  Add
+                </button>
+              </div>
+            </div>
+
+            {/* Selected Portfolios List */}
+            {criteria.portfolioFilter.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {criteria.portfolioFilter.map((portfolio) => (
+                  <div key={portfolio} className="bg-slate-950/50 border border-slate-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                    <span className="text-white text-sm font-medium">{portfolio}</span>
+                    <button
+                      type="button"
+                      onClick={() => removePortfolio(portfolio)}
+                      disabled={!criteria.portfolioFilterEnabled}
+                      className={`p-1 hover:bg-blue-500/20 rounded text-blue-400 transition-colors ${
+                        !criteria.portfolioFilterEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        {/* Stock Metrics - Merged Valuation and Additional Metrics */}
         <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
           <div className="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border-b border-emerald-500/30 p-4">
             <div className="flex items-center gap-3">
@@ -181,12 +318,85 @@ export default function CriteriaForm() {
                 <TrendingUp className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Financial Metrics</h2>
+                <h2 className="text-xl font-bold text-white">Stock Metrics</h2>
               </div>
             </div>
           </div>
 
           <div className="p-4 space-y-3">
+            {/* Rating */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-0">
+                  <button
+                    type="button"
+                    onClick={() => setCriteria({ ...criteria, ratingEnabled: !criteria.ratingEnabled })}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
+                      criteria.ratingEnabled
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
+                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
+                    }`}
+                  >
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.ratingEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
+                  </button>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">Rating</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                      criteria.ratingEnabled
+                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
+                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                    }`}>
+                      {criteria.ratingEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
+                  
+                  <div className="mt-1 grid grid-cols-3 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setCriteria({ ...criteria, minRating: -1 })}
+                      disabled={!criteria.ratingEnabled}
+                      className={`px-4 py-3 rounded-lg border-2 transition-all font-medium text-sm ${
+                        criteria.minRating === -1
+                          ? 'bg-gray-500/20 border-gray-500 text-gray-400'
+                          : 'bg-slate-800/30 border-slate-700 text-slate-400 hover:bg-slate-800/50'
+                      } ${!criteria.ratingEnabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                    >
+                      ☆ Not Rated
+                    </button>
+                    {[1, 2, 3, 4, 5].map((stars) => (
+                      <button
+                        key={stars}
+                        type="button"
+                        onClick={() => setCriteria({ ...criteria, minRating: stars })}
+                        disabled={!criteria.ratingEnabled}
+                        className={`px-4 py-3 rounded-lg border-2 transition-all font-medium text-sm ${
+                          criteria.minRating === stars
+                            ? 'bg-yellow-500/20 border-yellow-500 text-yellow-400'
+                            : 'bg-slate-800/30 border-slate-700 text-slate-400 hover:bg-slate-800/50'
+                        } ${!criteria.ratingEnabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      >
+                        {stars === 1 ? '⭐ 1+' : stars === 2 ? '⭐ 2+' : stars === 3 ? '⭐ 3+' : stars === 4 ? '⭐ 4+' : '⭐ 5'}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setCriteria({ ...criteria, minRating: 0 })}
+                      disabled={!criteria.ratingEnabled}
+                      className={`px-4 py-3 rounded-lg border-2 transition-all font-medium text-sm ${
+                        criteria.minRating === 0
+                          ? 'bg-blue-500/20 border-blue-500 text-blue-400'
+                          : 'bg-slate-800/30 border-slate-700 text-slate-400 hover:bg-slate-800/50'
+                      } ${!criteria.ratingEnabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                    >
+                      🔄 All
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* P/E Ratio */}
             <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
               <div className="flex items-start gap-3">
@@ -529,7 +739,18 @@ export default function CriteriaForm() {
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-slate-400 text-xs font-medium">Minimum</span>
-                        <span className="text-white font-mono font-bold text-sm">{criteria.minAvgDailyVolume.toFixed(0)}M</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max="1000"
+                            value={criteria.minAvgDailyVolume}
+                            onChange={(e) => setCriteria({ ...criteria, minAvgDailyVolume: parseFloat(e.target.value) || 0 })}
+                            disabled={!criteria.avgDailyVolumeEnabled}
+                            className="w-20 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white font-mono text-sm focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                          <span className="text-white font-mono font-bold text-sm">M</span>
+                        </div>
                       </div>
                       <div className="relative px-2">
                         <div className="relative h-8 flex items-center">
@@ -578,7 +799,18 @@ export default function CriteriaForm() {
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-slate-400 text-xs font-medium">Maximum</span>
-                        <span className="text-white font-mono font-bold text-sm">{criteria.maxAvgDailyVolume.toFixed(0)}M</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max="1000"
+                            value={criteria.maxAvgDailyVolume}
+                            onChange={(e) => setCriteria({ ...criteria, maxAvgDailyVolume: parseFloat(e.target.value) || 0 })}
+                            disabled={!criteria.avgDailyVolumeEnabled}
+                            className="w-20 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white font-mono text-sm focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                          <span className="text-white font-mono font-bold text-sm">M</span>
+                        </div>
                       </div>
                       <div className="relative px-2">
                         <div className="relative h-8 flex items-center">
@@ -619,6 +851,312 @@ export default function CriteriaForm() {
                           <span>500M</span>
                           <span>750M</span>
                           <span>1000M</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Avg Annual Volume % (10D) */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-0">
+                  <button
+                    type="button"
+                    onClick={() => setCriteria({ ...criteria, avgAnnualVolume10DEnabled: !criteria.avgAnnualVolume10DEnabled })}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
+                      criteria.avgAnnualVolume10DEnabled
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
+                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
+                    }`}
+                  >
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.avgAnnualVolume10DEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
+                  </button>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">Avg Annual Volume % (10D)</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                      criteria.avgAnnualVolume10DEnabled
+                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
+                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                    }`}>
+                      {criteria.avgAnnualVolume10DEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
+                  
+                  <div className="mt-1 space-y-3">
+                    {/* Min Avg Annual Volume % (10D) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-slate-400 text-xs font-medium">Minimum</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max="5000"
+                            value={criteria.minAvgAnnualVolume10D}
+                            onChange={(e) => setCriteria({ ...criteria, minAvgAnnualVolume10D: parseFloat(e.target.value) || 0 })}
+                            disabled={!criteria.avgAnnualVolume10DEnabled}
+                            className="w-20 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white font-mono text-sm focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                          <span className="text-white font-mono font-bold text-sm">%</span>
+                        </div>
+                      </div>
+                      <div className="relative px-2">
+                        <div className="relative h-8 flex items-center">
+                          <div
+                            className="absolute left-0 right-0 h-3 rounded-full"
+                            style={{
+                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
+                              opacity: criteria.avgAnnualVolume10DEnabled ? 0.4 : 0.2,
+                            }}
+                          />
+                          <div
+                            className="absolute"
+                            style={{
+                              left: `${(criteria.minAvgAnnualVolume10D / 5000) * 100}%`,
+                              transform: 'translateX(-50%)',
+                              zIndex: 10,
+                            }}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                              criteria.avgAnnualVolume10DEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
+                            }`} />
+                          </div>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="5000"
+                          step="10"
+                          value={criteria.minAvgAnnualVolume10D}
+                          onChange={(e) => setCriteria({ ...criteria, minAvgAnnualVolume10D: parseFloat(e.target.value) })}
+                          disabled={!criteria.avgAnnualVolume10DEnabled}
+                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          style={{ zIndex: 20 }}
+                        />
+                        <div className="flex justify-between mt-2 text-xs text-slate-500">
+                          <span>0%</span>
+                          <span>1250%</span>
+                          <span>2500%</span>
+                          <span>3750%</span>
+                          <span>5000%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Max Avg Annual Volume % (10D) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-slate-400 text-xs font-medium">Maximum</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max="5000"
+                            value={criteria.maxAvgAnnualVolume10D}
+                            onChange={(e) => setCriteria({ ...criteria, maxAvgAnnualVolume10D: parseFloat(e.target.value) || 0 })}
+                            disabled={!criteria.avgAnnualVolume10DEnabled}
+                            className="w-20 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white font-mono text-sm focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                          <span className="text-white font-mono font-bold text-sm">%</span>
+                        </div>
+                      </div>
+                      <div className="relative px-2">
+                        <div className="relative h-8 flex items-center">
+                          <div
+                            className="absolute left-0 right-0 h-3 rounded-full"
+                            style={{
+                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
+                              opacity: criteria.avgAnnualVolume10DEnabled ? 0.4 : 0.2,
+                            }}
+                          />
+                          <div
+                            className="absolute"
+                            style={{
+                              left: `${(criteria.maxAvgAnnualVolume10D / 5000) * 100}%`,
+                              transform: 'translateX(-50%)',
+                              zIndex: 10,
+                            }}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                              criteria.avgAnnualVolume10DEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
+                            }`} />
+                          </div>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="5000"
+                          step="10"
+                          value={criteria.maxAvgAnnualVolume10D}
+                          onChange={(e) => setCriteria({ ...criteria, maxAvgAnnualVolume10D: parseFloat(e.target.value) })}
+                          disabled={!criteria.avgAnnualVolume10DEnabled}
+                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          style={{ zIndex: 20 }}
+                        />
+                        <div className="flex justify-between mt-2 text-xs text-slate-500">
+                          <span>0%</span>
+                          <span>1250%</span>
+                          <span>2500%</span>
+                          <span>3750%</span>
+                          <span>5000%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Avg Annual Volume % (3M) */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-0">
+                  <button
+                    type="button"
+                    onClick={() => setCriteria({ ...criteria, avgAnnualVolume3MEnabled: !criteria.avgAnnualVolume3MEnabled })}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${
+                      criteria.avgAnnualVolume3MEnabled
+                        ? 'bg-emerald-500/10 border-emerald-500/20 hover:bg-emerald-500/20'
+                        : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70'
+                    }`}
+                  >
+                    <CheckCircle2 className={`w-5 h-5 ${criteria.avgAnnualVolume3MEnabled ? 'text-emerald-400' : 'text-slate-600'}`} />
+                  </button>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <h3 className="text-white font-semibold text-base">Avg Annual Volume % (3M)</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                      criteria.avgAnnualVolume3MEnabled
+                        ? 'bg-purple-500/10 text-emerald-400 border border-purple-500/20'
+                        : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                    }`}>
+                      {criteria.avgAnnualVolume3MEnabled ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
+                  
+                  <div className="mt-1 space-y-3">
+                    {/* Min Avg Annual Volume % (3M) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-slate-400 text-xs font-medium">Minimum</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max="5000"
+                            value={criteria.minAvgAnnualVolume3M}
+                            onChange={(e) => setCriteria({ ...criteria, minAvgAnnualVolume3M: parseFloat(e.target.value) || 0 })}
+                            disabled={!criteria.avgAnnualVolume3MEnabled}
+                            className="w-20 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white font-mono text-sm focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                          <span className="text-white font-mono font-bold text-sm">%</span>
+                        </div>
+                      </div>
+                      <div className="relative px-2">
+                        <div className="relative h-8 flex items-center">
+                          <div
+                            className="absolute left-0 right-0 h-3 rounded-full"
+                            style={{
+                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
+                              opacity: criteria.avgAnnualVolume3MEnabled ? 0.4 : 0.2,
+                            }}
+                          />
+                          <div
+                            className="absolute"
+                            style={{
+                              left: `${(criteria.minAvgAnnualVolume3M / 5000) * 100}%`,
+                              transform: 'translateX(-50%)',
+                              zIndex: 10,
+                            }}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                              criteria.avgAnnualVolume3MEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
+                            }`} />
+                          </div>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="5000"
+                          step="10"
+                          value={criteria.minAvgAnnualVolume3M}
+                          onChange={(e) => setCriteria({ ...criteria, minAvgAnnualVolume3M: parseFloat(e.target.value) })}
+                          disabled={!criteria.avgAnnualVolume3MEnabled}
+                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          style={{ zIndex: 20 }}
+                        />
+                        <div className="flex justify-between mt-2 text-xs text-slate-500">
+                          <span>0%</span>
+                          <span>1250%</span>
+                          <span>2500%</span>
+                          <span>3750%</span>
+                          <span>5000%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Max Avg Annual Volume % (3M) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-slate-400 text-xs font-medium">Maximum</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max="5000"
+                            value={criteria.maxAvgAnnualVolume3M}
+                            onChange={(e) => setCriteria({ ...criteria, maxAvgAnnualVolume3M: parseFloat(e.target.value) || 0 })}
+                            disabled={!criteria.avgAnnualVolume3MEnabled}
+                            className="w-20 px-2 py-1 bg-slate-900 border border-slate-700 rounded text-white font-mono text-sm focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
+                          <span className="text-white font-mono font-bold text-sm">%</span>
+                        </div>
+                      </div>
+                      <div className="relative px-2">
+                        <div className="relative h-8 flex items-center">
+                          <div
+                            className="absolute left-0 right-0 h-3 rounded-full"
+                            style={{
+                              background: 'linear-gradient(to right, #ef4444, #fbbf24, #10b981)',
+                              opacity: criteria.avgAnnualVolume3MEnabled ? 0.4 : 0.2,
+                            }}
+                          />
+                          <div
+                            className="absolute"
+                            style={{
+                              left: `${(criteria.maxAvgAnnualVolume3M / 5000) * 100}%`,
+                              transform: 'translateX(-50%)',
+                              zIndex: 10,
+                            }}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-3 shadow-lg transition-all ${
+                              criteria.avgAnnualVolume3MEnabled ? 'bg-blue-500 border-white' : 'bg-slate-600 border-slate-400'
+                            }`} />
+                          </div>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="5000"
+                          step="10"
+                          value={criteria.maxAvgAnnualVolume3M}
+                          onChange={(e) => setCriteria({ ...criteria, maxAvgAnnualVolume3M: parseFloat(e.target.value) })}
+                          disabled={!criteria.avgAnnualVolume3MEnabled}
+                          className="absolute inset-0 w-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                          style={{ zIndex: 20 }}
+                        />
+                        <div className="flex justify-between mt-2 text-xs text-slate-500">
+                          <span>0%</span>
+                          <span>1250%</span>
+                          <span>2500%</span>
+                          <span>3750%</span>
+                          <span>5000%</span>
                         </div>
                       </div>
                     </div>
@@ -1177,6 +1715,82 @@ export default function CriteriaForm() {
                 </div>
               </div>
             </div>
+
+          </div>
+        </div>
+
+        {/* Match Score Filter */}
+        <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border-b border-blue-500/30 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
+                <CheckCircle2 className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-white">Match Score Filter</h2>
+                <p className="text-slate-400 text-sm mt-1">Show only stocks above a certain match percentage</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCriteria({ ...criteria, matchScoreEnabled: !criteria.matchScoreEnabled })}
+                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                  criteria.matchScoreEnabled
+                    ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20'
+                    : 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20'
+                }`}
+              >
+                {criteria.matchScoreEnabled ? 'Enabled' : 'Disabled'}
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6">
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <div className="flex-1">
+                  <label className="text-white font-semibold text-sm mb-2 block">Minimum Match Score</label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={criteria.minMatchScore}
+                      onChange={(e) => setCriteria({ ...criteria, minMatchScore: parseFloat(e.target.value) || 0 })}
+                      disabled={!criteria.matchScoreEnabled}
+                      className={`w-24 px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                        !criteria.matchScoreEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    />
+                    <span className="text-slate-400 text-sm">%</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-blue-400">{criteria.minMatchScore}%</div>
+                  <div className="text-slate-400 text-xs mt-1">Minimum</div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value={criteria.minMatchScore}
+                  onChange={(e) => setCriteria({ ...criteria, minMatchScore: parseFloat(e.target.value) })}
+                  disabled={!criteria.matchScoreEnabled}
+                  className={`w-full h-3 bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-blue-500 [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-blue-500 [&::-moz-range-thumb]:cursor-pointer ${
+                    !criteria.matchScoreEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                />
+                <div className="flex justify-between text-xs text-slate-400">
+                  <span>0% (Show All)</span>
+                  <span>50% (Balanced)</span>
+                  <span>75% (Strict)</span>
+                  <span>100% (Perfect)</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1188,19 +1802,17 @@ export default function CriteriaForm() {
                 <Ban className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-xl font-bold text-white">Sector Exclusions</h2>
+                <h2 className="text-xl font-bold text-white">Sector Filter</h2>
               </div>
-              <button
-                type="button"
-                onClick={() => setCriteria({ ...criteria, sectorsEnabled: !criteria.sectorsEnabled })}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                  criteria.sectorsEnabled
-                    ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20'
-                    : 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20'
-                }`}
+              <select
+                value={criteria.sectorFilterMode}
+                onChange={(e) => setCriteria({ ...criteria, sectorFilterMode: e.target.value as 'exclude' | 'include' | 'disabled' })}
+                className="px-4 py-2 rounded-lg text-sm font-medium border bg-slate-900/50 text-white border-slate-700 hover:bg-slate-800/50 transition-colors"
               >
-                {criteria.sectorsEnabled ? 'Enabled' : 'Disabled'}
-              </button>
+                <option value="disabled">Disabled</option>
+                <option value="exclude">Exclude</option>
+                <option value="include">Include Only</option>
+              </select>
             </div>
           </div>
 
@@ -1211,14 +1823,14 @@ export default function CriteriaForm() {
                 <select
                   value={newSector}
                   onChange={(e) => setNewSector(e.target.value)}
-                  disabled={!criteria.sectorsEnabled}
+                  disabled={criteria.sectorFilterMode === 'disabled'}
                   className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500/50 ${
-                    !criteria.sectorsEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                    criteria.sectorFilterMode === 'disabled' ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
-                  <option value="">Select a sector to exclude...</option>
+                  <option value="">Select a sector to {criteria.sectorFilterMode === 'exclude' ? 'exclude' : 'include'}...</option>
                   {COMMON_SECTORS.map((sector) => (
-                    <option key={sector} value={sector} disabled={criteria.excludeSectors.includes(sector)}>
+                    <option key={sector} value={sector} disabled={criteria.sectorFilter.includes(sector)}>
                       {sector}
                     </option>
                   ))}
@@ -1226,9 +1838,12 @@ export default function CriteriaForm() {
                 <button
                   type="button"
                   onClick={addSector}
-                  disabled={!criteria.sectorsEnabled || !newSector.trim()}
-                  className={`px-4 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg text-red-400 font-medium transition-colors flex items-center gap-2 ${
-                    (!criteria.sectorsEnabled || !newSector.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                  disabled={criteria.sectorFilterMode === 'disabled' || !newSector.trim()}
+                  className={`px-4 py-3 ${
+                    criteria.sectorFilterMode === 'include' ? 'bg-green-500/10 hover:bg-green-500/20 border-green-500/20 text-green-400' :
+                    'bg-red-500/10 hover:bg-red-500/20 border-red-500/20 text-red-400'
+                  } border rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                    (criteria.sectorFilterMode === 'disabled' || !newSector.trim()) ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
                   <Plus className="w-4 h-4" />
@@ -1237,19 +1852,23 @@ export default function CriteriaForm() {
               </div>
             </div>
 
-            {/* Excluded Sectors List */}
-            {criteria.excludeSectors.length > 0 ? (
+            {/* Sectors List */}
+            {criteria.sectorFilter.length > 0 ? (
               <div className="flex flex-wrap gap-2">
-                {criteria.excludeSectors.map((sector) => (
+                {criteria.sectorFilter.map((sector) => (
                   <div key={sector} className="bg-slate-950/50 border border-slate-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
-                    <XCircle className="w-4 h-4 text-red-400" />
+                    {criteria.sectorFilterMode === 'exclude' ? (
+                      <XCircle className="w-4 h-4 text-red-400" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4 text-green-400" />
+                    )}
                     <span className="text-white text-sm font-medium">Sector: {sector}</span>
                     <button
                       type="button"
                       onClick={() => removeSector(sector)}
-                      disabled={!criteria.sectorsEnabled}
+                      disabled={criteria.sectorFilterMode === 'disabled'}
                       className={`p-1 hover:bg-red-500/20 rounded text-red-400 transition-colors ${
-                        !criteria.sectorsEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                        criteria.sectorFilterMode === 'disabled' ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -1269,19 +1888,17 @@ export default function CriteriaForm() {
                 <Ban className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-xl font-bold text-white">Country Exclusions</h2>
+                <h2 className="text-xl font-bold text-white">Country Filter</h2>
               </div>
-              <button
-                type="button"
-                onClick={() => setCriteria({ ...criteria, countriesEnabled: !criteria.countriesEnabled })}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                  criteria.countriesEnabled
-                    ? 'bg-orange-500/10 text-orange-400 border-orange-500/20 hover:bg-orange-500/20'
-                    : 'bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20'
-                }`}
+              <select
+                value={criteria.countryFilterMode}
+                onChange={(e) => setCriteria({ ...criteria, countryFilterMode: e.target.value as 'exclude' | 'include' | 'disabled' })}
+                className="px-4 py-2 rounded-lg text-sm font-medium border bg-slate-900/50 text-white border-slate-700 hover:bg-slate-800/50 transition-colors"
               >
-                {criteria.countriesEnabled ? 'Enabled' : 'Disabled'}
-              </button>
+                <option value="disabled">Disabled</option>
+                <option value="exclude">Exclude</option>
+                <option value="include">Include Only</option>
+              </select>
             </div>
           </div>
 
@@ -1292,14 +1909,14 @@ export default function CriteriaForm() {
                 <select
                   value={newCountry}
                   onChange={(e) => setNewCountry(e.target.value)}
-                  disabled={!criteria.countriesEnabled}
+                  disabled={criteria.countryFilterMode === 'disabled'}
                   className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 ${
-                    !criteria.countriesEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                    criteria.countryFilterMode === 'disabled' ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
-                  <option value="">Select a country to exclude...</option>
+                  <option value="">Select a country to {criteria.countryFilterMode === 'exclude' ? 'exclude' : 'include'}...</option>
                   {COMMON_COUNTRIES.map((country) => (
-                    <option key={country.code} value={country.code} disabled={criteria.excludeCountries.includes(country.code)}>
+                    <option key={country.code} value={country.code} disabled={criteria.countryFilter.includes(country.code)}>
                       {country.name}
                     </option>
                   ))}
@@ -1307,9 +1924,12 @@ export default function CriteriaForm() {
                 <button
                   type="button"
                   onClick={addCountry}
-                  disabled={!criteria.countriesEnabled || !newCountry.trim()}
-                  className={`px-4 py-3 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 rounded-lg text-orange-400 font-medium transition-colors flex items-center gap-2 ${
-                    (!criteria.countriesEnabled || !newCountry.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                  disabled={criteria.countryFilterMode === 'disabled' || !newCountry.trim()}
+                  className={`px-4 py-3 ${
+                    criteria.countryFilterMode === 'include' ? 'bg-green-500/10 hover:bg-green-500/20 border-green-500/20 text-green-400' :
+                    'bg-orange-500/10 hover:bg-orange-500/20 border-orange-500/20 text-orange-400'
+                  } border rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                    (criteria.countryFilterMode === 'disabled' || !newCountry.trim()) ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
                   <Plus className="w-4 h-4" />
@@ -1318,22 +1938,26 @@ export default function CriteriaForm() {
               </div>
             </div>
 
-            {/* Excluded Countries List */}
-            {criteria.excludeCountries.length > 0 ? (
+            {/* Countries List */}
+            {criteria.countryFilter.length > 0 ? (
               <div className="flex flex-wrap gap-2">
-                {criteria.excludeCountries.map((countryCode) => {
+                {criteria.countryFilter.map((countryCode) => {
                   const country = COMMON_COUNTRIES.find(c => c.code === countryCode);
                   const displayName = country ? country.name : countryCode;
                   return (
                     <div key={countryCode} className="bg-slate-950/50 border border-slate-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
-                      <XCircle className="w-4 h-4 text-orange-400" />
+                      {criteria.countryFilterMode === 'exclude' ? (
+                        <XCircle className="w-4 h-4 text-orange-400" />
+                      ) : (
+                        <CheckCircle2 className="w-4 h-4 text-green-400" />
+                      )}
                       <span className="text-white text-sm font-medium">{displayName}</span>
                       <button
                         type="button"
                         onClick={() => removeCountry(countryCode)}
-                        disabled={!criteria.countriesEnabled}
+                        disabled={criteria.countryFilterMode === 'disabled'}
                         className={`p-1 hover:bg-orange-500/20 rounded text-orange-400 transition-colors ${
-                          !criteria.countriesEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                          criteria.countryFilterMode === 'disabled' ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                       >
                         <Trash2 className="w-4 h-4" />

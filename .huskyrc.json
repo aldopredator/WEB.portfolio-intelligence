@@ -1,0 +1,6 @@
+{
+  "hooks": {
+    "pre-commit": "cd nextjs_space && yarn test --reporter=list --max-failures=5",
+    "pre-push": "cd nextjs_space && yarn test"
+  }
+}

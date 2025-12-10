@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PlusCircle, Edit2, Trash2, Briefcase, TrendingUp, Package } from 'lucide-react';
+import { PlusCircle, Edit2, Trash2, Briefcase, TrendingUp, Package, Lock, Unlock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -23,6 +23,7 @@ interface Portfolio {
   id: string;
   name: string;
   description: string | null;
+  isLocked: boolean;
   createdAt: string;
   updatedAt: string;
   stocks: Stock[];
@@ -145,10 +146,33 @@ export default function PortfoliosPage() {
     }
   };
 
+  const handleToggleLock = async (portfolio: Portfolio) => {
+    try {
+      const response = await fetch(`/api/portfolios/${portfolio.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          isLocked: !portfolio.isLocked 
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(`Portfolio "${portfolio.name}" ${portfolio.isLocked ? 'unlocked' : 'locked'} successfully`);
+        fetchPortfolios();
+      } else {
+        toast.error(data.error || 'Failed to update portfolio lock status');
+      }
+    } catch (error) {
+      console.error('Error toggling portfolio lock:', error);
+      toast.error('Failed to update portfolio lock status');
+    }
+  };
+
   const openEditDialog = (portfolio: Portfolio) => {
-    setSelectedPortfolio(portfolio);
-    setFormData({ name: portfolio.name, description: portfolio.description || '' });
-    setIsEditDialogOpen(true);
+    // Redirect to dedicated edit page
+    window.location.href = `/portfolios/${portfolio.id}/edit`;
   };
 
   const openDeleteDialog = (portfolio: Portfolio) => {
@@ -179,7 +203,7 @@ export default function PortfoliosPage() {
             Portfolio Management
           </h1>
           <p className="text-muted-foreground">
-            Organize your stocks into different portfolios
+            Organize your stocks into different buckets
           </p>
         </div>
         
@@ -243,13 +267,19 @@ export default function PortfoliosPage() {
       {/* Portfolios Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {portfolios.map((portfolio) => (
-          <Card key={portfolio.id} className="hover:shadow-lg transition-shadow">
+          <Card key={portfolio.id} className="hover:shadow-lg transition-shadow min-h-[280px]">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <CardTitle className="flex items-center gap-2">
                     <Package className="h-5 w-5 text-primary" />
                     {portfolio.name}
+                    {portfolio.isLocked && (
+                      <Badge variant="secondary" className="ml-2">
+                        <Lock className="h-3 w-3 mr-1" />
+                        Locked
+                      </Badge>
+                    )}
                   </CardTitle>
                   {portfolio.description && (
                     <CardDescription className="mt-2">
@@ -258,6 +288,18 @@ export default function PortfoliosPage() {
                   )}
                 </div>
                 <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleToggleLock(portfolio)}
+                    title={portfolio.isLocked ? 'Unlock portfolio' : 'Lock portfolio'}
+                  >
+                    {portfolio.isLocked ? (
+                      <Lock className="h-4 w-4 text-amber-500" />
+                    ) : (
+                      <Unlock className="h-4 w-4 text-green-500" />
+                    )}
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"
