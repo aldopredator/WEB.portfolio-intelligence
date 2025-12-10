@@ -1,10 +1,236 @@
 generator client {
     provider = "prisma-client-js"
-    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
-    output = "/home/ubuntu/stock_picking_agent/nextjs_space/node_modules/.prisma/client"
 }
 
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
+}
+
+// NextAuth.js Models
+model Account {
+    id                String  @id @default(cuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? @db.Text
+    session_state     String?
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+}
+
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+    id            String    @id @default(cuid())
+    name          String?
+    email         String?   @unique
+    emailVerified DateTime?
+    password      String?   // For credentials login
+    image         String?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+    
+    accounts      Account[]
+    sessions      Session[]
+    portfolios    Portfolio[]
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+// Portfolio model to organize stocks into different portfolios
+model Portfolio {
+    id          String   @id @default(cuid())
+    name        String
+    description String?
+    isLocked    Boolean  @default(false) // Whether portfolio can be modified
+    userId      String
+    user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    
+    // Relations
+    stocks      Stock[]
+    
+    @@unique([userId, name])
+    @@index([userId])
+    @@index([name])
+}
+
+// Core stock/ticker information
+model Stock {
+    id              String   @id @default(cuid())
+    ticker          String   @unique
+    company         String
+    type            String?  // 'Equity', 'ETF', etc.
+    exchange        String?  // 'NASDAQ', 'NYSE', etc.
+    region          String?  // 'United States', etc.
+    currency        String?  @default("USD")
+    isActive        Boolean  @default(true) // Whether the stock is in the user's portfolio
+    rating          Float?   // User's rating (1-5 stars)
+    ratingUpdatedAt DateTime? // When rating was last updated
+    addedAt         DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    
+    // Portfolio relationship
+    portfolioId String?
+    portfolio   Portfolio? @relation(fields: [portfolioId], references: [id], onDelete: SetNull)
+
+    // Relations
+    stockData           StockData?
+    priceHistory        PriceHistory[]
+    analystRecommendations AnalystRecommendation[]
+    socialSentiments    SocialSentiment[]
+    news                News[]
+    metrics             Metrics?
+
+    @@index([ticker])
+    @@index([isActive])
+    @@index([portfolioId])
+}
+
+// Current stock price and basic data
+model StockData {
+    id              String   @id @default(cuid())
+    stockId         String   @unique
+    stock           Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+    
+    currentPrice    Float?
+    change          Float?
+    changePercent   Float?
+    week52High      Float?
+    week52Low       Float?
+    volume          Float?
+    marketCap       Float?
+    
+    lastUpdated     DateTime @default(now())
+
+    @@index([stockId])
+}
+
+// Historical price data for charts
+model PriceHistory {
+    id        String   @id @default(cuid())
+    stockId   String
+    stock     Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+    
+    date      DateTime
+    price     Float
+    volume    Float?
+    
+    createdAt DateTime @default(now())
+
+    @@unique([stockId, date])
+    @@index([stockId, date])
+}
+
+// Analyst recommendations
+model AnalystRecommendation {
+    id          String   @id @default(cuid())
+    stockId     String   @unique
+    stock       Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+    
+    strongBuy   Int      @default(0)
+    buy         Int      @default(0)
+    hold        Int      @default(0)
+    sell        Int      @default(0)
+    strongSell  Int      @default(0)
+    consensus   String?  // 'Buy', 'Hold', 'Sell', 'N/A'
+    priceTarget Float?
+    
+    lastUpdated DateTime @default(now())
+
+    @@index([stockId])
+}
+
+// Social sentiment data
+model SocialSentiment {
+    id        String   @id @default(cuid())
+    stockId   String   @unique
+    stock     Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+    
+    positive  Int      @default(0)
+    neutral   Int      @default(0)
+    negative  Int      @default(0)
+    overall   String?  // 'Positive', 'Neutral', 'Negative', 'N/A'
+    
+    lastUpdated DateTime @default(now())
+
+    @@index([stockId])
+}
+
+// News articles
+model News {
+    id          String   @id @default(cuid())
+    stockId     String
+    stock       Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+    
+    title       String
+    url         String?
+    source      String?
+    summary     String?  @db.Text
+    publishedAt DateTime?
+    
+    createdAt   DateTime @default(now())
+
+    @@index([stockId, publishedAt])
+}
+
+// Financial metrics
+model Metrics {
+    id                      String   @id @default(cuid())
+    stockId                 String   @unique
+    stock                   Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+    
+    // Valuation metrics
+    peRatio                 Float?
+    forwardPE               Float?
+    pbRatio                 Float?
+    psRatio                 Float?
+    priceToBook             Float?
+    evToRevenue             Float?
+    evToEbitda              Float?
+    
+    // Performance metrics
+    beta5Y                  Float?
+    ytdReturn               Float?
+    week52Return            Float?
+    
+    // Financial health
+    debtToEquity            Float?
+    roe                     Float?   // Return on Equity
+    operatingMargin         Float?
+    profitMargin            Float?
+    
+    // Growth metrics
+    revenueGrowthQoQ        Float?
+    earningsGrowthQoQ       Float?
+    
+    // Other
+    dividendYield           Float?
+    payoutRatio             Float?
+    
+    lastUpdated             DateTime @default(now())
+
+    @@index([stockId])
 }
