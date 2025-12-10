@@ -40,7 +40,6 @@ export function SidebarNavigation() {
     },
     { name: 'Portfolios', href: '/portfolios', icon: Briefcase, description: 'Manage your portfolios' },
     { name: 'Screening', href: '/screening', icon: Filter, description: 'Stock screening results' },
-    { name: 'Benchmark', href: '/benchmark', icon: TrendingUp, description: 'Market benchmark comparison' },
   ];
 
   const SidebarContent = () => (
