@@ -59,7 +59,8 @@ export default function PriceHistoryChart({
   useEffect(() => {
     const fetchTickers = async () => {
       try {
-        const response = await fetch('/api/stock');
+        // Always fetch ALL stocks (no portfolio filter) for comparison dropdown
+        const response = await fetch('/api/stock?portfolioId=all');
         if (response.ok) {
           const data = await response.json();
           const stocks = data.stocks || [];
@@ -117,8 +118,8 @@ export default function PriceHistoryChart({
     const fetchBenchmarkData = async () => {
       setIsLoadingBenchmark(true);
       try {
-        // Fetch all stocks and find the selected comparison ticker
-        const response = await fetch('/api/stock');
+        // Fetch all stocks (no portfolio filter) to find the selected comparison ticker
+        const response = await fetch('/api/stock?portfolioId=all');
         if (response.ok) {
           const data = await response.json();
           const stocks = data.stocks || [];
