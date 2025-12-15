@@ -364,9 +364,9 @@ export async function fetchYahooCompanyProfile(ticker: string) {
       return null;
     }
 
-    const assetProfile = modules.assetProfile || {};
-    const price = modules.price || {};
-    const summaryDetail = modules.summaryDetail || {};
+    const assetProfile = modules.assetProfile as any || {};
+    const price = modules.price as any || {};
+    const summaryDetail = modules.summaryDetail as any || {};
 
     console.log(`[YAHOO] ✅ ${ticker} - Successfully fetched profile`);
 
