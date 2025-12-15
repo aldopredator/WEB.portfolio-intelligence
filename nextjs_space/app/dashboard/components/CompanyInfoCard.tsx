@@ -16,6 +16,7 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
+import TextField from '@mui/material/TextField';
 import toast from 'react-hot-toast';
 
 interface CompanyInfoCardProps {
@@ -46,6 +47,7 @@ interface CompanyInfoCardProps {
   twoHundredDayAverage?: number | null;
   enterpriseValue?: number | null;
   initialRating?: number;
+  initialNotes?: string | null;
   portfolios?: Array<{ id: string; name: string; description?: string | null }>;
   currentPortfolioId?: string | null;
   onRatingUpdate?: (ticker: string, rating: number) => void;
@@ -79,11 +81,13 @@ export default function CompanyInfoCard({
   twoHundredDayAverage,
   enterpriseValue,
   initialRating = 0,
+  initialNotes = '',
   portfolios = [],
   currentPortfolioId,
   onRatingUpdate,
 }: CompanyInfoCardProps) {
   const [rating, setRating] = React.useState(initialRating);
+  const [notes, setNotes] = React.useState(initialNotes || '');
   const [hoveredRating, setHoveredRating] = React.useState(0);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const moveMenuOpen = Boolean(anchorEl);
@@ -264,6 +268,46 @@ export default function CompanyInfoCard({
             </Button>
           </Stack>
 
+          {/* Notes Section */}
+          <Box sx={{ width: '100%', mb: 2 }}>
+            <TextField
+              fullWidth
+              multiline
+              rows={2}
+              placeholder="Add notes about this stock (max 100 characters)"
+              value={notes}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value.length <= 100) {
+                  setNotes(value);
+                }
+              }}
+              onBlur={async () => {
+                try {
+                  const response = await fetch('/api/stock/update-notes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ticker, notes }),
+                  });
+
+                  if (response.ok) {
+                    toast.success('Notes saved');
+                  } else {
+                    toast.error('Failed to save notes');
+                  }
+                } catch (error) {
+                  console.error('Error saving notes:', error);
+                  toast.error('Failed to save notes');
+                }
+              }}
+              helperText={`${notes.length}/100 characters`}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  fontSize: '0.875rem',
+                },
+              }}
+            />
+          </Box>
           {/* Move Button */}
           {portfolios.length > 0 && (
             <>

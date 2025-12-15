@@ -41,12 +41,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const stockRatings = dbStocks.reduce((acc, stock) => {
     acc[stock.ticker] = {
       rating: stock.rating || 0,
+      notes: stock.notes || '',
       ratingUpdatedAt: stock.ratingUpdatedAt,
       portfolioId: stock.portfolioId,
       isLocked: stock.portfolio?.isLocked || false,
     };
     return acc;
-  }, {} as Record<string, { rating: number; ratingUpdatedAt: Date | null; portfolioId: string | null; isLocked: boolean }>);
+  }, {} as Record<string, { rating: number; notes: string; ratingUpdatedAt: Date | null; portfolioId: string | null; isLocked: boolean }>);
 
   console.log('[DashboardPage] 📊 Stock ratings with lock status:', JSON.stringify(
     Object.entries(stockRatings).map(([ticker, data]) => ({ 
@@ -79,6 +80,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       company: config?.name || ticker,
       change_percent: stockInfo?.change_percent,
       rating: stockRatings[ticker]?.rating || 0,
+      notes: stockRatings[ticker]?.notes || '',
       ratingUpdatedAt: stockRatings[ticker]?.ratingUpdatedAt || null,
       portfolioId: stockRatings[ticker]?.portfolioId || null,
       isLocked: stockRatings[ticker]?.isLocked || false,
