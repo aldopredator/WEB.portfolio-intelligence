@@ -28,6 +28,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     select: {
       ticker: true,
       rating: true,
+      notes: true,
       ratingUpdatedAt: true,
       portfolioId: true,
       portfolio: {
@@ -41,7 +42,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const stockRatings = dbStocks.reduce((acc, stock) => {
     acc[stock.ticker] = {
       rating: stock.rating || 0,
-      notes: stock.notes || '',
+      notes: (stock as any).notes || '',
       ratingUpdatedAt: stock.ratingUpdatedAt,
       portfolioId: stock.portfolioId,
       isLocked: stock.portfolio?.isLocked || false,
