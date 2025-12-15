@@ -41,11 +41,12 @@ interface DashboardClientProps {
     ticker: string; 
     company: string; 
     change_percent?: number; 
-    rating?: number; 
+    rating?: number;
+    notes?: string;
     ratingUpdatedAt?: Date | null; 
     portfolioId?: string | null;
     isLocked?: boolean;
-  }>;
+  }>
 }
 
 const theme = createTheme({

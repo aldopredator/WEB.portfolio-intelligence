@@ -28,6 +28,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     select: {
       ticker: true,
       rating: true,
+      notes: true,
       portfolioId: true,
     },
   });
@@ -37,10 +38,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const stockRatings = dbStocks.reduce((acc, stock) => {
     acc[stock.ticker] = {
       rating: stock.rating || 0,
+      notes: (stock as any).notes || '',
       portfolioId: stock.portfolioId,
     };
     return acc;
-  }, {} as Record<string, { rating: number; portfolioId: string | null }>);
+  }, {} as Record<string, { rating: number; notes: string; portfolioId: string | null }>);
 
   console.log('[HomePage] Stock ratings map:', stockRatings);
 
@@ -56,6 +58,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       company: config?.name || ticker,
       change_percent: stockInfo?.change_percent,
       rating: stockRatings[ticker]?.rating || 0,
+      notes: stockRatings[ticker]?.notes || '',
       portfolioId: stockRatings[ticker]?.portfolioId || null,
     };
   });
