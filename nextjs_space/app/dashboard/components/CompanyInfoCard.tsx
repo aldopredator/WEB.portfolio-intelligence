@@ -207,163 +207,186 @@ export default function CompanyInfoCard({
   return (
     <Card variant="outlined" sx={{ height: '100%' }}>
       <CardContent>
-        {/* Star Rating Section */}
+        {/* Top Section: Rating, Buttons, and Transfer in one line */}
         <Box sx={{ 
           display: 'flex', 
           flexDirection: 'column',
-          alignItems: 'center',
           mb: 2,
           pb: 2,
           borderBottom: '1px solid',
           borderColor: 'divider',
         }}>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              mb: 1.5, 
-              color: 'text.secondary',
-              fontWeight: 500,
-            }}
-          >
-            Rate this stock
-          </Typography>
-          <Stack direction="row" spacing={0.5} sx={{ mb: 2 }}>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <IconButton
-                key={star}
-                onClick={() => handleRatingClick(star)}
-                onMouseEnter={() => setHoveredRating(star)}
-                onMouseLeave={() => setHoveredRating(0)}
+          {/* Rating Row */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: 'text.secondary',
+                  fontWeight: 500,
+                }}
+              >
+                Rate this stock
+              </Typography>
+              <Stack direction="row" spacing={0.5}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <IconButton
+                    key={star}
+                    onClick={() => handleRatingClick(star)}
+                    onMouseEnter={() => setHoveredRating(star)}
+                    onMouseLeave={() => setHoveredRating(0)}
+                    sx={{
+                      padding: 0.5,
+                      '&:hover': {
+                        backgroundColor: 'transparent',
+                      },
+                    }}
+                  >
+                    {(hoveredRating >= star || (hoveredRating === 0 && rating >= star)) ? (
+                      <StarIcon 
+                        sx={{ 
+                          fontSize: 28,
+                          color: 'warning.main',
+                          transition: 'all 0.2s',
+                        }} 
+                      />
+                    ) : (
+                      <StarBorderIcon 
+                        sx={{ 
+                          fontSize: 28,
+                          color: 'text.disabled',
+                          transition: 'all 0.2s',
+                        }} 
+                      />
+                    )}
+                  </IconButton>
+                ))}
+              </Stack>
+            </Box>
+            
+            {/* Buttons on the right */}
+            <Stack direction="row" spacing={1}>
+              <Button
+                variant="contained"
+                size="small"
+                onClick={async () => {
+                  try {
+                    // Save both rating and notes
+                    const [ratingResponse, notesResponse] = await Promise.all([
+                      fetch('/api/stock/update-rating', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ticker, rating }),
+                      }),
+                      fetch('/api/stock/update-notes', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ticker, notes }),
+                      }),
+                    ]);
+
+                    if (ratingResponse.ok && notesResponse.ok) {
+                      toast.success(`Saved: ${rating} star${rating !== 1 ? 's' : ''} and notes`);
+                      if (onRatingUpdate) {
+                        onRatingUpdate(ticker, rating);
+                      }
+                      setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                      toast.error('Failed to save');
+                    }
+                  } catch (error) {
+                    console.error('Error saving:', error);
+                    toast.error('Failed to save');
+                  }
+                }}
                 sx={{
-                  padding: 0.5,
+                  bgcolor: 'success.main',
                   '&:hover': {
-                    backgroundColor: 'transparent',
+                    bgcolor: 'success.dark',
                   },
                 }}
               >
-                {(hoveredRating >= star || (hoveredRating === 0 && rating >= star)) ? (
-                  <StarIcon 
-                    sx={{ 
-                      fontSize: 28,
-                      color: 'warning.main',
-                      transition: 'all 0.2s',
-                    }} 
-                  />
-                ) : (
-                  <StarBorderIcon 
-                    sx={{ 
-                      fontSize: 28,
-                      color: 'text.disabled',
-                      transition: 'all 0.2s',
-                    }} 
-                  />
-                )}
-              </IconButton>
-            ))}
-          </Stack>
+                Save
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={async () => {
+                  try {
+                    // Reset both rating and notes
+                    const [ratingResponse, notesResponse] = await Promise.all([
+                      fetch('/api/stock/update-rating', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ticker, rating: 0 }),
+                      }),
+                      fetch('/api/stock/update-notes', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ticker, notes: '' }),
+                      }),
+                    ]);
+
+                    if (ratingResponse.ok && notesResponse.ok) {
+                      setRating(0);
+                      setNotes('');
+                      toast.success('Rating and notes reset');
+                      setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                      toast.error('Failed to reset');
+                    }
+                  } catch (error) {
+                    console.error('Error resetting:', error);
+                    toast.error('Failed to reset');
+                  }
+                }}
+                sx={{
+                  borderColor: 'error.main',
+                  color: 'error.main',
+                  '&:hover': {
+                    borderColor: 'error.dark',
+                    bgcolor: 'error.main',
+                    color: 'white',
+                  },
+                }}
+              >
+                Reset
+              </Button>
+              {portfolios.length > 0 && !isLocked && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<DriveFileMoveIcon />}
+                  onClick={handleMoveClick}
+                  sx={{
+                    borderColor: 'primary.main',
+                    color: 'primary.main',
+                    '&:hover': {
+                      borderColor: 'primary.light',
+                      backgroundColor: 'primary.main',
+                      color: 'white',
+                    },
+                  }}
+                >
+                  Transfer
+                </Button>
+              )}
+            </Stack>
+          </Box>
 
           {/* Last Updated */}
           <Typography 
             variant="caption" 
             sx={{ 
-              mb: 2,
               color: 'text.disabled',
-              display: 'block',
-              textAlign: 'center',
+              mb: 1.5,
             }}
           >
             Last updated: {formatRelativeDate(ratingUpdatedAt)}
           </Typography>
 
-          {/* Rating Action Buttons */}
-          <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-            <Button
-              variant="contained"
-              size="small"
-              onClick={async () => {
-                try {
-                  // Save both rating and notes
-                  const [ratingResponse, notesResponse] = await Promise.all([
-                    fetch('/api/stock/update-rating', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ ticker, rating }),
-                    }),
-                    fetch('/api/stock/update-notes', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ ticker, notes }),
-                    }),
-                  ]);
-
-                  if (ratingResponse.ok && notesResponse.ok) {
-                    toast.success(`Saved: ${rating} star${rating !== 1 ? 's' : ''} and notes`);
-                    setTimeout(() => window.location.reload(), 1000);
-                  } else {
-                    toast.error('Failed to save changes');
-                  }
-                } catch (error) {
-                  console.error('Error saving:', error);
-                  toast.error('Failed to save changes');
-                }
-              }}
-              sx={{
-                bgcolor: 'success.main',
-                '&:hover': {
-                  bgcolor: 'success.dark',
-                },
-              }}
-            >
-              Save
-            </Button>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={async () => {
-                try {
-                  // Reset both rating and notes
-                  const [ratingResponse, notesResponse] = await Promise.all([
-                    fetch('/api/stock/update-rating', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ ticker, rating: 0 }),
-                    }),
-                    fetch('/api/stock/update-notes', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ ticker, notes: '' }),
-                    }),
-                  ]);
-
-                  if (ratingResponse.ok && notesResponse.ok) {
-                    setRating(0);
-                    setNotes('');
-                    toast.success('Rating and notes reset');
-                    setTimeout(() => window.location.reload(), 1000);
-                  } else {
-                    toast.error('Failed to reset');
-                  }
-                } catch (error) {
-                  console.error('Error resetting:', error);
-                  toast.error('Failed to reset');
-                }
-              }}
-              sx={{
-                borderColor: 'error.main',
-                color: 'error.main',
-                '&:hover': {
-                  borderColor: 'error.dark',
-                  bgcolor: 'error.main',
-                  color: 'white',
-                },
-              }}
-            >
-              Reset
-            </Button>
-          </Stack>
-
           {/* Notes Section */}
-          <Box sx={{ width: '100%', mb: 2 }}>
+          <Box sx={{ width: '100%' }}>
             <TextField
               fullWidth
               multiline
@@ -384,46 +407,29 @@ export default function CompanyInfoCard({
               }}
             />
           </Box>
-          {/* Move Button */}
+          
+          {/* Move Menu */}
           {portfolios.length > 0 && !isLocked && (
-            <>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<DriveFileMoveIcon />}
-                onClick={handleMoveClick}
-                sx={{
-                  borderColor: 'primary.main',
-                  color: 'primary.main',
-                  '&:hover': {
-                    borderColor: 'primary.light',
-                    backgroundColor: 'primary.main',
-                    color: 'white',
-                  },
-                }}
-              >
-                Transfer to Other Portfolio
-              </Button>
-              <Menu
-                anchorEl={anchorEl}
-                open={moveMenuOpen}
-                onClose={handleMoveClose}
-              >
-                {portfolios
-                  .filter(p => p.id !== currentPortfolioId)
-                  .map((portfolio) => (
-                    <MenuItem 
-                      key={portfolio.id} 
-                      onClick={() => handleMoveToPortfolio(portfolio.id)}
-                    >
-                      {portfolio.name}
-                    </MenuItem>
-                  ))}
-              </Menu>
-            </>
+            <Menu
+              anchorEl={anchorEl}
+              open={moveMenuOpen}
+              onClose={handleMoveClose}
+            >
+              {portfolios
+                .filter(p => p.id !== currentPortfolioId)
+                .map((portfolio) => (
+                  <MenuItem 
+                    key={portfolio.id} 
+                    onClick={() => handleMoveToPortfolio(portfolio.id)}
+                  >
+                    {portfolio.name}
+                  </MenuItem>
+                ))}
+            </Menu>
           )}
         </Box>
 
+        {/* Company Info Section */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
           {logo ? (
             <Avatar
