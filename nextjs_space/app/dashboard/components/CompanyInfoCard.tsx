@@ -457,10 +457,10 @@ export default function CompanyInfoCard({
             {ipoDate && (
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  IPO Date / Listing Age
+                  IPO
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {ipoDate} ({Math.floor((new Date().getTime() - new Date(ipoDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000))} years)
+                  {new Date(ipoDate).getFullYear()}
                 </Typography>
               </Box>
             )}
