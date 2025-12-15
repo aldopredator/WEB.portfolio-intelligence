@@ -278,5 +278,4 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
       </Box>
     </Box>
   );
-} );
 }
