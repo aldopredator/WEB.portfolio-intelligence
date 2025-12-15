@@ -219,15 +219,6 @@ export default function CompanyInfoCard({
           {/* Rating Row */}
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: 'text.secondary',
-                  fontWeight: 500,
-                }}
-              >
-                Rate this stock
-              </Typography>
               <Stack direction="row" spacing={0.5}>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <IconButton
@@ -399,7 +390,6 @@ export default function CompanyInfoCard({
                   setNotes(value);
                 }
               }}
-              helperText={`${notes.length}/100 characters`}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   fontSize: '0.875rem',
