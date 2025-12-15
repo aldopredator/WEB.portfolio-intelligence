@@ -8,7 +8,7 @@ export default async function SectorsPage() {
   // Fetch real stock data
   const stockData = await getStockData();
   
-  // Group stocks by sector with their data
+  // Group stocks by industry (from company_profile) with their data
   const sectorGroups: Record<string, Array<{
     ticker: string;
     name: string;
@@ -21,15 +21,21 @@ export default async function SectorsPage() {
   STOCK_CONFIG.forEach((config) => {
     const data = stockData[config.ticker];
     const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
+    const companyProfile = data && typeof data === 'object' && 'company_profile' in data ? data.company_profile : null;
     
-    if (!sectorGroups[config.sector]) {
-      sectorGroups[config.sector] = [];
+    // Use industry from company_profile, fallback to sector from config, then 'Other'
+    const industry = (companyProfile && typeof companyProfile === 'object' && 'industry' in companyProfile 
+      ? companyProfile.industry 
+      : config.sector) || 'Other';
+    
+    if (!sectorGroups[industry]) {
+      sectorGroups[industry] = [];
     }
 
-    sectorGroups[config.sector].push({
+    sectorGroups[industry].push({
       ticker: config.ticker,
       name: config.name,
-      sector: config.sector,
+      sector: industry,
       marketCap: stockInfo?.market_cap,
       change: stockInfo?.change,
       changePercent: stockInfo?.change_percent,
