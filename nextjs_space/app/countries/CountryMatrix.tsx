@@ -62,18 +62,20 @@ export default function CountryMatrix({ countryGroups }: CountryMatrixProps) {
   const getCountrySize = (stocks: Stock[]) => {
     const stockCount = stocks.length;
     // Scale size based on number of stocks for optimal space utilization
-    if (stockCount >= 40) return 'xlarge';
-    if (stockCount >= 20) return 'large';
-    if (stockCount >= 10) return 'medium';
-    return 'small';
+    if (stockCount >= 8) return 'xlarge';
+    if (stockCount >= 5) return 'large';
+    if (stockCount >= 3) return 'medium';
+    if (stockCount >= 1) return 'small';
+    return 'tiny';
   };
 
   const getCountrySizeClass = (size: string) => {
     switch (size) {
-      case 'xlarge': return 'col-span-2 row-span-2';
-      case 'large': return 'col-span-2';
-      case 'medium': return 'col-span-1 row-span-2';
-      default: return 'col-span-1';
+      case 'xlarge': return 'col-span-2 row-span-2 min-h-[300px]';
+      case 'large': return 'col-span-2 min-h-[200px]';
+      case 'medium': return 'col-span-1 row-span-2 min-h-[300px]';
+      case 'small': return 'col-span-1 min-h-[150px]';
+      default: return 'col-span-1 min-h-[100px]';
     }
   };
 
