@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { TrendingUp, TrendingDown, ExternalLink } from 'lucide-react';
+import { MASTER_INDUSTRIES } from '@/lib/master-industries';
 
 interface Stock {
   ticker: string;
@@ -74,35 +75,34 @@ export default function SectorMatrix({ sectorGroups }: SectorMatrixProps) {
     }
   };
 
-  const sectors = Object.entries(sectorGroups).sort((a, b) => {
-    const aTotal = a[1].reduce((sum, s) => sum + (s.marketCap || 0), 0);
-    const bTotal = b[1].reduce((sum, s) => sum + (s.marketCap || 0), 0);
-    return bTotal - aTotal; // Sort by total market cap descending
+  // Create entries for all master industries, including empty ones
+  const allIndustries = MASTER_INDUSTRIES.map(industry => [
+    industry,
+    sectorGroups[industry] || []
+  ] as [string, Stock[]]);
+  
+  // Sort: industries with stocks first (by stock count desc), then empty ones alphabetically
+  const sectors = allIndustries.sort((a, b) => {
+    const aCount = a[1].length;
+    const bCount = b[1].length;
+    if (aCount === 0 && bCount === 0) return a[0].localeCompare(b[0]); // Both empty: alphabetical
+    if (aCount === 0) return 1; // a is empty: move to end
+    if (bCount === 0) return -1; // b is empty: move to end
+    return bCount - aCount; // Both have stocks: sort by count descending
   });
 
   return (
     <div className="space-y-6">
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl p-6">
-          <div className="text-slate-400 text-sm mb-1">Total Sectors</div>
+          <div className="text-slate-400 text-sm mb-1">Total Industries</div>
           <div className="text-white text-3xl font-bold">{sectors.length}</div>
         </div>
         <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl p-6">
           <div className="text-slate-400 text-sm mb-1">Total Stocks</div>
           <div className="text-white text-3xl font-bold">
             {Object.values(sectorGroups).reduce((sum, stocks) => sum + stocks.length, 0)}
-          </div>
-        </div>
-        <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl p-6">
-          <div className="text-slate-400 text-sm mb-1">Combined Market Cap</div>
-          <div className="text-white text-3xl font-bold">
-            {formatMarketCap(
-              Object.values(sectorGroups).reduce(
-                (sum, stocks) => sum + stocks.reduce((s, stock) => s + (stock.marketCap || 0), 0),
-                0
-              )
-            )}
           </div>
         </div>
       </div>
@@ -134,7 +134,10 @@ export default function SectorMatrix({ sectorGroups }: SectorMatrixProps) {
 
                 {/* Stock Chips - Compact Cloud */}
                 <div className="flex-1 flex flex-wrap gap-2 content-start">
-                  {stocks.map((stock) => (
+                  {stocks.length === 0 ? (
+                    <div className="text-slate-600 text-sm italic">No stocks yet - opportunity for diversification</div>
+                  ) : (
+                    stocks.map((stock) => (
                     <Link
                       key={stock.ticker}
                       href={`/dashboard?ticker=${stock.ticker}`}
@@ -149,7 +152,8 @@ export default function SectorMatrix({ sectorGroups }: SectorMatrixProps) {
                       )}
                       <ExternalLink className="w-3 h-3 opacity-0 group-hover/chip:opacity-100 transition-opacity" />
                     </Link>
-                  ))}
+                  ))
+                  )}
                 </div>
               </div>
             </div>
