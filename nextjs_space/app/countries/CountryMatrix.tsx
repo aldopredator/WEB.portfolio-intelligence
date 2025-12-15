@@ -74,7 +74,7 @@ export default function CountryMatrix({ countryGroups }: CountryMatrixProps) {
       case 'xlarge': return 'col-span-2 row-span-2';
       case 'large': return 'col-span-2';
       case 'medium': return 'col-span-1 row-span-2';
-      case 'small': return 'col-span-1 h-32';
+      case 'small': return 'col-span-1 h-64';
       default: return 'col-span-1 h-24';
     }
   };
@@ -141,95 +141,73 @@ export default function CountryMatrix({ countryGroups }: CountryMatrixProps) {
       </div>
 
       {/* Country Matrix - Grouped by Geographic Regions */}
-      <div className="space-y-8">
-        {/* Countries with stocks - sorted by count */}
-        {countries.filter(([_, stocks]) => stocks.length > 0).length > 0 && (
-          <div>
-            <h2 className="text-lg font-semibold text-slate-300 mb-4 px-2">Your Holdings</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-fr">
-              {countries.filter(([_, stocks]) => stocks.length > 0).map(([country, stocks, region]) => {
-                const size = getCountrySize(stocks);
-                const sizeClass = getCountrySizeClass(size);
-                const colorClass = COUNTRY_COLORS[country] || 'from-slate-500/20 to-gray-500/20 border-slate-500/30';
-                const textColor = COUNTRY_TEXT_COLORS[country] || 'text-slate-400';
-
-                return (
-                  <div
-                    key={country}
-                    className={`${sizeClass} bg-gradient-to-br ${colorClass} backdrop-blur-sm border rounded-xl p-6 hover:scale-105 transition-all cursor-pointer group`}
-                    onClick={() => setSelectedCountry(selectedCountry === country ? null : country)}
-                  >
-                    <div className="flex flex-col h-full">
-                      {/* Country Header */}
-                      <div className="mb-4">
-                        <h3 className={`text-xl font-bold ${textColor} mb-1 group-hover:text-white transition-colors`}>
-                          {country}
-                        </h3>
-                        <div className="text-slate-400 text-sm">{stocks.length} stocks · {region}</div>
-                      </div>
-
-                {/* Stock Chips - Compact Cloud */}
-                <div className="flex-1 flex flex-wrap gap-2 content-start">
-                  {stocks.length === 0 ? (
-                    <div className="text-slate-600 text-sm italic">No stocks yet - opportunity for diversification</div>
-                  ) : (
-                    stocks.map((stock) => (
-                      <Link
-                        key={stock.ticker}
-                        href={`/dashboard?ticker=${stock.ticker}`}
-                        onClick={(e) => e.stopPropagation()}
-                        className={`inline-flex items-center gap-1 px-3 py-1.5 bg-slate-950/50 hover:bg-slate-950/80 border border-slate-700/50 hover:border-slate-600 rounded-lg transition-all group/chip ${textColor}`}
-                      >
-                        <span className="font-mono font-semibold text-sm">{stock.ticker}</span>
-                        {stock.changePercent !== undefined && (
-                          <span className={`text-xs font-mono ${stock.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                            {stock.changePercent >= 0 ? '+' : ''}{stock.changePercent.toFixed(1)}%
-                          </span>
-                        )}
-                        <ExternalLink className="w-3 h-3 opacity-0 group-hover/chip:opacity-100 transition-opacity" />
-                      </Link>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  )}
-
-        {/* Empty countries - grouped by region */}
+      <div className="space-y-4">
         {Object.entries(GEOGRAPHIC_REGIONS).map(([regionName, regionCountries]) => {
-          const emptyCountriesInRegion = countries.filter(
-            ([country, stocks]) => stocks.length === 0 && regionCountries.includes(country)
+          const countriesInRegion = countries.filter(
+            ([country]) => regionCountries.includes(country)
           );
           
-          if (emptyCountriesInRegion.length === 0) return null;
+          if (countriesInRegion.length === 0) return null;
+
+          const hasStocks = countriesInRegion.some(([_, stocks]) => stocks.length > 0);
+          const regionLabel = hasStocks ? regionName : `${regionName} - Opportunities`;
 
           return (
             <div key={regionName}>
-              <h2 className="text-lg font-semibold text-slate-300 mb-4 px-2">{regionName} - Opportunities</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-fr">
-                {emptyCountriesInRegion.map(([country, stocks]) => {
+              <h2 className="text-lg font-semibold text-slate-300 mb-3 px-2">{regionLabel}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2 auto-rows-fr">
+                {countriesInRegion.map(([country, stocks, region]) => {
                   const size = getCountrySize(stocks);
                   const sizeClass = getCountrySizeClass(size);
                   const colorClass = COUNTRY_COLORS[country] || 'from-slate-500/20 to-gray-500/20 border-slate-500/30';
                   const textColor = COUNTRY_TEXT_COLORS[country] || 'text-slate-400';
+                  const hasStocks = stocks.length > 0;
 
                   return (
                     <div
                       key={country}
-                      className={`${sizeClass} bg-gradient-to-br ${colorClass} backdrop-blur-sm border rounded-xl p-4 hover:scale-105 transition-all cursor-pointer group`}
+                      className={`${sizeClass} bg-gradient-to-br ${colorClass} backdrop-blur-sm border rounded-xl ${hasStocks ? 'p-6' : 'p-4'} hover:scale-105 transition-all cursor-pointer group`}
                       onClick={() => setSelectedCountry(selectedCountry === country ? null : country)}
                     >
                       <div className="flex flex-col h-full">
-                        <div>
-                          <h3 className={`text-lg font-bold ${textColor} mb-1 group-hover:text-white transition-colors`}>
-                            {country}
-                          </h3>
-                          <div className="text-slate-600 text-xs italic">No holdings</div>
-                        </div>
+                        {hasStocks ? (
+                          <>
+                            {/* Country Header */}
+                            <div className="mb-4">
+                              <h3 className={`text-xl font-bold ${textColor} mb-1 group-hover:text-white transition-colors`}>
+                                {country}
+                              </h3>
+                              <div className="text-slate-400 text-sm">{stocks.length} stocks</div>
+                            </div>
+
+                            {/* Stock Chips - Compact Cloud */}
+                            <div className="flex-1 flex flex-wrap gap-2 content-start">
+                              {stocks.map((stock) => (
+                                <Link
+                                  key={stock.ticker}
+                                  href={`/dashboard?ticker=${stock.ticker}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className={`inline-flex items-center gap-1 px-3 py-1.5 bg-slate-950/50 hover:bg-slate-950/80 border border-slate-700/50 hover:border-slate-600 rounded-lg transition-all group/chip ${textColor}`}
+                                >
+                                  <span className="font-mono font-semibold text-sm">{stock.ticker}</span>
+                                  {stock.changePercent !== undefined && (
+                                    <span className={`text-xs font-mono ${stock.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                                      {stock.changePercent >= 0 ? '+' : ''}{stock.changePercent.toFixed(1)}%
+                                    </span>
+                                  )}
+                                  <ExternalLink className="w-3 h-3 opacity-0 group-hover/chip:opacity-100 transition-opacity" />
+                                </Link>
+                              ))}
+                            </div>
+                          </>
+                        ) : (
+                          <div>
+                            <h3 className={`text-lg font-bold ${textColor} mb-1 group-hover:text-white transition-colors`}>
+                              {country}
+                            </h3>
+                            <div className="text-slate-600 text-xs italic">No holdings</div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -238,9 +216,7 @@ export default function CountryMatrix({ countryGroups }: CountryMatrixProps) {
             </div>
           );
         })}
-      </div>
-
-      {/* Selected Country Details */}
+      </div>      {/* Selected Country Details */}
       {selectedCountry && countryGroups[selectedCountry] && countryGroups[selectedCountry].length > 0 && (
         <div className="bg-gradient-to-br from-slate-900/90 to-slate-950/90 backdrop-blur-sm border border-slate-800/50 rounded-xl p-6">
           <div className="flex items-center justify-between mb-6">
