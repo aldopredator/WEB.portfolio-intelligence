@@ -1,6 +1,7 @@
 // Yahoo Finance API utility functions for fetching real-time stock data
 
 import YahooFinance from 'yahoo-finance2';
+import { normalizeCountry } from './country-utils';
 
 // Initialize yahoo-finance2 instance
 const yahooFinance = new YahooFinance();
@@ -356,7 +357,7 @@ export async function fetchYahooCompanyProfile(ticker: string) {
     console.log(`[YAHOO] ${ticker} - Fetching company profile`);
     
     const modules = await yahooFinance.quoteSummary(ticker, {
-      modules: ['assetProfile', 'price', 'summaryDetail']
+      modules: ['assetProfile', 'price', 'summaryDetail', 'defaultKeyStatistics']
     });
 
     if (!modules) {
@@ -367,6 +368,7 @@ export async function fetchYahooCompanyProfile(ticker: string) {
     const assetProfile = modules.assetProfile as any || {};
     const price = modules.price as any || {};
     const summaryDetail = modules.summaryDetail as any || {};
+    const keyStats = modules.defaultKeyStatistics as any || {};
 
     console.log(`[YAHOO] ✅ ${ticker} - Successfully fetched profile`);
 
@@ -375,10 +377,14 @@ export async function fetchYahooCompanyProfile(ticker: string) {
       logo: assetProfile.website ? `https://logo.clearbit.com/${assetProfile.website.replace(/^https?:\/\//, '').split('/')[0]}` : undefined,
       industry: assetProfile.industry,
       sector: assetProfile.sector,
-      country: assetProfile.country,
+      country: normalizeCountry(assetProfile.country),
       marketCapitalization: price.marketCap || summaryDetail.marketCap,
       currency: price.currency,
       weburl: assetProfile.website,
+      description: assetProfile.longBusinessSummary,
+      ipoDate: keyStats.lastSplitDate || price.firstTradeDateEpochUtc 
+        ? new Date((keyStats.lastSplitDate || price.firstTradeDateEpochUtc) * 1000).toISOString().split('T')[0]
+        : undefined,
     };
   } catch (error) {
     console.error(`[YAHOO] ❌ ${ticker} - Error fetching profile:`, error);

@@ -29,6 +29,7 @@ interface CompanyInfoCardProps {
   marketCapitalization?: number;
   currency?: string;
   weburl?: string;
+  ipoDate?: string;
   assets?: number;
   liabilities?: number;
   floatShares?: number | null;
@@ -61,6 +62,7 @@ export default function CompanyInfoCard({
   marketCapitalization,
   currency,
   weburl,
+  ipoDate,
   assets,
   liabilities,
   floatShares,
@@ -366,6 +368,16 @@ export default function CompanyInfoCard({
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
                   {country}
+                </Typography>
+              </Box>
+            )}
+            {ipoDate && (
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  IPO Date / Listing Age
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {ipoDate} ({Math.floor((new Date().getTime() - new Date(ipoDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000))} years)
                 </Typography>
               </Box>
             )}

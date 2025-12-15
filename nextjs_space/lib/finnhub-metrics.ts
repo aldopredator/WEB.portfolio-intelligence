@@ -3,6 +3,7 @@
 
 import type { AnalystRecommendation } from './types';
 import { shouldUseYahooFinance, fetchYahooCompanyProfile } from './yahoo-finance';
+import { normalizeCountry } from './country-utils';
 
 export interface CompanyProfile {
   name?: string;
@@ -14,6 +15,8 @@ export interface CompanyProfile {
   marketCapitalization?: number;
   currency?: string;
   weburl?: string;
+  description?: string;
+  ipoDate?: string;
 }
 
 export interface BalanceSheet {
@@ -283,6 +286,8 @@ export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfil
           marketCapitalization: yahooProfile.marketCapitalization,
           currency: yahooProfile.currency,
           weburl: yahooProfile.weburl,
+          description: yahooProfile.description,
+          ipoDate: yahooProfile.ipoDate,
         };
       }
     } catch (error) {
@@ -318,10 +323,11 @@ export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfil
         industry: data.finnhubIndustry,
         sector: data.gsector,
         subSector: data.naicsSubsector,
-        country: data.country,
+        country: normalizeCountry(data.country),
         marketCapitalization: data.marketCapitalization ? data.marketCapitalization * 1000000 : undefined,
         currency: data.currency,
         weburl: data.weburl,
+        ipoDate: data.ipo,
       };
     }
   } catch (error) {

@@ -11,6 +11,7 @@ import StockStatisticsCard from './StockStatisticsCard';
 import ShareStatisticsCard from './ShareStatisticsCard';
 import SocialSentimentCard from './SocialSentimentCard';
 import CompanyInfoCard from './CompanyInfoCard';
+import CompanyDescriptionCard from './CompanyDescriptionCard';
 import MarketNewsCard from './MarketNewsCard';
 import RecommendationTrendsCard from './RecommendationTrendsCard';
 import EarningsCalendarCard from './EarningsCalendarCard';
@@ -144,6 +145,7 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
                 fiftyDayAverage={stock.fiftyDayAverage}
                 twoHundredDayAverage={stock.twoHundredDayAverage}
                 enterpriseValue={stock.enterpriseValue}
+                ipoDate={stockEntry.company_profile.ipoDate}
                 initialRating={currentRating}
                 portfolios={portfolios}
                 currentPortfolioId={currentPortfolioId}
@@ -250,14 +252,31 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
           sentiment={stockEntry.social_sentiment}
         />
       </Box>
-
-      {/* Market News Section */}
-      <Box sx={{ mt: 3 }}>
+      {/* Market News and Company Description Section */}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            lg: 'repeat(2, 1fr)',
+          },
+          gap: 2,
+          mt: 3,
+        }}
+      >
         <MarketNewsCard
           ticker={selectedStock}
           articles={stockEntry.latest_news || []}
         />
+        {stockEntry.company_profile?.description && (
+          <CompanyDescriptionCard
+            ticker={selectedStock}
+            companyName={stockEntry.company_profile.name}
+            description={stockEntry.company_profile.description}
+          />
+        )}
       </Box>
     </Box>
   );
+} );
 }
