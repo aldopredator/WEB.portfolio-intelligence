@@ -21,7 +21,7 @@ import type { StockInsightsData } from '@/lib/types';
 interface MainGridProps {
   stockData: StockInsightsData;
   selectedStock: string;
-  stocks?: Array<{ ticker: string; company: string; change_percent?: number; rating?: number; notes?: string; portfolioId?: string | null }>;
+  stocks?: Array<{ ticker: string; company: string; change_percent?: number; rating?: number; notes?: string; portfolioId?: string | null; isLocked?: boolean }>;
   portfolios?: Array<{ id: string; name: string; description?: string | null }>;
   onRatingUpdate?: (ticker: string, rating: number) => void;
 }
@@ -31,6 +31,7 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
   const currentStock = stocks.find(s => s.ticker === selectedStock);
   const currentRating = currentStock?.rating || 0;
   const currentPortfolioId = currentStock?.portfolioId;
+  const isLocked = currentStock?.isLocked || false;
   
   // Debug logging
   console.log('[MainGrid] Selected stock:', selectedStock);
@@ -148,6 +149,7 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
                 ipoDate={stockEntry.company_profile.ipoDate}
                 initialRating={currentRating}
                 initialNotes={currentStock?.notes}
+                isLocked={isLocked}
                 portfolios={portfolios}
                 currentPortfolioId={currentPortfolioId}
                 onRatingUpdate={onRatingUpdate}

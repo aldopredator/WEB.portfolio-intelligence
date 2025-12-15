@@ -48,6 +48,7 @@ interface CompanyInfoCardProps {
   enterpriseValue?: number | null;
   initialRating?: number;
   initialNotes?: string | null;
+  isLocked?: boolean;
   portfolios?: Array<{ id: string; name: string; description?: string | null }>;
   currentPortfolioId?: string | null;
   onRatingUpdate?: (ticker: string, rating: number) => void;
@@ -82,6 +83,7 @@ export default function CompanyInfoCard({
   enterpriseValue,
   initialRating = 0,
   initialNotes = '',
+  isLocked = false,
   portfolios = [],
   currentPortfolioId,
   onRatingUpdate,
@@ -348,7 +350,7 @@ export default function CompanyInfoCard({
             />
           </Box>
           {/* Move Button */}
-          {portfolios.length > 0 && (
+          {portfolios.length > 0 && !isLocked && (
             <>
               <Button
                 variant="outlined"
