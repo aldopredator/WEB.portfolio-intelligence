@@ -2,6 +2,7 @@
 // Uses Next.js fetch caching with 30-day revalidation for persistent caching
 
 import type { AnalystRecommendation } from './types';
+import { shouldUseYahooFinance, fetchYahooCompanyProfile } from './yahoo-finance';
 
 export interface CompanyProfile {
   name?: string;
@@ -267,6 +268,29 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
  * Fetch company profile data from Finnhub
  */
 export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfile> {
+  // Check if this is a non-US stock that should use Yahoo Finance
+  if (shouldUseYahooFinance(ticker)) {
+    console.log(`[FINNHUB] ${ticker} - Non-US stock detected, using Yahoo Finance fallback`);
+    try {
+      const yahooProfile = await fetchYahooCompanyProfile(ticker);
+      if (yahooProfile) {
+        return {
+          name: yahooProfile.name,
+          logo: yahooProfile.logo,
+          industry: yahooProfile.industry,
+          sector: yahooProfile.sector,
+          country: yahooProfile.country,
+          marketCapitalization: yahooProfile.marketCapitalization,
+          currency: yahooProfile.currency,
+          weburl: yahooProfile.weburl,
+        };
+      }
+    } catch (error) {
+      console.error(`[FINNHUB] ${ticker} - Yahoo Finance fallback failed:`, error);
+    }
+  }
+
+  // Try Finnhub for US stocks or if Yahoo failed
   const apiKey = process.env.FINNHUB_API_KEY;
   if (!apiKey) {
     console.warn(`[FINNHUB] ${ticker} - API key not configured for profile`);
@@ -281,6 +305,13 @@ export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfil
 
     if (response.ok) {
       const data = await response.json();
+      
+      // Check if Finnhub returned an error (common for non-US stocks)
+      if (data.error) {
+        console.warn(`[FINNHUB] ${ticker} - API error: ${data.error}`);
+        return {};
+      }
+      
       return {
         name: data.name,
         logo: data.logo,

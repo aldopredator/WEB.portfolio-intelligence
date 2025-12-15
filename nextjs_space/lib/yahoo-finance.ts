@@ -316,3 +316,72 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
         return null;
     }
 }
+
+/**
+ * Check if a ticker is likely a non-US stock that needs Yahoo Finance fallback
+ * European stocks typically have format: XXX.PA, XXX.DE, XXX.L, etc.
+ */
+export function shouldUseYahooFinance(ticker: string): boolean {
+  // Common European and international exchange suffixes
+  const internationalExchanges = [
+    '.PA',  // Euronext Paris (France)
+    '.DE',  // Xetra (Germany)
+    '.F',   // Frankfurt (Germany)
+    '.L',   // London Stock Exchange (UK)
+    '.MI',  // Milan (Italy)
+    '.AS',  // Amsterdam (Netherlands)
+    '.BR',  // Brussels (Belgium)
+    '.MC',  // Madrid (Spain)
+    '.LS',  // Lisbon (Portugal)
+    '.SW',  // SIX Swiss Exchange
+    '.HE',  // Helsinki (Finland)
+    '.ST',  // Stockholm (Sweden)
+    '.OL',  // Oslo (Norway)
+    '.CO',  // Copenhagen (Denmark)
+    '.VI',  // Vienna (Austria)
+    '.HK',  // Hong Kong
+    '.T',   // Tokyo Stock Exchange
+    '.TO',  // Toronto Stock Exchange
+  ];
+
+  return internationalExchanges.some(suffix => ticker.endsWith(suffix));
+}
+
+/**
+ * Fetch company profile using Yahoo Finance (works for international stocks)
+ * Better alternative to Finnhub for non-US stocks like MC.PA, SU.PA, GLE.PA
+ */
+export async function fetchYahooCompanyProfile(ticker: string) {
+  try {
+    console.log(`[YAHOO] ${ticker} - Fetching company profile`);
+    
+    const modules = await yahooFinance.quoteSummary(ticker, {
+      modules: ['assetProfile', 'price', 'summaryDetail']
+    });
+
+    if (!modules) {
+      console.warn(`[YAHOO] ${ticker} - No profile data returned`);
+      return null;
+    }
+
+    const assetProfile = modules.assetProfile || {};
+    const price = modules.price || {};
+    const summaryDetail = modules.summaryDetail || {};
+
+    console.log(`[YAHOO] ✅ ${ticker} - Successfully fetched profile`);
+
+    return {
+      name: price.longName || price.shortName,
+      logo: assetProfile.website ? `https://logo.clearbit.com/${assetProfile.website.replace(/^https?:\/\//, '').split('/')[0]}` : undefined,
+      industry: assetProfile.industry,
+      sector: assetProfile.sector,
+      country: assetProfile.country,
+      marketCapitalization: price.marketCap || summaryDetail.marketCap,
+      currency: price.currency,
+      weburl: assetProfile.website,
+    };
+  } catch (error) {
+    console.error(`[YAHOO] ❌ ${ticker} - Error fetching profile:`, error);
+    return null;
+  }
+}
