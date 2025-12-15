@@ -112,6 +112,8 @@ export interface CompanyProfile {
   weburl?: string;
   assets?: number;
   liabilities?: number;
+  description?: string;
+  ipoDate?: string;
 }
 
 export interface NewsArticle {
