@@ -48,6 +48,7 @@ interface CompanyInfoCardProps {
   enterpriseValue?: number | null;
   initialRating?: number;
   initialNotes?: string | null;
+  ratingUpdatedAt?: Date | null;
   isLocked?: boolean;
   portfolios?: Array<{ id: string; name: string; description?: string | null }>;
   currentPortfolioId?: string | null;
@@ -83,6 +84,7 @@ export default function CompanyInfoCard({
   enterpriseValue,
   initialRating = 0,
   initialNotes = '',
+  ratingUpdatedAt = null,
   isLocked = false,
   portfolios = [],
   currentPortfolioId,
@@ -94,6 +96,26 @@ export default function CompanyInfoCard({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const moveMenuOpen = Boolean(anchorEl);
   const router = useRouter();
+
+  // Format relative date
+  const formatRelativeDate = (date: Date | null): string => {
+    if (!date) return 'Never';
+    
+    const now = new Date();
+    const diff = now.getTime() - new Date(date).getTime();
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor(diff / (1000 * 60));
+    
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+    if (days < 7) return `${days} days ago`;
+    if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+    return new Date(date).toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+  };
 
   // Update rating when initialRating changes
   React.useEffect(() => {
@@ -239,6 +261,19 @@ export default function CompanyInfoCard({
               </IconButton>
             ))}
           </Stack>
+
+          {/* Last Updated */}
+          <Typography 
+            variant="caption" 
+            sx={{ 
+              mb: 2,
+              color: 'text.disabled',
+              display: 'block',
+              textAlign: 'center',
+            }}
+          >
+            Last updated: {formatRelativeDate(ratingUpdatedAt)}
+          </Typography>
 
           {/* Rating Action Buttons */}
           <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
