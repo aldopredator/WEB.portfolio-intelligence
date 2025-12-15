@@ -13,7 +13,8 @@ import {
   Menu,
   X,
   Briefcase,
-  Package
+  Package,
+  Grid3x3
 } from 'lucide-react';
 import { usePortfolio } from '@/lib/portfolio-context';
 import {
@@ -40,6 +41,7 @@ export function SidebarNavigation() {
     },
     { name: 'Portfolios', href: '/portfolios', icon: Briefcase, description: 'Manage your portfolios' },
     { name: 'Screening', href: '/screening', icon: Filter, description: 'Stock screening results' },
+    { name: 'Sectors', href: '/sectors', icon: Grid3x3, description: 'Sector matrix visualization' },
   ];
 
   const SidebarContent = () => (
