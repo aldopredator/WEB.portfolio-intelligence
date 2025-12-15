@@ -243,9 +243,32 @@ export default function CompanyInfoCard({
             <Button
               variant="contained"
               size="small"
-              onClick={() => {
-                toast.success(`Rating saved: ${rating} star${rating !== 1 ? 's' : ''}`);
-                window.location.reload();
+              onClick={async () => {
+                try {
+                  // Save both rating and notes
+                  const [ratingResponse, notesResponse] = await Promise.all([
+                    fetch('/api/stock/update-rating', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ ticker, rating }),
+                    }),
+                    fetch('/api/stock/update-notes', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ ticker, notes }),
+                    }),
+                  ]);
+
+                  if (ratingResponse.ok && notesResponse.ok) {
+                    toast.success(`Saved: ${rating} star${rating !== 1 ? 's' : ''} and notes`);
+                    setTimeout(() => window.location.reload(), 1000);
+                  } else {
+                    toast.error('Failed to save changes');
+                  }
+                } catch (error) {
+                  console.error('Error saving:', error);
+                  toast.error('Failed to save changes');
+                }
               }}
               sx={{
                 bgcolor: 'success.main',
@@ -254,12 +277,40 @@ export default function CompanyInfoCard({
                 },
               }}
             >
-              Save Rating
+              Save
             </Button>
             <Button
               variant="outlined"
               size="small"
-              onClick={() => handleRatingClick(0)}
+              onClick={async () => {
+                try {
+                  // Reset both rating and notes
+                  const [ratingResponse, notesResponse] = await Promise.all([
+                    fetch('/api/stock/update-rating', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ ticker, rating: 0 }),
+                    }),
+                    fetch('/api/stock/update-notes', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ ticker, notes: '' }),
+                    }),
+                  ]);
+
+                  if (ratingResponse.ok && notesResponse.ok) {
+                    setRating(0);
+                    setNotes('');
+                    toast.success('Rating and notes reset');
+                    setTimeout(() => window.location.reload(), 1000);
+                  } else {
+                    toast.error('Failed to reset');
+                  }
+                } catch (error) {
+                  console.error('Error resetting:', error);
+                  toast.error('Failed to reset');
+                }
+              }}
               sx={{
                 borderColor: 'error.main',
                 color: 'error.main',
@@ -270,7 +321,7 @@ export default function CompanyInfoCard({
                 },
               }}
             >
-              Reset Rating
+              Reset
             </Button>
           </Stack>
 
@@ -286,24 +337,6 @@ export default function CompanyInfoCard({
                 const value = e.target.value;
                 if (value.length <= 100) {
                   setNotes(value);
-                }
-              }}
-              onBlur={async () => {
-                try {
-                  const response = await fetch('/api/stock/update-notes', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ticker, notes }),
-                  });
-
-                  if (response.ok) {
-                    toast.success('Notes saved');
-                  } else {
-                    toast.error('Failed to save notes');
-                  }
-                } catch (error) {
-                  console.error('Error saving notes:', error);
-                  toast.error('Failed to save notes');
                 }
               }}
               helperText={`${notes.length}/100 characters`}
