@@ -65,7 +65,8 @@ export default function CountryMatrix({ countryGroups }: CountryMatrixProps) {
     if (stockCount >= 40) return 'xlarge';
     if (stockCount >= 20) return 'large';
     if (stockCount >= 10) return 'medium';
-    return 'small';
+    if (stockCount >= 1) return 'small';
+    return 'tiny';
   };
 
   const getCountrySizeClass = (size: string) => {
@@ -73,24 +74,54 @@ export default function CountryMatrix({ countryGroups }: CountryMatrixProps) {
       case 'xlarge': return 'col-span-2 row-span-2';
       case 'large': return 'col-span-2';
       case 'medium': return 'col-span-1 row-span-2';
-      default: return 'col-span-1';
+      case 'small': return 'col-span-1';
+      default: return 'col-span-1 h-24';
     }
   };
 
+  // Geographic regions for better organization
+  const GEOGRAPHIC_REGIONS = {
+    'North America': ['United States', 'Canada', 'Mexico'],
+    'Europe': ['United Kingdom', 'Germany', 'France', 'Italy', 'Spain', 'Netherlands', 'Switzerland', 'Belgium', 'Sweden', 'Ireland', 'Norway', 'Denmark', 'Poland', 'Portugal', 'Finland', 'Greece', 'Czech Republic', 'Romania', 'Hungary', 'Austria'],
+    'Asia Pacific': ['China', 'Japan', 'India', 'South Korea', 'Australia', 'Taiwan', 'Singapore', 'Hong Kong', 'Indonesia', 'Thailand', 'Malaysia', 'Philippines', 'Vietnam', 'New Zealand'],
+    'Middle East': ['Saudi Arabia', 'Turkey', 'Israel', 'United Arab Emirates', 'Egypt'],
+    'Latin America': ['Brazil', 'Argentina', 'Chile', 'Colombia', 'Peru'],
+    'Africa': ['South Africa', 'Egypt', 'Nigeria'],
+    'Other': ['Pakistan']
+  };
+
+  // Create country-to-region mapping
+  const countryToRegion = Object.entries(GEOGRAPHIC_REGIONS).reduce((acc, [region, countries]) => {
+    countries.forEach(country => acc[country] = region);
+    return acc;
+  }, {} as Record<string, string>);
+
   // Create entries for all master countries, including empty ones
-  const allCountries = MASTER_COUNTRIES.map(country => [
+  const allCountries = MASTER_COUNTRIES.map(country => ([
     country,
-    countryGroups[country] || []
-  ] as [string, Stock[]]);
+    countryGroups[country] || [],
+    countryToRegion[country] || 'Other'
+  ] as [string, Stock[], string]));
   
-  // Sort: countries with stocks first (by stock count desc), then empty ones alphabetically
+  // Sort: countries with stocks first (by stock count desc), then by region and alphabetically
   const countries = allCountries.sort((a, b) => {
     const aCount = a[1].length;
     const bCount = b[1].length;
-    if (aCount === 0 && bCount === 0) return a[0].localeCompare(b[0]); // Both empty: alphabetical
-    if (aCount === 0) return 1; // a is empty: move to end
-    if (bCount === 0) return -1; // b is empty: move to end
-    return bCount - aCount; // Both have stocks: sort by count descending
+    
+    // Both have stocks: sort by count descending
+    if (aCount > 0 && bCount > 0) return bCount - aCount;
+    
+    // Both empty: sort by region, then alphabetically
+    if (aCount === 0 && bCount === 0) {
+      if (a[2] !== b[2]) return a[2].localeCompare(b[2]);
+      return a[0].localeCompare(b[0]);
+    }
+    
+    // Move empty countries to end
+    if (aCount === 0) return 1;
+    if (bCount === 0) return -1;
+    
+    return 0;
   });
 
   return (
