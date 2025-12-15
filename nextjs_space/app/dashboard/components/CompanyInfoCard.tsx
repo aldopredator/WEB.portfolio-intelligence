@@ -99,6 +99,12 @@ export default function CompanyInfoCard({
     setRating(initialRating);
   }, [initialRating, ticker, rating]);
 
+  // Update notes when ticker or initialNotes changes
+  React.useEffect(() => {
+    console.log('[CompanyInfoCard] Notes changed:', { ticker, notes: initialNotes });
+    setNotes(initialNotes || '');
+  }, [ticker, initialNotes]);
+
   const handleMoveClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
