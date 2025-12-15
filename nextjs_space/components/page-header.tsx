@@ -10,11 +10,13 @@ interface PageHeaderProps {
 }
 
 export function PageHeader({ title, description, lastUpdated, action }: PageHeaderProps) {
+  const hasActions = lastUpdated || action;
+  
   return (
     <div className="bg-gradient-to-r from-slate-900/50 to-slate-900/30 border-b border-slate-800/50 backdrop-blur-sm">
       <div className="px-6 lg:px-8 py-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div className="flex-1 text-center lg:text-left">
+          <div className={hasActions ? "flex-1" : "flex-1 text-center"}>
             <h1 className="text-3xl font-bold text-white mb-2">{title}</h1>
             <p className="text-slate-400">{description}</p>
           </div>

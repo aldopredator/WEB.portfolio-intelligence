@@ -14,8 +14,8 @@ interface SectorsPageProps {
 export default async function SectorsPage({ searchParams }: SectorsPageProps) {
   const portfolioId = searchParams.portfolio || null;
   
-  // Fetch real stock data
-  const stockData = await getStockData(portfolioId);
+  // Fetch ALL stock data (no portfolio filter at server level)
+  const stockData = await getStockData(null);
   
   // Fetch portfolios for filter
   const portfolios = await prisma.portfolio.findMany({
@@ -26,11 +26,10 @@ export default async function SectorsPage({ searchParams }: SectorsPageProps) {
     },
   });
 
-  // Fetch stock ratings from database
+  // Fetch ALL stock ratings from database (no portfolio filter)
   const dbStocks = await prisma.stock.findMany({
     where: { 
       isActive: true,
-      ...(portfolioId ? { portfolioId } : {}),
     },
     select: {
       ticker: true,
@@ -49,14 +48,8 @@ export default async function SectorsPage({ searchParams }: SectorsPageProps) {
 
   await prisma.$disconnect();
   
-  // Prepare all stocks with their data
-  const allStocks = STOCK_CONFIG.filter(config => {
-    // If portfolio filter is active, only include stocks from that portfolio
-    if (portfolioId) {
-      return stockRatings[config.ticker]?.portfolioId === portfolioId;
-    }
-    return true;
-  }).map((config) => {
+  // Prepare all stocks with their data (no filtering - client will handle it)
+  const allStocks = STOCK_CONFIG.map((config) => {
     const data = stockData[config.ticker];
     const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
     const companyProfile = data && typeof data === 'object' && 'company_profile' in data ? data.company_profile : null;

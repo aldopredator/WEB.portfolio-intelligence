@@ -45,6 +45,9 @@ export default function SectorsClient({ allStocks, portfolios, selectedPortfolio
 
   // Apply filters
   const filteredStocks = allStocks.filter(stock => {
+    // Portfolio filter
+    if (selectedPortfolioId && stock.portfolioId !== selectedPortfolioId) return false;
+    
     // Rating filter
     if (ratingFilter === -1 && (stock.rating || 0) > 0) return false; // Not Rated
     if (ratingFilter > 0 && (stock.rating || 0) < ratingFilter) return false; // Minimum stars
