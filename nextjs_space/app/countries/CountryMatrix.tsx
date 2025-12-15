@@ -74,7 +74,7 @@ export default function CountryMatrix({ countryGroups }: CountryMatrixProps) {
       case 'xlarge': return 'col-span-2 row-span-2';
       case 'large': return 'col-span-2';
       case 'medium': return 'col-span-1 row-span-2';
-      case 'small': return 'col-span-1';
+      case 'small': return 'col-span-1 h-32';
       default: return 'col-span-1 h-24';
     }
   };
@@ -140,28 +140,33 @@ export default function CountryMatrix({ countryGroups }: CountryMatrixProps) {
         </div>
       </div>
 
-      {/* Country Matrix - Cloud Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-fr">
-        {countries.map(([country, stocks]) => {
-          const size = getCountrySize(stocks);
-          const sizeClass = getCountrySizeClass(size);
-          const colorClass = COUNTRY_COLORS[country] || 'from-slate-500/20 to-gray-500/20 border-slate-500/30';
-          const textColor = COUNTRY_TEXT_COLORS[country] || 'text-slate-400';
+      {/* Country Matrix - Grouped by Geographic Regions */}
+      <div className="space-y-8">
+        {/* Countries with stocks - sorted by count */}
+        {countries.filter(([_, stocks]) => stocks.length > 0).length > 0 && (
+          <div>
+            <h2 className="text-lg font-semibold text-slate-300 mb-4 px-2">Your Holdings</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-fr">
+              {countries.filter(([_, stocks]) => stocks.length > 0).map(([country, stocks, region]) => {
+                const size = getCountrySize(stocks);
+                const sizeClass = getCountrySizeClass(size);
+                const colorClass = COUNTRY_COLORS[country] || 'from-slate-500/20 to-gray-500/20 border-slate-500/30';
+                const textColor = COUNTRY_TEXT_COLORS[country] || 'text-slate-400';
 
-          return (
-            <div
-              key={country}
-              className={`${sizeClass} bg-gradient-to-br ${colorClass} backdrop-blur-sm border rounded-xl p-6 hover:scale-105 transition-all cursor-pointer group`}
-              onClick={() => setSelectedCountry(selectedCountry === country ? null : country)}
-            >
-              <div className="flex flex-col h-full">
-                {/* Country Header */}
-                <div className="mb-4">
-                  <h3 className={`text-xl font-bold ${textColor} mb-1 group-hover:text-white transition-colors`}>
-                    {country}
-                  </h3>
-                  <div className="text-slate-400 text-sm">{stocks.length} stocks</div>
-                </div>
+                return (
+                  <div
+                    key={country}
+                    className={`${sizeClass} bg-gradient-to-br ${colorClass} backdrop-blur-sm border rounded-xl p-6 hover:scale-105 transition-all cursor-pointer group`}
+                    onClick={() => setSelectedCountry(selectedCountry === country ? null : country)}
+                  >
+                    <div className="flex flex-col h-full">
+                      {/* Country Header */}
+                      <div className="mb-4">
+                        <h3 className={`text-xl font-bold ${textColor} mb-1 group-hover:text-white transition-colors`}>
+                          {country}
+                        </h3>
+                        <div className="text-slate-400 text-sm">{stocks.length} stocks · {region}</div>
+                      </div>
 
                 {/* Stock Chips - Compact Cloud */}
                 <div className="flex-1 flex flex-wrap gap-2 content-start">
@@ -186,6 +191,49 @@ export default function CountryMatrix({ countryGroups }: CountryMatrixProps) {
                     ))
                   )}
                 </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  )}
+
+        {/* Empty countries - grouped by region */}
+        {Object.entries(GEOGRAPHIC_REGIONS).map(([regionName, regionCountries]) => {
+          const emptyCountriesInRegion = countries.filter(
+            ([country, stocks]) => stocks.length === 0 && regionCountries.includes(country)
+          );
+          
+          if (emptyCountriesInRegion.length === 0) return null;
+
+          return (
+            <div key={regionName}>
+              <h2 className="text-lg font-semibold text-slate-300 mb-4 px-2">{regionName} - Opportunities</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-fr">
+                {emptyCountriesInRegion.map(([country, stocks]) => {
+                  const size = getCountrySize(stocks);
+                  const sizeClass = getCountrySizeClass(size);
+                  const colorClass = COUNTRY_COLORS[country] || 'from-slate-500/20 to-gray-500/20 border-slate-500/30';
+                  const textColor = COUNTRY_TEXT_COLORS[country] || 'text-slate-400';
+
+                  return (
+                    <div
+                      key={country}
+                      className={`${sizeClass} bg-gradient-to-br ${colorClass} backdrop-blur-sm border rounded-xl p-4 hover:scale-105 transition-all cursor-pointer group`}
+                      onClick={() => setSelectedCountry(selectedCountry === country ? null : country)}
+                    >
+                      <div className="flex flex-col h-full">
+                        <div>
+                          <h3 className={`text-lg font-bold ${textColor} mb-1 group-hover:text-white transition-colors`}>
+                            {country}
+                          </h3>
+                          <div className="text-slate-600 text-xs italic">No holdings</div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           );
