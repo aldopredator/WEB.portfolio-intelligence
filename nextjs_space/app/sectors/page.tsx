@@ -1,24 +1,62 @@
 import { PageHeader } from '@/components/page-header';
 import { getStockData, STOCK_CONFIG } from '@/lib/stock-data';
-import SectorMatrix from './SectorMatrix';
+import { PrismaClient } from '@prisma/client';
+import SectorsClient from './SectorsClient';
+
+const prisma = new PrismaClient();
 
 export const revalidate = 1800; // 30 minutes
 
-export default async function SectorsPage() {
-  // Fetch real stock data
-  const stockData = await getStockData();
-  
-  // Group stocks by industry (from company_profile) with their data
-  const sectorGroups: Record<string, Array<{
-    ticker: string;
-    name: string;
-    sector: string;
-    marketCap?: number;
-    change?: number;
-    changePercent?: number;
-  }>> = {};
+interface SectorsPageProps {
+  searchParams: { portfolio?: string };
+}
 
-  STOCK_CONFIG.forEach((config) => {
+export default async function SectorsPage({ searchParams }: SectorsPageProps) {
+  const portfolioId = searchParams.portfolio || null;
+  
+  // Fetch real stock data
+  const stockData = await getStockData(portfolioId);
+  
+  // Fetch portfolios for filter
+  const portfolios = await prisma.portfolio.findMany({
+    select: {
+      id: true,
+      name: true,
+      description: true,
+    },
+  });
+
+  // Fetch stock ratings from database
+  const dbStocks = await prisma.stock.findMany({
+    where: { 
+      isActive: true,
+      ...(portfolioId ? { portfolioId } : {}),
+    },
+    select: {
+      ticker: true,
+      rating: true,
+      portfolioId: true,
+    },
+  });
+
+  const stockRatings = dbStocks.reduce((acc, stock) => {
+    acc[stock.ticker] = {
+      rating: stock.rating || 0,
+      portfolioId: stock.portfolioId,
+    };
+    return acc;
+  }, {} as Record<string, { rating: number; portfolioId: string | null }>);
+
+  await prisma.$disconnect();
+  
+  // Prepare all stocks with their data
+  const allStocks = STOCK_CONFIG.filter(config => {
+    // If portfolio filter is active, only include stocks from that portfolio
+    if (portfolioId) {
+      return stockRatings[config.ticker]?.portfolioId === portfolioId;
+    }
+    return true;
+  }).map((config) => {
     const data = stockData[config.ticker];
     const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
     const companyProfile = data && typeof data === 'object' && 'company_profile' in data ? data.company_profile : null;
@@ -27,19 +65,17 @@ export default async function SectorsPage() {
     const industry = (companyProfile && typeof companyProfile === 'object' && 'industry' in companyProfile 
       ? companyProfile.industry 
       : config.sector) || 'Other';
-    
-    if (!sectorGroups[industry]) {
-      sectorGroups[industry] = [];
-    }
 
-    sectorGroups[industry].push({
+    return {
       ticker: config.ticker,
       name: config.name,
       sector: industry,
       marketCap: stockInfo?.market_cap,
       change: stockInfo?.change,
       changePercent: stockInfo?.change_percent,
-    });
+      rating: stockRatings[config.ticker]?.rating || 0,
+      portfolioId: stockRatings[config.ticker]?.portfolioId || null,
+    };
   });
 
   return (
@@ -50,7 +86,11 @@ export default async function SectorsPage() {
       />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-        <SectorMatrix sectorGroups={sectorGroups} />
+        <SectorsClient 
+          allStocks={allStocks} 
+          portfolios={portfolios}
+          selectedPortfolioId={portfolioId}
+        />
       </div>
     </main>
   );

@@ -57,14 +57,12 @@ export default function SectorMatrix({ sectorGroups }: SectorMatrixProps) {
   };
 
   const getSectorSize = (stocks: Stock[]) => {
-    const totalMarketCap = stocks.reduce((sum, stock) => sum + (stock.marketCap || 0), 0);
-    // Scale size based on total market cap (logarithmic scale for better visualization)
-    if (totalMarketCap === 0) return 'small';
-    const logCap = Math.log10(totalMarketCap);
-    if (logCap > 13) return 'xlarge'; // > $10T
-    if (logCap > 12.5) return 'large'; // $3T - $10T
-    if (logCap > 12) return 'medium'; // $1T - $3T
-    return 'small'; // < $1T
+    const stockCount = stocks.length;
+    // Scale size based on number of stocks for optimal space utilization
+    if (stockCount >= 40) return 'xlarge';
+    if (stockCount >= 20) return 'large';
+    if (stockCount >= 10) return 'medium';
+    return 'small';
   };
 
   const getSectorSizeClass = (size: string) => {
@@ -132,21 +130,6 @@ export default function SectorMatrix({ sectorGroups }: SectorMatrixProps) {
                     {sector}
                   </h3>
                   <div className="text-slate-400 text-sm">{stocks.length} stocks</div>
-                </div>
-
-                {/* Sector Stats */}
-                <div className="space-y-2 mb-4">
-                  <div>
-                    <div className="text-slate-500 text-xs">Total Market Cap</div>
-                    <div className="text-white font-mono font-semibold">{formatMarketCap(totalMarketCap)}</div>
-                  </div>
-                  <div>
-                    <div className="text-slate-500 text-xs">Avg Change</div>
-                    <div className={`flex items-center gap-1 font-mono font-semibold ${avgChange >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {avgChange >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                      {avgChange >= 0 ? '+' : ''}{avgChange.toFixed(2)}%
-                    </div>
-                  </div>
                 </div>
 
                 {/* Stock Chips - Compact Cloud */}
