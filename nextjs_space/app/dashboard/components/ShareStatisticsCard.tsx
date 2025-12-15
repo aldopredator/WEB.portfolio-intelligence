@@ -108,7 +108,7 @@ export default function ShareStatisticsCard({
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: 700, color: (averageVolume10Day && floatShares) ? 'text.primary' : 'text.disabled' }}>
               {(averageVolume10Day && floatShares)
-                ? `${((averageVolume10Day * 250 / floatShares) * 100).toFixed(2)}%`
+                ? `${((averageVolume10Day * 250 / floatShares) * 100).toFixed(0)}%`
                 : 'N/A'}
             </Typography>
           </Box>
@@ -136,7 +136,7 @@ export default function ShareStatisticsCard({
             </Typography>
             <Typography variant="h6" sx={{ fontWeight: 700, color: (averageVolume3Month && floatShares) ? 'text.primary' : 'text.disabled' }}>
               {(averageVolume3Month && floatShares)
-                ? `${((averageVolume3Month * 250 / floatShares) * 100).toFixed(2)}%`
+                ? `${((averageVolume3Month * 250 / floatShares) * 100).toFixed(0)}%`
                 : 'N/A'}
             </Typography>
           </Box>
