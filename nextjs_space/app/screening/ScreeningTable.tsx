@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown, ExternalLink } from 'lucide-react';
+import { CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown, ExternalLink, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 type SortField = 'ticker' | 'sector' | 'portfolio' | 'rating' | 'updatedAt' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'avgAnnualVolume10D' | 'avgAnnualVolume3M' | 'beta' | 'roe' | 'profitMargin' | 'debtToEquity' | 'sentiment' | 'matchScore';
 type SortDirection = 'asc' | 'desc';
@@ -119,8 +120,67 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
     );
   };
 
+  const exportToExcel = () => {
+    // Format date as DDMMYYYY_HHMM
+    const now = new Date();
+    const dd = String(now.getDate()).padStart(2, '0');
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const yyyy = now.getFullYear();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    const filename = `pi_${dd}${mm}${yyyy}_${hh}${min}.xlsx`;
+
+    // Prepare data for export
+    const exportData = sortedStocks.map(stock => ({
+      'Portfolio': stock.portfolio,
+      'Ticker': stock.ticker,
+      'Name': stock.name,
+      'Rating': stock.rating,
+      'Last Updated': formatDate(stock.updatedAt),
+      'Sector': stock.sector,
+      ...(criteria.peEnabled && { 'P/E': stock.pe }),
+      ...(criteria.pbEnabled && { 'P/B': stock.pb }),
+      'P/S': stock.priceToSales,
+      ...(criteria.marketCapEnabled && { 'Market Cap': stock.marketCap }),
+      'Avg Volume': stock.avgVolume,
+      ...(criteria.avgAnnualVolume10DEnabled && { 'Avg Annual Volume (10D)': stock.avgAnnualVolume10D }),
+      ...(criteria.avgAnnualVolume3MEnabled && { 'Avg Annual Volume (3M)': stock.avgAnnualVolume3M }),
+      ...(criteria.betaEnabled && { 'Beta': stock.beta }),
+      ...(criteria.roeEnabled && { 'ROE': stock.roe }),
+      ...(criteria.profitMarginEnabled && { 'Profit Margin': stock.profitMargin }),
+      ...(criteria.debtToEquityEnabled && { 'Debt/Equity': stock.debtToEquity }),
+      ...(criteria.sentimentEnabled && { 'Sentiment': stock.sentiment }),
+      'Match Score': `${stock.matchScore}%`,
+    }));
+
+    // Create workbook and worksheet
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Screening Results');
+
+    // Auto-size columns
+    const maxWidth = 50;
+    const colWidths = Object.keys(exportData[0] || {}).map(key => ({
+      wch: Math.min(Math.max(key.length, 10), maxWidth)
+    }));
+    worksheet['!cols'] = colWidths;
+
+    // Export file
+    XLSX.writeFile(workbook, filename);
+  };
+
   return (
     <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
+      {/* Export Button */}
+      <div className="px-6 py-4 border-b border-slate-800/50 flex justify-end">
+        <button
+          onClick={exportToExcel}
+          className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg text-emerald-400 font-medium transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          Export to Excel
+        </button>
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
