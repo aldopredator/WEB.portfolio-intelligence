@@ -29,10 +29,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if the source portfolio is locked
+    // Check if the source portfolio is locked (can't move OUT of locked portfolio)
+    // Note: Moving INTO a locked portfolio is allowed - we just can't remove existing positions
     if (currentStock.portfolio?.isLocked) {
       return NextResponse.json(
-        { error: 'Cannot move stock from a locked portfolio' },
+        { error: 'Cannot move stock out of a locked portfolio. Locked portfolios protect existing positions from being removed.' },
         { status: 403 }
       );
     }
