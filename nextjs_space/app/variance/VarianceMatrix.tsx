@@ -98,27 +98,52 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
     }
   };
 
-  // Get color based on correlation value (reversed: red = high positive correlation = bad diversification)
+  // Get color based on correlation value using smooth gradient (red to green spectrum)
   const getCorrelationColor = (value: number): string => {
-    if (value >= 0.8) return 'bg-red-600/80';      // Strong positive = very risky
-    if (value >= 0.5) return 'bg-red-500/60';      // Moderate positive = risky
-    if (value >= 0.2) return 'bg-orange-500/60';   // Weak positive = slightly risky
-    if (value >= -0.2) return 'bg-gray-500/60';    // Neutral
-    if (value >= -0.5) return 'bg-blue-500/60';    // Weak negative = good
-    if (value >= -0.8) return 'bg-green-500/60';   // Moderate negative = very good
-    return 'bg-green-600/80';                      // Strong negative = excellent diversification
+    // Clamp value between -1 and 1
+    const clampedValue = Math.max(-1, Math.min(1, value));
+    
+    // Map -1 to 1 range to 0 to 1 for easier calculation
+    // -1 (strong negative) -> 0 (full green)
+    // 0 (neutral) -> 0.5 (yellow/gray)
+    // 1 (strong positive) -> 1 (full red)
+    const normalized = (clampedValue + 1) / 2;
+    
+    let r, g, b;
+    if (normalized < 0.5) {
+      // Green to Yellow (0 to 0.5)
+      r = Math.round(normalized * 2 * 255);
+      g = 255;
+      b = 0;
+    } else {
+      // Yellow to Red (0.5 to 1)
+      r = 255;
+      g = Math.round((1 - normalized) * 2 * 255);
+      b = 0;
+    }
+    
+    return `rgb(${r} ${g} ${b} / 0.8)`;
   };
 
-  // Get color based on covariance value (scaled, reversed: red = high positive = bad)
+  // Get color based on covariance value using smooth gradient
   const getCovarianceColor = (value: number, maxAbsValue: number): string => {
     const normalized = maxAbsValue > 0 ? value / maxAbsValue : 0;
-    if (normalized >= 0.6) return 'bg-red-600/80';      // High positive covariance = risky
-    if (normalized >= 0.3) return 'bg-red-500/60';
-    if (normalized >= 0.1) return 'bg-orange-500/60';
-    if (normalized >= -0.1) return 'bg-gray-500/60';
-    if (normalized >= -0.3) return 'bg-blue-500/60';
-    if (normalized >= -0.6) return 'bg-green-500/60';
-    return 'bg-green-600/80';                           // High negative covariance = good diversification
+    
+    // Map to 0-1 range
+    const mappedValue = (normalized + 1) / 2;
+    
+    let r, g, b;
+    if (mappedValue < 0.5) {
+      r = Math.round(mappedValue * 2 * 255);
+      g = 255;
+      b = 0;
+    } else {
+      r = 255;
+      g = Math.round((1 - mappedValue) * 2 * 255);
+      b = 0;
+    }
+    
+    return `rgb(${r} ${g} ${b} / 0.8)`;
   };
 
   const maxAbsCovariance = useMemo(() => {
@@ -222,14 +247,15 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                       return (
                         <td
                           key={j}
-                          className={`p-2 text-center text-white ${
-                            showCorrelation 
+                          className="p-2 text-center text-white"
+                          style={{
+                            backgroundColor: showCorrelation 
                               ? getCorrelationColor(value)
                               : getCovarianceColor(value, maxAbsCovariance)
-                          }`}
+                          }}
                         >
                           {showCorrelation 
-                            ? value.toFixed(3)
+                            ? value.toFixed(2)
                             : value.toExponential(2)}
                         </td>
                       );
@@ -242,43 +268,36 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
             {/* Legend */}
             <div className="mt-6 pt-6 border-t border-slate-700">
               <h3 className="text-sm font-semibold text-slate-300 mb-3">
-                {showCorrelation ? 'Correlation Scale' : 'Intensity Scale'}
+                {showCorrelation ? 'Correlation Scale' : 'Covariance Scale'}
               </h3>
               {showCorrelation ? (
-                <div className="flex gap-2 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-green-600/80 rounded"></div>
-                    <span className="text-xs text-slate-400">Strong Negative (≤-0.8) - Excellent Diversification</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-green-500/60 rounded"></div>
-                    <span className="text-xs text-slate-400">Moderate Negative (-0.8 to -0.5) - Very Good</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-blue-500/60 rounded"></div>
-                    <span className="text-xs text-slate-400">Weak Negative (-0.5 to -0.2) - Good</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-gray-500/60 rounded"></div>
-                    <span className="text-xs text-slate-400">Neutral (-0.2 to 0.2)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-orange-500/60 rounded"></div>
-                    <span className="text-xs text-slate-400">Weak Positive (0.2-0.5) - Slightly Risky</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-red-500/60 rounded"></div>
-                    <span className="text-xs text-slate-400">Moderate Positive (0.5-0.8) - Risky</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-red-600/80 rounded"></div>
-                    <span className="text-xs text-slate-400">Strong Positive (≥0.8) - Poor Diversification</span>
+                <div className="space-y-2">
+                  <div 
+                    className="h-8 rounded-lg"
+                    style={{
+                      background: 'linear-gradient(to right, rgb(0 255 0 / 0.8), rgb(255 255 0 / 0.8), rgb(255 0 0 / 0.8))'
+                    }}
+                  ></div>
+                  <div className="flex justify-between text-xs text-slate-400">
+                    <span>-1.00 (Perfect Negative - Excellent Diversification)</span>
+                    <span>0.00 (No Correlation)</span>
+                    <span>+1.00 (Perfect Positive - Poor Diversification)</span>
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-slate-400">
-                  Colors indicate relative covariance magnitude. Red = high positive covariance (risky), Green = negative covariance (good diversification). Only lower triangle shown (matrix is symmetric).
-                </p>
+                <div className="space-y-2">
+                  <div 
+                    className="h-8 rounded-lg"
+                    style={{
+                      background: 'linear-gradient(to right, rgb(0 255 0 / 0.8), rgb(255 255 0 / 0.8), rgb(255 0 0 / 0.8))'
+                    }}
+                  ></div>
+                  <div className="flex justify-between text-xs text-slate-400">
+                    <span>Negative Covariance (Good Diversification)</span>
+                    <span>Zero</span>
+                    <span>Positive Covariance (Poor Diversification)</span>
+                  </div>
+                </div>
               )}
             </div>
           </div>
