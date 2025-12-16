@@ -15,7 +15,6 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
 
   // Fetch portfolios for the filter
   const portfolios = await prisma.portfolio.findMany({
-    where: { isActive: true },
     orderBy: { name: 'asc' },
   });
 
