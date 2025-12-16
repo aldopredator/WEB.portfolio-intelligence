@@ -98,52 +98,54 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
     }
   };
 
-  // Get color based on correlation value using smooth gradient (red to green spectrum)
+  // Get color based on correlation value using smooth gradient (muted blue to orange spectrum)
   const getCorrelationColor = (value: number): string => {
     // Clamp value between -1 and 1
     const clampedValue = Math.max(-1, Math.min(1, value));
     
-    // Map -1 to 1 range to 0 to 1 for easier calculation
-    // -1 (strong negative) -> 0 (full green)
-    // 0 (neutral) -> 0.5 (yellow/gray)
-    // 1 (strong positive) -> 1 (full red)
+    // Map -1 to 1 range to 0 to 1
+    // -1 (strong negative) -> 0 (muted blue)
+    // 0 (neutral) -> 0.5 (gray)
+    // 1 (strong positive) -> 1 (muted orange/red)
     const normalized = (clampedValue + 1) / 2;
     
     let r, g, b;
     if (normalized < 0.5) {
-      // Green to Yellow (0 to 0.5)
-      r = Math.round(normalized * 2 * 255);
-      g = 255;
-      b = 0;
+      // Muted blue to gray (0 to 0.5)
+      const t = normalized * 2; // 0 to 1
+      r = Math.round(100 + t * 50);   // 100 to 150
+      g = Math.round(150 + t * 30);   // 150 to 180
+      b = Math.round(200 + t * (-80)); // 200 to 120
     } else {
-      // Yellow to Red (0.5 to 1)
-      r = 255;
-      g = Math.round((1 - normalized) * 2 * 255);
-      b = 0;
+      // Gray to muted orange (0.5 to 1)
+      const t = (normalized - 0.5) * 2; // 0 to 1
+      r = Math.round(150 + t * 70);   // 150 to 220
+      g = Math.round(180 + t * (-60)); // 180 to 120
+      b = Math.round(120 + t * (-50)); // 120 to 70
     }
     
-    return `rgb(${r} ${g} ${b} / 0.8)`;
+    return `rgb(${r} ${g} ${b} / 0.7)`;
   };
 
-  // Get color based on covariance value using smooth gradient
+  // Get color based on covariance value using muted gradient
   const getCovarianceColor = (value: number, maxAbsValue: number): string => {
     const normalized = maxAbsValue > 0 ? value / maxAbsValue : 0;
-    
-    // Map to 0-1 range
     const mappedValue = (normalized + 1) / 2;
     
     let r, g, b;
     if (mappedValue < 0.5) {
-      r = Math.round(mappedValue * 2 * 255);
-      g = 255;
-      b = 0;
+      const t = mappedValue * 2;
+      r = Math.round(100 + t * 50);
+      g = Math.round(150 + t * 30);
+      b = Math.round(200 + t * (-80));
     } else {
-      r = 255;
-      g = Math.round((1 - mappedValue) * 2 * 255);
-      b = 0;
+      const t = (mappedValue - 0.5) * 2;
+      r = Math.round(150 + t * 70);
+      g = Math.round(180 + t * (-60));
+      b = Math.round(120 + t * (-50));
     }
     
-    return `rgb(${r} ${g} ${b} / 0.8)`;
+    return `rgb(${r} ${g} ${b} / 0.7)`;
   };
 
   const maxAbsCovariance = useMemo(() => {
@@ -275,7 +277,7 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                   <div 
                     className="h-8 rounded-lg"
                     style={{
-                      background: 'linear-gradient(to right, rgb(0 255 0 / 0.8), rgb(255 255 0 / 0.8), rgb(255 0 0 / 0.8))'
+                      background: 'linear-gradient(to right, rgb(100 150 200 / 0.7), rgb(150 180 120 / 0.7), rgb(220 120 70 / 0.7))'
                     }}
                   ></div>
                   <div className="flex justify-between text-xs text-slate-400">
@@ -289,7 +291,7 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                   <div 
                     className="h-8 rounded-lg"
                     style={{
-                      background: 'linear-gradient(to right, rgb(0 255 0 / 0.8), rgb(255 255 0 / 0.8), rgb(255 0 0 / 0.8))'
+                      background: 'linear-gradient(to right, rgb(100 150 200 / 0.7), rgb(150 180 120 / 0.7), rgb(220 120 70 / 0.7))'
                     }}
                   ></div>
                   <div className="flex justify-between text-xs text-slate-400">
