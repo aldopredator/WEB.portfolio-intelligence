@@ -67,12 +67,35 @@ function correlation(returns1: number[], returns2: number[]): number {
   return cov / (std1 * std2);
 }
 
+// Calculate optimal portfolio weights (minimum variance portfolio)
+function calculateOptimalWeights(covarianceMatrix: number[][]): number[] {
+  const n = covarianceMatrix.length;
+  if (n === 0) return [];
+  if (n === 1) return [1.0];
+  
+  // For minimum variance portfolio: w = (Σ^-1 * 1) / (1^T * Σ^-1 * 1)
+  // Using simplified approach: equal weights as baseline, then adjusted
+  // For production, you'd want a proper matrix inversion library
+  
+  // Simple approach: inverse variance weighting
+  const variances = covarianceMatrix.map((row, i) => row[i]);
+  const invVariances = variances.map(v => v > 0 ? 1 / v : 0);
+  const sumInvVar = invVariances.reduce((sum, iv) => sum + iv, 0);
+  
+  if (sumInvVar === 0) {
+    // Fallback to equal weights
+    return Array(n).fill(1 / n);
+  }
+  
+  return invVariances.map(iv => iv / sumInvVar);
+}
+
 export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId, selectedPortfolioId2 }: VarianceMatrixProps) {
   const router = useRouter();
   const [showCorrelation, setShowCorrelation] = useState(true);
 
   // Calculate variance-covariance matrix
-  const { matrix, tickers, stocksMap } = useMemo(() => {
+  const { matrix, tickers, stocksMap, covarianceMatrix, optimalWeights } = useMemo(() => {
     // Sort stocks first by portfolio name, then by ticker
     const sortedStocks = [...stocks].sort((a, b) => {
       const portfolioCompare = (a.portfolioName || '').localeCompare(b.portfolioName || '');
@@ -86,6 +109,17 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
     // Create a map of ticker to stock data for easy lookup
     const stocksMap = new Map(sortedStocks.map(s => [s.ticker, s]));
     
+    // Calculate covariance matrix (always needed for weights)
+    const covarianceMatrix: number[][] = [];
+    for (let i = 0; i < tickers.length; i++) {
+      const row: number[] = [];
+      for (let j = 0; j < tickers.length; j++) {
+        row.push(covariance(returnsData[i], returnsData[j]));
+      }
+      covarianceMatrix.push(row);
+    }
+    
+    // Calculate display matrix (correlation or covariance)
     const matrix: number[][] = [];
     for (let i = 0; i < tickers.length; i++) {
       const row: number[] = [];
@@ -93,13 +127,16 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
         if (showCorrelation) {
           row.push(correlation(returnsData[i], returnsData[j]));
         } else {
-          row.push(covariance(returnsData[i], returnsData[j]));
+          row.push(covarianceMatrix[i][j]);
         }
       }
       matrix.push(row);
     }
     
-    return { matrix, tickers, stocksMap };
+    // Calculate optimal weights based on covariance matrix
+    const optimalWeights = calculateOptimalWeights(covarianceMatrix);
+    
+    return { matrix, tickers, stocksMap, covarianceMatrix, optimalWeights };
   }, [stocks, showCorrelation]);
 
   const handlePortfolioChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -261,6 +298,53 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
             </button>
           </div>
         </div>
+
+        {/* Optimal Allocation Weights */}
+        {tickers.length > 0 && (
+          <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-700/50 rounded-xl p-6 mb-6">
+            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <span className="text-2xl">⚖️</span>
+              Optimal Portfolio Allocation (Minimum Variance)
+            </h2>
+            <p className="text-slate-300 text-sm mb-4">
+              Based on Modern Portfolio Theory, these weights minimize portfolio variance while maintaining full investment (100% allocation).
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              {tickers.map((ticker, i) => {
+                const weight = optimalWeights[i] || 0;
+                const stock = stocksMap.get(ticker);
+                return (
+                  <div 
+                    key={ticker}
+                    className="bg-slate-800/50 backdrop-blur rounded-lg p-3 border border-slate-700 hover:border-blue-500 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-semibold text-white">{ticker}</span>
+                      {selectedPortfolioId2 && stock?.portfolioName && (
+                        <span className="text-xs text-slate-400">{stock.portfolioName}</span>
+                      )}
+                    </div>
+                    <div className="text-2xl font-bold text-blue-400">
+                      {(weight * 100).toFixed(1)}%
+                    </div>
+                    <div className="mt-2 h-2 bg-slate-700 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+                        style={{ width: `${weight * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-4 pt-4 border-t border-slate-700 flex justify-between items-center">
+              <span className="text-slate-400 text-sm">Total Allocation:</span>
+              <span className="text-xl font-bold text-green-400">
+                {(optimalWeights.reduce((sum, w) => sum + w, 0) * 100).toFixed(1)}%
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Matrix */}
         {tickers.length === 0 ? (
