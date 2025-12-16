@@ -193,7 +193,6 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
               📊 Analyzing combined diversification: <span className="font-semibold">{portfolio1Name}</span> + <span className="font-semibold">{portfolio2Name}</span>
             </p>
           )}
-          </p>
         </div>
 
         {/* Controls */}
