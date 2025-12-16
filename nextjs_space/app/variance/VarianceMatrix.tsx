@@ -7,6 +7,8 @@ interface StockData {
   ticker: string;
   company: string;
   prices: number[];
+  portfolioId: string;
+  portfolioName?: string;
 }
 
 interface Portfolio {
@@ -70,9 +72,15 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
   const [showCorrelation, setShowCorrelation] = useState(true);
 
   // Calculate variance-covariance matrix
-  const { matrix, tickers } = useMemo(() => {
-    const tickers = stocks.map(s => s.ticker);
-    const returnsData = stocks.map(s => calculateReturns(s.prices));
+  const { matrix, tickers, stocksMap } = useMemo(() => {
+    // Sort stocks alphabetically by ticker
+    const sortedStocks = [...stocks].sort((a, b) => a.ticker.localeCompare(b.ticker));
+    
+    const tickers = sortedStocks.map(s => s.ticker);
+    const returnsData = sortedStocks.map(s => calculateReturns(s.prices));
+    
+    // Create a map of ticker to stock data for easy lookup
+    const stocksMap = new Map(sortedStocks.map(s => [s.ticker, s]));
     
     const matrix: number[][] = [];
     for (let i = 0; i < tickers.length; i++) {
@@ -87,7 +95,7 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
       matrix.push(row);
     }
     
-    return { matrix, tickers };
+    return { matrix, tickers, stocksMap };
   }, [stocks, showCorrelation]);
 
   const handlePortfolioChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -260,7 +268,12 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
             <table className="w-full text-sm">
               <thead>
                 <tr>
-                  <th className="sticky left-0 bg-slate-800 p-2 text-left text-slate-300 font-semibold min-w-[80px]">
+                  {selectedPortfolioId2 && (
+                    <th className="sticky left-0 bg-slate-800 p-2 text-left text-slate-300 font-semibold min-w-[120px] z-20">
+                      Portfolio
+                    </th>
+                  )}
+                  <th className={`${selectedPortfolioId2 ? 'sticky left-[120px] z-20' : 'sticky left-0'} bg-slate-800 p-2 text-left text-slate-300 font-semibold min-w-[80px]`}>
                     Ticker
                   </th>
                   {tickers.map(ticker => (
@@ -271,11 +284,29 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                 </tr>
               </thead>
               <tbody>
-                {tickers.map((ticker, i) => (
-                  <tr key={ticker} className="border-t border-slate-700">
-                    <td className="sticky left-0 bg-slate-800 p-2 text-left text-white font-semibold">
-                      {ticker}
-                    </td>
+                {tickers.map((ticker, i) => {
+                  const stock = stocksMap.get(ticker);
+                  const stockPortfolioId = stock?.portfolioId || selectedPortfolioId;
+                  return (
+                    <tr key={ticker} className="border-t border-slate-700">
+                      {selectedPortfolioId2 && (
+                        <td className="sticky left-0 bg-slate-800 p-2 text-left text-slate-400 text-xs z-10">
+                          {stock?.portfolioName || ''}
+                        </td>
+                      )}
+                      <td className={`${selectedPortfolioId2 ? 'sticky left-[120px] z-10' : 'sticky left-0'} bg-slate-800 p-2 text-left text-white font-semibold`}>
+                        <a 
+                          href={`https://www.portfolio-intelligence.co.uk/?stock=${ticker}&portfolio=${stockPortfolioId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-blue-400 transition-colors inline-flex items-center gap-1"
+                        >
+                          {ticker}
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </a>
+                      </td>
                     {matrix[i].map((value, j) => {
                       // Only show lower triangle (j <= i) since matrix is symmetric
                       if (j > i) {
@@ -309,8 +340,9 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                         </td>
                       );
                     })}
-                  </tr>
-                ))}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
 

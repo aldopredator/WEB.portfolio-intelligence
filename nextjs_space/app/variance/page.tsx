@@ -45,13 +45,18 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
   await prisma.$disconnect();
 
   // Prepare data for variance calculation
-  const stockData = stocks.map(stock => ({
-    ticker: stock.ticker,
-    company: stock.company,
-    prices: stock.priceHistory
-      .sort((a, b) => a.date.getTime() - b.date.getTime())
-      .map(ph => ph.price),
-  }));
+  const stockData = stocks.map(stock => {
+    const portfolio = portfolios.find(p => p.id === stock.portfolioId);
+    return {
+      ticker: stock.ticker,
+      company: stock.company,
+      prices: stock.priceHistory
+        .sort((a, b) => a.date.getTime() - b.date.getTime())
+        .map(ph => ph.price),
+      portfolioId: stock.portfolioId,
+      portfolioName: portfolio?.name,
+    };
+  });
 
   return (
     <VarianceMatrix 
