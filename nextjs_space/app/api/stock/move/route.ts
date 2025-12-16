@@ -16,6 +16,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get the current stock with its portfolio
+    const currentStock = await prisma.stock.findUnique({
+      where: { ticker },
+      include: { portfolio: true },
+    });
+
+    if (!currentStock) {
+      return NextResponse.json(
+        { error: 'Stock not found' },
+        { status: 404 }
+      );
+    }
+
+    // Check if the source portfolio is locked
+    if (currentStock.portfolio?.isLocked) {
+      return NextResponse.json(
+        { error: 'Cannot move stock from a locked portfolio' },
+        { status: 403 }
+      );
+    }
+
     // Verify the target portfolio exists
     const targetPortfolio = await prisma.portfolio.findUnique({
       where: { id: targetPortfolioId },
