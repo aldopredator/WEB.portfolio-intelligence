@@ -66,7 +66,7 @@ function correlation(returns1: number[], returns2: number[]): number {
 
 export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId }: VarianceMatrixProps) {
   const router = useRouter();
-  const [showCorrelation, setShowCorrelation] = useState(false);
+  const [showCorrelation, setShowCorrelation] = useState(true);
 
   // Calculate variance-covariance matrix
   const { matrix, tickers } = useMemo(() => {

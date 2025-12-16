@@ -11,12 +11,17 @@ interface VariancePageProps {
 }
 
 export default async function VariancePage({ searchParams }: VariancePageProps) {
-  const portfolioId = searchParams.portfolio || null;
-
   // Fetch portfolios for the filter
   const portfolios = await prisma.portfolio.findMany({
     orderBy: { name: 'asc' },
   });
+
+  // Default to BARCLAYS portfolio if no portfolio specified
+  let portfolioId = searchParams.portfolio || null;
+  if (!portfolioId) {
+    const barclaysPortfolio = portfolios.find(p => p.name === 'BARCLAYS');
+    portfolioId = barclaysPortfolio?.id || null;
+  }
 
   // Fetch stocks for the selected portfolio (or all if no portfolio selected)
   const stocks = await prisma.stock.findMany({
