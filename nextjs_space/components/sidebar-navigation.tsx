@@ -44,6 +44,7 @@ export function SidebarNavigation() {
     { name: 'Screening', href: '/screening', icon: Filter, description: 'Stock screening results' },
     { name: 'Sectors', href: '/sectors', icon: Grid3x3, description: 'Sector matrix visualization' },
     { name: 'Countries', href: '/countries', icon: Globe, description: 'Country matrix visualization' },
+    { name: 'Variance Matrix', href: '/variance', icon: Grid3x3, description: 'Variance-covariance matrix' },
   ];
 
   const SidebarContent = () => (
