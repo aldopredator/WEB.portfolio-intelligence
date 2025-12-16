@@ -38,7 +38,7 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
         stockData: true,
         priceHistory: {
           orderBy: { date: 'asc' },
-          take: 30, // Last 30 days
+          take: 90, // Last 90 days
         },
         analystRecommendations: true,
         socialSentiments: true,
@@ -81,7 +81,7 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
           change_percent: stockData?.changePercent || 0,
           '52_week_high': stockData?.week52High || 0,
           '52_week_low': stockData?.week52Low || 0,
-          price_movement_30_days: stock.priceHistory.map((ph: any) => ({
+          price_movement_90_days: stock.priceHistory.map((ph: any) => ({
             Date: ph.date.toISOString().split('T')[0],
             Close: ph.price,
           })),

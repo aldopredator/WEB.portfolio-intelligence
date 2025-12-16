@@ -26,7 +26,7 @@ export interface StockData {
   change_percent: number;
   '52_week_high': number;
   '52_week_low': number;
-  price_movement_30_days: PriceMovement[];
+  price_movement_90_days: PriceMovement[];
   analyst_recommendations: AnalystData;
   // Optional real-time fields sourced from Yahoo Finance
   previous_close?: number;

@@ -18,7 +18,7 @@ export function PriceChart({ data, ticker }: PriceChartProps) {
   return (
     <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
       <div className="mb-4">
-        <h3 className="text-xl font-bold text-white mb-1">30-Day Price Movement</h3>
+        <h3 className="text-xl font-bold text-white mb-1">90-Day Price Movement</h3>
         <p className="text-slate-400 text-sm">{ticker ?? 'Stock'} Historical Performance</p>
       </div>
       
