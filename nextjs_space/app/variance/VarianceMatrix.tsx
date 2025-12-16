@@ -93,6 +93,7 @@ function calculateOptimalWeights(covarianceMatrix: number[][]): number[] {
 export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId, selectedPortfolioId2 }: VarianceMatrixProps) {
   const router = useRouter();
   const [showCorrelation, setShowCorrelation] = useState(true);
+  const [capitalAmount, setCapitalAmount] = useState<string>('20000');
 
   // Calculate variance-covariance matrix
   const { matrix, tickers, stocksMap, covarianceMatrix, optimalWeights } = useMemo(() => {
@@ -302,24 +303,56 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
         {/* Optimal Allocation Weights */}
         {tickers.length > 0 && (
           <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-700/50 rounded-xl p-6 mb-6">
-            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <span className="text-2xl">⚖️</span>
-              Optimal Portfolio Allocation (Minimum Variance)
-            </h2>
-            <p className="text-slate-300 text-sm mb-4">
-              Based on Modern Portfolio Theory, these weights minimize portfolio variance while maintaining full investment (100% allocation).
-            </p>
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                  <span className="text-2xl">⚖️</span>
+                  Optimal Portfolio Allocation (Minimum Variance)
+                </h2>
+                <p className="text-slate-300 text-sm">
+                  Based on Modern Portfolio Theory, these weights minimize portfolio variance while maintaining full investment (100% allocation).
+                </p>
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                <label className="text-sm text-slate-300 font-medium">Capital to Invest</label>
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-400">$</span>
+                  <input
+                    type="number"
+                    value={capitalAmount}
+                    onChange={(e) => setCapitalAmount(e.target.value)}
+                    className="w-32 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="20000"
+                  />
+                </div>
+              </div>
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
               {tickers.map((ticker, i) => {
                 const weight = optimalWeights[i] || 0;
                 const stock = stocksMap.get(ticker);
+                const stockPortfolioId = stock?.portfolioId || selectedPortfolioId;
+                const capital = parseFloat(capitalAmount) || 0;
+                const dollarAmount = capital * weight;
+                const isToBuyPortfolio = stock?.portfolioName === 'TO BUY';
+                
                 return (
                   <div 
                     key={ticker}
                     className="bg-slate-800/50 backdrop-blur rounded-lg p-3 border border-slate-700 hover:border-blue-500 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-semibold text-white">{ticker}</span>
+                      <a 
+                        href={`https://www.portfolio-intelligence.co.uk/?stock=${ticker}&portfolio=${stockPortfolioId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold text-white hover:text-blue-400 transition-colors inline-flex items-center gap-1"
+                      >
+                        {ticker}
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </a>
                       {selectedPortfolioId2 && stock?.portfolioName && (
                         <span className="text-xs text-slate-400">{stock.portfolioName}</span>
                       )}
@@ -327,12 +360,29 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                     <div className="text-2xl font-bold text-blue-400">
                       {(weight * 100).toFixed(1)}%
                     </div>
+                    {capital > 0 && (
+                      <div className="text-sm text-green-400 font-semibold mt-1">
+                        ${dollarAmount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                      </div>
+                    )}
                     <div className="mt-2 h-2 bg-slate-700 rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
                         style={{ width: `${weight * 100}%` }}
                       ></div>
                     </div>
+                    {isToBuyPortfolio && (
+                      <button
+                        onClick={() => {
+                          if (confirm(`Transfer ${ticker} out of TO BUY portfolio?`)) {
+                            window.location.href = `https://www.portfolio-intelligence.co.uk/?stock=${ticker}&portfolio=${stockPortfolioId}`;
+                          }
+                        }}
+                        className="mt-2 w-full px-2 py-1 text-xs bg-orange-600 hover:bg-orange-700 text-white rounded transition-colors"
+                      >
+                        Transfer
+                      </button>
+                    )}
                   </div>
                 );
               })}
