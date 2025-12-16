@@ -19,6 +19,7 @@ interface VarianceMatrixProps {
   stocks: StockData[];
   portfolios: Portfolio[];
   selectedPortfolioId: string | null;
+  selectedPortfolioId2?: string | null;
 }
 
 // Calculate returns from prices
@@ -64,7 +65,7 @@ function correlation(returns1: number[], returns2: number[]): number {
   return cov / (std1 * std2);
 }
 
-export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId }: VarianceMatrixProps) {
+export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId, selectedPortfolioId2 }: VarianceMatrixProps) {
   const router = useRouter();
   const [showCorrelation, setShowCorrelation] = useState(true);
 
@@ -91,11 +92,18 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
 
   const handlePortfolioChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const portfolioId = e.target.value;
-    if (portfolioId) {
-      router.push(`/variance?portfolio=${portfolioId}`);
-    } else {
-      router.push('/variance');
-    }
+    const params = new URLSearchParams();
+    if (portfolioId) params.set('portfolio', portfolioId);
+    if (selectedPortfolioId2) params.set('portfolio2', selectedPortfolioId2);
+    router.push(`/variance${params.toString() ? '?' + params.toString() : ''}`);
+  };
+
+  const handlePortfolio2Change = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const portfolioId2 = e.target.value;
+    const params = new URLSearchParams();
+    if (selectedPortfolioId) params.set('portfolio', selectedPortfolioId);
+    if (portfolioId2) params.set('portfolio2', portfolioId2);
+    router.push(`/variance${params.toString() ? '?' + params.toString() : ''}`);
   };
 
   // Get color based on correlation value using RED-WHITE-GREEN spectrum
@@ -158,6 +166,10 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
     return max;
   }, [matrix]);
 
+  // Get portfolio names for display
+  const portfolio1Name = portfolios.find(p => p.id === selectedPortfolioId)?.name;
+  const portfolio2Name = portfolios.find(p => p.id === selectedPortfolioId2)?.name;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
       <div className="max-w-7xl mx-auto">
@@ -165,24 +177,35 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white mb-2">
             {showCorrelation ? 'Correlation Matrix' : 'Variance-Covariance Matrix'}
+            {selectedPortfolioId2 && (
+              <span className="text-green-400 text-xl ml-3">
+                (Combined Portfolio Simulation)
+              </span>
+            )}
           </h1>
           <p className="text-slate-400">
             {showCorrelation 
               ? 'Correlation coefficients between stock returns (90-day historical data)'
               : 'Variance-covariance between stock returns (90-day historical data)'}
           </p>
+          {selectedPortfolioId2 && portfolio1Name && portfolio2Name && (
+            <p className="text-green-400 text-sm mt-2">
+              📊 Analyzing combined diversification: <span className="font-semibold">{portfolio1Name}</span> + <span className="font-semibold">{portfolio2Name}</span>
+            </p>
+          )}
+          </p>
         </div>
 
         {/* Controls */}
-        <div className="mb-6 flex gap-4 items-center">
-          <div className="flex-1">
+        <div className="mb-6 flex gap-4 items-start flex-wrap">
+          <div className="flex-1 min-w-[200px]">
             <label className="block text-sm font-medium text-slate-300 mb-2">
-              Filter by Portfolio
+              Portfolio 1 (Base)
             </label>
             <select
               value={selectedPortfolioId || ''}
               onChange={handlePortfolioChange}
-              className="w-full max-w-xs px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Stocks</option>
               {portfolios.map(portfolio => (
@@ -191,6 +214,31 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Portfolio 2 (Combine) - Optional
+            </label>
+            <select
+              value={selectedPortfolioId2 || ''}
+              onChange={handlePortfolio2Change}
+              className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="">None</option>
+              {portfolios
+                .filter(p => p.id !== selectedPortfolioId)
+                .map(portfolio => (
+                  <option key={portfolio.id} value={portfolio.id}>
+                    {portfolio.name}
+                  </option>
+                ))}
+            </select>
+            {selectedPortfolioId2 && (
+              <p className="text-xs text-green-400 mt-1">
+                📊 Simulating combined portfolio diversification
+              </p>
+            )}
           </div>
 
           <div className="flex items-end">

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 interface VariancePageProps {
-  searchParams: { portfolio?: string };
+  searchParams: { portfolio?: string; portfolio2?: string };
 }
 
 export default async function VariancePage({ searchParams }: VariancePageProps) {
@@ -23,11 +23,16 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
     portfolioId = barclaysPortfolio?.id || null;
   }
 
-  // Fetch stocks for the selected portfolio (or all if no portfolio selected)
+  // Get second portfolio for combination (optional)
+  const portfolioId2 = searchParams.portfolio2 || null;
+
+  // Fetch stocks for the selected portfolio(s)
+  const portfolioIds = [portfolioId, portfolioId2].filter(Boolean) as string[];
+  
   const stocks = await prisma.stock.findMany({
     where: {
       isActive: true,
-      ...(portfolioId ? { portfolioId } : {}),
+      ...(portfolioIds.length > 0 ? { portfolioId: { in: portfolioIds } } : {}),
     },
     include: {
       priceHistory: {
@@ -53,6 +58,7 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
       stocks={stockData}
       portfolios={portfolios}
       selectedPortfolioId={portfolioId}
+      selectedPortfolioId2={portfolioId2}
     />
   );
 }
