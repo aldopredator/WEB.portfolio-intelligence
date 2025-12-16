@@ -7,7 +7,7 @@ interface StockData {
   ticker: string;
   company: string;
   prices: number[];
-  portfolioId: string;
+  portfolioId: string | null;
   portfolioName?: string;
 }
 
