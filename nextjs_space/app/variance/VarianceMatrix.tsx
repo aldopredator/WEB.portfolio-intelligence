@@ -73,8 +73,12 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
 
   // Calculate variance-covariance matrix
   const { matrix, tickers, stocksMap } = useMemo(() => {
-    // Sort stocks alphabetically by ticker
-    const sortedStocks = [...stocks].sort((a, b) => a.ticker.localeCompare(b.ticker));
+    // Sort stocks first by portfolio name, then by ticker
+    const sortedStocks = [...stocks].sort((a, b) => {
+      const portfolioCompare = (a.portfolioName || '').localeCompare(b.portfolioName || '');
+      if (portfolioCompare !== 0) return portfolioCompare;
+      return a.ticker.localeCompare(b.ticker);
+    });
     
     const tickers = sortedStocks.map(s => s.ticker);
     const returnsData = sortedStocks.map(s => calculateReturns(s.prices));
