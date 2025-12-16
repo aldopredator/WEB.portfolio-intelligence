@@ -328,8 +328,10 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
               </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-              {tickers.map((ticker, i) => {
-                const weight = optimalWeights[i] || 0;
+              {tickers
+                .map((ticker, i) => ({ ticker, weight: optimalWeights[i] || 0, index: i }))
+                .sort((a, b) => b.weight - a.weight)
+                .map(({ ticker, weight, index }) => {
                 const stock = stocksMap.get(ticker);
                 const stockPortfolioId = stock?.portfolioId || selectedPortfolioId;
                 const capital = parseFloat(capitalAmount) || 0;
