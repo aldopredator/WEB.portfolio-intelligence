@@ -96,7 +96,7 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
   const [capitalAmount, setCapitalAmount] = useState<string>('20000');
 
   // Calculate variance-covariance matrix
-  const { matrix, tickers, stocksMap, covarianceMatrix, optimalWeights } = useMemo(() => {
+  const { matrix, tickers, stocksMap, covarianceMatrix, optimalWeights, expectedReturn, portfolioStdDev, sharpeRatio } = useMemo(() => {
     // Sort stocks first by portfolio name, then by ticker
     const sortedStocks = [...stocks].sort((a, b) => {
       const portfolioCompare = (a.portfolioName || '').localeCompare(b.portfolioName || '');
@@ -109,6 +109,9 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
     
     // Create a map of ticker to stock data for easy lookup
     const stocksMap = new Map(sortedStocks.map(s => [s.ticker, s]));
+    
+    // Calculate expected returns (mean of historical returns)
+    const expectedReturns = returnsData.map(returns => mean(returns));
     
     // Calculate covariance matrix (always needed for weights)
     const covarianceMatrix: number[][] = [];
@@ -137,7 +140,25 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
     // Calculate optimal weights based on covariance matrix
     const optimalWeights = calculateOptimalWeights(covarianceMatrix);
     
-    return { matrix, tickers, stocksMap, covarianceMatrix, optimalWeights };
+    // Calculate portfolio expected return: E(Rp) = w^T * E(R)
+    const expectedReturn = optimalWeights.reduce((sum, w, i) => sum + w * expectedReturns[i], 0);
+    
+    // Calculate portfolio variance: σ²p = w^T * Σ * w
+    let portfolioVariance = 0;
+    for (let i = 0; i < optimalWeights.length; i++) {
+      for (let j = 0; j < optimalWeights.length; j++) {
+        portfolioVariance += optimalWeights[i] * optimalWeights[j] * covarianceMatrix[i][j];
+      }
+    }
+    const portfolioStdDev = Math.sqrt(portfolioVariance);
+    
+    // Calculate annualized Sharpe ratio (assuming risk-free rate = 0 for simplicity)
+    // Annualize: multiply daily return by 252, multiply daily std by sqrt(252)
+    const annualizedReturn = expectedReturn * 252;
+    const annualizedStdDev = portfolioStdDev * Math.sqrt(252);
+    const sharpeRatio = annualizedStdDev > 0 ? annualizedReturn / annualizedStdDev : 0;
+    
+    return { matrix, tickers, stocksMap, covarianceMatrix, optimalWeights, expectedReturn, portfolioStdDev, sharpeRatio };
   }, [stocks, showCorrelation]);
 
   const handlePortfolioChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -389,11 +410,27 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                 );
               })}
             </div>
-            <div className="mt-4 pt-4 border-t border-slate-700 flex justify-between items-center">
-              <span className="text-slate-400 text-sm">Total Allocation:</span>
-              <span className="text-xl font-bold text-green-400">
-                {(optimalWeights.reduce((sum, w) => sum + w, 0) * 100).toFixed(1)}%
-              </span>
+            <div className="mt-4 pt-4 border-t border-slate-700">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Total Allocation:</span>
+                  <span className="text-xl font-bold text-green-400">
+                    {(optimalWeights.reduce((sum, w) => sum + w, 0) * 100).toFixed(1)}%
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Expected Ann. Return:</span>
+                  <span className="text-xl font-bold text-blue-400">
+                    {(expectedReturn * 252 * 100).toFixed(2)}%
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Sharpe Ratio:</span>
+                  <span className="text-xl font-bold text-purple-400">
+                    {sharpeRatio.toFixed(2)}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         )}
