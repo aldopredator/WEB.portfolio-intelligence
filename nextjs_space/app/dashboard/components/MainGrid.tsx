@@ -191,9 +191,9 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
         }}
       >
         {/* Price Chart */}
-        {stock.price_movement_30_days && stock.price_movement_30_days.length > 0 && (
+        {stock.price_movement_90_days && stock.price_movement_90_days.length > 0 && (
           <PriceHistoryChart
-            data={stock.price_movement_30_days}
+            data={stock.price_movement_90_days}
             ticker={selectedStock}
             currentPrice={stock.current_price || 0}
             priceChange={stock.change || 0}
