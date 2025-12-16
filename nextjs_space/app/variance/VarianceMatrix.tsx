@@ -410,25 +410,130 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                 );
               })}
             </div>
-            <div className="mt-4 pt-4 border-t border-slate-700">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400 text-sm">Total Allocation:</span>
-                  <span className="text-xl font-bold text-green-400">
-                    {(optimalWeights.reduce((sum, w) => sum + w, 0) * 100).toFixed(1)}%
-                  </span>
+            <div className="mt-6 pt-6 border-t border-slate-700">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Pie Chart */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4">Portfolio Composition</h3>
+                  <div className="relative" style={{ height: '300px' }}>
+                    <svg viewBox="0 0 200 200" className="w-full h-full">
+                      {(() => {
+                        let cumulativePercent = 0;
+                        const colors = [
+                          '#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981',
+                          '#06b6d4', '#6366f1', '#f97316', '#14b8a6', '#a855f7',
+                          '#ef4444', '#84cc16', '#f43f5e', '#eab308', '#22c55e'
+                        ];
+                        
+                        return tickers
+                          .map((ticker, i) => ({ ticker, weight: optimalWeights[i] || 0, index: i }))
+                          .sort((a, b) => b.weight - a.weight)
+                          .map(({ ticker, weight, index }, i) => {
+                            if (weight === 0) return null;
+                            
+                            const startAngle = cumulativePercent * 360;
+                            const angle = weight * 360;
+                            cumulativePercent += weight;
+                            
+                            const startRadians = (startAngle - 90) * Math.PI / 180;
+                            const endRadians = (startAngle + angle - 90) * Math.PI / 180;
+                            
+                            const x1 = 100 + 80 * Math.cos(startRadians);
+                            const y1 = 100 + 80 * Math.sin(startRadians);
+                            const x2 = 100 + 80 * Math.cos(endRadians);
+                            const y2 = 100 + 80 * Math.sin(endRadians);
+                            
+                            const largeArc = angle > 180 ? 1 : 0;
+                            
+                            const pathData = [
+                              `M 100 100`,
+                              `L ${x1} ${y1}`,
+                              `A 80 80 0 ${largeArc} 1 ${x2} ${y2}`,
+                              'Z'
+                            ].join(' ');
+                            
+                            return (
+                              <g key={ticker}>
+                                <path
+                                  d={pathData}
+                                  fill={colors[i % colors.length]}
+                                  stroke="#1e293b"
+                                  strokeWidth="1"
+                                  opacity="0.9"
+                                />
+                                <title>{ticker}: {(weight * 100).toFixed(1)}%</title>
+                              </g>
+                            );
+                          });
+                      })()}
+                    </svg>
+                  </div>
+                  {/* Legend */}
+                  <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
+                    {tickers
+                      .map((ticker, i) => ({ ticker, weight: optimalWeights[i] || 0, index: i }))
+                      .sort((a, b) => b.weight - a.weight)
+                      .slice(0, 15)
+                      .map(({ ticker, weight }, i) => {
+                        const colors = [
+                          '#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981',
+                          '#06b6d4', '#6366f1', '#f97316', '#14b8a6', '#a855f7',
+                          '#ef4444', '#84cc16', '#f43f5e', '#eab308', '#22c55e'
+                        ];
+                        return (
+                          <div key={ticker} className="flex items-center gap-1">
+                            <div 
+                              className="w-3 h-3 rounded-sm flex-shrink-0" 
+                              style={{ backgroundColor: colors[i % colors.length] }}
+                            ></div>
+                            <span className="text-slate-300 truncate">{ticker}</span>
+                            <span className="text-slate-400 ml-auto">{(weight * 100).toFixed(1)}%</span>
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400 text-sm">Expected Ann. Return:</span>
-                  <span className="text-xl font-bold text-blue-400">
-                    {(expectedReturn * 252 * 100).toFixed(2)}%
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400 text-sm">Sharpe Ratio:</span>
-                  <span className="text-xl font-bold text-purple-400">
-                    {sharpeRatio.toFixed(2)}
-                  </span>
+                
+                {/* Metrics */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4">Portfolio Metrics</h3>
+                  <div className="space-y-4">
+                    <div className="bg-slate-800/50 rounded-lg p-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400 text-sm">Total Allocation</span>
+                        <span className="text-2xl font-bold text-green-400">
+                          {(optimalWeights.reduce((sum, w) => sum + w, 0) * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400 text-sm">Ex-ante Return</span>
+                        <span className="text-2xl font-bold text-blue-400">
+                          {(expectedReturn * 252 * 100).toFixed(2)}%
+                        </span>
+                      </div>
+                      <div className="text-xs text-slate-500 mt-1">Annualized expected return</div>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400 text-sm">Ex-ante Volatility</span>
+                        <span className="text-2xl font-bold text-orange-400">
+                          {(portfolioStdDev * Math.sqrt(252) * 100).toFixed(2)}%
+                        </span>
+                      </div>
+                      <div className="text-xs text-slate-500 mt-1">Annualized standard deviation</div>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400 text-sm">Sharpe Ratio</span>
+                        <span className="text-2xl font-bold text-purple-400">
+                          {sharpeRatio.toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="text-xs text-slate-500 mt-1">Risk-adjusted return</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
