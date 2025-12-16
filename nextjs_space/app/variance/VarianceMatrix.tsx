@@ -211,6 +211,14 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                           </td>
                         );
                       }
+                      // Hide diagonal values when showing correlation (always 1.000)
+                      if (i === j && showCorrelation) {
+                        return (
+                          <td key={j} className="p-2 text-center bg-slate-900/50">
+                            <span className="text-slate-600">-</span>
+                          </td>
+                        );
+                      }
                       return (
                         <td
                           key={j}
