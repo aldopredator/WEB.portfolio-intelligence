@@ -38,16 +38,10 @@ export default function SectorsClient({ allStocks, portfolios, selectedPortfolio
   const selectedPortfolio2 = portfolios.find(p => p.id === selectedPortfolioId2);
 
   const handlePortfolioChange = (portfolioId: string) => {
-    if (portfolioId === 'all') {
-      const params = new URLSearchParams();
-      if (selectedPortfolioId2) params.set('portfolio2', selectedPortfolioId2);
-      router.push(`/sectors${params.toString() ? `?${params}` : ''}`);
-    } else {
-      const params = new URLSearchParams();
-      params.set('portfolio', portfolioId);
-      if (selectedPortfolioId2) params.set('portfolio2', selectedPortfolioId2);
-      router.push(`/sectors?${params}`);
-    }
+    const params = new URLSearchParams();
+    params.set('portfolio', portfolioId);
+    if (selectedPortfolioId2) params.set('portfolio2', selectedPortfolioId2);
+    router.push(`/sectors?${params}`);
   };
 
   const handlePortfolio2Change = (portfolioId2: string) => {
@@ -106,11 +100,11 @@ export default function SectorsClient({ allStocks, portfolios, selectedPortfolio
             }}
             size="small"
           >
-            <InputLabel sx={{ color: '#94a3b8' }}>Portfolio Filter</InputLabel>
+            <InputLabel sx={{ color: '#94a3b8' }}>Portfolio 1 (Base)</InputLabel>
             <Select
-              value={selectedPortfolio?.id || 'all'}
+              value={selectedPortfolio?.id || ''}
               onChange={(e) => handlePortfolioChange(e.target.value)}
-              label="Portfolio Filter"
+              label="Portfolio 1 (Base)"
               sx={{ 
                 color: '#fff',
                 '& .MuiSvgIcon-root': {
@@ -118,12 +112,6 @@ export default function SectorsClient({ allStocks, portfolios, selectedPortfolio
                 }
               }}
             >
-              <MenuItem value="all">
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Package size={16} />
-                  All Portfolios ({allStocks.length} tickers)
-                </Box>
-              </MenuItem>
               {portfolios.map((portfolio) => (
                 <MenuItem key={portfolio.id} value={portfolio.id}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

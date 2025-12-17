@@ -12,12 +12,6 @@ interface CountriesPageProps {
 }
 
 export default async function CountriesPage({ searchParams }: CountriesPageProps) {
-  const portfolioId = searchParams.portfolio || null;
-  const portfolioId2 = searchParams.portfolio2 || null;
-  
-  // Fetch ALL stock data (no portfolio filter at server level)
-  const stockData = await getStockData(null);
-  
   // Fetch portfolios for filter
   const portfolios = await prisma.portfolio.findMany({
     select: {
@@ -26,6 +20,16 @@ export default async function CountriesPage({ searchParams }: CountriesPageProps
       description: true,
     },
   });
+
+  // Set defaults: BARCLAYS as portfolio 1, TO BUY as portfolio 2
+  const barclaysPortfolio = portfolios.find(p => p.name === 'BARCLAYS');
+  const toBuyPortfolio = portfolios.find(p => p.name === 'TO BUY');
+  
+  const portfolioId = searchParams.portfolio || barclaysPortfolio?.id || null;
+  const portfolioId2 = searchParams.portfolio2 || toBuyPortfolio?.id || null;
+  
+  // Fetch ALL stock data (no portfolio filter at server level)
+  const stockData = await getStockData(null);
 
   // Fetch ALL stock ratings from database (combined portfolio filter if specified)
   const portfolioIds = [portfolioId, portfolioId2].filter(Boolean) as string[];
