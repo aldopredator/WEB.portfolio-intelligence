@@ -61,9 +61,9 @@ export default async function SectorsPage({ searchParams }: SectorsPageProps) {
     const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
     const companyProfile = data && typeof data === 'object' && 'company_profile' in data ? data.company_profile : null;
     
-    // Use industry from company_profile, fallback to sector from config, then 'Other'
+    // Use industry from company_profile.industry, fallback to config.sector, then 'Other'
     const industry = (companyProfile && typeof companyProfile === 'object' && 'industry' in companyProfile 
-      ? companyProfile.industry 
+      ? (companyProfile as any).industry
       : config.sector) || 'Other';
 
     return {
