@@ -51,12 +51,8 @@ export default function CountriesClient({ allStocks, portfolios, selectedPortfol
     router.push(`/countries${params.toString() ? `?${params}` : ''}`);
   };
 
-  // Apply filters - include both portfolios if portfolio2 is selected
-  const portfolioIds = [selectedPortfolioId, selectedPortfolioId2].filter(Boolean);
+  // Apply rating filter only (portfolio filtering already done server-side)
   const filteredStocks = allStocks.filter(stock => {
-    // Portfolio filter - include stocks from either portfolio if both are selected
-    if (portfolioIds.length > 0 && !portfolioIds.includes(stock.portfolioId || '')) return false;
-    
     // Rating filter
     if (ratingFilter === -1 && (stock.rating || 0) > 0) return false; // Not Rated
     if (ratingFilter > 0 && (stock.rating || 0) < ratingFilter) return false; // Minimum stars
@@ -102,7 +98,7 @@ export default function CountriesClient({ allStocks, portfolios, selectedPortfol
           >
             <InputLabel sx={{ color: '#94a3b8' }}>Portfolio 1 (Base)</InputLabel>
             <Select
-              value={selectedPortfolio?.id || ''}
+              value={selectedPortfolioId || ''}
               onChange={(e) => handlePortfolioChange(e.target.value)}
               label="Portfolio 1 (Base)"
               sx={{ 
@@ -148,7 +144,7 @@ export default function CountriesClient({ allStocks, portfolios, selectedPortfol
           >
             <InputLabel sx={{ color: selectedPortfolioId2 ? '#22c55e' : '#94a3b8' }}>Portfolio 2 (Combine) - Optional</InputLabel>
             <Select
-              value={selectedPortfolio2?.id || ''}
+              value={selectedPortfolioId2 || ''}
               onChange={(e) => handlePortfolio2Change(e.target.value)}
               label="Portfolio 2 (Combine) - Optional"
               sx={{ 
