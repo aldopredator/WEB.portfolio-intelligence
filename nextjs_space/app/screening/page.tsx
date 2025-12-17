@@ -81,6 +81,7 @@ export default async function ScreeningPage({
 
     // Apply screening criteria (only check enabled criteria)
     const passes: Record<string, boolean> = {};
+    const hardFilters: Record<string, boolean> = {}; // Filters that must pass 100%
     
     if (CRITERIA.peEnabled) {
       passes.pe = !stockInfo.pe_ratio || stockInfo.pe_ratio < CRITERIA.maxPE;
@@ -157,39 +158,46 @@ export default async function ScreeningPage({
       const stockRating = stock.rating || 0;
       if (CRITERIA.minRating === -1) {
         // Filter for "Not Rated" - rating must be 0
-        passes.rating = stockRating === 0;
+        hardFilters.rating = stockRating === 0;
       } else {
         // Filter for rated stocks - rating must be >= minRating
-        passes.rating = stockRating >= CRITERIA.minRating;
+        hardFilters.rating = stockRating >= CRITERIA.minRating;
       }
     }
     
     if (CRITERIA.portfolioFilterEnabled && CRITERIA.portfolioFilter.length > 0) {
       const portfolioName = stock.portfolio?.name || '';
-      passes.portfolio = CRITERIA.portfolioFilter.includes(portfolioName);
+      hardFilters.portfolio = CRITERIA.portfolioFilter.includes(portfolioName);
     }
     
     if (CRITERIA.sectorFilterMode !== 'disabled') {
       if (companyProfile?.industry) {
         if (CRITERIA.sectorFilterMode === 'exclude') {
-          passes.sector = !CRITERIA.sectorFilter.includes(companyProfile.industry);
+          hardFilters.sector = !CRITERIA.sectorFilter.includes(companyProfile.industry);
         } else if (CRITERIA.sectorFilterMode === 'include' && CRITERIA.sectorFilter.length > 0) {
-          passes.sector = CRITERIA.sectorFilter.includes(companyProfile.industry);
+          hardFilters.sector = CRITERIA.sectorFilter.includes(companyProfile.industry);
         }
       } else if (CRITERIA.sectorFilterMode === 'include' && CRITERIA.sectorFilter.length > 0) {
         // In include mode, reject stocks without an industry
-        passes.sector = false;
+        hardFilters.sector = false;
       }
     }
     
     if (CRITERIA.countryFilterMode !== 'disabled' && companyProfile?.country) {
       if (CRITERIA.countryFilterMode === 'exclude') {
-        passes.country = !CRITERIA.countryFilter.includes(companyProfile.country);
+        hardFilters.country = !CRITERIA.countryFilter.includes(companyProfile.country);
       } else if (CRITERIA.countryFilterMode === 'include' && CRITERIA.countryFilter.length > 0) {
-        passes.country = CRITERIA.countryFilter.includes(companyProfile.country);
+        hardFilters.country = CRITERIA.countryFilter.includes(companyProfile.country);
       }
     }
 
+    // Hard filters must ALL pass (100% required)
+    const hardFiltersPassed = Object.values(hardFilters).every(v => v === true);
+    if (!hardFiltersPassed) {
+      return null;
+    }
+
+    // Calculate match score only from flexible criteria (not hard filters)
     const totalCriteria = Object.keys(passes).length;
     const passCount = Object.values(passes).filter(Boolean).length;
     const matchScore = totalCriteria > 0 ? Math.round((passCount / totalCriteria) * 100) : 100;
