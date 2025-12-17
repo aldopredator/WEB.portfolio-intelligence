@@ -202,10 +202,17 @@ export default async function ScreeningPage({
     const passCount = Object.values(passes).filter(Boolean).length;
     const matchScore = totalCriteria > 0 ? Math.round((passCount / totalCriteria) * 100) : 100;
 
-    // Apply match score filter if enabled, otherwise require 100% match
-    const requiredMatchScore = CRITERIA.matchScoreEnabled ? CRITERIA.minMatchScore : 100;
-    if (matchScore < requiredMatchScore) {
-      return null;
+    // Apply match score filter if enabled
+    // If no flexible criteria are enabled, match score filter cannot be applied
+    if (CRITERIA.matchScoreEnabled && totalCriteria > 0) {
+      if (matchScore < CRITERIA.minMatchScore) {
+        return null;
+      }
+    } else if (!CRITERIA.matchScoreEnabled && totalCriteria > 0) {
+      // If match score is disabled but we have flexible criteria, require 100% match
+      if (matchScore < 100) {
+        return null;
+      }
     }
 
     // Filter out stocks with missing portfolio assignment
