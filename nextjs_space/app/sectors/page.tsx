@@ -8,11 +8,12 @@ const prisma = new PrismaClient();
 export const revalidate = 1800; // 30 minutes
 
 interface SectorsPageProps {
-  searchParams: { portfolio?: string };
+  searchParams: { portfolio?: string; portfolio2?: string };
 }
 
 export default async function SectorsPage({ searchParams }: SectorsPageProps) {
   const portfolioId = searchParams.portfolio || null;
+  const portfolioId2 = searchParams.portfolio2 || null;
   
   // Fetch ALL stock data (no portfolio filter at server level)
   const stockData = await getStockData(null);
@@ -26,10 +27,12 @@ export default async function SectorsPage({ searchParams }: SectorsPageProps) {
     },
   });
 
-  // Fetch ALL stock ratings from database (no portfolio filter)
+  // Fetch ALL stock ratings from database (combined portfolio filter if specified)
+  const portfolioIds = [portfolioId, portfolioId2].filter(Boolean) as string[];
   const dbStocks = await prisma.stock.findMany({
     where: { 
       isActive: true,
+      ...(portfolioIds.length > 0 ? { portfolioId: { in: portfolioIds } } : {}),
     },
     select: {
       ticker: true,
@@ -83,6 +86,7 @@ export default async function SectorsPage({ searchParams }: SectorsPageProps) {
           allStocks={allStocks} 
           portfolios={portfolios}
           selectedPortfolioId={portfolioId}
+          selectedPortfolioId2={portfolioId2}
         />
       </div>
     </main>

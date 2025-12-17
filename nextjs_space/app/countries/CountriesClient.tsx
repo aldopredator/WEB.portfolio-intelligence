@@ -27,26 +27,41 @@ interface CountriesClientProps {
   allStocks: Stock[];
   portfolios: Portfolio[];
   selectedPortfolioId?: string | null;
+  selectedPortfolioId2?: string | null;
 }
 
-export default function CountriesClient({ allStocks, portfolios, selectedPortfolioId }: CountriesClientProps) {
+export default function CountriesClient({ allStocks, portfolios, selectedPortfolioId, selectedPortfolioId2 }: CountriesClientProps) {
   const router = useRouter();
   const [ratingFilter, setRatingFilter] = useState<number>(0); // 0 = All, -1 = Not Rated, 1-5 = min stars
 
   const selectedPortfolio = portfolios.find(p => p.id === selectedPortfolioId);
+  const selectedPortfolio2 = portfolios.find(p => p.id === selectedPortfolioId2);
 
   const handlePortfolioChange = (portfolioId: string) => {
     if (portfolioId === 'all') {
-      router.push('/countries');
+      const params = new URLSearchParams();
+      if (selectedPortfolioId2) params.set('portfolio2', selectedPortfolioId2);
+      router.push(`/countries${params.toString() ? `?${params}` : ''}`);
     } else {
-      router.push(`/countries?portfolio=${portfolioId}`);
+      const params = new URLSearchParams();
+      params.set('portfolio', portfolioId);
+      if (selectedPortfolioId2) params.set('portfolio2', selectedPortfolioId2);
+      router.push(`/countries?${params}`);
     }
   };
 
-  // Apply filters
+  const handlePortfolio2Change = (portfolioId2: string) => {
+    const params = new URLSearchParams();
+    if (selectedPortfolioId) params.set('portfolio', selectedPortfolioId);
+    if (portfolioId2) params.set('portfolio2', portfolioId2);
+    router.push(`/countries${params.toString() ? `?${params}` : ''}`);
+  };
+
+  // Apply filters - include both portfolios if portfolio2 is selected
+  const portfolioIds = [selectedPortfolioId, selectedPortfolioId2].filter(Boolean);
   const filteredStocks = allStocks.filter(stock => {
-    // Portfolio filter
-    if (selectedPortfolioId && stock.portfolioId !== selectedPortfolioId) return false;
+    // Portfolio filter - include stocks from either portfolio if both are selected
+    if (portfolioIds.length > 0 && !portfolioIds.includes(stock.portfolioId || '')) return false;
     
     // Rating filter
     if (ratingFilter === -1 && (stock.rating || 0) > 0) return false; // Not Rated
@@ -117,6 +132,60 @@ export default function CountriesClient({ allStocks, portfolios, selectedPortfol
                   </Box>
                 </MenuItem>
               ))}
+            </Select>
+          </FormControl>
+
+          {/* Portfolio 2 Filter (Optional) */}
+          <FormControl
+            sx={{
+              minWidth: 250,
+              '& .MuiOutlinedInput-root': {
+                color: '#fff',
+                backgroundColor: 'rgba(30, 41, 59, 0.5)',
+                borderColor: selectedPortfolioId2 ? 'rgba(34, 197, 94, 0.5)' : 'rgba(148, 163, 184, 0.3)',
+                '&:hover': {
+                  borderColor: selectedPortfolioId2 ? 'rgba(34, 197, 94, 0.7)' : 'rgba(148, 163, 184, 0.5)',
+                  backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                },
+                '&.Mui-focused': {
+                  borderColor: selectedPortfolioId2 ? '#22c55e' : '#3b82f6',
+                  backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                }
+              },
+              '& .MuiInputLabel-root': {
+                color: selectedPortfolioId2 ? '#22c55e' : '#94a3b8',
+              }
+            }}
+            size="small"
+          >
+            <InputLabel sx={{ color: selectedPortfolioId2 ? '#22c55e' : '#94a3b8' }}>Portfolio 2 (Combine) - Optional</InputLabel>
+            <Select
+              value={selectedPortfolio2?.id || ''}
+              onChange={(e) => handlePortfolio2Change(e.target.value)}
+              label="Portfolio 2 (Combine) - Optional"
+              sx={{ 
+                color: '#fff',
+                '& .MuiSvgIcon-root': {
+                  color: selectedPortfolioId2 ? '#22c55e' : '#94a3b8',
+                }
+              }}
+            >
+              <MenuItem value="">
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Package size={16} />
+                  None
+                </Box>
+              </MenuItem>
+              {portfolios
+                .filter(p => p.id !== selectedPortfolioId)
+                .map((portfolio) => (
+                  <MenuItem key={portfolio.id} value={portfolio.id}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Package size={16} />
+                      {portfolio.name}
+                    </Box>
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
           
@@ -208,11 +277,14 @@ export default function CountriesClient({ allStocks, portfolios, selectedPortfol
         </div>
 
         {/* Active Filter Info */}
-        {(selectedPortfolio || ratingFilter !== 0) && (
+        {(selectedPortfolio || selectedPortfolio2 || ratingFilter !== 0) && (
           <div className="mt-4 pt-4 border-t border-slate-800/50">
             <Typography variant="body2" sx={{ color: '#94a3b8', fontSize: '0.875rem' }}>
               Showing <span className="text-blue-400 font-semibold">{filteredStocks.length}</span> stocks
-              {selectedPortfolio && <span> from <span className="text-blue-400 font-semibold">{selectedPortfolio.name}</span></span>}
+              {selectedPortfolio && !selectedPortfolio2 && <span> from <span className="text-blue-400 font-semibold">{selectedPortfolio.name}</span></span>}
+              {selectedPortfolio && selectedPortfolio2 && (
+                <span> from <span className="text-blue-400 font-semibold">{selectedPortfolio.name}</span> + <span className="text-green-400 font-semibold">{selectedPortfolio2.name}</span></span>
+              )}
               {ratingFilter === -1 && <span> with <span className="text-gray-400 font-semibold">No Rating</span></span>}
               {ratingFilter > 0 && <span> with <span className="text-yellow-400 font-semibold">{ratingFilter}+ stars</span></span>}
             </Typography>
