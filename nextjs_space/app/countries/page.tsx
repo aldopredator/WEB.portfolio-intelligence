@@ -12,7 +12,7 @@ interface CountriesPageProps {
 }
 
 export default async function CountriesPage({ searchParams }: CountriesPageProps) {
-  // Fetch portfolios first to determine defaults
+  // Fetch portfolios for the filter
   const portfolios = await prisma.portfolio.findMany({
     select: {
       id: true,
@@ -21,19 +21,21 @@ export default async function CountriesPage({ searchParams }: CountriesPageProps
     },
   });
 
-  // Set defaults: BARCLAYS as portfolio 1, TO BUY as portfolio 2
-  const barclaysPortfolio = portfolios.find(p => p.name === 'BARCLAYS');
-  const toBuyPortfolio = portfolios.find(p => p.name === 'TO BUY');
-  
-  const portfolioId = searchParams.portfolio || barclaysPortfolio?.id || null;
-  const portfolioId2 = searchParams.portfolio2 || toBuyPortfolio?.id || null;
-  
-  // Build portfolio filter array with defaults applied
+  // Default to BARCLAYS portfolio if no portfolio specified
+  let portfolioId = searchParams.portfolio || null;
+  if (!portfolioId) {
+    const barclaysPortfolio = portfolios.find(p => p.name === 'BARCLAYS');
+    portfolioId = barclaysPortfolio?.id || null;
+  }
+
+  // Get second portfolio for combination (optional)
+  const portfolioId2 = searchParams.portfolio2 || null;
+
+  // Fetch stocks for the selected portfolio(s)
   const portfolioIds = [portfolioId, portfolioId2].filter(Boolean) as string[];
   
-  // Fetch stocks filtered by the selected portfolios (with defaults)
   const dbStocks = await prisma.stock.findMany({
-    where: { 
+    where: {
       isActive: true,
       ...(portfolioIds.length > 0 ? { portfolioId: { in: portfolioIds } } : {}),
     },
