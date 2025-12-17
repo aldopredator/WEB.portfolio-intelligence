@@ -1,5 +1,5 @@
 import { PageHeader } from '@/components/page-header';
-import { getStockData, STOCK_CONFIG } from '@/lib/stock-data';
+import { getStockData } from '@/lib/stock-data';
 import { PrismaClient } from '@prisma/client';
 import SectorsClient from './SectorsClient';
 
@@ -12,6 +12,23 @@ interface SectorsPageProps {
 }
 
 export default async function SectorsPage({ searchParams }: SectorsPageProps) {
+  // Fetch ALL stock ratings from database (combined portfolio filter if specified)
+  const portfolioIds = [searchParams.portfolio, searchParams.portfolio2].filter(Boolean) as string[];
+  
+  // Fetch all active stocks from database
+  const dbStocks = await prisma.stock.findMany({
+    where: { 
+      isActive: true,
+      ...(portfolioIds.length > 0 ? { portfolioId: { in: portfolioIds } } : {}),
+    },
+    select: {
+      ticker: true,
+      company: true,
+      rating: true,
+      portfolioId: true,
+    },
+  });
+
   // Fetch portfolios for filter
   const portfolios = await prisma.portfolio.findMany({
     select: {
@@ -28,53 +45,32 @@ export default async function SectorsPage({ searchParams }: SectorsPageProps) {
   const portfolioId = searchParams.portfolio || barclaysPortfolio?.id || null;
   const portfolioId2 = searchParams.portfolio2 || toBuyPortfolio?.id || null;
   
-  // Fetch ALL stock data (no portfolio filter at server level)
+  // Fetch stock data for all tickers from database
+  const tickers = dbStocks.map(s => s.ticker);
   const stockData = await getStockData(null);
-
-  // Fetch ALL stock ratings from database (combined portfolio filter if specified)
-  const portfolioIds = [portfolioId, portfolioId2].filter(Boolean) as string[];
-  const dbStocks = await prisma.stock.findMany({
-    where: { 
-      isActive: true,
-      ...(portfolioIds.length > 0 ? { portfolioId: { in: portfolioIds } } : {}),
-    },
-    select: {
-      ticker: true,
-      rating: true,
-      portfolioId: true,
-    },
-  });
-
-  const stockRatings = dbStocks.reduce((acc, stock) => {
-    acc[stock.ticker] = {
-      rating: stock.rating || 0,
-      portfolioId: stock.portfolioId,
-    };
-    return acc;
-  }, {} as Record<string, { rating: number; portfolioId: string | null }>);
 
   await prisma.$disconnect();
   
-  // Prepare all stocks with their data (no filtering - client will handle it)
-  const allStocks = STOCK_CONFIG.map((config) => {
-    const data = stockData[config.ticker];
+  // Prepare all stocks with their data from database + JSON data
+  const allStocks = dbStocks.map((dbStock) => {
+    const data = stockData[dbStock.ticker];
     const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
     const companyProfile = data && typeof data === 'object' && 'company_profile' in data ? data.company_profile : null;
     
-    // Use industry from company_profile.industry, fallback to config.sector, then 'Other'
+    // Use industry from company_profile.industry, fallback to 'Other'
     const industry = (companyProfile && typeof companyProfile === 'object' && 'industry' in companyProfile 
       ? (companyProfile as any).industry
-      : config.sector) || 'Other';
+      : null) || 'Other';
 
     return {
-      ticker: config.ticker,
-      name: config.name,
+      ticker: dbStock.ticker,
+      name: dbStock.company,
       sector: industry,
       marketCap: stockInfo?.market_cap,
       change: stockInfo?.change,
       changePercent: stockInfo?.change_percent,
-      rating: stockRatings[config.ticker]?.rating || 0,
-      portfolioId: stockRatings[config.ticker]?.portfolioId || null,
+      rating: dbStock.rating || 0,
+      portfolioId: dbStock.portfolioId || null,
     };
   });
 
