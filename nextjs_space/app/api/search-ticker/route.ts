@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -77,6 +78,8 @@ export async function GET(request: NextRequest) {
 
     console.log('[Search API] Static results:', staticResults.length);
 
+    let searchResults: any[] = [];
+
     // Try Yahoo Finance first (it has a much larger database)
     // Only use static results as a fallback or to supplement Yahoo results
     try {
@@ -99,7 +102,7 @@ export async function GET(request: NextRequest) {
         
         console.log('[Search API] Yahoo quotes found:', quotes.length);
         
-        const results = quotes
+        searchResults = quotes
           .filter((q: YahooSearchResult) => q.symbol && (q.shortname || q.longname || q.name))
           .map((quote: YahooSearchResult) => ({
             symbol: quote.symbol,
@@ -110,68 +113,91 @@ export async function GET(request: NextRequest) {
             currency: 'USD',
           }))
           .slice(0, 15);
-
-        if (results.length > 0) {
-          console.log('[Search API] Returning Yahoo results:', results.length);
-          return NextResponse.json({ results });
-        }
       }
     } catch (yahooError) {
       console.error('[Search API] Yahoo Finance API error:', yahooError);
     }
 
     // If Yahoo didn't work, return static results if we have any
-    if (staticResults.length > 0) {
-      return NextResponse.json({ results: staticResults });
+    if (searchResults.length === 0 && staticResults.length > 0) {
+      searchResults = staticResults;
     }
 
-    // Fallback: Try Alpha Vantage if API key is available
-    const alphaVantageKey = process.env.ALPHA_VANTAGE_API_KEY;
-    if (alphaVantageKey) {
-      try {
-        console.log('[Search API] Trying Alpha Vantage...');
-        const avResponse = await fetch(
-          `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(query)}&apikey=${alphaVantageKey}`
-        );
+    // If still no results, try Alpha Vantage
+    if (searchResults.length === 0) {
+      const alphaVantageKey = process.env.ALPHA_VANTAGE_API_KEY;
+      if (alphaVantageKey) {
+        try {
+          console.log('[Search API] Trying Alpha Vantage...');
+          const avResponse = await fetch(
+            `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(query)}&apikey=${alphaVantageKey}`
+          );
 
-        if (avResponse.ok) {
-          const data = await avResponse.json();
-          const matches = data.bestMatches || [];
-          
-          console.log('[Search API] Alpha Vantage matches:', matches.length);
-          
-          const results = matches.map((match: AlphaVantageSearchResult) => ({
-            symbol: match['1. symbol'],
-            name: match['2. name'],
-            exchange: match['4. region'],
-            type: match['3. type'],
-            region: match['4. region'],
-            currency: match['8. currency'],
-          }));
-
-          if (results.length > 0) {
-            return NextResponse.json({ results });
+          if (avResponse.ok) {
+            const data = await avResponse.json();
+            const matches = data.bestMatches || [];
+            
+            console.log('[Search API] Alpha Vantage matches:', matches.length);
+            
+            searchResults = matches.map((match: AlphaVantageSearchResult) => ({
+              symbol: match['1. symbol'],
+              name: match['2. name'],
+              exchange: match['4. region'],
+              type: match['3. type'],
+              region: match['4. region'],
+              currency: match['8. currency'],
+            }));
           }
+        } catch (avError) {
+          console.error('[Search API] Alpha Vantage API error:', avError);
         }
-      } catch (avError) {
-        console.error('[Search API] Alpha Vantage API error:', avError);
       }
     }
 
     // Last resort: return a generic result
-    console.log('[Search API] Returning generic fallback');
-    const fallbackResults = [
-      { 
-        symbol: query.toUpperCase(), 
-        name: query.toUpperCase(), 
-        exchange: '', 
-        type: 'Equity', 
-        region: '',
-        currency: ''
-      },
-    ];
+    if (searchResults.length === 0) {
+      console.log('[Search API] Returning generic fallback');
+      searchResults = [
+        { 
+          symbol: query.toUpperCase(), 
+          name: query.toUpperCase(), 
+          exchange: '', 
+          type: 'Equity', 
+          region: '',
+          currency: ''
+        },
+      ];
+    }
 
-    return NextResponse.json({ results: fallbackResults });
+    // Now check which tickers already exist in portfolios
+    const tickers = searchResults.map((r: any) => r.symbol);
+    const existingStocks = await prisma.stock.findMany({
+      where: {
+        ticker: {
+          in: tickers,
+        },
+      },
+      include: {
+        portfolio: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    // Map portfolio info to search results
+    const resultsWithPortfolio = searchResults.map((result: any) => {
+      const existingStock = existingStocks.find(s => s.ticker === result.symbol);
+      return {
+        ...result,
+        portfolioId: existingStock?.portfolioId || null,
+        portfolioName: existingStock?.portfolio?.name || null,
+      };
+    });
+
+    return NextResponse.json({ results: resultsWithPortfolio });
 
   } catch (error) {
     console.error('[Search API] Fatal error:', error);

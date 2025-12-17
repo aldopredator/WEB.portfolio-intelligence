@@ -11,6 +11,8 @@ interface SearchResult {
   type: string;
   region?: string;
   currency?: string;
+  portfolioId?: string | null;
+  portfolioName?: string | null;
 }
 
 interface TickerSearchProps {
@@ -280,6 +282,24 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search by 
                               fontSize: '0.7rem',
                               bgcolor: '#333',
                               color: '#999',
+                              '& .MuiChip-label': {
+                                px: 1,
+                              },
+                            }}
+                          />
+                        )}
+
+                        {result.portfolioName && (
+                          <Chip
+                            label={`In ${result.portfolioName}`}
+                            size="small"
+                            sx={{
+                              height: 20,
+                              fontSize: '0.7rem',
+                              fontWeight: 600,
+                              bgcolor: '#00c89620',
+                              color: '#00c896',
+                              border: '1px solid #00c89640',
                               '& .MuiChip-label': {
                                 px: 1,
                               },
