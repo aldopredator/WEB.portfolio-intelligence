@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, XCircle, TrendingUp, Ban, ArrowRight, Plus, Trash2, Save, Filter } from 'lucide-react';
+import { CheckCircle2, XCircle, TrendingUp, Ban, ArrowRight, Plus, Trash2, Save, Filter, Loader2 } from 'lucide-react';
 import { DEFAULT_CRITERIA, buildCriteriaURL, type ScreeningCriteria } from '@/lib/screening-criteria';
 
 const STORAGE_KEY = 'portfolio_screening_criteria';
@@ -107,6 +107,7 @@ const COMMON_COUNTRIES = [
 
 export default function CriteriaForm() {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [criteria, setCriteria] = useState<ScreeningCriteria>(DEFAULT_CRITERIA);
   const [newSector, setNewSector] = useState('');
   const [newCountry, setNewCountry] = useState('');
@@ -170,7 +171,9 @@ export default function CriteriaForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const url = buildCriteriaURL(criteria);
-    router.push(url);
+    startTransition(() => {
+      router.push(url);
+    });
   };
 
   const handleSave = () => {
