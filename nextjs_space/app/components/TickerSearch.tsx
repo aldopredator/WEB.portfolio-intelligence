@@ -294,14 +294,14 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search by 
                             label={`In ${result.portfolioName}`}
                             size="small"
                             sx={{
-                              height: 20,
-                              fontSize: '0.7rem',
-                              fontWeight: 600,
-                              bgcolor: '#00c89620',
-                              color: '#00c896',
-                              border: '1px solid #00c89640',
+                              height: 22,
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              bgcolor: '#ef444420',
+                              color: '#ef4444',
+                              border: '1px solid #ef444460',
                               '& .MuiChip-label': {
-                                px: 1,
+                                px: 1.5,
                               },
                             }}
                           />
