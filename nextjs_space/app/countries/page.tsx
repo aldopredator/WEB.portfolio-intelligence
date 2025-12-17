@@ -12,24 +12,7 @@ interface CountriesPageProps {
 }
 
 export default async function CountriesPage({ searchParams }: CountriesPageProps) {
-  // Fetch ALL stock ratings from database (combined portfolio filter if specified)
-  const portfolioIds = [searchParams.portfolio, searchParams.portfolio2].filter(Boolean) as string[];
-  
-  // Fetch all active stocks from database
-  const dbStocks = await prisma.stock.findMany({
-    where: { 
-      isActive: true,
-      ...(portfolioIds.length > 0 ? { portfolioId: { in: portfolioIds } } : {}),
-    },
-    select: {
-      ticker: true,
-      company: true,
-      rating: true,
-      portfolioId: true,
-    },
-  });
-
-  // Fetch portfolios for filter
+  // Fetch portfolios first to determine defaults
   const portfolios = await prisma.portfolio.findMany({
     select: {
       id: true,
@@ -44,6 +27,23 @@ export default async function CountriesPage({ searchParams }: CountriesPageProps
   
   const portfolioId = searchParams.portfolio || barclaysPortfolio?.id || null;
   const portfolioId2 = searchParams.portfolio2 || toBuyPortfolio?.id || null;
+  
+  // Build portfolio filter array with defaults applied
+  const portfolioIds = [portfolioId, portfolioId2].filter(Boolean) as string[];
+  
+  // Fetch stocks filtered by the selected portfolios (with defaults)
+  const dbStocks = await prisma.stock.findMany({
+    where: { 
+      isActive: true,
+      ...(portfolioIds.length > 0 ? { portfolioId: { in: portfolioIds } } : {}),
+    },
+    select: {
+      ticker: true,
+      company: true,
+      rating: true,
+      portfolioId: true,
+    },
+  });
   
   // Fetch stock data for all tickers from database
   const stockData = await getStockData(null);
