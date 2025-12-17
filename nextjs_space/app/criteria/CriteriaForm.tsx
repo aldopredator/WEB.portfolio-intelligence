@@ -273,10 +273,22 @@ export default function CriteriaForm() {
           </button>
           <button
             type="submit"
-            className="flex-1 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 rounded-lg text-white font-medium text-sm transition-all flex items-center justify-center gap-2"
+            disabled={isPending}
+            className={`flex-1 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 rounded-lg text-white font-medium text-sm transition-all flex items-center justify-center gap-2 ${
+              isPending ? 'opacity-75 cursor-not-allowed' : ''
+            }`}
           >
-            Apply
-            <ArrowRight className="w-4 h-4" />
+            {isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Applying...
+              </>
+            ) : (
+              <>
+                Apply
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -2044,10 +2056,22 @@ export default function CriteriaForm() {
           </button>
           <button
             type="submit"
-            className="flex-1 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 rounded-lg text-white font-medium text-sm transition-all flex items-center justify-center gap-2"
+            disabled={isPending}
+            className={`flex-1 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 rounded-lg text-white font-medium text-sm transition-all flex items-center justify-center gap-2 ${
+              isPending ? 'opacity-75 cursor-not-allowed' : ''
+            }`}
           >
-            Apply
-            <ArrowRight className="w-4 h-4" />
+            {isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Applying...
+              </>
+            ) : (
+              <>
+                Apply
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
           </button>
         </div>
       </div>
