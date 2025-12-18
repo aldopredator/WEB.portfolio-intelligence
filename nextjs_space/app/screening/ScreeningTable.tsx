@@ -5,13 +5,14 @@ import Link from 'next/link';
 import { CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown, ExternalLink, Download, Database } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-type SortField = 'ticker' | 'sector' | 'portfolio' | 'rating' | 'updatedAt' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'avgAnnualVolume10D' | 'avgAnnualVolume3M' | 'beta' | 'roe' | 'profitMargin' | 'debtToEquity' | 'sentiment' | 'matchScore';
+type SortField = 'ticker' | 'sector' | 'industry' | 'portfolio' | 'rating' | 'updatedAt' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'avgAnnualVolume10D' | 'avgAnnualVolume3M' | 'beta' | 'roe' | 'profitMargin' | 'debtToEquity' | 'sentiment' | 'matchScore';
 type SortDirection = 'asc' | 'desc';
 
 interface Stock {
   ticker: string;
   name: string;
   sector: string;
+  industry: string;
   portfolio: string;
   portfolioId: string;
   rating: number;
@@ -146,6 +147,7 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
       'Rating': stock.rating,
       'Last Updated': formatDate(stock.updatedAt),
       'Sector': stock.sector,
+      'Industry': stock.industry,
       ...(criteria.peEnabled && { 'P/E': stock.pe }),
       ...(criteria.pbEnabled && { 'P/B': stock.pb }),
       'P/S': stock.priceToSales,
@@ -195,6 +197,7 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
       'Rating': stock.rating,
       'Last Updated': formatDate(stock.updatedAt),
       'Sector': stock.sector,
+      'Industry': stock.industry,
       'P/E': stock.pe,
       'P/B': stock.pb,
       'P/S': stock.priceToSales,
@@ -292,6 +295,24 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                 <div className="flex items-center gap-2">
                   Sector
                   <SortIcon field="sector" />
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('sector')}
+              >
+                <div className="flex items-center gap-2">
+                  Sector
+                  <SortIcon field="sector" />
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('industry')}
+              >
+                <div className="flex items-center gap-2">
+                  Industry
+                  <SortIcon field="industry" />
                 </div>
               </th>
               {criteria.peEnabled && (
@@ -478,6 +499,11 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                 <td className="px-6 py-5">
                   <span className="inline-block px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-blue-400 text-xs font-medium">
                     {stock.sector}
+                  </span>
+                </td>
+                <td className="px-6 py-5">
+                  <span className="inline-block px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-xs font-medium">
+                    {stock.industry}
                   </span>
                 </td>
                 {criteria.peEnabled && (

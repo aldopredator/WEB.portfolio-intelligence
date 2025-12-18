@@ -221,7 +221,8 @@ export default async function ScreeningPage({
     }
 
     // Build the initial stock data object
-    const sector = companyProfile?.industry || stock.type;
+    const industry = companyProfile?.industry || stock.type;
+    const sector = companyProfile?.sector || 'N/A';
     const pe = stockInfo.pe_ratio?.toFixed(0);
     const pb = stockInfo.pb_ratio?.toFixed(0);
     const priceToSales = stockInfo.priceToSales?.toFixed(0);
@@ -242,7 +243,7 @@ export default async function ScreeningPage({
       : null;
 
     // Calculate data completeness score for key fields
-    const keyFields = [sector, pe, pb, priceToSales, marketCap, avgVolume];
+    const keyFields = [industry, pe, pb, priceToSales, marketCap, avgVolume];
     const availableFields = keyFields.filter(field => field !== null && field !== undefined).length;
     const totalKeyFields = keyFields.length;
     const dataCompletenessScore = Math.round((availableFields / totalKeyFields) * 100);
@@ -255,6 +256,7 @@ export default async function ScreeningPage({
       ticker: stock.ticker,
       name: stock.company,
       sector: sector || 'N/A',
+      industry: industry || 'N/A',
       portfolio: stock.portfolio.name,
       portfolioId: stock.portfolio.id,
       rating: stock.rating || 0,
