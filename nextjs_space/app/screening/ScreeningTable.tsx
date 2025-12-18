@@ -169,6 +169,55 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
     XLSX.writeFile(workbook, filename);
   };
 
+  const exportRawData = () => {
+    // Format date as DDMMYYYY_HHMM
+    const now = new Date();
+    const dd = String(now.getDate()).padStart(2, '0');
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const yyyy = now.getFullYear();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    const filename = `pi_raw_${dd}${mm}${yyyy}_${hh}${min}.xlsx`;
+
+    // Prepare data for export (all metrics regardless of enabled state)
+    const exportData = sortedStocks.map(stock => ({
+      'Portfolio': stock.portfolio,
+      'Ticker': stock.ticker,
+      'Name': stock.name,
+      'Rating': stock.rating,
+      'Last Updated': formatDate(stock.updatedAt),
+      'Sector': stock.sector,
+      'P/E': stock.pe,
+      'P/B': stock.pb,
+      'P/S': stock.priceToSales,
+      'Market Cap': stock.marketCap,
+      'Avg Volume': stock.avgVolume,
+      'Avg Annual Volume (10D)': stock.avgAnnualVolume10D,
+      'Avg Annual Volume (3M)': stock.avgAnnualVolume3M,
+      'Beta': stock.beta,
+      'ROE': stock.roe,
+      'Profit Margin': stock.profitMargin,
+      'Debt/Equity': stock.debtToEquity,
+      'Sentiment': stock.sentiment,
+      'Match Score': `${stock.matchScore}%`,
+    }));
+
+    // Create workbook and worksheet
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Raw Data');
+
+    // Auto-size columns
+    const maxWidth = 50;
+    const colWidths = Object.keys(exportData[0] || {}).map(key => ({
+      wch: Math.min(Math.max(key.length, 10), maxWidth)
+    }));
+    worksheet['!cols'] = colWidths;
+
+    // Export file
+    XLSX.writeFile(workbook, filename);
+  };
+
   return (
     <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
       {/* Export Buttons */}
