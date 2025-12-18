@@ -445,6 +445,16 @@ export default function CompanyInfoCard({
 
         {(industry || sector || subSector || country || marketCapitalization || floatShares || averageVolume || averageVolume10Day || sharesOutstanding || assets || liabilities || weburl) && (
           <Stack spacing={2}>
+            {sector && (
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  Sector
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {sector}
+                </Typography>
+              </Box>
+            )}
             {industry && (
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
