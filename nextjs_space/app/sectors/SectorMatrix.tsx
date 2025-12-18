@@ -76,13 +76,16 @@ export default function SectorMatrix({ sectorGroups }: SectorMatrixProps) {
   };
 
   // Create entries for all master sectors, including empty ones
-  const allSectors = MASTER_SECTORS.map(sector => [
+  // Separate N/A from regular sectors
+  const regularSectors = MASTER_SECTORS.filter(s => s !== 'N/A').map(sector => [
     sector,
     sectorGroups[sector] || []
   ] as [string, Stock[]]);
   
-  // Sort: sectors with stocks first (by stock count desc), then empty ones alphabetically
-  const sectors = allSectors.sort((a, b) => {
+  const naSector: [string, Stock[]] = ['N/A', sectorGroups['N/A'] || []];
+  
+  // Sort regular sectors: sectors with stocks first (by stock count desc), then empty ones alphabetically
+  const sortedRegularSectors = regularSectors.sort((a, b) => {
     const aCount = a[1].length;
     const bCount = b[1].length;
     if (aCount === 0 && bCount === 0) return a[0].localeCompare(b[0]); // Both empty: alphabetical
@@ -90,6 +93,9 @@ export default function SectorMatrix({ sectorGroups }: SectorMatrixProps) {
     if (bCount === 0) return -1; // b is empty: move to end
     return bCount - aCount; // Both have stocks: sort by count descending
   });
+  
+  // Append N/A at the end as a catch-all for unclassified stocks
+  const sectors = [...sortedRegularSectors, naSector];
 
   return (
     <div className="space-y-6">

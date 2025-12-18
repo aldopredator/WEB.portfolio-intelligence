@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, FormControl, InputLabel, Select, MenuItem, Typography } from '@mui/material';
 import { Package } from 'lucide-react';
@@ -33,22 +33,29 @@ interface SectorsClientProps {
 export default function SectorsClient({ allStocks, portfolios, selectedPortfolioId, selectedPortfolioId2 }: SectorsClientProps) {
   const router = useRouter();
   const [ratingFilter, setRatingFilter] = useState<number>(0); // 0 = All, -1 = Not Rated, 1-5 = min stars
+  const [isPending, startTransition] = useTransition();
+  
+  // Local state for portfolio selections (before Apply)
+  const [localPortfolioId, setLocalPortfolioId] = useState(selectedPortfolioId || '');
+  const [localPortfolioId2, setLocalPortfolioId2] = useState(selectedPortfolioId2 || '');
 
   const selectedPortfolio = portfolios.find(p => p.id === selectedPortfolioId);
   const selectedPortfolio2 = portfolios.find(p => p.id === selectedPortfolioId2);
 
-  const handlePortfolioChange = (portfolioId: string) => {
-    const params = new URLSearchParams();
-    params.set('portfolio', portfolioId);
-    if (selectedPortfolioId2) params.set('portfolio2', selectedPortfolioId2);
-    router.push(`/sectors?${params}`);
+  const handleReset = () => {
+    const barclaysPortfolio = portfolios.find(p => p.name === 'BARCLAYS');
+    setLocalPortfolioId(barclaysPortfolio?.id || '');
+    setLocalPortfolioId2('');
+    setRatingFilter(0);
   };
 
-  const handlePortfolio2Change = (portfolioId2: string) => {
-    const params = new URLSearchParams();
-    if (selectedPortfolioId) params.set('portfolio', selectedPortfolioId);
-    if (portfolioId2) params.set('portfolio2', portfolioId2);
-    router.push(`/sectors${params.toString() ? `?${params}` : ''}`);
+  const handleApply = () => {
+    startTransition(() => {
+      const params = new URLSearchParams();
+      if (localPortfolioId) params.set('portfolio', localPortfolioId);
+      if (localPortfolioId2) params.set('portfolio2', localPortfolioId2);
+      router.push(`/sectors${params.toString() ? `?${params}` : ''}`);
+    });
   };
 
   // Apply rating filter only (portfolio filtering already done server-side)
@@ -70,6 +77,23 @@ export default function SectorsClient({ allStocks, portfolios, selectedPortfolio
 
   return (
     <div className="space-y-6">
+      {/* Action Buttons */}
+      <div className="flex gap-3 justify-end">
+        <button
+          onClick={handleReset}
+          className="px-6 py-2.5 bg-slate-800/50 hover:bg-slate-800/70 border border-slate-700 rounded-lg text-slate-300 hover:text-white transition-all font-medium"
+        >
+          Reset
+        </button>
+        <button
+          onClick={handleApply}
+          disabled={isPending}
+          className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 border border-blue-500 rounded-lg text-white transition-all font-medium disabled:cursor-not-allowed"
+        >
+          {isPending ? 'Applying...' : 'Apply'}
+        </button>
+      </div>
+
       {/* Filters Section */}
       <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl p-6">
         <div className="flex flex-col md:flex-row gap-6">
@@ -98,8 +122,8 @@ export default function SectorsClient({ allStocks, portfolios, selectedPortfolio
           >
             <InputLabel sx={{ color: '#94a3b8' }}>Portfolio 1 (Base)</InputLabel>
             <Select
-              value={selectedPortfolioId || ''}
-              onChange={(e) => handlePortfolioChange(e.target.value)}
+              value={localPortfolioId}
+              onChange={(e) => setLocalPortfolioId(e.target.value)}
               label="Portfolio 1 (Base)"
               sx={{ 
                 color: '#fff',
@@ -126,26 +150,26 @@ export default function SectorsClient({ allStocks, portfolios, selectedPortfolio
               '& .MuiOutlinedInput-root': {
                 color: '#fff',
                 backgroundColor: 'rgba(30, 41, 59, 0.5)',
-                borderColor: selectedPortfolioId2 ? 'rgba(34, 197, 94, 0.5)' : 'rgba(148, 163, 184, 0.3)',
+                borderColor: localPortfolioId2 ? 'rgba(34, 197, 94, 0.5)' : 'rgba(148, 163, 184, 0.3)',
                 '&:hover': {
-                  borderColor: selectedPortfolioId2 ? 'rgba(34, 197, 94, 0.7)' : 'rgba(148, 163, 184, 0.5)',
+                  borderColor: localPortfolioId2 ? 'rgba(34, 197, 94, 0.7)' : 'rgba(148, 163, 184, 0.5)',
                   backgroundColor: 'rgba(30, 41, 59, 0.7)',
                 },
                 '&.Mui-focused': {
-                  borderColor: selectedPortfolioId2 ? '#22c55e' : '#3b82f6',
+                  borderColor: localPortfolioId2 ? '#22c55e' : '#3b82f6',
                   backgroundColor: 'rgba(30, 41, 59, 0.7)',
                 }
               },
               '& .MuiInputLabel-root': {
-                color: selectedPortfolioId2 ? '#22c55e' : '#94a3b8',
+                color: localPortfolioId2 ? '#22c55e' : '#94a3b8',
               }
             }}
             size="small"
           >
-            <InputLabel sx={{ color: selectedPortfolioId2 ? '#22c55e' : '#94a3b8' }}>Portfolio 2 (Combine) - Optional</InputLabel>
+            <InputLabel sx={{ color: localPortfolioId2 ? '#22c55e' : '#94a3b8' }}>Portfolio 2 (Combine) - Optional</InputLabel>
             <Select
-              value={selectedPortfolioId2 || ''}
-              onChange={(e) => handlePortfolio2Change(e.target.value)}
+              value={localPortfolioId2}
+              onChange={(e) => setLocalPortfolioId2(e.target.value)}
               label="Portfolio 2 (Combine) - Optional"
               sx={{ 
                 color: '#fff',
