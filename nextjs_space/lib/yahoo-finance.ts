@@ -43,6 +43,8 @@ export interface YahooStockStatistics {
     fiftyDayAverage?: number | null;          // 50-day moving average
     twoHundredDayAverage?: number | null;     // 200-day moving average
     returnOnAssets?: number | null;           // Return on Assets (ttm)
+    returnOnEquity?: number | null;           // Return on Equity (ttm)
+    profitMargins?: number | null;            // Profit Margin (ttm)
     debtToEquity?: number | null;             // Total Debt/Equity (mrq)
     quarterlyRevenueGrowth?: number | null;   // Quarterly Revenue Growth (yoy)
     quarterlyEarningsGrowth?: number | null;  // Quarterly Earnings Growth (yoy)
@@ -270,6 +272,8 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
         
         // Extract financial metrics from financialData
         const returnOnAssets = financial?.returnOnAssets ? financial.returnOnAssets * 100 : null;
+        const returnOnEquity = financial?.returnOnEquity ? financial.returnOnEquity * 100 : null;
+        const profitMargins = financial?.profitMargins ? financial.profitMargins * 100 : null;
         const debtToEquity = financial?.debtToEquity || null;
         const quarterlyRevenueGrowth = financial?.revenueGrowth ? financial.revenueGrowth * 100 : null;
         const quarterlyEarningsGrowth = financial?.earningsGrowth ? financial.earningsGrowth * 100 : null;
@@ -286,7 +290,7 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
         const pegRatio = stats?.pegRatio || null;
         const priceToBook = stats?.priceToBook || null;
         
-        console.log(`[YAHOO] ✅ ${ticker} - Float: ${floatShares}, Outstanding: ${sharesOutstanding}, ROA: ${returnOnAssets}%, D/E: ${debtToEquity}, P/S: ${priceToSales}`);
+        console.log(`[YAHOO] ✅ ${ticker} - Float: ${floatShares}, Outstanding: ${sharesOutstanding}, ROA: ${returnOnAssets}%, ROE: ${returnOnEquity}%, Profit Margin: ${profitMargins}%, D/E: ${debtToEquity}, P/S: ${priceToSales}`);
         
         return {
             floatShares,
@@ -300,6 +304,8 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
             fiftyDayAverage,
             twoHundredDayAverage,
             returnOnAssets,
+            returnOnEquity,
+            profitMargins,
             debtToEquity,
             quarterlyRevenueGrowth,
             quarterlyEarningsGrowth,

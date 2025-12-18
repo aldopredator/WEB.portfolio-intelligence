@@ -104,12 +104,20 @@ export default async function ScreeningPage({
       passes.beta = stockInfo.beta >= CRITERIA.minBeta && stockInfo.beta <= CRITERIA.maxBeta;
     }
     
-    if (CRITERIA.roeEnabled && stockInfo.roe !== undefined) {
-      passes.roe = stockInfo.roe >= CRITERIA.minROE;
+    if (CRITERIA.roeEnabled) {
+      // Prioritize Yahoo Finance returnOnEquity over Finnhub roe
+      const roeValue = (stockInfo as any).returnOnEquity || stockInfo.roe;
+      if (roeValue !== undefined) {
+        passes.roe = roeValue >= CRITERIA.minROE;
+      }
     }
     
-    if (CRITERIA.profitMarginEnabled && stockInfo.profit_margin !== undefined) {
-      passes.profitMargin = stockInfo.profit_margin >= CRITERIA.minProfitMargin;
+    if (CRITERIA.profitMarginEnabled) {
+      // Prioritize Yahoo Finance profitMargins over Finnhub profit_margin
+      const profitMarginValue = (stockInfo as any).profitMargins || stockInfo.profit_margin;
+      if (profitMarginValue !== undefined) {
+        passes.profitMargin = profitMarginValue >= CRITERIA.minProfitMargin;
+      }
     }
     
     if (CRITERIA.priceToSalesEnabled) {
@@ -257,8 +265,9 @@ export default async function ScreeningPage({
       ? `${((stockInfo.averageVolume * 250 / stockInfo.floatShares) * 100).toFixed(0)}%`
       : null;
     const beta = stockInfo.beta?.toFixed(2);
-    const roe = stockInfo.roe ? `${stockInfo.roe.toFixed(0)}%` : null;
-    const profitMargin = stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(0)}%` : null;
+    // Prioritize Yahoo Finance ROE and Profit Margin over Finnhub
+    const roe = (stockInfo as any).returnOnEquity ? `${(stockInfo as any).returnOnEquity.toFixed(0)}%` : (stockInfo.roe ? `${stockInfo.roe.toFixed(0)}%` : null);
+    const profitMargin = (stockInfo as any).profitMargins ? `${(stockInfo as any).profitMargins.toFixed(0)}%` : (stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(0)}%` : null);
     const debtToEquity = stockInfo.debtToEquity?.toFixed(0);
     const sentiment = data && typeof data === 'object' && 'sentiment_data' in data
       ? (data.sentiment_data as any)?.overall_sentiment

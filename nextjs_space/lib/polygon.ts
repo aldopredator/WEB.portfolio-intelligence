@@ -33,6 +33,8 @@ export interface PolygonStockStats {
     fiftyDayAverage?: number | null;
     twoHundredDayAverage?: number | null;
     returnOnAssets?: number | null;
+    returnOnEquity?: number | null;
+    profitMargins?: number | null;
     debtToEquity?: number | null;
     quarterlyRevenueGrowth?: number | null;
     quarterlyEarningsGrowth?: number | null;
@@ -206,6 +208,8 @@ export async function fetchPolygonStockStats(ticker: string): Promise<PolygonSto
             twoHundredDayAverage: yahooStats?.twoHundredDayAverage || null,
             // Use Yahoo Finance for financial metrics
             returnOnAssets: yahooStats?.returnOnAssets || null,
+            returnOnEquity: yahooStats?.returnOnEquity || null,
+            profitMargins: yahooStats?.profitMargins || null,
             debtToEquity: yahooStats?.debtToEquity || null,
             quarterlyRevenueGrowth: yahooStats?.quarterlyRevenueGrowth || null,
             quarterlyEarningsGrowth: yahooStats?.quarterlyEarningsGrowth || null,
