@@ -299,11 +299,11 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
               </th>
               <th 
                 className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
-                onClick={() => handleSort('sector')}
+                onClick={() => handleSort('industry')}
               >
                 <div className="flex items-center gap-2">
-                  Sector
-                  <SortIcon field="sector" />
+                  Industry
+                  <SortIcon field="industry" />
                 </div>
               </th>
               <th 
