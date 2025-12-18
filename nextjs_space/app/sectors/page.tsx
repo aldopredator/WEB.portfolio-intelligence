@@ -59,15 +59,15 @@ export default async function SectorsPage({ searchParams }: SectorsPageProps) {
     const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
     const companyProfile = data && typeof data === 'object' && 'company_profile' in data ? data.company_profile : null;
     
-    // Use industry from company_profile.industry, fallback to 'Other'
-    const industry = (companyProfile && typeof companyProfile === 'object' && 'industry' in companyProfile 
-      ? (companyProfile as any).industry
-      : null) || 'Other';
+    // Use sector from company_profile.sector, fallback to 'N/A'
+    const sector = (companyProfile && typeof companyProfile === 'object' && 'sector' in companyProfile 
+      ? (companyProfile as any).sector
+      : null) || 'N/A';
 
     return {
       ticker: dbStock.ticker,
       name: dbStock.company,
-      sector: industry,
+      sector: sector,
       marketCap: stockInfo?.market_cap,
       change: stockInfo?.change,
       changePercent: stockInfo?.change_percent,
@@ -80,7 +80,7 @@ export default async function SectorsPage({ searchParams }: SectorsPageProps) {
     <main className="min-h-screen">
       <PageHeader
         title="Sector Matrix"
-        description="Visual grouping of stocks by industry sectors"
+        description="Visual grouping of stocks by sector categories"
       />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
