@@ -7,8 +7,23 @@ import { DEFAULT_CRITERIA, buildCriteriaURL, type ScreeningCriteria } from '@/li
 
 const STORAGE_KEY = 'portfolio_screening_criteria';
 
-// Common sectors for dropdown
-const COMMON_SECTORS = [
+// Common sectors (broader categories from Yahoo Finance)
+const COMMON_ACTUAL_SECTORS = [
+  'Basic Materials',
+  'Communication Services',
+  'Consumer Cyclical',
+  'Consumer Defensive',
+  'Energy',
+  'Financial Services',
+  'Healthcare',
+  'Industrials',
+  'Real Estate',
+  'Technology',
+  'Utilities'
+].sort();
+
+// Common industries for dropdown (more specific classifications)
+const COMMON_INDUSTRIES = [
   'Media',
   'Banking',
   'Food Product',
@@ -110,6 +125,7 @@ export default function CriteriaForm() {
   const [isPending, startTransition] = useTransition();
   const [criteria, setCriteria] = useState<ScreeningCriteria>(DEFAULT_CRITERIA);
   const [newSector, setNewSector] = useState('');
+  const [newIndustry, setNewIndustry] = useState('');
   const [newCountry, setNewCountry] = useState('');
   const [newPortfolio, setNewPortfolio] = useState('');
   const [portfolios, setPortfolios] = useState<{ id: string; name: string }[]>([]);
@@ -142,16 +158,19 @@ export default function CriteriaForm() {
           ...DEFAULT_CRITERIA,
           ...parsed,
           // Ensure arrays exist
-          sectorFilter: Array.isArray(parsed.sectorFilter) ? parsed.sectorFilter : 
+          sectorFilter: Array.isArray(parsed.sectorFilter) ? parsed.sectorFilter : DEFAULT_CRITERIA.sectorFilter,
+          industryFilter: Array.isArray(parsed.industryFilter) ? parsed.industryFilter : 
+                        (Array.isArray(parsed.sectorFilter) ? parsed.sectorFilter :  // migrate old sectorFilter
                         (Array.isArray(parsed.excludeSectors) ? parsed.excludeSectors : 
-                        (Array.isArray(parsed.includeSectors) ? parsed.includeSectors : DEFAULT_CRITERIA.sectorFilter)),
+                        (Array.isArray(parsed.includeSectors) ? parsed.includeSectors : DEFAULT_CRITERIA.industryFilter))),
           countryFilter: Array.isArray(parsed.countryFilter) ? parsed.countryFilter : 
                          (Array.isArray(parsed.excludeCountries) ? parsed.excludeCountries : DEFAULT_CRITERIA.countryFilter),
           portfolioFilter: Array.isArray(parsed.portfolioFilter) ? parsed.portfolioFilter : DEFAULT_CRITERIA.portfolioFilter,
           // Migrate old fields to new mode-based approach
-          sectorFilterMode: parsed.sectorFilterMode || 
+          sectorFilterMode: parsed.sectorFilterMode || DEFAULT_CRITERIA.sectorFilterMode,
+          industryFilterMode: parsed.industryFilterMode || parsed.sectorFilterMode || 
                            (parsed.includeSectorsEnabled ? 'include' : 
-                           (parsed.sectorsEnabled ? 'exclude' : 'disabled')),
+                           (parsed.sectorsEnabled ? 'exclude' : DEFAULT_CRITERIA.industryFilterMode)),
           countryFilterMode: parsed.countryFilterMode || 
                             (parsed.countriesEnabled ? 'exclude' : 'disabled'),
         };
@@ -185,6 +204,7 @@ export default function CriteriaForm() {
   const handleReset = () => {
     setCriteria(DEFAULT_CRITERIA);
     setNewSector('');
+    setNewIndustry('');
     setNewCountry('');
     setNewPortfolio('');
     localStorage.removeItem(STORAGE_KEY);
@@ -204,6 +224,23 @@ export default function CriteriaForm() {
     setCriteria(prev => ({
       ...prev,
       sectorFilter: prev.sectorFilter.filter(s => s !== sector),
+    }));
+  };
+
+  const addIndustry = () => {
+    if (newIndustry.trim() && !criteria.industryFilter.includes(newIndustry.trim())) {
+      setCriteria(prev => ({
+        ...prev,
+        industryFilter: [...prev.industryFilter, newIndustry.trim()],
+      }));
+      setNewIndustry('');
+    }
+  };
+
+  const removeIndustry = (industry: string) => {
+    setCriteria(prev => ({
+      ...prev,
+      industryFilter: prev.industryFilter.filter(s => s !== industry),
     }));
   };
 
@@ -1856,6 +1893,178 @@ export default function CriteriaForm() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Sector Filter */}
+        <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
+          <div className="bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border-b border-purple-500/30 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
+                <Ban className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-white">Sector Filter</h2>
+              </div>
+              <select
+                value={criteria.sectorFilterMode}
+                onChange={(e) => setCriteria({ ...criteria, sectorFilterMode: e.target.value as 'exclude' | 'include' | 'disabled' })}
+                className="px-4 py-2 rounded-lg text-sm font-medium border bg-slate-900/50 text-white border-slate-700 hover:bg-slate-800/50 transition-colors"
+              >
+                <option value="disabled">Disabled</option>
+                <option value="exclude">Exclude</option>
+                <option value="include">Include Only</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-4">
+            {/* Add New Sector */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <select
+                  value={newSector}
+                  onChange={(e) => setNewSector(e.target.value)}
+                  disabled={criteria.sectorFilterMode === 'disabled'}
+                  className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 ${
+                    criteria.sectorFilterMode === 'disabled' ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <option value="">Select a sector to {criteria.sectorFilterMode === 'exclude' ? 'exclude' : 'include'}...</option>
+                  {COMMON_ACTUAL_SECTORS.map((sector) => (
+                    <option key={sector} value={sector} disabled={criteria.sectorFilter.includes(sector)}>
+                      {sector}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={addSector}
+                  disabled={criteria.sectorFilterMode === 'disabled' || !newSector.trim()}
+                  className={`px-4 py-3 ${
+                    criteria.sectorFilterMode === 'include' ? 'bg-green-500/10 hover:bg-green-500/20 border-green-500/20 text-green-400' :
+                    'bg-purple-500/10 hover:bg-purple-500/20 border-purple-500/20 text-purple-400'
+                  } border rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                    (criteria.sectorFilterMode === 'disabled' || !newSector.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <Plus className="w-4 h-4" />
+                  Add
+                </button>
+              </div>
+            </div>
+
+            {/* Sectors List */}
+            {criteria.sectorFilter.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {criteria.sectorFilter.map((sector) => (
+                  <div key={sector} className="bg-slate-950/50 border border-slate-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
+                    {criteria.sectorFilterMode === 'exclude' ? (
+                      <XCircle className="w-4 h-4 text-purple-400" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4 text-green-400" />
+                    )}
+                    <span className="text-white text-sm font-medium">{sector}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeSector(sector)}
+                      disabled={criteria.sectorFilterMode === 'disabled'}
+                      className={`p-1 hover:bg-red-500/20 rounded text-red-400 transition-colors ${
+                        criteria.sectorFilterMode === 'disabled' ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        {/* Industry Filter */}
+        <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
+          <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 border-b border-red-500/30 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center border border-slate-700/50">
+                <Ban className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-white">Industry Filter</h2>
+              </div>
+              <select
+                value={criteria.industryFilterMode}
+                onChange={(e) => setCriteria({ ...criteria, industryFilterMode: e.target.value as 'exclude' | 'include' | 'disabled' })}
+                className="px-4 py-2 rounded-lg text-sm font-medium border bg-slate-900/50 text-white border-slate-700 hover:bg-slate-800/50 transition-colors"
+              >
+                <option value="disabled">Disabled</option>
+                <option value="exclude">Exclude</option>
+                <option value="include">Include Only</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-4">
+            {/* Add New Industry */}
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <select
+                  value={newIndustry}
+                  onChange={(e) => setNewIndustry(e.target.value)}
+                  disabled={criteria.industryFilterMode === 'disabled'}
+                  className={`flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500/50 ${
+                    criteria.industryFilterMode === 'disabled' ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <option value="">Select an industry to {criteria.industryFilterMode === 'exclude' ? 'exclude' : 'include'}...</option>
+                  {COMMON_INDUSTRIES.map((industry) => (
+                    <option key={industry} value={industry} disabled={criteria.industryFilter.includes(industry)}>
+                      {industry}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={addIndustry}
+                  disabled={criteria.industryFilterMode === 'disabled' || !newIndustry.trim()}
+                  className={`px-4 py-3 ${
+                    criteria.industryFilterMode === 'include' ? 'bg-green-500/10 hover:bg-green-500/20 border-green-500/20 text-green-400' :
+                    'bg-red-500/10 hover:bg-red-500/20 border-red-500/20 text-red-400'
+                  } border rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                    (criteria.industryFilterMode === 'disabled' || !newIndustry.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <Plus className="w-4 h-4" />
+                  Add
+                </button>
+              </div>
+            </div>
+
+            {/* Industries List */}
+            {criteria.industryFilter.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {criteria.industryFilter.map((industry) => (
+                  <div key={industry} className="bg-slate-950/50 border border-slate-800/50 rounded-lg px-3 py-2 flex items-center gap-2">
+                    {criteria.industryFilterMode === 'exclude' ? (
+                      <XCircle className="w-4 h-4 text-red-400" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4 text-green-400" />
+                    )}
+                    <span className="text-white text-sm font-medium">{industry}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeIndustry(industry)}
+                      disabled={criteria.industryFilterMode === 'disabled'}
+                      className={`p-1 hover:bg-red-500/20 rounded text-red-400 transition-colors ${
+                        criteria.industryFilterMode === 'disabled' ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
 

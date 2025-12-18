@@ -63,6 +63,8 @@ export interface ScreeningCriteria {
   portfolioFilterEnabled: boolean;
   sectorFilterMode: 'exclude' | 'include' | 'disabled';
   sectorFilter: string[];
+  industryFilterMode: 'exclude' | 'include' | 'disabled';
+  industryFilter: string[];
   countryFilterMode: 'exclude' | 'include' | 'disabled';
   countryFilter: string[];
   minMatchScore: number;
@@ -131,8 +133,10 @@ export const DEFAULT_CRITERIA: ScreeningCriteria = {
   ratingEnabled: false,
   portfolioFilter: [],
   portfolioFilterEnabled: false,
-  sectorFilterMode: 'exclude',
-  sectorFilter: ['Alcohol', 'Gambling'],
+  sectorFilterMode: 'disabled',
+  sectorFilter: [],
+  industryFilterMode: 'exclude',
+  industryFilter: ['Alcohol', 'Gambling'],
   countryFilterMode: 'disabled',
   countryFilter: [],
   minMatchScore: 50,
@@ -205,6 +209,8 @@ export function parseCriteriaFromParams(searchParams: URLSearchParams): Screenin
     portfolioFilterEnabled: searchParams.get('portfolioFilterEnabled') === 'true',
     sectorFilterMode: (searchParams.get('sectorFilterMode') as 'exclude' | 'include' | 'disabled') || DEFAULT_CRITERIA.sectorFilterMode,
     sectorFilter: searchParams.get('sectorFilter')?.split(',').filter(s => s) || DEFAULT_CRITERIA.sectorFilter,
+    industryFilterMode: (searchParams.get('industryFilterMode') as 'exclude' | 'include' | 'disabled') || DEFAULT_CRITERIA.industryFilterMode,
+    industryFilter: searchParams.get('industryFilter')?.split(',').filter(s => s) || DEFAULT_CRITERIA.industryFilter,
     countryFilterMode: (searchParams.get('countryFilterMode') as 'exclude' | 'include' | 'disabled') || DEFAULT_CRITERIA.countryFilterMode,
     countryFilter: searchParams.get('countryFilter')?.split(',').filter(s => s) || DEFAULT_CRITERIA.countryFilter,
     minMatchScore: parseFloat(searchParams.get('minMatchScore') || String(DEFAULT_CRITERIA.minMatchScore)),
@@ -278,6 +284,8 @@ export function buildCriteriaURL(criteria: ScreeningCriteria): string {
     portfolioFilterEnabled: String(criteria.portfolioFilterEnabled),
     sectorFilterMode: criteria.sectorFilterMode,
     sectorFilter: criteria.sectorFilter.join(','),
+    industryFilterMode: criteria.industryFilterMode,
+    industryFilter: criteria.industryFilter.join(','),
     countryFilterMode: criteria.countryFilterMode,
     countryFilter: criteria.countryFilter.join(','),
     minMatchScore: String(criteria.minMatchScore),

@@ -171,15 +171,28 @@ export default async function ScreeningPage({
     }
     
     if (CRITERIA.sectorFilterMode !== 'disabled') {
-      if (companyProfile?.industry) {
+      if (companyProfile?.sector) {
         if (CRITERIA.sectorFilterMode === 'exclude') {
-          hardFilters.sector = !CRITERIA.sectorFilter.includes(companyProfile.industry);
+          hardFilters.sector = !CRITERIA.sectorFilter.includes(companyProfile.sector);
         } else if (CRITERIA.sectorFilterMode === 'include' && CRITERIA.sectorFilter.length > 0) {
-          hardFilters.sector = CRITERIA.sectorFilter.includes(companyProfile.industry);
+          hardFilters.sector = CRITERIA.sectorFilter.includes(companyProfile.sector);
         }
       } else if (CRITERIA.sectorFilterMode === 'include' && CRITERIA.sectorFilter.length > 0) {
-        // In include mode, reject stocks without an industry
+        // In include mode, reject stocks without a sector
         hardFilters.sector = false;
+      }
+    }
+    
+    if (CRITERIA.industryFilterMode !== 'disabled') {
+      if (companyProfile?.industry) {
+        if (CRITERIA.industryFilterMode === 'exclude') {
+          hardFilters.industry = !CRITERIA.industryFilter.includes(companyProfile.industry);
+        } else if (CRITERIA.industryFilterMode === 'include' && CRITERIA.industryFilter.length > 0) {
+          hardFilters.industry = CRITERIA.industryFilter.includes(companyProfile.industry);
+        }
+      } else if (CRITERIA.industryFilterMode === 'include' && CRITERIA.industryFilter.length > 0) {
+        // In include mode, reject stocks without an industry
+        hardFilters.industry = false;
       }
     }
     
