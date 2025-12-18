@@ -386,90 +386,78 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
                   )}
                   
                   {/* Rating Filter */}
-                  <Box sx={{ mt: 2 }}>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
+                  <FormControl
+                    sx={{
+                      mt: 2,
+                      minWidth: '100%',
+                      '& .MuiOutlinedInput-root': {
+                        color: '#fff',
+                        backgroundColor: 'rgba(30, 41, 59, 0.5)',
+                        borderColor: 'rgba(148, 163, 184, 0.3)',
+                        '&:hover': {
+                          borderColor: 'rgba(148, 163, 184, 0.5)',
+                          backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                        },
+                        '&.Mui-focused': {
+                          borderColor: '#3b82f6',
+                          backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                        }
+                      },
+                      '& .MuiInputLabel-root': {
                         color: '#94a3b8',
-                        mb: 1,
-                        fontSize: '0.875rem',
-                        fontWeight: 600,
+                      }
+                    }}
+                    size="small"
+                  >
+                    <InputLabel sx={{ color: '#94a3b8' }}>Rating</InputLabel>
+                    <Select
+                      value={ratingFilter}
+                      onChange={(e) => setRatingFilter(e.target.value as number)}
+                      label="Rating"
+                      sx={{ 
+                        color: '#fff',
+                        '& .MuiSvgIcon-root': {
+                          color: '#94a3b8',
+                        }
                       }}
                     >
-                      Rating
-                    </Typography>
-                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1 }}>
-                      <Box
-                        onClick={() => setRatingFilter(-1)}
-                        sx={{
-                          px: 1.5,
-                          py: 1,
-                          borderRadius: 1.5,
-                          border: '2px solid',
-                          borderColor: ratingFilter === -1 ? '#6b7280' : 'rgba(148, 163, 184, 0.2)',
-                          bgcolor: ratingFilter === -1 ? 'rgba(107, 114, 128, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-                          color: ratingFilter === -1 ? '#9ca3af' : '#64748b',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s',
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                          fontWeight: 500,
-                          '&:hover': {
-                            bgcolor: ratingFilter === -1 ? 'rgba(107, 114, 128, 0.3)' : 'rgba(30, 41, 59, 0.5)',
-                          }
-                        }}
-                      >
-                        ☆ Not Rated
-                      </Box>
-                      {[1, 2, 3, 4, 5].map((stars) => (
-                        <Box
-                          key={stars}
-                          onClick={() => setRatingFilter(stars)}
-                          sx={{
-                            px: 1.5,
-                            py: 1,
-                            borderRadius: 1.5,
-                            border: '2px solid',
-                            borderColor: ratingFilter === stars ? '#eab308' : 'rgba(148, 163, 184, 0.2)',
-                            bgcolor: ratingFilter === stars ? 'rgba(234, 179, 8, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-                            color: ratingFilter === stars ? '#facc15' : '#64748b',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                            textAlign: 'center',
-                            fontSize: '0.875rem',
-                            fontWeight: 500,
-                            '&:hover': {
-                              bgcolor: ratingFilter === stars ? 'rgba(234, 179, 8, 0.3)' : 'rgba(30, 41, 59, 0.5)',
-                            }
-                          }}
-                        >
-                          {stars === 1 ? '⭐ 1+' : stars === 2 ? '⭐ 2+' : stars === 3 ? '⭐ 3+' : stars === 4 ? '⭐ 4+' : '⭐ 5'}
+                      <MenuItem value={0}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          📊 All
                         </Box>
-                      ))}
-                      <Box
-                        onClick={() => setRatingFilter(0)}
-                        sx={{
-                          px: 1.5,
-                          py: 1,
-                          borderRadius: 1.5,
-                          border: '2px solid',
-                          borderColor: ratingFilter === 0 ? '#3b82f6' : 'rgba(148, 163, 184, 0.2)',
-                          bgcolor: ratingFilter === 0 ? 'rgba(59, 130, 246, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-                          color: ratingFilter === 0 ? '#60a5fa' : '#64748b',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s',
-                          textAlign: 'center',
-                          fontSize: '0.875rem',
-                          fontWeight: 500,
-                          '&:hover': {
-                            bgcolor: ratingFilter === 0 ? 'rgba(59, 130, 246, 0.3)' : 'rgba(30, 41, 59, 0.5)',
-                          }
-                        }}
-                      >
-                        🔄 All
-                      </Box>
-                    </Box>
-                  </Box>
+                      </MenuItem>
+                      <MenuItem value={-1}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          ≠ Not Rated
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value={1}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          ⭐ 1+
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value={2}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          ⭐⭐ 2+
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value={3}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          ⭐⭐⭐ 3+
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value={4}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          ⭐⭐⭐⭐ 4+
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value={5}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          ⭐⭐⭐⭐⭐ 5
+                        </Box>
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
                 </Box>
 
                 {/* Search Tickers */}
