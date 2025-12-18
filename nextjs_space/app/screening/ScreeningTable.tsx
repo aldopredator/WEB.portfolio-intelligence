@@ -80,6 +80,14 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
       let aVal: any = a[sortField];
       let bVal: any = b[sortField];
 
+      // Check for N/A values first - always put them at the bottom
+      const aIsNA = aVal === 'N/A' || aVal === null || aVal === undefined;
+      const bIsNA = bVal === 'N/A' || bVal === null || bVal === undefined;
+
+      if (aIsNA && bIsNA) return 0; // Both N/A, keep same order
+      if (aIsNA) return 1; // a is N/A, put it after b
+      if (bIsNA) return -1; // b is N/A, put it after a
+
       // Convert string numbers to actual numbers for sorting
       if (sortField === 'rating') {
         aVal = a.rating;
@@ -88,14 +96,14 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
         aVal = new Date(a.updatedAt).getTime();
         bVal = new Date(b.updatedAt).getTime();
       } else if (sortField === 'pe' || sortField === 'pb' || sortField === 'priceToSales' || sortField === 'beta' || sortField === 'roe' || sortField === 'profitMargin' || sortField === 'debtToEquity') {
-        aVal = aVal === 'N/A' ? -Infinity : parseFloat(aVal);
-        bVal = bVal === 'N/A' ? -Infinity : parseFloat(bVal);
+        aVal = parseFloat(aVal);
+        bVal = parseFloat(bVal);
       } else if (sortField === 'marketCap') {
-        aVal = aVal === 'N/A' ? -Infinity : parseFloat(aVal.replace(/[$B]/g, ''));
-        bVal = bVal === 'N/A' ? -Infinity : parseFloat(bVal.replace(/[$B]/g, ''));
+        aVal = parseFloat(aVal.replace(/[$B]/g, ''));
+        bVal = parseFloat(bVal.replace(/[$B]/g, ''));
       } else if (sortField === 'avgVolume') {
-        aVal = aVal === 'N/A' ? -Infinity : parseFloat(aVal.replace(/[M]/g, ''));
-        bVal = bVal === 'N/A' ? -Infinity : parseFloat(bVal.replace(/[M]/g, ''));
+        aVal = parseFloat(aVal.replace(/[M]/g, ''));
+        bVal = parseFloat(bVal.replace(/[M]/g, ''));
       } else if (sortField === 'matchScore') {
         aVal = a.matchScore;
         bVal = b.matchScore;
