@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { CheckCircle2, XCircle, TrendingUp, Ban, ArrowRight, Plus, Trash2, Save, Filter, Loader2 } from 'lucide-react';
 import { DEFAULT_CRITERIA, buildCriteriaURL, type ScreeningCriteria } from '@/lib/screening-criteria';
 
@@ -454,47 +455,83 @@ export default function CriteriaForm() {
                     </span>
                   </div>
                   
-                  <div className="mt-1 grid grid-cols-3 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setCriteria({ ...criteria, minRating: -1 })}
+                  <FormControl
+                    sx={{
+                      width: '100%',
+                      '& .MuiOutlinedInput-root': {
+                        color: '#fff',
+                        backgroundColor: 'rgba(30, 41, 59, 0.5)',
+                        borderColor: 'rgba(148, 163, 184, 0.3)',
+                        '&:hover': {
+                          borderColor: 'rgba(148, 163, 184, 0.5)',
+                          backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                        },
+                        '&.Mui-focused': {
+                          borderColor: '#3b82f6',
+                          backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                        },
+                        '&.Mui-disabled': {
+                          opacity: 0.5,
+                          cursor: 'not-allowed',
+                        }
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#94a3b8',
+                      }
+                    }}
+                    size="small"
+                    disabled={!criteria.ratingEnabled}
+                  >
+                    <InputLabel sx={{ color: '#94a3b8' }}>Select Rating</InputLabel>
+                    <Select
+                      value={criteria.minRating}
+                      onChange={(e) => setCriteria({ ...criteria, minRating: e.target.value as number })}
+                      label="Select Rating"
                       disabled={!criteria.ratingEnabled}
-                      className={`px-4 py-3 rounded-lg border-2 transition-all font-medium text-sm ${
-                        criteria.minRating === -1
-                          ? 'bg-gray-500/20 border-gray-500 text-gray-400'
-                          : 'bg-slate-800/30 border-slate-700 text-slate-400 hover:bg-slate-800/50'
-                      } ${!criteria.ratingEnabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      sx={{ 
+                        color: '#fff',
+                        '& .MuiSvgIcon-root': {
+                          color: '#94a3b8',
+                        }
+                      }}
                     >
-                      ☆ Not Rated
-                    </button>
-                    {[1, 2, 3, 4, 5].map((stars) => (
-                      <button
-                        key={stars}
-                        type="button"
-                        onClick={() => setCriteria({ ...criteria, minRating: stars })}
-                        disabled={!criteria.ratingEnabled}
-                        className={`px-4 py-3 rounded-lg border-2 transition-all font-medium text-sm ${
-                          criteria.minRating === stars
-                            ? 'bg-yellow-500/20 border-yellow-500 text-yellow-400'
-                            : 'bg-slate-800/30 border-slate-700 text-slate-400 hover:bg-slate-800/50'
-                        } ${!criteria.ratingEnabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                      >
-                        {stars === 1 ? '⭐ 1+' : stars === 2 ? '⭐ 2+' : stars === 3 ? '⭐ 3+' : stars === 4 ? '⭐ 4+' : '⭐ 5'}
-                      </button>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => setCriteria({ ...criteria, minRating: 0 })}
-                      disabled={!criteria.ratingEnabled}
-                      className={`px-4 py-3 rounded-lg border-2 transition-all font-medium text-sm ${
-                        criteria.minRating === 0
-                          ? 'bg-blue-500/20 border-blue-500 text-blue-400'
-                          : 'bg-slate-800/30 border-slate-700 text-slate-400 hover:bg-slate-800/50'
-                      } ${!criteria.ratingEnabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                    >
-                      🔄 All
-                    </button>
-                  </div>
+                      <MenuItem value={0}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          📊 All
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value={-1}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          ≠ Not Rated
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value={1}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          ⭐ 1+
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value={2}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          ⭐⭐ 2+
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value={3}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          ⭐⭐⭐ 3+
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value={4}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          ⭐⭐⭐⭐ 4+
+                        </Box>
+                      </MenuItem>
+                      <MenuItem value={5}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          ⭐⭐⭐⭐⭐ 5
+                        </Box>
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
                 </div>
               </div>
             </div>
