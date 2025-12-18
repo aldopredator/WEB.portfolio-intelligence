@@ -84,11 +84,15 @@ export default async function ScreeningPage({
     const hardFilters: Record<string, boolean> = {}; // Filters that must pass 100%
     
     if (CRITERIA.peEnabled) {
-      passes.pe = !stockInfo.pe_ratio || stockInfo.pe_ratio < CRITERIA.maxPE;
+      // Use Finnhub pe_ratio or fallback to Yahoo Finance trailingPE
+      const peValue = stockInfo.pe_ratio || (stockInfo as any).trailingPE;
+      passes.pe = !peValue || peValue < CRITERIA.maxPE;
     }
     
     if (CRITERIA.pbEnabled) {
-      passes.pb = !stockInfo.pb_ratio || stockInfo.pb_ratio < CRITERIA.maxPB;
+      // Use Finnhub pb_ratio or fallback to Yahoo Finance priceToBook
+      const pbValue = stockInfo.pb_ratio || (stockInfo as any).priceToBook;
+      passes.pb = !pbValue || pbValue < CRITERIA.maxPB;
     }
     
     if (CRITERIA.marketCapEnabled && stockInfo.market_cap) {
@@ -236,8 +240,9 @@ export default async function ScreeningPage({
     // Build the initial stock data object
     const industry = companyProfile?.industry || stock.type;
     const sector = companyProfile?.sector || 'N/A';
-    const pe = stockInfo.pe_ratio?.toFixed(0);
-    const pb = stockInfo.pb_ratio?.toFixed(0);
+    // Use Finnhub fields or fallback to Yahoo Finance fields
+    const pe = stockInfo.pe_ratio?.toFixed(0) || (stockInfo as any).trailingPE?.toFixed(0);
+    const pb = stockInfo.pb_ratio?.toFixed(0) || (stockInfo as any).priceToBook?.toFixed(0);
     const priceToSales = stockInfo.priceToSales?.toFixed(0);
     const marketCap = stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(0)}B` : null;
     const avgVolume = stockInfo.averageVolume ? `${(stockInfo.averageVolume / 1e6).toFixed(0)}M` : null;
