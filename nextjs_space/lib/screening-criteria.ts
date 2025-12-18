@@ -136,7 +136,7 @@ export const DEFAULT_CRITERIA: ScreeningCriteria = {
   sectorFilterMode: 'disabled',
   sectorFilter: [],
   industryFilterMode: 'exclude',
-  industryFilter: ['Alcohol', 'Gambling'],
+  industryFilter: ['Alcohol', 'Gambling', 'Beverages - Brewers'],
   countryFilterMode: 'disabled',
   countryFilter: [],
   minMatchScore: 50,
