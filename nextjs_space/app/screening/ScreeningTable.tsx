@@ -187,55 +187,6 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
           <Database className="w-4 h-4" />
           Export Raw Data
         </button>
-      </div>portData = sortedStocks.map(stock => ({
-      'Portfolio': stock.portfolio,
-      'Ticker': stock.ticker,
-      'Name': stock.name,
-      'Rating': stock.rating,
-      'Last Updated': formatDate(stock.updatedAt),
-      'Sector': stock.sector,
-      'P/E': stock.pe,
-      'P/B': stock.pb,
-      'P/S': stock.priceToSales,
-      'Market Cap': stock.marketCap,
-      'Avg Volume': stock.avgVolume,
-      'Avg Annual Volume (10D)': stock.avgAnnualVolume10D,
-      'Avg Annual Volume (3M)': stock.avgAnnualVolume3M,
-      'Beta': stock.beta,
-      'ROE': stock.roe,
-      'Profit Margin': stock.profitMargin,
-      'Debt/Equity': stock.debtToEquity,
-      'Sentiment': stock.sentiment,
-      'Match Score': `${stock.matchScore}%`,
-    }));
-
-    // Create workbook and worksheet
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Raw Data');
-
-    // Auto-size columns
-    const maxWidth = 50;
-    const colWidths = Object.keys(exportData[0] || {}).map(key => ({
-      wch: Math.min(Math.max(key.length, 10), maxWidth)
-    }));
-    worksheet['!cols'] = colWidths;
-
-    // Export file
-    XLSX.writeFile(workbook, filename);
-  };
-
-  return (
-    <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
-      {/* Export Button */}
-      <div className="px-6 py-4 border-b border-slate-800/50 flex justify-end">
-        <button
-          onClick={exportToExcel}
-          className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg text-emerald-400 font-medium transition-colors"
-        >
-          <Download className="w-4 h-4" />
-          Export to Excel
-        </button>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full">
