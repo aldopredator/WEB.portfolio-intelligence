@@ -84,14 +84,14 @@ export default async function ScreeningPage({
     const hardFilters: Record<string, boolean> = {}; // Filters that must pass 100%
     
     if (CRITERIA.peEnabled) {
-      // Use Finnhub pe_ratio or fallback to Yahoo Finance trailingPE
-      const peValue = stockInfo.pe_ratio || (stockInfo as any).trailingPE;
+      // Prioritize Yahoo Finance trailingPE over Finnhub pe_ratio
+      const peValue = (stockInfo as any).trailingPE || stockInfo.pe_ratio;
       passes.pe = !peValue || peValue < CRITERIA.maxPE;
     }
     
     if (CRITERIA.pbEnabled) {
-      // Use Finnhub pb_ratio or fallback to Yahoo Finance priceToBook
-      const pbValue = stockInfo.pb_ratio || (stockInfo as any).priceToBook;
+      // Prioritize Yahoo Finance priceToBook over Finnhub pb_ratio
+      const pbValue = (stockInfo as any).priceToBook || stockInfo.pb_ratio;
       passes.pb = !pbValue || pbValue < CRITERIA.maxPB;
     }
     
@@ -112,8 +112,12 @@ export default async function ScreeningPage({
       passes.profitMargin = stockInfo.profit_margin >= CRITERIA.minProfitMargin;
     }
     
-    if (CRITERIA.priceToSalesEnabled && stockInfo.priceToSales !== undefined) {
-      passes.priceToSales = stockInfo.priceToSales >= CRITERIA.minPriceToSales && stockInfo.priceToSales <= CRITERIA.maxPriceToSales;
+    if (CRITERIA.priceToSalesEnabled) {
+      // Prioritize Yahoo Finance priceToSales over Finnhub ps_ratio
+      const psValue = stockInfo.priceToSales || stockInfo.ps_ratio;
+      if (psValue !== undefined) {
+        passes.priceToSales = psValue >= CRITERIA.minPriceToSales && psValue <= CRITERIA.maxPriceToSales;
+      }
     }
     
     if (CRITERIA.avgDailyVolumeEnabled && stockInfo.averageVolume !== undefined) {
@@ -240,10 +244,10 @@ export default async function ScreeningPage({
     // Build the initial stock data object
     const industry = companyProfile?.industry || stock.type;
     const sector = companyProfile?.sector || 'N/A';
-    // Use Finnhub fields or fallback to Yahoo Finance fields
-    const pe = stockInfo.pe_ratio?.toFixed(0) || (stockInfo as any).trailingPE?.toFixed(0);
-    const pb = stockInfo.pb_ratio?.toFixed(0) || (stockInfo as any).priceToBook?.toFixed(0);
-    const priceToSales = stockInfo.priceToSales?.toFixed(0);
+    // Prioritize Yahoo Finance fields over Finnhub fields
+    const pe = (stockInfo as any).trailingPE?.toFixed(0) || stockInfo.pe_ratio?.toFixed(0);
+    const pb = (stockInfo as any).priceToBook?.toFixed(0) || stockInfo.pb_ratio?.toFixed(0);
+    const priceToSales = stockInfo.priceToSales?.toFixed(0) || stockInfo.ps_ratio?.toFixed(0);
     const marketCap = stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(0)}B` : null;
     const avgVolume = stockInfo.averageVolume ? `${(stockInfo.averageVolume / 1e6).toFixed(0)}M` : null;
     const avgAnnualVolume10D = (stockInfo.averageVolume10Day && stockInfo.floatShares && stockInfo.floatShares > 0)
