@@ -268,34 +268,32 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
 }
 
 /**
- * Fetch company profile data from Finnhub
+ * Fetch company profile data - using Yahoo Finance as single source to ensure consistency
  */
 export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfile> {
-  // Check if this is a non-US stock that should use Yahoo Finance
-  if (shouldUseYahooFinance(ticker)) {
-    console.log(`[FINNHUB] ${ticker} - Non-US stock detected, using Yahoo Finance fallback`);
-    try {
-      const yahooProfile = await fetchYahooCompanyProfile(ticker);
-      if (yahooProfile) {
-        return {
-          name: yahooProfile.name,
-          logo: yahooProfile.logo,
-          industry: yahooProfile.industry,
-          sector: yahooProfile.sector,
-          country: yahooProfile.country,
-          marketCapitalization: yahooProfile.marketCapitalization,
-          currency: yahooProfile.currency,
-          weburl: yahooProfile.weburl,
-          description: yahooProfile.description,
-          ipoDate: yahooProfile.ipoDate,
-        };
-      }
-    } catch (error) {
-      console.error(`[FINNHUB] ${ticker} - Yahoo Finance fallback failed:`, error);
+  // Use Yahoo Finance for all stocks to ensure consistent industry naming
+  console.log(`[FINNHUB] ${ticker} - Using Yahoo Finance for consistent industry data`);
+  try {
+    const yahooProfile = await fetchYahooCompanyProfile(ticker);
+    if (yahooProfile) {
+      return {
+        name: yahooProfile.name,
+        logo: yahooProfile.logo,
+        industry: yahooProfile.industry,
+        sector: yahooProfile.sector,
+        country: yahooProfile.country,
+        marketCapitalization: yahooProfile.marketCapitalization,
+        currency: yahooProfile.currency,
+        weburl: yahooProfile.weburl,
+        description: yahooProfile.description,
+        ipoDate: yahooProfile.ipoDate,
+      };
     }
+  } catch (error) {
+    console.error(`[FINNHUB] ${ticker} - Yahoo Finance failed:`, error);
   }
 
-  // Try Finnhub for US stocks or if Yahoo failed
+  // Fallback to Finnhub only if Yahoo Finance fails
   const apiKey = process.env.FINNHUB_API_KEY;
   if (!apiKey) {
     console.warn(`[FINNHUB] ${ticker} - API key not configured for profile`);
@@ -303,6 +301,7 @@ export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfil
   }
 
   try {
+    console.log(`[FINNHUB] ${ticker} - Falling back to Finnhub API`);
     const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${apiKey}`;
     const response = await fetch(url, {
       next: { revalidate: METRICS_CACHE_TTL_SECONDS }
@@ -311,7 +310,7 @@ export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfil
     if (response.ok) {
       const data = await response.json();
       
-      // Check if Finnhub returned an error (common for non-US stocks)
+      // Check if Finnhub returned an error
       if (data.error) {
         console.warn(`[FINNHUB] ${ticker} - API error: ${data.error}`);
         return {};
