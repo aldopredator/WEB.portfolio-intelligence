@@ -41,6 +41,16 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
         take: 90, // Last 90 days for variance calculation
       },
     },
+    select: {
+      ticker: true,
+      company: true,
+      portfolioId: true,
+      rating: true,
+      priceHistory: {
+        orderBy: { date: 'desc' },
+        take: 90,
+      },
+    },
   });
 
   // Fetch stock data for all tickers to get sector information
@@ -68,6 +78,7 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
       portfolioId: stock.portfolioId,
       portfolioName: portfolio?.name,
       sector: sector,
+      rating: stock.rating || 0,
     };
   });
 

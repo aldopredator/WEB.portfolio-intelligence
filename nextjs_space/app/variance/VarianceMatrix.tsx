@@ -10,6 +10,7 @@ interface StockData {
   portfolioId: string | null;
   portfolioName?: string;
   sector?: string;
+  rating?: number;
 }
 
 interface Portfolio {
@@ -382,8 +383,17 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                       )}
                     </div>
                     {stock?.sector && (
-                      <div className="text-xs text-slate-400 mb-2">
+                      <div className="text-xs text-slate-400 mb-1">
                         {stock.sector}
+                      </div>
+                    )}
+                    {stock?.rating !== undefined && stock.rating > 0 && (
+                      <div className="flex items-center gap-1 mb-2">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <span key={i} className={i < stock.rating! ? 'text-yellow-400' : 'text-slate-600'}>
+                            ★
+                          </span>
+                        ))}
                       </div>
                     )}
                     <div className="text-2xl font-bold text-blue-400">
