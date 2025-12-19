@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import VarianceMatrix from './VarianceMatrix';
+import { getStockData } from '@/lib/stock-data';
 
 const prisma = new PrismaClient();
 
@@ -39,19 +40,25 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
         orderBy: { date: 'desc' },
         take: 90, // Last 90 days for variance calculation
       },
-      companyProfile: {
-        select: {
-          sector: true,
-        },
-      },
     },
   });
+
+  // Fetch stock data for all tickers to get sector information
+  const stockData = await getStockData(null);
 
   await prisma.$disconnect();
 
   // Prepare data for variance calculation
-  const stockData = stocks.map(stock => {
+  const stockDataMap = stocks.map(stock => {
     const portfolio = portfolios.find(p => p.id === stock.portfolioId);
+    const data = stockData[stock.ticker];
+    const companyProfile = data && typeof data === 'object' && 'company_profile' in data ? data.company_profile : null;
+    
+    // Extract sector from company_profile
+    const sector = (companyProfile && typeof companyProfile === 'object' && 'sector' in companyProfile 
+      ? (companyProfile as any).sector
+      : null) || 'N/A';
+    
     return {
       ticker: stock.ticker,
       company: stock.company,
@@ -60,13 +67,13 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
         .map(ph => ph.price),
       portfolioId: stock.portfolioId,
       portfolioName: portfolio?.name,
-      sector: stock.companyProfile?.sector || 'N/A',
+      sector: sector,
     };
   });
 
   return (
     <VarianceMatrix 
-      stocks={stockData}
+      stocks={stockDataMap}
       portfolios={portfolios}
       selectedPortfolioId={portfolioId}
       selectedPortfolioId2={portfolioId2}
