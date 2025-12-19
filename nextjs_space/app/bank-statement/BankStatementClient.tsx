@@ -1,0 +1,319 @@
+'use client';
+
+import { useState, useCallback } from 'react';
+import { Upload, FileSpreadsheet, Trash2, Download, AlertCircle } from 'lucide-react';
+import * as XLSX from 'xlsx';
+
+interface HoldingRow {
+  investment: string;
+  identifier: string;
+  quantityHeld: number;
+  lastPrice: number;
+  lastPriceCcy: string;
+  value: number;
+  valueCcy: string;
+  fxRate: number;
+  lastPriceP: number;
+  valueR: number;
+  bookCost: number;
+  bookCostCcy: string;
+  averageFxRate: number;
+  bookCostR: number;
+  percentChange: number;
+}
+
+export default function BankStatementClient() {
+  const [holdings, setHoldings] = useState<HoldingRow[]>([]);
+  const [accountId, setAccountId] = useState<string>('');
+  const [fileName, setFileName] = useState<string>('');
+  const [isDragging, setIsDragging] = useState(false);
+
+  const parseExcelFile = useCallback((file: File) => {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      try {
+        const data = e.target?.result;
+        const workbook = XLSX.read(data, { type: 'binary' });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData: any[] = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+        // Find the account ID (first row)
+        const firstRow = jsonData[0] as string[];
+        if (firstRow && firstRow[0]) {
+          setAccountId(firstRow[0]);
+        }
+
+        // Find the header row (contains "Investment", "Identifier", etc.)
+        let headerRowIndex = -1;
+        for (let i = 0; i < jsonData.length; i++) {
+          const row = jsonData[i] as string[];
+          if (row[0] === 'Investment') {
+            headerRowIndex = i;
+            break;
+          }
+        }
+
+        if (headerRowIndex === -1) {
+          throw new Error('Could not find header row');
+        }
+
+        // Parse data rows
+        const parsedHoldings: HoldingRow[] = [];
+        for (let i = headerRowIndex + 1; i < jsonData.length; i++) {
+          const row = jsonData[i] as any[];
+          if (!row || !row[0]) continue; // Skip empty rows
+
+          const holding: HoldingRow = {
+            investment: row[0] || '',
+            identifier: row[1] || '',
+            quantityHeld: parseFloat(row[2]) || 0,
+            lastPrice: parseFloat(row[3]) || 0,
+            lastPriceCcy: row[4] || '',
+            value: parseFloat(row[5]) || 0,
+            valueCcy: row[6] || '',
+            fxRate: parseFloat(row[7]) || 0,
+            lastPriceP: parseFloat(row[8]) || 0,
+            valueR: parseFloat(row[9]) || 0,
+            bookCost: parseFloat(row[10]) || 0,
+            bookCostCcy: row[11] || '',
+            averageFxRate: parseFloat(row[12]) || 0,
+            bookCostR: parseFloat(row[13]) || 0,
+            percentChange: parseFloat(row[14]) || 0,
+          };
+
+          parsedHoldings.push(holding);
+        }
+
+        setHoldings(parsedHoldings);
+        setFileName(file.name);
+      } catch (error) {
+        console.error('Error parsing Excel file:', error);
+        alert('Error parsing file. Please ensure it is a valid Barclays statement.');
+      }
+    };
+
+    reader.readAsBinaryString(file);
+  }, []);
+
+  const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      parseExcelFile(file);
+    }
+  }, [parseExcelFile]);
+
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      parseExcelFile(file);
+    }
+  }, [parseExcelFile]);
+
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  }, []);
+
+  const handleClear = () => {
+    setHoldings([]);
+    setAccountId('');
+    setFileName('');
+  };
+
+  const exportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(holdings.map(h => ({
+      'Investment': h.investment,
+      'Identifier': h.identifier,
+      'Quantity Held': h.quantityHeld,
+      'Last Price': h.lastPrice,
+      'Last Price CCY': h.lastPriceCcy,
+      'Value': h.value,
+      'Value CCY': h.valueCcy,
+      'FX Rate': h.fxRate,
+      'Last Price (£)': h.lastPriceP,
+      'Value (£)': h.valueR,
+      'Book Cost': h.bookCost,
+      'Book Cost CCY': h.bookCostCcy,
+      'Average FX Rate': h.averageFxRate,
+      'Book Cost (£)': h.bookCostR,
+      '% Change': h.percentChange,
+    })));
+    
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Holdings');
+    
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+    XLSX.writeFile(workbook, `bank_statement_${timestamp}.xlsx`);
+  };
+
+  const totalValue = holdings.reduce((sum, h) => sum + (h.valueR || 0), 0);
+  const totalBookCost = holdings.reduce((sum, h) => sum + (h.bookCostR || 0), 0);
+  const totalGainLoss = totalValue - totalBookCost;
+  const totalGainLossPercent = totalBookCost > 0 ? (totalGainLoss / totalBookCost) * 100 : 0;
+
+  return (
+    <div className="space-y-6">
+      {/* Upload Area */}
+      {holdings.length === 0 ? (
+        <div
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          className={`
+            border-2 border-dashed rounded-xl p-12 text-center transition-all
+            ${isDragging 
+              ? 'border-blue-500 bg-blue-500/10' 
+              : 'border-slate-700 bg-slate-900/50 hover:border-slate-600'
+            }
+          `}
+        >
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center">
+              <Upload className="w-8 h-8 text-blue-400" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-white mb-2">
+                Upload Bank Statement
+              </h3>
+              <p className="text-slate-400 mb-4">
+                Drag and drop your Barclays Excel file here, or click to browse
+              </p>
+            </div>
+            <label className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg cursor-pointer transition-colors">
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              Choose File
+            </label>
+            <div className="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-amber-200">
+                  Supported format: Barclays Investment ISA Excel statements (.xlsx, .xls)
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Header with file info and actions */}
+          <div className="bg-slate-900/50 border border-slate-800/50 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                  <FileSpreadsheet className="w-6 h-6 text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">{accountId}</h3>
+                  <p className="text-sm text-slate-400">{fileName}</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={exportToExcel}
+                  className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg text-emerald-400 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  Export
+                </button>
+                <button
+                  onClick={handleClear}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg text-red-400 transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Clear
+                </button>
+              </div>
+            </div>
+
+            {/* Summary Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-slate-950/50 border border-slate-800/50 rounded-lg p-4">
+                <p className="text-sm text-slate-400 mb-1">Total Holdings</p>
+                <p className="text-2xl font-bold text-white">{holdings.length}</p>
+              </div>
+              <div className="bg-slate-950/50 border border-slate-800/50 rounded-lg p-4">
+                <p className="text-sm text-slate-400 mb-1">Total Value (£)</p>
+                <p className="text-2xl font-bold text-white">£{totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+              </div>
+              <div className="bg-slate-950/50 border border-slate-800/50 rounded-lg p-4">
+                <p className="text-sm text-slate-400 mb-1">Total Book Cost (£)</p>
+                <p className="text-2xl font-bold text-white">£{totalBookCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+              </div>
+              <div className="bg-slate-950/50 border border-slate-800/50 rounded-lg p-4">
+                <p className="text-sm text-slate-400 mb-1">Total Gain/Loss</p>
+                <p className={`text-2xl font-bold ${totalGainLoss >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {totalGainLoss >= 0 ? '+' : ''}£{totalGainLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <span className="text-sm ml-2">({totalGainLossPercent >= 0 ? '+' : ''}{totalGainLossPercent.toFixed(2)}%)</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Holdings Table */}
+          <div className="bg-slate-900/50 border border-slate-800/50 rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gradient-to-r from-slate-950/50 to-slate-900/50 border-b border-slate-800/50">
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Investment</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Identifier</th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">Quantity</th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">Last Price</th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">Value</th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">Value (£)</th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">Book Cost (£)</th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">% Change</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {holdings.map((holding, index) => (
+                    <tr
+                      key={index}
+                      className="border-b border-slate-800/30 hover:bg-slate-800/30 transition-colors"
+                    >
+                      <td className="px-4 py-4 text-sm text-white">{holding.investment}</td>
+                      <td className="px-4 py-4 text-sm text-slate-300 font-mono">{holding.identifier}</td>
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">{holding.quantityHeld.toLocaleString()}</td>
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {holding.lastPrice.toFixed(2)} {holding.lastPriceCcy}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {holding.value.toLocaleString(undefined, { minimumFractionDigits: 2 })} {holding.valueCcy}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-right text-white font-semibold">
+                        £{holding.valueR.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        £{holding.bookCostR.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </td>
+                      <td className={`px-4 py-4 text-sm text-right font-semibold ${
+                        holding.percentChange >= 0 ? 'text-emerald-400' : 'text-red-400'
+                      }`}>
+                        {holding.percentChange >= 0 ? '+' : ''}{holding.percentChange.toFixed(2)}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
