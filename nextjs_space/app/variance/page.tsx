@@ -39,6 +39,11 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
         orderBy: { date: 'desc' },
         take: 90, // Last 90 days for variance calculation
       },
+      companyProfile: {
+        select: {
+          sector: true,
+        },
+      },
     },
   });
 
@@ -55,6 +60,7 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
         .map(ph => ph.price),
       portfolioId: stock.portfolioId,
       portfolioName: portfolio?.name,
+      sector: stock.companyProfile?.sector || 'N/A',
     };
   });
 

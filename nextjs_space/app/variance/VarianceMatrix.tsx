@@ -9,6 +9,7 @@ interface StockData {
   prices: number[];
   portfolioId: string | null;
   portfolioName?: string;
+  sector?: string;
 }
 
 interface Portfolio {
@@ -380,6 +381,11 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                         <span className="text-xs text-slate-400">{stock.portfolioName}</span>
                       )}
                     </div>
+                    {stock?.sector && (
+                      <div className="text-xs text-slate-400 mb-2">
+                        {stock.sector}
+                      </div>
+                    )}
                     <div className="text-2xl font-bold text-blue-400">
                       {(weight * 100).toFixed(1)}%
                     </div>
