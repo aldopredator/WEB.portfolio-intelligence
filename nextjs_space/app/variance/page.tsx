@@ -35,12 +35,6 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
       isActive: true,
       ...(portfolioIds.length > 0 ? { portfolioId: { in: portfolioIds } } : {}),
     },
-    include: {
-      priceHistory: {
-        orderBy: { date: 'desc' },
-        take: 90, // Last 90 days for variance calculation
-      },
-    },
     select: {
       ticker: true,
       company: true,
