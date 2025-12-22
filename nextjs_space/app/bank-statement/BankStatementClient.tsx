@@ -85,42 +85,6 @@ export default function BankStatementClient() {
   const stockTotalGainLoss = stockTotalValue - stockTotalBookCost;
   const stockTotalGainLossPercent = stockTotalBookCost > 0 ? (stockTotalGainLoss / stockTotalBookCost) * 100 : 0;
 
-  const sortedHoldings = useMemo(() => {
-    if (!sortField || !sortDirection) return holdings;
-
-    return [...holdings].sort((a, b) => {
-      let aVal: string | number;
-      let bVal: string | number;
-
-      // Handle computed field returnGBP
-      if (sortField === 'returnGBP') {
-        aVal = a.valueR - a.bookCostR;
-        bVal = b.valueR - b.bookCostR;
-      } else if (sortField === 'weight') {
-        aVal = totalValue > 0 ? (a.valueR / totalValue) * 100 : 0;
-        bVal = totalValue > 0 ? (b.valueR / totalValue) * 100 : 0;
-      } else if (sortField === 'investmentType') {
-        aVal = getInvestmentType(a.investment);
-        bVal = getInvestmentType(b.investment);
-      } else {
-        aVal = a[sortField];
-        bVal = b[sortField];
-      }
-
-      if (typeof aVal === 'string' && typeof bVal === 'string') {
-        return sortDirection === 'asc' 
-          ? aVal.localeCompare(bVal)
-          : bVal.localeCompare(aVal);
-      }
-
-      if (typeof aVal === 'number' && typeof bVal === 'number') {
-        return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
-      }
-
-      return 0;
-    });
-  }, [holdings, sortField, sortDirection, totalValue]);
-
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return <ArrowUpDown className="w-3 h-3 opacity-40" />;
     if (sortDirection === 'asc') return <ArrowUp className="w-3 h-3" />;
