@@ -7,6 +7,7 @@ import * as XLSX from 'xlsx';
 type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy' | 'returnGBP' | 'weight' | 'investmentType';
 type SortDirection = 'asc' | 'desc' | null;
 
+// Holdings row interface
 interface HoldingRow {
   investment: string;
   identifier: string;
