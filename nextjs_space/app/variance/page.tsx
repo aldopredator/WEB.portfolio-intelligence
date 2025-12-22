@@ -57,11 +57,17 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
     const portfolio = portfolios.find(p => p.id === stock.portfolioId);
     const data = stockData[stock.ticker];
     const companyProfile = data && typeof data === 'object' && 'company_profile' in data ? data.company_profile : null;
+    const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
     
     // Extract sector from company_profile
     const sector = (companyProfile && typeof companyProfile === 'object' && 'sector' in companyProfile 
       ? (companyProfile as any).sector
       : null) || 'N/A';
+    
+    // Extract P/E ratio (prioritize Yahoo Finance trailingPE over Finnhub pe_ratio)
+    const peRatio = stockInfo 
+      ? ((stockInfo as any).trailingPE || (stockInfo as any).pe_ratio)
+      : undefined;
     
     return {
       ticker: stock.ticker,
@@ -73,6 +79,7 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
       portfolioName: portfolio?.name,
       sector: sector,
       rating: stock.rating || 0,
+      peRatio: peRatio,
     };
   });
 

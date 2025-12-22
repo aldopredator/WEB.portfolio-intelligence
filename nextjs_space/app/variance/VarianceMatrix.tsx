@@ -11,6 +11,7 @@ interface StockData {
   portfolioName?: string;
   sector?: string;
   rating?: number;
+  peRatio?: number;
 }
 
 interface Portfolio {
@@ -382,9 +383,19 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                         <span className="text-xs text-slate-400">{stock.portfolioName}</span>
                       )}
                     </div>
+                    {stock?.company && (
+                      <div className="text-sm text-slate-300 mb-1 font-medium">
+                        {stock.company}
+                      </div>
+                    )}
                     {stock?.sector && (
                       <div className="text-xs text-slate-400 mb-1">
                         {stock.sector}
+                      </div>
+                    )}
+                    {stock?.peRatio !== undefined && (
+                      <div className="text-xs text-slate-400 mb-1">
+                        P/E: {typeof stock.peRatio === 'number' ? stock.peRatio.toFixed(2) : 'N/A'}
                       </div>
                     )}
                     {stock?.rating !== undefined && stock.rating > 0 && (
