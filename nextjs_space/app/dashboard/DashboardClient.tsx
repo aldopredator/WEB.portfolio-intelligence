@@ -76,8 +76,6 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'info' | 'warning' | 'error'>('info');
   const [isAddingTicker, setIsAddingTicker] = React.useState(false);
-  const [isNavigatingToTicker, setIsNavigatingToTicker] = React.useState(false);
-  const [navigatingTicker, setNavigatingTicker] = React.useState('');
   const [panelCollapsed, setPanelCollapsed] = React.useState(false);
   const [ratingFilter, setRatingFilter] = React.useState<number>(0); // 0 = All, -1 = Not Rated, 1-5 = min stars
 
@@ -126,15 +124,11 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
     const tickerExists = stocks.some(s => s.ticker === result.symbol);
     
     if (tickerExists) {
-      // Show loading message and navigate to existing ticker
-      setIsNavigatingToTicker(true);
-      setNavigatingTicker(result.symbol);
-      setSnackbarMessage(`Searching for ${result.symbol}...`);
-      setSnackbarSeverity('info');
+      // Navigate to existing ticker
+      router.push(`/dashboard?stock=${result.symbol}`);
+      setSnackbarMessage(`Switched to ${result.symbol}`);
+      setSnackbarSeverity('success');
       setSnackbarOpen(true);
-      // Use window.location for full page reload to fetch server data
-      const portfolioParam = selectedPortfolio ? `&portfolio=${selectedPortfolio.id}` : '';
-      window.location.href = `/?stock=${result.symbol}${portfolioParam}`;
     } else {
       // Add ticker to portfolio
       setIsAddingTicker(true);
@@ -166,11 +160,6 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
           
           // Wait a bit to show the success message, then refresh the page
           setTimeout(() => {
-            setIsNavigatingToTicker(true);
-            setNavigatingTicker(result.symbol);
-            setSnackbarMessage(`Loading ${result.symbol}...`);
-            setSnackbarSeverity('info');
-            setSnackbarOpen(true);
             // Refresh the page to load the new ticker data with portfolio filter
             const portfolioParam = selectedPortfolio ? `&portfolio=${selectedPortfolio.id}` : '';
             window.location.href = `/?stock=${result.symbol}${portfolioParam}`;
@@ -236,50 +225,6 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
-      
-      {/* Loading Overlay */}
-      {isNavigatingToTicker && (
-        <Box
-          sx={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            bgcolor: 'rgba(15, 23, 42, 0.9)',
-            backdropFilter: 'blur(8px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999,
-          }}
-        >
-          <Box sx={{ textAlign: 'center' }}>
-            <Box
-              sx={{
-                width: 64,
-                height: 64,
-                margin: '0 auto 24px',
-                borderRadius: '50%',
-                border: '4px solid rgba(59, 130, 246, 0.2)',
-                borderTopColor: '#3b82f6',
-                animation: 'spin 1s linear infinite',
-                '@keyframes spin': {
-                  '0%': { transform: 'rotate(0deg)' },
-                  '100%': { transform: 'rotate(360deg)' },
-                },
-              }}
-            />
-            <Typography variant="h6" sx={{ color: 'white', mb: 1 }}>
-              Searching for {navigatingTicker}
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(148, 163, 184, 0.8)' }}>
-              Loading data...
-            </Typography>
-          </Box>
-        </Box>
-      )}
-      
       <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         {/* Main Content */}
         <Box
