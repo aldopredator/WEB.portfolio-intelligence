@@ -25,13 +25,25 @@ interface HoldingRow {
   percentChange: number;
 }
 
+interface Statement {
+  id: string;
+  accountId: string;
+  fileName: string;
+  uploadDate: Date;
+  holdings: HoldingRow[];
+}
+
 export default function BankStatementClient() {
-  const [holdings, setHoldings] = useState<HoldingRow[]>([]);
-  const [accountId, setAccountId] = useState<string>('');
-  const [fileName, setFileName] = useState<string>('');
+  const [statements, setStatements] = useState<Statement[]>([]);
+  const [activeStatementId, setActiveStatementId] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+
+  const activeStatement = statements.find(s => s.id === activeStatementId);
+  const holdings = activeStatement?.holdings || [];
+  const accountId = activeStatement?.accountId || '';
+  const fileName = activeStatement?.fileName || '';
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -148,8 +160,21 @@ export default function BankStatementClient() {
           parsedHoldings.push(holding);
         }
 
-        setHoldings(parsedHoldings);
-        setFileName(file.name);
+        // Create new statement
+        const newStatement: Statement = {
+          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          accountId: accountIdFromFile,
+          fileName: file.name,
+          uploadDate: new Date(),
+          holdings: parsedHoldings,
+        };
+
+        // Keep only the last 3 statements
+        setStatements(prev => {
+          const updated = [newStatement, ...prev].slice(0, 3);
+          return updated;
+        });
+        setActiveStatementId(newStatement.id);
       } catch (error) {
         console.error('Error parsing Excel file:', error);
         alert('Error parsing file. Please ensure it is a valid Barclays statement.');
@@ -187,9 +212,13 @@ export default function BankStatementClient() {
   }, []);
 
   const handleClear = () => {
-    setHoldings([]);
-    setAccountId('');
-    setFileName('');
+    if (activeStatementId) {
+      setStatements(prev => prev.filter(s => s.id !== activeStatementId));
+      setActiveStatementId(prev => {
+        const remaining = statements.filter(s => s.id !== prev);
+        return remaining.length > 0 ? remaining[0].id : null;
+      });
+    }
   };
 
   const exportToExcel = () => {
@@ -225,8 +254,50 @@ export default function BankStatementClient() {
 
   return (
     <div className="space-y-6">
+      {/* Statement Tabs - Show when we have statements */}
+      {statements.length > 0 && (
+        <div className="bg-slate-900/50 border border-slate-800/50 rounded-xl p-4">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-sm font-semibold text-slate-400">Statements:</span>
+            {statements.map((statement) => (
+              <button
+                key={statement.id}
+                onClick={() => setActiveStatementId(statement.id)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activeStatementId === statement.id
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <FileSpreadsheet className="w-4 h-4" />
+                  <div className="text-left">
+                    <div className="font-semibold">{statement.fileName}</div>
+                    <div className="text-xs opacity-75">
+                      {statement.uploadDate.toLocaleDateString()} {statement.uploadDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                </div>
+              </button>
+            ))}
+            {statements.length < 3 && (
+              <label className="px-4 py-2 rounded-lg text-sm font-medium bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 cursor-pointer transition-all flex items-center gap-2">
+                <Upload className="w-4 h-4" />
+                Add Statement
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </label>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Upload Area */}
-      {holdings.length === 0 ? (
+      {statements.length === 0 ? (
         <div
           onDrop={handleDrop}
           onDragOver={handleDragOver}
@@ -297,7 +368,7 @@ export default function BankStatementClient() {
                   className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg text-red-400 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
-                  Clear
+                  Remove
                 </button>
               </div>
             </div>
