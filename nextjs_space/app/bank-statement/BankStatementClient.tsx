@@ -305,16 +305,16 @@ export default function BankStatementClient() {
               </div>
               <div className="bg-slate-950/50 border border-slate-800/50 rounded-lg p-4">
                 <p className="text-sm text-slate-400 mb-1">Total Value (£)</p>
-                <p className="text-2xl font-bold text-white">£{totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                <p className="text-2xl font-bold text-white">£{totalValue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
               </div>
               <div className="bg-slate-950/50 border border-slate-800/50 rounded-lg p-4">
                 <p className="text-sm text-slate-400 mb-1">Total Book Cost (£)</p>
-                <p className="text-2xl font-bold text-white">£{totalBookCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                <p className="text-2xl font-bold text-white">£{totalBookCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
               </div>
               <div className="bg-slate-950/50 border border-slate-800/50 rounded-lg p-4">
                 <p className="text-sm text-slate-400 mb-1">Total Gain/Loss</p>
                 <p className={`text-2xl font-bold ${totalGainLoss >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {totalGainLoss >= 0 ? '+' : ''}£{totalGainLoss.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {totalGainLoss >= 0 ? '+' : ''}£{totalGainLoss.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                   <span className="text-sm ml-2">({totalGainLossPercent >= 0 ? '+' : ''}{totalGainLossPercent.toFixed(2)}%)</span>
                 </p>
               </div>
