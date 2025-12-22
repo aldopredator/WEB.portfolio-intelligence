@@ -48,6 +48,9 @@ export default function BankStatementClient() {
     }
   };
 
+  // Calculate totalValue before using it in sortedHoldings
+  const totalValue = holdings.reduce((sum, h) => sum + (h.valueR || 0), 0);
+
   const sortedHoldings = useMemo(() => {
     if (!sortField || !sortDirection) return holdings;
 
@@ -79,7 +82,7 @@ export default function BankStatementClient() {
 
       return 0;
     });
-  }, [holdings, sortField, sortDirection]);
+  }, [holdings, sortField, sortDirection, totalValue]);
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return <ArrowUpDown className="w-3 h-3 opacity-40" />;
@@ -216,7 +219,6 @@ export default function BankStatementClient() {
     XLSX.writeFile(workbook, `bank_statement_${timestamp}.xlsx`);
   };
 
-  const totalValue = holdings.reduce((sum, h) => sum + (h.valueR || 0), 0);
   const totalBookCost = holdings.reduce((sum, h) => sum + (h.bookCostR || 0), 0);
   const totalGainLoss = totalValue - totalBookCost;
   const totalGainLossPercent = totalBookCost > 0 ? (totalGainLoss / totalBookCost) * 100 : 0;
