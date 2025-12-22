@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { Upload, FileSpreadsheet, Trash2, Download, AlertCircle, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy' | 'returnGBP';
+type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy' | 'returnGBP' | 'weight';
 type SortDirection = 'asc' | 'desc' | null;
 
 interface HoldingRow {
@@ -59,6 +59,9 @@ export default function BankStatementClient() {
       if (sortField === 'returnGBP') {
         aVal = a.valueR - a.bookCostR;
         bVal = b.valueR - b.bookCostR;
+      } else if (sortField === 'weight') {
+        aVal = totalValue > 0 ? (a.valueR / totalValue) * 100 : 0;
+        bVal = totalValue > 0 ? (b.valueR / totalValue) * 100 : 0;
       } else {
         aVal = a[sortField];
         bVal = b[sortField];
@@ -363,6 +366,11 @@ export default function BankStatementClient() {
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={() => handleSort('weight')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                        Weight <SortIcon field="weight" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={() => handleSort('bookCostR')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Book Cost (£) <SortIcon field="bookCostR" />
                       </button>
@@ -399,6 +407,9 @@ export default function BankStatementClient() {
                       </td>
                       <td className="px-4 py-4 text-sm text-right text-white font-semibold">
                         £{holding.valueR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {totalValue > 0 ? ((holding.valueR / totalValue) * 100).toFixed(2) : '0.00'}%
                       </td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
                         £{holding.bookCostR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
