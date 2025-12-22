@@ -2,6 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useMemo } from 'react';
+import { toast } from 'sonner';
+import { toast } from 'sonner';
+import { toast } from 'sonner';
 
 interface StockData {
   ticker: string;
@@ -98,6 +101,84 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
   const router = useRouter();
   const [showCorrelation, setShowCorrelation] = useState(true);
   const [capitalAmount, setCapitalAmount] = useState<string>('20000');
+  const [transferAnchorEl, setTransferAnchorEl] = useState<{ element: HTMLElement; ticker: string; portfolioId: string | null } | null>(null);
+
+  const handleTransferClick = (event: React.MouseEvent<HTMLElement>, ticker: string, portfolioId: string | null) => {
+    setTransferAnchorEl({ element: event.currentTarget, ticker, portfolioId });
+  };
+
+  const handleTransferClose = () => {
+    setTransferAnchorEl(null);
+  };
+
+  const handleTransferToPortfolio = async (targetPortfolioId: string) => {
+    if (!transferAnchorEl) return;
+    
+    const { ticker } = transferAnchorEl;
+    try {
+      const response = await fetch('/api/stock/move', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticker, targetPortfolioId }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message || 'Stock moved successfully');
+        // Refresh the page after a short delay
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        toast.error(data.error || 'Failed to move stock');
+      }
+    } catch (error) {
+      console.error('Error moving stock:', error);
+      toast.error('Failed to move stock');
+    } finally {
+      handleTransferClose();
+    }
+  };
+  const [transferAnchorEl, setTransferAnchorEl] = useState<{ element: HTMLElement; ticker: string; portfolioId: string | null } | null>(null);
+
+  const handleTransferClick = (event: React.MouseEvent<HTMLElement>, ticker: string, portfolioId: string | null) => {
+    setTransferAnchorEl({ element: event.currentTarget, ticker, portfolioId });
+  };
+
+  const handleTransferClose = () => {
+    setTransferAnchorEl(null);
+  };
+
+  const handleTransferToPortfolio = async (targetPortfolioId: string) => {
+    if (!transferAnchorEl) return;
+    
+    const { ticker } = transferAnchorEl;
+    try {
+      const response = await fetch('/api/stock/move', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticker, targetPortfolioId }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message || 'Stock moved successfully');
+        // Refresh the page after a short delay
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        toast.error(data.error || 'Failed to move stock');
+      }
+    } catch (error) {
+      console.error('Error moving stock:', error);
+      toast.error('Failed to move stock');
+    } finally {
+      handleTransferClose();
+    }
+  };
 
   // Calculate variance-covariance matrix
   const { matrix, tickers, stocksMap, covarianceMatrix, optimalWeights, expectedReturn, portfolioStdDev, sharpeRatio } = useMemo(() => {
@@ -423,16 +504,29 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                       ></div>
                     </div>
                     {isToBuyPortfolio && (
-                      <button
-                        onClick={() => {
-                          if (confirm(`Transfer ${ticker} out of TO BUY portfolio?`)) {
-                            window.location.href = `https://www.portfolio-intelligence.co.uk/?stock=${ticker}&portfolio=${stockPortfolioId}`;
-                          }
-                        }}
-                        className="mt-2 w-full px-2 py-1 text-xs bg-orange-600 hover:bg-orange-700 text-white rounded transition-colors"
-                      >
-                        Transfer
-                      </button>
+                      <div className="relative">
+                        <button
+                          onClick={(e) => handleTransferClick(e, ticker, stockPortfolioId)}
+                          className="mt-2 w-full px-2 py-1 text-xs bg-orange-600 hover:bg-orange-700 text-white rounded transition-colors"
+                        >
+                          Transfer
+                        </button>
+                        {transferAnchorEl && transferAnchorEl.ticker === ticker && (
+                          <div className="absolute z-50 mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                            {portfolios
+                              .filter(p => p.id !== stockPortfolioId)
+                              .map((portfolio) => (
+                                <button
+                                  key={portfolio.id}
+                                  onClick={() => handleTransferToPortfolio(portfolio.id)}
+                                  className="w-full px-3 py-2 text-left text-sm text-white hover:bg-slate-700 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                                >
+                                  {portfolio.name}
+                                </button>
+                              ))}
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
                 );
