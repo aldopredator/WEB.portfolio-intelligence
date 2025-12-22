@@ -132,7 +132,9 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
       setSnackbarMessage(`Searching for ${result.symbol}...`);
       setSnackbarSeverity('info');
       setSnackbarOpen(true);
-      router.push(`/dashboard?stock=${result.symbol}`);
+      // Use window.location for full page reload to fetch server data
+      const portfolioParam = selectedPortfolio ? `&portfolio=${selectedPortfolio.id}` : '';
+      window.location.href = `/dashboard?stock=${result.symbol}${portfolioParam}`;
     } else {
       // Add ticker to portfolio
       setIsAddingTicker(true);
