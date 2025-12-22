@@ -471,7 +471,7 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                           Transfer
                         </button>
                         {transferAnchorEl && transferAnchorEl.ticker === ticker && (
-                          <div className="absolute z-50 mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                          <div className="absolute z-50 bottom-full mb-1 w-full bg-slate-800 border border-slate-700 rounded-lg shadow-xl max-h-48 overflow-y-auto">
                             {portfolios
                               .filter(p => p.id !== stockPortfolioId)
                               .map((portfolio) => (
