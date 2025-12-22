@@ -126,8 +126,9 @@ export default function BankStatementClient() {
 
         // Find the account ID (first row)
         const firstRow = jsonData[0] as string[];
+        let accountIdFromFile = '';
         if (firstRow && firstRow[0]) {
-          setAccountId(firstRow[0]);
+          accountIdFromFile = firstRow[0];
         }
 
         // Find the header row (contains "Investment", "Identifier", etc.)
