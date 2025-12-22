@@ -85,6 +85,43 @@ export default function BankStatementClient() {
   const stockTotalGainLoss = stockTotalValue - stockTotalBookCost;
   const stockTotalGainLossPercent = stockTotalBookCost > 0 ? (stockTotalGainLoss / stockTotalBookCost) * 100 : 0;
 
+  // Sort holdings
+  const sortHoldings = (holdingsToSort: HoldingRow[], categoryTotalValue: number) => {
+    if (!sortField || !sortDirection) return holdingsToSort;
+
+    return [...holdingsToSort].sort((a, b) => {
+      let aVal: string | number;
+      let bVal: string | number;
+
+      if (sortField === 'returnGBP') {
+        aVal = a.valueR - a.bookCostR;
+        bVal = b.valueR - b.bookCostR;
+      } else if (sortField === 'weight') {
+        aVal = categoryTotalValue > 0 ? (a.valueR / categoryTotalValue) * 100 : 0;
+        bVal = categoryTotalValue > 0 ? (b.valueR / categoryTotalValue) * 100 : 0;
+      } else if (sortField === 'investmentType') {
+        aVal = getInvestmentType(a.investment);
+        bVal = getInvestmentType(b.investment);
+      } else {
+        aVal = a[sortField];
+        bVal = b[sortField];
+      }
+
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      }
+
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+      }
+
+      return 0;
+    });
+  };
+
+  const sortedEtfHoldings = sortHoldings(etfHoldings, etfTotalValue);
+  const sortedStockHoldings = sortHoldings(stockHoldings, stockTotalValue);
+
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return <ArrowUpDown className="w-3 h-3 opacity-40" />;
     if (sortDirection === 'asc') return <ArrowUp className="w-3 h-3" />;
@@ -475,7 +512,7 @@ export default function BankStatementClient() {
                   </tr>
                 </thead>
                 <tbody>
-                  {etfHoldings.map((holding, index) => (
+                  {sortedEtfHoldings.map((holding, index) => (
                     <tr
                       key={index}
                       className="border-b border-slate-800/30 hover:bg-slate-800/30 transition-colors"
@@ -614,7 +651,7 @@ export default function BankStatementClient() {
                   </tr>
                 </thead>
                 <tbody>
-                  {stockHoldings.map((holding, index) => (
+                  {sortedStockHoldings.map((holding, index) => (
                     <tr
                       key={index}
                       className="border-b border-slate-800/30 hover:bg-slate-800/30 transition-colors"
