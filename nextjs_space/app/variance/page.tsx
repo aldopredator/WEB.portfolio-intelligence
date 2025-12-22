@@ -69,6 +69,11 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
       ? ((stockInfo as any).trailingPE || (stockInfo as any).pe_ratio)
       : undefined;
     
+    // Extract P/S ratio (prioritize Yahoo Finance priceToSales over Finnhub ps_ratio)
+    const psRatio = stockInfo 
+      ? ((stockInfo as any).priceToSales || (stockInfo as any).ps_ratio)
+      : undefined;
+    
     return {
       ticker: stock.ticker,
       company: stock.company,
@@ -80,6 +85,7 @@ export default async function VariancePage({ searchParams }: VariancePageProps) 
       sector: sector,
       rating: stock.rating || 0,
       peRatio: peRatio,
+      psRatio: psRatio,
     };
   });
 

@@ -12,6 +12,7 @@ interface StockData {
   sector?: string;
   rating?: number;
   peRatio?: number;
+  psRatio?: number;
 }
 
 interface Portfolio {
@@ -559,6 +560,46 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                         </span>
                       </div>
                       <div className="text-xs text-slate-500 mt-1">Risk-adjusted return</div>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400 text-sm">Weighted Avg P/E</span>
+                        <span className="text-2xl font-bold text-cyan-400">
+                          {(() => {
+                            let totalWeight = 0;
+                            let weightedPE = 0;
+                            tickers.forEach((ticker, i) => {
+                              const stock = filteredStocks.find(s => s.ticker === ticker);
+                              if (stock?.peRatio && typeof stock.peRatio === 'number' && optimalWeights[i]) {
+                                weightedPE += stock.peRatio * optimalWeights[i];
+                                totalWeight += optimalWeights[i];
+                              }
+                            });
+                            return totalWeight > 0 ? (weightedPE / totalWeight).toFixed(2) : 'N/A';
+                          })()}
+                        </span>
+                      </div>
+                      <div className="text-xs text-slate-500 mt-1">Portfolio average P/E ratio</div>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400 text-sm">Weighted Avg P/S</span>
+                        <span className="text-2xl font-bold text-teal-400">
+                          {(() => {
+                            let totalWeight = 0;
+                            let weightedPS = 0;
+                            tickers.forEach((ticker, i) => {
+                              const stock = filteredStocks.find(s => s.ticker === ticker);
+                              if (stock?.psRatio && typeof stock.psRatio === 'number' && optimalWeights[i]) {
+                                weightedPS += stock.psRatio * optimalWeights[i];
+                                totalWeight += optimalWeights[i];
+                              }
+                            });
+                            return totalWeight > 0 ? (weightedPS / totalWeight).toFixed(2) : 'N/A';
+                          })()}
+                        </span>
+                      </div>
+                      <div className="text-xs text-slate-500 mt-1">Portfolio average P/S ratio</div>
                     </div>
                   </div>
                 </div>
