@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { Upload, FileSpreadsheet, Trash2, Download, AlertCircle, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy' | 'returnGBP' | 'weight';
+type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy' | 'returnGBP' | 'weight' | 'investmentType';
 type SortDirection = 'asc' | 'desc' | null;
 
 interface HoldingRow {
@@ -45,6 +45,14 @@ export default function BankStatementClient() {
   const accountId = activeStatement?.accountId || '';
   const fileName = activeStatement?.fileName || '';
 
+  const getInvestmentType = (investmentName: string): string => {
+    const nameLower = investmentName.toLowerCase();
+    if (nameLower.includes('etf')) return 'ETF';
+    if (nameLower.includes('tracker')) return 'Tracker';
+    if (nameLower.includes('swap')) return 'Swap';
+    return '-';
+  };
+
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       // Cycle through: asc -> desc -> null
@@ -77,6 +85,9 @@ export default function BankStatementClient() {
       } else if (sortField === 'weight') {
         aVal = totalValue > 0 ? (a.valueR / totalValue) * 100 : 0;
         bVal = totalValue > 0 ? (b.valueR / totalValue) * 100 : 0;
+      } else if (sortField === 'investmentType') {
+        aVal = getInvestmentType(a.investment);
+        bVal = getInvestmentType(b.investment);
       } else {
         aVal = a[sortField];
         bVal = b[sortField];
@@ -409,6 +420,11 @@ export default function BankStatementClient() {
                       </button>
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={() => handleSort('investmentType')} className="flex items-center gap-1 hover:text-white transition-colors">
+                        Type <SortIcon field="investmentType" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={() => handleSort('identifier')} className="flex items-center gap-1 hover:text-white transition-colors">
                         Identifier <SortIcon field="identifier" />
                       </button>
@@ -467,6 +483,16 @@ export default function BankStatementClient() {
                       className="border-b border-slate-800/30 hover:bg-slate-800/30 transition-colors"
                     >
                       <td className="px-4 py-4 text-sm text-white">{holding.investment}</td>
+                      <td className="px-4 py-4 text-sm text-center">
+                        <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                          getInvestmentType(holding.investment) === 'ETF' ? 'bg-blue-500/20 text-blue-300' :
+                          getInvestmentType(holding.investment) === 'Tracker' ? 'bg-purple-500/20 text-purple-300' :
+                          getInvestmentType(holding.investment) === 'Swap' ? 'bg-amber-500/20 text-amber-300' :
+                          'text-slate-500'
+                        }`}>
+                          {getInvestmentType(holding.investment)}
+                        </span>
+                      </td>
                       <td className="px-4 py-4 text-sm text-slate-300 font-mono">{holding.identifier}</td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">{holding.quantityHeld.toLocaleString()}</td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
