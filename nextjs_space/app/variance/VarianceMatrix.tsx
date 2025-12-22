@@ -3,8 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { useState, useMemo } from 'react';
 import { toast } from 'sonner';
-import { toast } from 'sonner';
-import { toast } from 'sonner';
 
 interface StockData {
   ticker: string;
