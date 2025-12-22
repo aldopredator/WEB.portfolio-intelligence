@@ -134,7 +134,7 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
       setSnackbarOpen(true);
       // Use window.location for full page reload to fetch server data
       const portfolioParam = selectedPortfolio ? `&portfolio=${selectedPortfolio.id}` : '';
-      window.location.href = `/dashboard?stock=${result.symbol}${portfolioParam}`;
+      window.location.href = `/?stock=${result.symbol}${portfolioParam}`;
     } else {
       // Add ticker to portfolio
       setIsAddingTicker(true);
