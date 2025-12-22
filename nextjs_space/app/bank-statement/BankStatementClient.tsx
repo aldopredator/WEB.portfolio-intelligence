@@ -209,7 +209,7 @@ export default function BankStatementClient() {
     };
 
     reader.readAsBinaryString(file);
-  }, []);
+  }, [statements]);
 
   const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
