@@ -569,7 +569,7 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                             let totalWeight = 0;
                             let weightedPE = 0;
                             tickers.forEach((ticker, i) => {
-                              const stock = filteredStocks.find(s => s.ticker === ticker);
+                              const stock = stocksMap.get(ticker);
                               if (stock?.peRatio && typeof stock.peRatio === 'number' && optimalWeights[i]) {
                                 weightedPE += stock.peRatio * optimalWeights[i];
                                 totalWeight += optimalWeights[i];
@@ -589,7 +589,7 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                             let totalWeight = 0;
                             let weightedPS = 0;
                             tickers.forEach((ticker, i) => {
-                              const stock = filteredStocks.find(s => s.ticker === ticker);
+                              const stock = stocksMap.get(ticker);
                               if (stock?.psRatio && typeof stock.psRatio === 'number' && optimalWeights[i]) {
                                 weightedPS += stock.psRatio * optimalWeights[i];
                                 totalWeight += optimalWeights[i];
