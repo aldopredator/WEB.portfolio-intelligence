@@ -138,45 +138,6 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
       handleTransferClose();
     }
   };
-  const [transferAnchorEl, setTransferAnchorEl] = useState<{ element: HTMLElement; ticker: string; portfolioId: string | null } | null>(null);
-
-  const handleTransferClick = (event: React.MouseEvent<HTMLElement>, ticker: string, portfolioId: string | null) => {
-    setTransferAnchorEl({ element: event.currentTarget, ticker, portfolioId });
-  };
-
-  const handleTransferClose = () => {
-    setTransferAnchorEl(null);
-  };
-
-  const handleTransferToPortfolio = async (targetPortfolioId: string) => {
-    if (!transferAnchorEl) return;
-    
-    const { ticker } = transferAnchorEl;
-    try {
-      const response = await fetch('/api/stock/move', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ticker, targetPortfolioId }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success(data.message || 'Stock moved successfully');
-        // Refresh the page after a short delay
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      } else {
-        toast.error(data.error || 'Failed to move stock');
-      }
-    } catch (error) {
-      console.error('Error moving stock:', error);
-      toast.error('Failed to move stock');
-    } finally {
-      handleTransferClose();
-    }
-  };
 
   // Calculate variance-covariance matrix
   const { matrix, tickers, stocksMap, covarianceMatrix, optimalWeights, expectedReturn, portfolioStdDev, sharpeRatio } = useMemo(() => {
