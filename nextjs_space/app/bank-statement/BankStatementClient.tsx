@@ -1,8 +1,11 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { Upload, FileSpreadsheet, Trash2, Download, AlertCircle } from 'lucide-react';
+import { useState, useCallback, useMemo } from 'react';
+import { Upload, FileSpreadsheet, Trash2, Download, AlertCircle, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import * as XLSX from 'xlsx';
+
+type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy';
+type SortDirection = 'asc' | 'desc' | null;
 
 interface HoldingRow {
   investment: string;
@@ -27,6 +30,51 @@ export default function BankStatementClient() {
   const [accountId, setAccountId] = useState<string>('');
   const [fileName, setFileName] = useState<string>('');
   const [isDragging, setIsDragging] = useState(false);
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Cycle through: asc -> desc -> null
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else if (sortDirection === 'desc') {
+        setSortDirection(null);
+        setSortField(null);
+      }
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedHoldings = useMemo(() => {
+    if (!sortField || !sortDirection) return holdings;
+
+    return [...holdings].sort((a, b) => {
+      const aVal = a[sortField];
+      const bVal = b[sortField];
+
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortDirection === 'asc' 
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal);
+      }
+
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+      }
+
+      return 0;
+    });
+  }, [holdings, sortField, sortDirection]);
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) return <ArrowUpDown className="w-3 h-3 opacity-40" />;
+    if (sortDirection === 'asc') return <ArrowUp className="w-3 h-3" />;
+    if (sortDirection === 'desc') return <ArrowDown className="w-3 h-3" />;
+    return <ArrowUpDown className="w-3 h-3 opacity-40" />;
+  };
 
   const parseExcelFile = useCallback((file: File) => {
     const reader = new FileReader();
@@ -270,18 +318,55 @@ export default function BankStatementClient() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-gradient-to-r from-slate-950/50 to-slate-900/50 border-b border-slate-800/50">
-                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Investment</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Identifier</th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">Quantity</th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">Last Price</th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">Value</th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">Value (£)</th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">Book Cost (£)</th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">% Change</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={() => handleSort('investment')} className="flex items-center gap-1 hover:text-white transition-colors">
+                        Investment <SortIcon field="investment" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={() => handleSort('identifier')} className="flex items-center gap-1 hover:text-white transition-colors">
+                        Identifier <SortIcon field="identifier" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={() => handleSort('quantityHeld')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                        Quantity <SortIcon field="quantityHeld" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={() => handleSort('lastPrice')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                        Last Price <SortIcon field="lastPrice" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={() => handleSort('value')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                        Value <SortIcon field="value" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-center text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={() => handleSort('valueCcy')} className="flex items-center gap-1 hover:text-white transition-colors mx-auto">
+                        Ccy <SortIcon field="valueCcy" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={() => handleSort('valueR')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                        Value (£) <SortIcon field="valueR" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={() => handleSort('bookCostR')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                        Book Cost (£) <SortIcon field="bookCostR" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={() => handleSort('percentChange')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                        % Change <SortIcon field="percentChange" />
+                      </button>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {holdings.map((holding, index) => (
+                  {sortedHoldings.map((holding, index) => (
                     <tr
                       key={index}
                       className="border-b border-slate-800/30 hover:bg-slate-800/30 transition-colors"
@@ -290,10 +375,13 @@ export default function BankStatementClient() {
                       <td className="px-4 py-4 text-sm text-slate-300 font-mono">{holding.identifier}</td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">{holding.quantityHeld.toLocaleString()}</td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {holding.lastPrice.toFixed(2)} {holding.lastPriceCcy}
+                        {holding.lastPrice.toFixed(2)}
                       </td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {holding.value.toLocaleString(undefined, { minimumFractionDigits: 2 })} {holding.valueCcy}
+                        {holding.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-center text-slate-400 font-mono text-xs">
+                        {holding.valueCcy}
                       </td>
                       <td className="px-4 py-4 text-sm text-right text-white font-semibold">
                         £{holding.valueR.toLocaleString(undefined, { minimumFractionDigits: 2 })}
