@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Plus, Trash2, Save, RefreshCw } from 'lucide-react';
+import { Search, Plus, Trash2, Save, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 interface Stock {
   id: string;
@@ -10,6 +10,9 @@ interface Stock {
   alternativeTickers: string[];
 }
 
+type SortField = 'ticker' | 'company' | 'alternativeTickers';
+type SortDirection = 'asc' | 'desc';
+
 export default function TickerMappingPage() {
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,6 +20,8 @@ export default function TickerMappingPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTickers, setEditingTickers] = useState<string[]>([]);
   const [newAltTicker, setNewAltTicker] = useState('');
+  const [sortField, setSortField] = useState<SortField>('ticker');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   useEffect(() => {
     fetchStocks();
@@ -108,11 +113,45 @@ export default function TickerMappingPage() {
     }
   };
 
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="w-4 h-4 opacity-50" />;
+    }
+    return sortDirection === 'asc' ? 
+      <ArrowUp className="w-4 h-4" /> : 
+      <ArrowDown className="w-4 h-4" />;
+  };
+
   const filteredStocks = stocks.filter(stock => 
     stock.ticker.toLowerCase().includes(searchTerm.toLowerCase()) ||
     stock.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
     stock.alternativeTickers.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const sortedStocks = [...filteredStocks].sort((a, b) => {
+    let compareValue = 0;
+    
+    if (sortField === 'ticker') {
+      compareValue = a.ticker.localeCompare(b.ticker);
+    } else if (sortField === 'company') {
+      compareValue = a.company.localeCompare(b.company);
+    } else if (sortField === 'alternativeTickers') {
+      const aAlt = a.alternativeTickers.join(',');
+      const bAlt = b.alternativeTickers.join(',');
+      compareValue = aAlt.localeCompare(bAlt);
+    }
+    
+    return sortDirection === 'asc' ? compareValue : -compareValue;
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
@@ -152,9 +191,30 @@ export default function TickerMappingPage() {
             <table className="w-full">
               <thead>
                 <tr className="bg-slate-900/50 border-b border-slate-700">
-                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase">Ticker</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase">Company</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase">Alternative Tickers</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase">
+                    <button 
+                      onClick={() => handleSort('ticker')}
+                      className="flex items-center gap-2 hover:text-white transition-colors"
+                    >
+                      Ticker <SortIcon field="ticker" />
+                    </button>
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase">
+                    <button 
+                      onClick={() => handleSort('company')}
+                      className="flex items-center gap-2 hover:text-white transition-colors"
+                    >
+                      Company <SortIcon field="company" />
+                    </button>
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase">
+                    <button 
+                      onClick={() => handleSort('alternativeTickers')}
+                      className="flex items-center gap-2 hover:text-white transition-colors"
+                    >
+                      Alternative Tickers <SortIcon field="alternativeTickers" />
+                    </button>
+                  </th>
                   <th className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase">Actions</th>
                 </tr>
               </thead>
@@ -163,12 +223,12 @@ export default function TickerMappingPage() {
                   <tr>
                     <td colSpan={4} className="px-6 py-8 text-center text-slate-400">Loading...</td>
                   </tr>
-                ) : filteredStocks.length === 0 ? (
+                ) : sortedStocks.length === 0 ? (
                   <tr>
                     <td colSpan={4} className="px-6 py-8 text-center text-slate-400">No stocks found</td>
                   </tr>
                 ) : (
-                  filteredStocks.map((stock) => (
+                  sortedStocks.map((stock) => (
                     <tr key={stock.id} className="border-b border-slate-700/50 hover:bg-slate-700/20">
                       <td className="px-6 py-4">
                         <span className="font-mono font-semibold text-white">{stock.ticker}</span>
