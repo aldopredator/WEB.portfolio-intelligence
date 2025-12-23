@@ -813,7 +813,11 @@ export default function BankStatementClient() {
                         £{holding.valueR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                       </td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {holding.value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                        {getInvestmentType(holding.investment) === 'Cash' ? (
+                          <span className="text-slate-500 text-xs">-</span>
+                        ) : (
+                          <>{holding.value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</>
+                        )}
                       </td>
                       <td className="px-4 py-4 text-sm text-center text-slate-400 font-mono text-xs">
                         {holding.valueCcy}
