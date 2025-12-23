@@ -62,17 +62,23 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // If portfolioId is provided and different, return an error instead of updating
+      // If portfolioId is provided and different, return the existing portfolio info
       if (portfolioId && existingStock.portfolioId !== portfolioId) {
-        // Get the portfolio name for a better error message
+        // Get the portfolio info for redirection
         const existingPortfolio = await prisma.portfolio.findUnique({
           where: { id: existingStock.portfolioId || '' },
-          select: { name: true },
+          select: { id: true, name: true },
         });
         
         return NextResponse.json(
-          { error: `${ticker} already exists in portfolio "${existingPortfolio?.name || 'Unknown'}"` },
-          { status: 409 }
+          { 
+            existsInOtherPortfolio: true,
+            portfolioId: existingPortfolio?.id,
+            portfolioName: existingPortfolio?.name,
+            ticker,
+            stockId: existingStock.id
+          },
+          { status: 200 }
         );
       }
 

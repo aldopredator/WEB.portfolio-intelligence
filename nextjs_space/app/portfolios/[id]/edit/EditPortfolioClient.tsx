@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Plus, X, GripVertical, Upload, FileUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,6 +29,7 @@ interface Portfolio {
 
 export default function EditPortfolioClient({ portfolioId }: { portfolioId: string }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,6 +37,29 @@ export default function EditPortfolioClient({ portfolioId }: { portfolioId: stri
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [importText, setImportText] = useState('');
   const [isImporting, setIsImporting] = useState(false);
+  const [highlightedTicker, setHighlightedTicker] = useState<string | null>(null);
+
+  // Check for highlight parameter in URL
+  useEffect(() => {
+    const highlight = searchParams.get('highlight');
+    if (highlight) {
+      setHighlightedTicker(highlight);
+      // Scroll to the highlighted ticker after a short delay to ensure it's rendered
+      setTimeout(() => {
+        const element = document.getElementById(`stock-${highlight}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+      // Clear highlight after 3 seconds
+      setTimeout(() => {
+        setHighlightedTicker(null);
+        // Remove highlight param from URL
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+      }, 3000);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     fetchPortfolio();
@@ -107,8 +131,17 @@ export default function EditPortfolioClient({ portfolioId }: { portfolioId: stri
       const data = await response.json();
 
       if (response.ok) {
-        toast.success(`${result.symbol} added to portfolio`);
-        fetchPortfolio();
+        // Check if ticker exists in another portfolio
+        if (data.existsInOtherPortfolio) {
+          toast.success(`${result.symbol} found in "${data.portfolioName}". Redirecting...`);
+          // Navigate to the portfolio that contains this ticker
+          setTimeout(() => {
+            router.push(`/portfolios/${data.portfolioId}/edit?highlight=${result.symbol}`);
+          }, 1000);
+        } else {
+          toast.success(`${result.symbol} added to portfolio`);
+          fetchPortfolio();
+        }
       } else {
         toast.error(data.error || 'Failed to add ticker');
       }
@@ -398,7 +431,10 @@ export default function EditPortfolioClient({ portfolioId }: { portfolioId: stri
                 {[...portfolio.stocks].sort((a, b) => a.ticker.localeCompare(b.ticker)).map((stock) => (
                   <div
                     key={stock.id}
-                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"
+                    id={`stock-${stock.ticker}`}
+                    className={`flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors ${
+                      highlightedTicker === stock.ticker ? 'ring-2 ring-blue-500 bg-blue-500/10' : ''
+                    }`}
                   >
                     <div className="flex items-center gap-3">
                       <GripVertical className="h-5 w-5 text-muted-foreground cursor-move" />
