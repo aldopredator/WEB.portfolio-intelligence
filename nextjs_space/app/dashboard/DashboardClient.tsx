@@ -117,10 +117,28 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
     }
   }, [stockParam]);
 
-  const handleTickerSelect = async (result: { symbol: string; name: string; exchange: string; type: string }) => {
+  const handleTickerSelect = async (result: { symbol: string; name: string; exchange: string; type: string; portfolioId?: string | null; portfolioName?: string | null }) => {
     console.log('Selected ticker:', result);
     
-    // Check if ticker already exists in portfolio
+    // Check if ticker exists in a different portfolio
+    if (result.portfolioId && result.portfolioId !== selectedPortfolio?.id) {
+      console.log('[Dashboard] Ticker exists in different portfolio:', result.portfolioName);
+      setSnackbarMessage(`${result.symbol} found in "${result.portfolioName}". Switching...`);
+      setSnackbarSeverity('info');
+      setSnackbarOpen(true);
+      
+      // Switch to the portfolio that contains this ticker
+      const targetPortfolio = portfolios.find(p => p.id === result.portfolioId);
+      if (targetPortfolio) {
+        selectPortfolio(targetPortfolio);
+        setTimeout(() => {
+          window.location.href = `/?stock=${result.symbol}&portfolio=${result.portfolioId}`;
+        }, 500);
+      }
+      return;
+    }
+    
+    // Check if ticker already exists in current portfolio
     const tickerExists = stocks.some(s => s.ticker === result.symbol);
     
     if (tickerExists) {
