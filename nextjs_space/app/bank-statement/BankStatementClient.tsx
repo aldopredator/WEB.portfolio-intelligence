@@ -367,8 +367,18 @@ export default function BankStatementClient() {
     XLSX.writeFile(workbook, `bank_statement_${timestamp}.xlsx`);
   };
 
-  const totalBookCost = holdings.reduce((sum, h) => sum + (h.bookCostR || 0), 0);
-  const totalGainLoss = totalValue - totalBookCost;
+  // Exclude Cash from Total Book Cost and Total Gain/Loss calculations
+  const totalBookCost = holdings.reduce((sum, h) => {
+    const type = getInvestmentType(h.investment);
+    return type === 'Cash' ? sum : sum + (h.bookCostR || 0);
+  }, 0);
+  
+  const totalNonCashValue = holdings.reduce((sum, h) => {
+    const type = getInvestmentType(h.investment);
+    return type === 'Cash' ? sum : sum + (h.valueR || 0);
+  }, 0);
+  
+  const totalGainLoss = totalNonCashValue - totalBookCost;
   const totalGainLossPercent = totalBookCost > 0 ? (totalGainLoss / totalBookCost) * 100 : 0;
 
   return (
