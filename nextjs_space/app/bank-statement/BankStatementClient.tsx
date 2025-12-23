@@ -750,11 +750,6 @@ export default function BankStatementClient() {
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={(e) => handleColumnClick('bookCostR', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Book Cost (£) <SortIcon field="bookCostR" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('returnGBP', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Return (£) <SortIcon field="returnGBP" />
                       </button>
@@ -762,6 +757,11 @@ export default function BankStatementClient() {
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('percentChange', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         % Change <SortIcon field="percentChange" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={(e) => handleColumnClick('bookCostR', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                        Book Cost (£) <SortIcon field="bookCostR" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
@@ -821,9 +821,6 @@ export default function BankStatementClient() {
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
                         {totalValue > 0 ? ((holding.valueR / totalValue) * 100).toFixed(2) : '0.00'}%
                       </td>
-                      <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        £{holding.bookCostR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                      </td>
                       <td className={`px-4 py-4 text-sm text-right font-semibold ${
                         (holding.valueR - holding.bookCostR) >= 0 ? 'text-emerald-400' : 'text-red-400'
                       }`}>
@@ -833,6 +830,9 @@ export default function BankStatementClient() {
                         holding.percentChange >= 0 ? 'text-emerald-400' : 'text-red-400'
                       }`}>
                         {holding.percentChange >= 0 ? '+' : ''}{holding.percentChange.toFixed(0)}%
+                      </td>
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        £{holding.bookCostR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                       </td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">{holding.quantityHeld.toLocaleString()}</td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
