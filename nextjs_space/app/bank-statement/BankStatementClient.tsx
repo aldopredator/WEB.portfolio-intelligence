@@ -252,6 +252,11 @@ export default function BankStatementClient() {
       } else if (sortField === 'weight') {
         aVal = totalValue > 0 ? (a.valueR / totalValue) * 100 : 0;
         bVal = totalValue > 0 ? (b.valueR / totalValue) * 100 : 0;
+      } else if (sortField === 'optimalWeight') {
+        const tickerA = stockInfo[a.identifier]?.ticker;
+        const tickerB = stockInfo[b.identifier]?.ticker;
+        aVal = tickerA ? (optimalWeights[tickerA] || 0) : 0;
+        bVal = tickerB ? (optimalWeights[tickerB] || 0) : 0;
       } else if (sortField === 'investmentType') {
         aVal = getInvestmentType(a.investment);
         bVal = getInvestmentType(b.investment);
