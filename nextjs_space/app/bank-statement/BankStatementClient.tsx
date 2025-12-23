@@ -60,7 +60,6 @@ export default function BankStatementClient() {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [stockInfo, setStockInfo] = useState<Record<string, StockInfo>>({});
   const [optimalWeights, setOptimalWeights] = useState<Record<string, number>>({});
-  const [portfolioId, setPortfolioId] = useState<string | null>(null);
 
   const activeStatement = statements.find(s => s.id === activeStatementId);
   const holdings = activeStatement?.holdings || [];
@@ -84,15 +83,8 @@ export default function BankStatementClient() {
           const data = await response.json();
           setStockInfo(data);
           
-          // Extract portfolio ID from first stock (assumes all stocks in statement from same portfolio)
-          const firstTicker = Object.keys(data)[0];
-          if (firstTicker && data[firstTicker]) {
-            // Fetch portfolio ID by name
-            const portfolioName = data[firstTicker].portfolioName;
-            if (portfolioName) {
-              fetchPortfolioIdByName(portfolioName);
-            }
-          }
+          // Fetch optimal weights directly using the tickers from stockInfo
+          fetchOptimalWeightsForTickers(data);
         }
       } catch (error) {
         console.error('Failed to fetch stock info:', error);
@@ -102,53 +94,33 @@ export default function BankStatementClient() {
     fetchStockInfo();
   }, [holdings]);
 
-  // Fetch portfolio ID by name
-  const fetchPortfolioIdByName = async (portfolioName: string) => {
+  // Fetch optimal weights for tickers
+  const fetchOptimalWeightsForTickers = async (stockInfoData: Record<string, StockInfo>) => {
+    // Extract actual tickers from stockInfo (not identifiers)
+    const tickers = Object.values(stockInfoData)
+      .map(info => info.ticker)
+      .filter(Boolean);
+
+    if (tickers.length === 0) return;
+
+    console.log('Fetching optimal weights for tickers:', tickers);
     try {
-      console.log('Fetching portfolio ID for:', portfolioName);
-      const response = await fetch(`/api/portfolios`);
-      if (response.ok) {
-        const portfolios = await response.json();
-        console.log('Available portfolios:', portfolios.map((p: any) => p.name));
-        const portfolio = portfolios.find((p: any) => p.name === portfolioName);
-        if (portfolio) {
-          console.log('Found portfolio ID:', portfolio.id);
-          setPortfolioId(portfolio.id);
-        } else {
-          console.warn('Portfolio not found:', portfolioName);
-        }
+      const response = await fetch(`/api/optimal-weights?tickers=${tickers.join(',')}`);
+      console.log('Optimal weights response status:', response.status);
+      
+      const data = await response.json();
+      console.log('Optimal weights data:', data);
+      
+      if (response.ok && data.success && data.weights) {
+        console.log('Setting optimal weights:', data.weights);
+        setOptimalWeights(data.weights);
+      } else if (data.error) {
+        console.error('Optimal weights API error:', data.error, data.details);
       }
     } catch (error) {
-      console.error('Failed to fetch portfolio ID:', error);
+      console.error('Failed to fetch optimal weights:', error);
     }
   };
-
-  // Fetch optimal weights when portfolio ID is available
-  useEffect(() => {
-    const fetchOptimalWeights = async () => {
-      if (!portfolioId) return;
-
-      console.log('Fetching optimal weights for portfolio ID:', portfolioId);
-      try {
-        const response = await fetch(`/api/optimal-weights?portfolioId=${portfolioId}`);
-        console.log('Optimal weights response status:', response.status);
-        
-        const data = await response.json();
-        console.log('Optimal weights data:', data);
-        
-        if (response.ok && data.success && data.weights) {
-          console.log('Setting optimal weights:', data.weights);
-          setOptimalWeights(data.weights);
-        } else if (data.error) {
-          console.error('Optimal weights API error:', data.error, data.details);
-        }
-      } catch (error) {
-        console.error('Failed to fetch optimal weights:', error);
-      }
-    };
-
-    fetchOptimalWeights();
-  }, [portfolioId]);
 
   const getInvestmentType = (investmentName: string): string => {
     const nameLower = investmentName.toLowerCase();

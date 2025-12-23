@@ -38,16 +38,45 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const portfolioId = searchParams.get('portfolioId');
+    const tickersParam = searchParams.get('tickers');
 
-    if (!portfolioId) {
-      return NextResponse.json({ error: 'portfolioId is required' }, { status: 400 });
+    // Support two modes: by portfolio ID or by ticker list
+    let stocks;
+    
+    if (tickersParam) {
+      // Mode 1: Calculate for specific tickers
+      const tickers = tickersParam.split(',').map(t => t.trim());
+      stocks = await prisma.stock.findMany({
+        where: {
+          ticker: { in: tickers }
+        },
+        include: {
+          priceHistory: {
+            orderBy: {
+              date: 'desc'
+            },
+            take: 90
+          }
+        }
+      });
+    } else if (portfolioId) {
+      // Mode 2: Calculate for all stocks in a portfolio
+      stocks = await prisma.stock.findMany({
+        where: {
+          portfolioId: portfolioId
+        },
+        include: {
+          priceHistory: {
+            orderBy: {
+              date: 'desc'
+            },
+            take: 90
+          }
+        }
+      });
+    } else {
+      return NextResponse.json({ error: 'Either portfolioId or tickers parameter is required' }, { status: 400 });
     }
-
-    // Fetch all stocks for the portfolio with price history
-    const stocks = await prisma.stock.findMany({
-      where: {
-        portfolioId: portfolioId
-      },
       include: {
         priceHistory: {
           orderBy: {
