@@ -17,7 +17,8 @@ import {
   Grid3x3,
   Globe,
   Building2,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Link2
 } from 'lucide-react';
 import { usePortfolio } from '@/lib/portfolio-context';
 import {
@@ -44,6 +45,7 @@ export function SidebarNavigation() {
     },
     { name: 'Portfolios', href: '/portfolios', icon: Briefcase, description: 'Manage your portfolios' },
     { name: 'Bank Statement', href: '/bank-statement', icon: FileSpreadsheet, description: 'Upload & view statements' },
+    { name: 'Ticker Mapping', href: '/ticker-mapping', icon: Link2, description: 'Alternative ticker symbols' },
     { name: 'Screening', href: '/screening', icon: Filter, description: 'Stock screening results' },
     { name: 'Sectors', href: '/sectors', icon: Grid3x3, description: 'Sector matrix visualization' },
     { name: 'Industries', href: '/industries', icon: Building2, description: 'Industry matrix visualization' },
