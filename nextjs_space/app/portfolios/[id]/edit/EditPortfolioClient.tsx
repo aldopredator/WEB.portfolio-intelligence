@@ -133,11 +133,12 @@ export default function EditPortfolioClient({ portfolioId }: { portfolioId: stri
       if (response.ok) {
         // Check if ticker exists in another portfolio
         if (data.existsInOtherPortfolio) {
-          toast.success(`${result.symbol} found in "${data.portfolioName}". Redirecting...`);
-          // Navigate to the portfolio that contains this ticker
-          setTimeout(() => {
-            router.push(`/portfolios/${data.portfolioId}/edit?highlight=${result.symbol}`);
-          }, 1000);
+          console.log('[EditPortfolio] Ticker exists in another portfolio:', data);
+          toast.success(`${result.symbol} found in "${data.portfolioName}". Switching...`);
+          // Navigate immediately to the portfolio that contains this ticker
+          const targetUrl = `/portfolios/${data.portfolioId}/edit?highlight=${result.symbol}`;
+          console.log('[EditPortfolio] Navigating to:', targetUrl);
+          router.push(targetUrl);
         } else {
           toast.success(`${result.symbol} added to portfolio`);
           fetchPortfolio();
