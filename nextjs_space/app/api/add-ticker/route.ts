@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingStock) {
-      // If it exists but is inactive, reactivate it
+      // If it exists but is inactive, reactivate it in the same portfolio
       if (!existingStock.isActive) {
         await prisma.stock.update({
           where: { ticker },
@@ -62,21 +62,22 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // If portfolioId is provided and different, update it
+      // If portfolioId is provided and different, return an error instead of updating
       if (portfolioId && existingStock.portfolioId !== portfolioId) {
-        await prisma.stock.update({
-          where: { ticker },
-          data: { portfolioId },
+        // Get the portfolio name for a better error message
+        const existingPortfolio = await prisma.portfolio.findUnique({
+          where: { id: existingStock.portfolioId || '' },
+          select: { name: true },
         });
-        return NextResponse.json({
-          success: true,
-          message: `${ticker} has been moved to the selected portfolio`,
-          ticker,
-        });
+        
+        return NextResponse.json(
+          { error: `${ticker} already exists in portfolio "${existingPortfolio?.name || 'Unknown'}"` },
+          { status: 409 }
+        );
       }
 
       return NextResponse.json(
-        { message: 'Ticker already exists', ticker },
+        { message: 'Ticker already exists in this portfolio', ticker },
         { status: 200 }
       );
     }
