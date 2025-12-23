@@ -121,8 +121,11 @@ export default function BankStatementClient() {
           const data = await response.json();
           setStockInfo(data);
           
-          // Fetch optimal weights directly using the tickers from stockInfo
-          fetchOptimalWeightsForTickers(data);
+          // Get portfolio name from first stock (assumes all from same portfolio)
+          const firstTicker = Object.keys(data)[0];
+          if (firstTicker && data[firstTicker]?.portfolioName) {
+            fetchOptimalWeightsForPortfolio(data[firstTicker].portfolioName);
+          }
         }
       } catch (error) {
         console.error('Failed to fetch stock info:', error);
@@ -132,18 +135,27 @@ export default function BankStatementClient() {
     fetchStockInfo();
   }, [holdings]);
 
-  // Fetch optimal weights for tickers
-  const fetchOptimalWeightsForTickers = async (stockInfoData: Record<string, StockInfo>) => {
-    // Extract actual tickers from stockInfo (not identifiers)
-    const tickers = Object.values(stockInfoData)
-      .map(info => info.ticker)
-      .filter(Boolean);
-
-    if (tickers.length === 0) return;
-
-    console.log('Fetching optimal weights for tickers:', tickers);
+  // Fetch optimal weights for portfolio
+  const fetchOptimalWeightsForPortfolio = async (portfolioName: string) => {
     try {
-      const response = await fetch(`/api/optimal-weights?tickers=${tickers.join(',')}`);
+      console.log('Fetching portfolio ID for:', portfolioName);
+      
+      // Get portfolio ID from name
+      const portfoliosResponse = await fetch('/api/portfolios');
+      if (!portfoliosResponse.ok) return;
+      
+      const portfolios = await portfoliosResponse.json();
+      const portfolio = portfolios.find((p: any) => p.name === portfolioName);
+      
+      if (!portfolio) {
+        console.warn('Portfolio not found:', portfolioName);
+        return;
+      }
+      
+      console.log('Found portfolio:', portfolio.name, 'ID:', portfolio.id);
+      
+      // Fetch optimal weights for this portfolio
+      const response = await fetch(`/api/optimal-weights?portfolioId=${portfolio.id}`);
       console.log('Optimal weights response status:', response.status);
       
       const data = await response.json();
