@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
     // Prepare price data for each stock
     const stockPrices = validStocks.map(stock => ({
       ticker: stock.ticker,
-      prices: stock.priceHistory.map(ph => ph.closePrice).reverse() // Oldest to newest
+      prices: stock.priceHistory.map(ph => ph.price).reverse() // Oldest to newest
     }));
 
     // Calculate returns for each stock
