@@ -731,6 +731,11 @@ export default function BankStatementClient() {
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                        Ticker
+                      </span>
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                         Alt Tickers
                       </span>
                     </th>
@@ -804,6 +809,9 @@ export default function BankStatementClient() {
                         {stockInfo[holding.identifier]?.industry || '-'}
                       </td>
                       <td className="px-4 py-4 text-sm text-slate-300 font-mono">{holding.identifier}</td>
+                      <td className="px-4 py-4 text-sm text-slate-300 font-mono">
+                        {stockInfo[holding.identifier]?.ticker || '-'}
+                      </td>
                       <td className="px-4 py-4 text-sm text-slate-300">
                         {stockInfo[holding.identifier]?.alternativeTickers?.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
