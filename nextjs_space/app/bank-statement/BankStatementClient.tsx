@@ -87,7 +87,7 @@ export default function BankStatementClient() {
   const stockTotalGainLossPercent = stockTotalBookCost > 0 ? (stockTotalGainLoss / stockTotalBookCost) * 100 : 0;
 
   // Sort holdings
-  const sortHoldings = (holdingsToSort: HoldingRow[], categoryTotalValue: number) => {
+  const sortHoldings = useCallback((holdingsToSort: HoldingRow[], categoryTotalValue: number) => {
     if (!sortField || !sortDirection) return holdingsToSort;
 
     return [...holdingsToSort].sort((a, b) => {
@@ -118,7 +118,7 @@ export default function BankStatementClient() {
 
       return 0;
     });
-  };
+  }, [sortField, sortDirection, getInvestmentType]);
 
   const sortedEtfHoldings = sortHoldings(etfHoldings, etfTotalValue);
   const sortedStockHoldings = sortHoldings(stockHoldings, stockTotalValue);
