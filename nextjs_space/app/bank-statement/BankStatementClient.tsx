@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Upload, FileSpreadsheet, Trash2, Download, AlertCircle, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy' | 'returnGBP' | 'weight' | 'investmentType' | 'sector' | 'industry' | 'ticker' | 'alternativeTicker' | 'portfolio';
+type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy' | 'returnGBP' | 'weight' | 'optimalWeight' | 'investmentType' | 'sector' | 'industry' | 'ticker' | 'alternativeTicker' | 'portfolio';
 type SortDirection = 'asc' | 'desc' | null;
 
 interface SortLevel {
@@ -59,6 +59,8 @@ export default function BankStatementClient() {
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [stockInfo, setStockInfo] = useState<Record<string, StockInfo>>({});
+  const [optimalWeights, setOptimalWeights] = useState<Record<string, number>>({});
+  const [portfolioId, setPortfolioId] = useState<string | null>(null);
 
   const activeStatement = statements.find(s => s.id === activeStatementId);
   const holdings = activeStatement?.holdings || [];
@@ -81,6 +83,16 @@ export default function BankStatementClient() {
         if (response.ok) {
           const data = await response.json();
           setStockInfo(data);
+          
+          // Extract portfolio ID from first stock (assumes all stocks in statement from same portfolio)
+          const firstTicker = Object.keys(data)[0];
+          if (firstTicker && data[firstTicker]) {
+            // Fetch portfolio ID by name
+            const portfolioName = data[firstTicker].portfolioName;
+            if (portfolioName) {
+              fetchPortfolioIdByName(portfolioName);
+            }
+          }
         }
       } catch (error) {
         console.error('Failed to fetch stock info:', error);
@@ -89,6 +101,43 @@ export default function BankStatementClient() {
 
     fetchStockInfo();
   }, [holdings]);
+
+  // Fetch portfolio ID by name
+  const fetchPortfolioIdByName = async (portfolioName: string) => {
+    try {
+      const response = await fetch(`/api/portfolios`);
+      if (response.ok) {
+        const portfolios = await response.json();
+        const portfolio = portfolios.find((p: any) => p.name === portfolioName);
+        if (portfolio) {
+          setPortfolioId(portfolio.id);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch portfolio ID:', error);
+    }
+  };
+
+  // Fetch optimal weights when portfolio ID is available
+  useEffect(() => {
+    const fetchOptimalWeights = async () => {
+      if (!portfolioId) return;
+
+      try {
+        const response = await fetch(`/api/optimal-weights?portfolioId=${portfolioId}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.weights) {
+            setOptimalWeights(data.weights);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch optimal weights:', error);
+      }
+    };
+
+    fetchOptimalWeights();
+  }, [portfolioId]);
 
   const getInvestmentType = (investmentName: string): string => {
     const nameLower = investmentName.toLowerCase();
@@ -146,6 +195,9 @@ export default function BankStatementClient() {
       return holding.valueR - holding.bookCostR;
     } else if (field === 'weight') {
       return totalValue > 0 ? (holding.valueR / totalValue) * 100 : 0;
+    } else if (field === 'optimalWeight') {
+      const ticker = stockInfo[holding.identifier]?.ticker;
+      return ticker ? (optimalWeights[ticker] || 0) : 0;
     } else if (field === 'investmentType') {
       return getInvestmentType(holding.investment);
     } else if (field === 'sector') {
@@ -762,7 +814,12 @@ export default function BankStatementClient() {
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('weight', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Weight <SortIcon field="weight" />
+                        Actual Weight <SortIcon field="weight" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={(e) => handleColumnClick('optimalWeight', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                        Optimal Weight <SortIcon field="optimalWeight" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
@@ -845,6 +902,33 @@ export default function BankStatementClient() {
                       </td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
                         {totalValue > 0 ? ((holding.valueR / totalValue) * 100).toFixed(2) : '0.00'}%
+                      </td>
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {(() => {
+                          const ticker = stockInfo[holding.identifier]?.ticker;
+                          const optimalWeight = ticker ? (optimalWeights[ticker] || 0) : 0;
+                          const actualWeight = totalValue > 0 ? (holding.valueR / totalValue) * 100 : 0;
+                          const difference = Math.abs(optimalWeight - actualWeight);
+                          
+                          // Color coding: green if close (< 2%), yellow if moderate (2-5%), red if far (> 5%)
+                          let colorClass = 'text-slate-300';
+                          if (optimalWeight > 0) {
+                            if (difference < 2) {
+                              colorClass = 'text-emerald-400';
+                            } else if (difference < 5) {
+                              colorClass = 'text-yellow-400';
+                            } else {
+                              colorClass = 'text-red-400';
+                            }
+                          }
+                          
+                          return (
+                            <span className={colorClass}>
+                              {optimalWeight > 0 ? optimalWeight.toFixed(2) : '-'}
+                              {optimalWeight > 0 && '%'}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td className={`px-4 py-4 text-sm text-right font-semibold ${
                         (holding.valueR - holding.bookCostR) >= 0 ? 'text-emerald-400' : 'text-red-400'
