@@ -34,23 +34,40 @@ export async function GET(request: Request) {
         type: true,
         exchange: true,
         region: true,
-        alternativeTickers: true
+        alternativeTickers: true,
+        portfolio: {
+          select: {
+            name: true
+          }
+        }
       }
     });
 
     // Create a map for quick lookup
     // Map both primary ticker AND alternative tickers to the same stock data
     const stockMap = stocks.reduce((acc, stock) => {
+      const stockData = {
+        ticker: stock.ticker,
+        company: stock.company,
+        sector: stock.sector,
+        industry: stock.industry,
+        type: stock.type,
+        exchange: stock.exchange,
+        region: stock.region,
+        alternativeTickers: stock.alternativeTickers,
+        portfolioName: stock.portfolio?.name || null
+      };
+      
       // Map primary ticker
-      acc[stock.ticker] = stock;
+      acc[stock.ticker] = stockData;
       
       // Map all alternative tickers to the same stock data
       stock.alternativeTickers.forEach(altTicker => {
-        acc[altTicker] = stock;
+        acc[altTicker] = stockData;
       });
       
       return acc;
-    }, {} as Record<string, typeof stocks[0]>);
+    }, {} as Record<string, any>);
 
     return NextResponse.json(stockMap);
   } catch (error) {

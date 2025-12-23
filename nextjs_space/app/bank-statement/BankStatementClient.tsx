@@ -21,6 +21,7 @@ interface StockInfo {
   type: string | null;
   exchange: string | null;
   region: string | null;
+  portfolioName: string | null;
 }
 
 interface HoldingRow {
@@ -784,6 +785,11 @@ export default function BankStatementClient() {
                         Alt Tickers
                       </span>
                     </th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                        Portfolio
+                      </span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -876,6 +882,15 @@ export default function BankStatementClient() {
                               </span>
                             ))}
                           </div>
+                        ) : (
+                          <span className="text-slate-500 text-xs">-</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-4 text-sm">
+                        {stockInfo[holding.identifier]?.portfolioName ? (
+                          <span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs font-medium border border-blue-500/30">
+                            {stockInfo[holding.identifier].portfolioName}
+                          </span>
                         ) : (
                           <span className="text-slate-500 text-xs">-</span>
                         )}
