@@ -30,6 +30,14 @@ interface Stock {
   debtToEquity: string;
   sentiment: string;
   matchScore: number;
+  country: string;
+  trailingPE: string;
+  forwardPE: string;
+  enterpriseToRevenue: string;
+  enterpriseToEbitda: string;
+  roa: string;
+  quarterlyRevenueGrowth: string;
+  quarterlyEarningsGrowth: string;
 }
 
 interface ScreeningTableProps {
@@ -198,16 +206,24 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
       'Last Updated': formatDate(stock.updatedAt),
       'Sector': stock.sector,
       'Industry': stock.industry,
+      'Country': stock.country,
       'P/E': stock.pe,
+      'Trailing P/E': stock.trailingPE,
+      'Forward P/E': stock.forwardPE,
       'P/B': stock.pb,
       'P/S': stock.priceToSales,
+      'Enterprise Value/Revenue': stock.enterpriseToRevenue,
+      'Enterprise Value/EBITDA': stock.enterpriseToEbitda,
       'Market Cap': stock.marketCap,
       'Avg Volume': stock.avgVolume,
       'Avg Annual Volume (10D)': stock.avgAnnualVolume10D,
       'Avg Annual Volume (3M)': stock.avgAnnualVolume3M,
       'Beta': stock.beta,
       'ROE': stock.roe,
+      'ROA': stock.roa,
       'Profit Margin': stock.profitMargin,
+      'Quarterly Revenue Growth': stock.quarterlyRevenueGrowth,
+      'Quarterly Earnings Growth': stock.quarterlyEarningsGrowth,
       'Debt/Equity': stock.debtToEquity,
       'Sentiment': stock.sentiment,
       'Match Score': `${stock.matchScore}%`,

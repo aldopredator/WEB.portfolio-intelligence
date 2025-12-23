@@ -283,6 +283,16 @@ export default async function ScreeningPage({
     // If stock passes criteria filters but has missing data, reduce match score proportionally
     const adjustedMatchScore = Math.round((matchScore * dataCompletenessScore) / 100);
 
+    // Extract additional fields for export
+    const country = companyProfile?.country || 'N/A';
+    const trailingPE = (stockInfo as any).trailingPE?.toFixed(2) || 'N/A';
+    const forwardPE = (stockInfo as any).forwardPE?.toFixed(2) || 'N/A';
+    const enterpriseToRevenue = (stockInfo as any).enterpriseToRevenue?.toFixed(2) || 'N/A';
+    const enterpriseToEbitda = (stockInfo as any).enterpriseToEbitda?.toFixed(2) || 'N/A';
+    const roa = (stockInfo as any).returnOnAssets ? `${((stockInfo as any).returnOnAssets * 100).toFixed(2)}%` : 'N/A';
+    const quarterlyRevenueGrowth = (stockInfo as any).quarterlyRevenueGrowth ? `${((stockInfo as any).quarterlyRevenueGrowth * 100).toFixed(2)}%` : 'N/A';
+    const quarterlyEarningsGrowth = (stockInfo as any).quarterlyEarningsGrowth ? `${((stockInfo as any).quarterlyEarningsGrowth * 100).toFixed(2)}%` : 'N/A';
+
     return {
       ticker: stock.ticker,
       name: stock.company,
@@ -305,6 +315,14 @@ export default async function ScreeningPage({
       debtToEquity: debtToEquity || 'N/A',
       sentiment: sentiment || 'N/A',
       matchScore: adjustedMatchScore,
+      country,
+      trailingPE,
+      forwardPE,
+      enterpriseToRevenue,
+      enterpriseToEbitda,
+      roa,
+      quarterlyRevenueGrowth,
+      quarterlyEarningsGrowth,
     };
   }).filter((stock): stock is NonNullable<typeof stock> => stock !== null);
 
