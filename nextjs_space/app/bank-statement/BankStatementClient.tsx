@@ -60,6 +60,44 @@ export default function BankStatementClient() {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [stockInfo, setStockInfo] = useState<Record<string, StockInfo>>({});
   const [optimalWeights, setOptimalWeights] = useState<Record<string, number>>({});
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load statements from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('bankStatements');
+    const savedActiveId = localStorage.getItem('activeBankStatementId');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Convert date strings back to Date objects
+        const statements = parsed.map((s: any) => ({
+          ...s,
+          uploadDate: new Date(s.uploadDate)
+        }));
+        setStatements(statements);
+        if (savedActiveId) {
+          setActiveStatementId(savedActiveId);
+        }
+      } catch (error) {
+        console.error('Failed to load saved statements:', error);
+      }
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Save statements to localStorage whenever they change
+  useEffect(() => {
+    if (isLoaded && statements.length > 0) {
+      localStorage.setItem('bankStatements', JSON.stringify(statements));
+    }
+  }, [statements, isLoaded]);
+
+  // Save active statement ID to localStorage
+  useEffect(() => {
+    if (isLoaded && activeStatementId) {
+      localStorage.setItem('activeBankStatementId', activeStatementId);
+    }
+  }, [activeStatementId, isLoaded]);
 
   const activeStatement = statements.find(s => s.id === activeStatementId);
   const holdings = activeStatement?.holdings || [];
@@ -431,11 +469,16 @@ export default function BankStatementClient() {
 
   const handleClear = () => {
     if (activeStatementId) {
-      setStatements(prev => prev.filter(s => s.id !== activeStatementId));
-      setActiveStatementId(prev => {
-        const remaining = statements.filter(s => s.id !== prev);
-        return remaining.length > 0 ? remaining[0].id : null;
-      });
+      const updatedStatements = statements.filter(s => s.id !== activeStatementId);
+      setStatements(updatedStatements);
+      
+      if (updatedStatements.length > 0) {
+        setActiveStatementId(updatedStatements[0].id);
+      } else {
+        setActiveStatementId(null);
+        localStorage.removeItem('bankStatements');
+        localStorage.removeItem('activeBankStatementId');
+      }
     }
   };
 
