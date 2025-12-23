@@ -181,11 +181,14 @@ export default function BankStatementClient() {
     holdings.forEach(h => {
       const type = getInvestmentType(h.investment);
       const existing = totals.get(type) || { count: 0, value: 0, bookCost: 0, gainLoss: 0 };
+      // Exclude Cash from book cost and gain/loss calculations
+      const bookCost = type === 'Cash' ? 0 : h.bookCostR;
+      const gainLoss = type === 'Cash' ? 0 : (h.valueR - h.bookCostR);
       totals.set(type, {
         count: existing.count + 1,
         value: existing.value + h.valueR,
-        bookCost: existing.bookCost + h.bookCostR,
-        gainLoss: existing.gainLoss + (h.valueR - h.bookCostR)
+        bookCost: existing.bookCost + bookCost,
+        gainLoss: existing.gainLoss + gainLoss
       });
     });
     
@@ -334,8 +337,10 @@ export default function BankStatementClient() {
   };
 
   const exportToExcel = () => {
+    const totalVal = holdings.reduce((sum, h) => sum + (h.valueR || 0), 0);
     const worksheet = XLSX.utils.json_to_sheet(holdings.map(h => ({
       'Investment': h.investment,
+      'Type': getInvestmentType(h.investment),
       'Identifier': h.identifier,
       'Quantity Held': h.quantityHeld,
       'Last Price': h.lastPrice,
@@ -345,10 +350,12 @@ export default function BankStatementClient() {
       'FX Rate': h.fxRate,
       'Last Price (£)': h.lastPriceP,
       'Value (£)': h.valueR,
+      'Weight (%)': totalVal > 0 ? ((h.valueR / totalVal) * 100).toFixed(2) : '0.00',
       'Book Cost': h.bookCost,
       'Book Cost CCY': h.bookCostCcy,
       'Average FX Rate': h.averageFxRate,
       'Book Cost (£)': h.bookCostR,
+      'Return (£)': h.valueR - h.bookCostR,
       '% Change': h.percentChange,
     })));
     
