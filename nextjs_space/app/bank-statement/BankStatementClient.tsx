@@ -47,10 +47,8 @@ export default function BankStatementClient() {
 
   const getInvestmentType = (investmentName: string): string => {
     const nameLower = investmentName.toLowerCase();
-    if (nameLower.includes('etf')) return 'ETF';
-    if (nameLower.includes('tracker')) return 'Tracker';
-    if (nameLower.includes('swap')) return 'Swap';
-    return '-';
+    if (nameLower.includes('etf') || nameLower.includes('tracker')) return 'ETF';
+    return 'Stock';
   };
 
   const handleSort = (field: SortField) => {
@@ -486,10 +484,7 @@ export default function BankStatementClient() {
                       <td className="px-4 py-4 text-sm text-white">{holding.investment}</td>
                       <td className="px-4 py-4 text-sm text-center">
                         <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                          getInvestmentType(holding.investment) === 'ETF' ? 'bg-blue-500/20 text-blue-300' :
-                          getInvestmentType(holding.investment) === 'Tracker' ? 'bg-purple-500/20 text-purple-300' :
-                          getInvestmentType(holding.investment) === 'Swap' ? 'bg-amber-500/20 text-amber-300' :
-                          'text-slate-500'
+                          getInvestmentType(holding.investment) === 'ETF' ? 'bg-blue-500/20 text-blue-300' : 'bg-emerald-500/20 text-emerald-300'
                         }`}>
                           {getInvestmentType(holding.investment)}
                         </span>
