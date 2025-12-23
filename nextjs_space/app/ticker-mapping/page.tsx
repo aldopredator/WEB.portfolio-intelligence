@@ -89,19 +89,9 @@ export default function TickerMappingPage() {
       setLoading(true);
       const response = await fetch('/api/update-stock-sectors', {
         method: 'POST',
-        headers: { 'Content- flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Ticker Mapping Manager</h1>
-            <p className="text-slate-400">Manage alternative ticker symbols for bank statement matching</p>
-          </div>
-          <button
-            onClick={handleBulkUpdate}
-            disabled={loading}
-            className="flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-700 disabled:text-slate-500 rounded-lg text-white font-semibold transition-colors"
-          >
-            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-            Update All from Mappings
-          </button
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}) // Empty body = update all stocks
+      });
 
       if (response.ok) {
         const result = await response.json();
@@ -127,7 +117,20 @@ export default function TickerMappingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">Ticker Mapping Manager</h1>
+            <p className="text-slate-400">Manage alternative ticker symbols for bank statement matching</p>
+          </div>
+          <button
+            onClick={handleBulkUpdate}
+            disabled={loading}
+            className="flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-700 disabled:text-slate-500 rounded-lg text-white font-semibold transition-colors"
+          >
+            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+            Update All from Mappings
+          </button>
+        </div>
           <h1 className="text-3xl font-bold text-white mb-2">Ticker Mapping Manager</h1>
           <p className="text-slate-400">Manage alternative ticker symbols for bank statement matching</p>
         </div>
