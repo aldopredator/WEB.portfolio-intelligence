@@ -415,6 +415,41 @@ export default function BankStatementClient() {
     XLSX.writeFile(workbook, `bank_statement_${timestamp}.xlsx`);
   };
 
+  const updateSectorsForHoldings = async () => {
+    const tickers = holdings
+      .map(h => h.identifier)
+      .filter(id => id && id !== '-' && id !== 'CASH');
+
+    if (tickers.length === 0) return;
+
+    try {
+      const response = await fetch('/api/update-stock-sectors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tickers })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Sector update result:', result);
+        
+        // Refresh stock info
+        const refreshResponse = await fetch(`/api/stock-info?tickers=${tickers.join(',')}`);
+        if (refreshResponse.ok) {
+          const data = await refreshResponse.json();
+          setStockInfo(data);
+        }
+        
+        alert(`Updated ${result.updated} stocks successfully!`);
+      } else {
+        alert('Failed to update sectors');
+      }
+    } catch (error) {
+      console.error('Error updating sectors:', error);
+      alert('Error updating sectors');
+    }
+  };
+
   // Exclude Cash from Total Book Cost and Total Gain/Loss calculations
   const totalBookCost = holdings.reduce((sum, h) => {
     const type = getInvestmentType(h.investment);
@@ -533,6 +568,14 @@ export default function BankStatementClient() {
                 </div>
               </div>
               <div className="flex gap-3">
+                <button
+                  onClick={updateSectorsForHoldings}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-lg text-blue-400 transition-colors"
+                  title="Fetch sector and industry data from Yahoo Finance"
+                >
+                  <FileSpreadsheet className="w-4 h-4" />
+                  Update Sectors
+                </button>
                 <button
                   onClick={exportToExcel}
                   className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg text-emerald-400 transition-colors"
