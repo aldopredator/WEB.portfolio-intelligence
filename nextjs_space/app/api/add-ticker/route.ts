@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { fetchYahooPriceHistory, fetchYahooProfile } from '@/lib/yahoo-finance';
+import { fetchYahooPriceHistory, fetchYahooCompanyProfile } from '@/lib/yahoo-finance';
 
 const prisma = new PrismaClient();
 
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch profile information from Yahoo Finance for sector/industry
-    const profile = await fetchYahooProfile(ticker);
+    const profile = await fetchYahooCompanyProfile(ticker);
 
     // Create new stock in database
     const stock = await prisma.stock.create({

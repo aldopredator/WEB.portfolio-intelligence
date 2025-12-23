@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { fetchYahooProfile } from '@/lib/yahoo-finance';
+import { fetchYahooCompanyProfile } from '@/lib/yahoo-finance';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
 
     for (const stock of stocksToUpdate) {
       try {
-        const profile = await fetchYahooProfile(stock.ticker);
+        const profile = await fetchYahooCompanyProfile(stock.ticker);
         
         if (profile?.sector || profile?.industry) {
           await prisma.stock.update({

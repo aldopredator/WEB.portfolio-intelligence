@@ -4,7 +4,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
-import { fetchYahooProfile } from '../lib/yahoo-finance';
+import { fetchYahooCompanyProfile } from '../lib/yahoo-finance';
 
 const prisma = new PrismaClient();
 
@@ -47,7 +47,7 @@ async function populateSectors() {
     try {
       console.log(`${progress} Fetching ${stock.ticker} (${stock.company})...`);
 
-      const profile = await fetchYahooProfile(stock.ticker);
+      const profile = await fetchYahooCompanyProfile(stock.ticker);
 
       if (profile?.sector || profile?.industry) {
         await prisma.stock.update({
