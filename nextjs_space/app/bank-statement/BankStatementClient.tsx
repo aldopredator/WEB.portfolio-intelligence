@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Upload, FileSpreadsheet, Trash2, Download, AlertCircle, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy' | 'returnGBP' | 'weight' | 'investmentType';
 type SortDirection = 'asc' | 'desc' | null;
 
-// Holdings row interface
 interface HoldingRow {
   investment: string;
   identifier: string;
@@ -48,8 +47,10 @@ export default function BankStatementClient() {
 
   const getInvestmentType = (investmentName: string): string => {
     const nameLower = investmentName.toLowerCase();
-    if (nameLower.includes('etf') || nameLower.includes('tracker') || nameLower.includes('swap')) return 'ETF';
-    return 'Stock';
+    if (nameLower.includes('etf')) return 'ETF';
+    if (nameLower.includes('tracker')) return 'Tracker';
+    if (nameLower.includes('swap')) return 'Swap';
+    return '-';
   };
 
   const handleSort = (field: SortField) => {
@@ -70,36 +71,20 @@ export default function BankStatementClient() {
   // Calculate totalValue before using it in sortedHoldings
   const totalValue = holdings.reduce((sum, h) => sum + (h.valueR || 0), 0);
 
-  // Split holdings into ETF and Stock categories
-  const etfHoldings = holdings.filter(h => getInvestmentType(h.investment) === 'ETF');
-  const stockHoldings = holdings.filter(h => getInvestmentType(h.investment) === 'Stock');
+  const sortedHoldings = useMemo(() => {
+    if (!sortField || !sortDirection) return holdings;
 
-  // ETF calculations
-  const etfTotalValue = etfHoldings.reduce((sum, h) => sum + (h.valueR || 0), 0);
-  const etfTotalBookCost = etfHoldings.reduce((sum, h) => sum + (h.bookCostR || 0), 0);
-  const etfTotalGainLoss = etfTotalValue - etfTotalBookCost;
-  const etfTotalGainLossPercent = etfTotalBookCost > 0 ? (etfTotalGainLoss / etfTotalBookCost) * 100 : 0;
-
-  // Stock calculations
-  const stockTotalValue = stockHoldings.reduce((sum, h) => sum + (h.valueR || 0), 0);
-  const stockTotalBookCost = stockHoldings.reduce((sum, h) => sum + (h.bookCostR || 0), 0);
-  const stockTotalGainLoss = stockTotalValue - stockTotalBookCost;
-  const stockTotalGainLossPercent = stockTotalBookCost > 0 ? (stockTotalGainLoss / stockTotalBookCost) * 100 : 0;
-
-  // Sort holdings
-  const sortHoldings = useCallback((holdingsToSort: HoldingRow[], categoryTotalValue: number) => {
-    if (!sortField || !sortDirection) return holdingsToSort;
-
-    return [...holdingsToSort].sort((a, b) => {
+    return [...holdings].sort((a, b) => {
       let aVal: string | number;
       let bVal: string | number;
 
+      // Handle computed field returnGBP
       if (sortField === 'returnGBP') {
         aVal = a.valueR - a.bookCostR;
         bVal = b.valueR - b.bookCostR;
       } else if (sortField === 'weight') {
-        aVal = categoryTotalValue > 0 ? (a.valueR / categoryTotalValue) * 100 : 0;
-        bVal = categoryTotalValue > 0 ? (b.valueR / categoryTotalValue) * 100 : 0;
+        aVal = totalValue > 0 ? (a.valueR / totalValue) * 100 : 0;
+        bVal = totalValue > 0 ? (b.valueR / totalValue) * 100 : 0;
       } else if (sortField === 'investmentType') {
         aVal = getInvestmentType(a.investment);
         bVal = getInvestmentType(b.investment);
@@ -109,7 +94,9 @@ export default function BankStatementClient() {
       }
 
       if (typeof aVal === 'string' && typeof bVal === 'string') {
-        return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        return sortDirection === 'asc' 
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal);
       }
 
       if (typeof aVal === 'number' && typeof bVal === 'number') {
@@ -118,10 +105,7 @@ export default function BankStatementClient() {
 
       return 0;
     });
-  }, [sortField, sortDirection, getInvestmentType]);
-
-  const sortedEtfHoldings = sortHoldings(etfHoldings, etfTotalValue);
-  const sortedStockHoldings = sortHoldings(stockHoldings, stockTotalValue);
+  }, [holdings, sortField, sortDirection, totalValue]);
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return <ArrowUpDown className="w-3 h-3 opacity-40" />;
@@ -210,7 +194,7 @@ export default function BankStatementClient() {
     };
 
     reader.readAsBinaryString(file);
-  }, [statements]);
+  }, []);
 
   const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -239,7 +223,7 @@ export default function BankStatementClient() {
     setIsDragging(false);
   }, []);
 
-  const handleClear = useCallback(() => {
+  const handleClear = () => {
     if (activeStatementId) {
       setStatements(prev => prev.filter(s => s.id !== activeStatementId));
       setActiveStatementId(prev => {
@@ -247,9 +231,9 @@ export default function BankStatementClient() {
         return remaining.length > 0 ? remaining[0].id : null;
       });
     }
-  }, [activeStatementId, statements]);
+  };
 
-  const exportToExcel = useCallback(() => {
+  const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(holdings.map(h => ({
       'Investment': h.investment,
       'Identifier': h.identifier,
@@ -274,7 +258,11 @@ export default function BankStatementClient() {
     const now = new Date();
     const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
     XLSX.writeFile(workbook, `bank_statement_${timestamp}.xlsx`);
-  }, [holdings]);
+  };
+
+  const totalBookCost = holdings.reduce((sum, h) => sum + (h.bookCostR || 0), 0);
+  const totalGainLoss = totalValue - totalBookCost;
+  const totalGainLossPercent = totalBookCost > 0 ? (totalGainLoss / totalBookCost) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -397,7 +385,7 @@ export default function BankStatementClient() {
               </div>
             </div>
 
-            {/* Overall Summary Stats */}
+            {/* Summary Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="bg-slate-950/50 border border-slate-800/50 rounded-lg p-4">
                 <p className="text-sm text-slate-400 mb-1">Total Holdings</p>
@@ -409,43 +397,20 @@ export default function BankStatementClient() {
               </div>
               <div className="bg-slate-950/50 border border-slate-800/50 rounded-lg p-4">
                 <p className="text-sm text-slate-400 mb-1">Total Book Cost (£)</p>
-                <p className="text-2xl font-bold text-white">£{(etfTotalBookCost + stockTotalBookCost).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+                <p className="text-2xl font-bold text-white">£{totalBookCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
               </div>
               <div className="bg-slate-950/50 border border-slate-800/50 rounded-lg p-4">
                 <p className="text-sm text-slate-400 mb-1">Total Gain/Loss</p>
-                <p className={`text-2xl font-bold ${(etfTotalGainLoss + stockTotalGainLoss) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {(etfTotalGainLoss + stockTotalGainLoss) >= 0 ? '+' : ''}£{(etfTotalGainLoss + stockTotalGainLoss).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                  <span className="text-sm ml-2">({((etfTotalBookCost + stockTotalBookCost) > 0 ? ((etfTotalGainLoss + stockTotalGainLoss) / (etfTotalBookCost + stockTotalBookCost) * 100) : 0) >= 0 ? '+' : ''}{((etfTotalBookCost + stockTotalBookCost) > 0 ? ((etfTotalGainLoss + stockTotalGainLoss) / (etfTotalBookCost + stockTotalBookCost) * 100) : 0).toFixed(2)}%)</span>
+                <p className={`text-2xl font-bold ${totalGainLoss >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {totalGainLoss >= 0 ? '+' : ''}£{totalGainLoss.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  <span className="text-sm ml-2">({totalGainLossPercent >= 0 ? '+' : ''}{totalGainLossPercent.toFixed(2)}%)</span>
                 </p>
               </div>
             </div>
           </div>
 
-          {/* ETF Holdings Table */}
+          {/* Holdings Table */}
           <div className="bg-slate-900/50 border border-slate-800/50 rounded-xl overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-950/50 to-blue-900/30 px-6 py-4 border-b border-slate-800/50">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-white">ETF Holdings</h3>
-                <div className="flex gap-6 text-sm">
-                  <div>
-                    <span className="text-slate-400">Count: </span>
-                    <span className="text-white font-semibold">{etfHoldings.length}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400">Value: </span>
-                    <span className="text-white font-semibold">£{etfTotalValue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400">Gain/Loss: </span>
-                    <span className={`font-semibold ${etfTotalGainLoss >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {etfTotalGainLoss >= 0 ? '+' : ''}£{etfTotalGainLoss.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                      <span className="text-xs ml-1">({etfTotalGainLossPercent >= 0 ? '+' : ''}{etfTotalGainLossPercent.toFixed(2)}%)</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="overflow-x-auto">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -513,15 +478,20 @@ export default function BankStatementClient() {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedEtfHoldings.map((holding, index) => (
+                  {sortedHoldings.map((holding, index) => (
                     <tr
                       key={index}
                       className="border-b border-slate-800/30 hover:bg-slate-800/30 transition-colors"
                     >
                       <td className="px-4 py-4 text-sm text-white">{holding.investment}</td>
                       <td className="px-4 py-4 text-sm text-center">
-                        <span className="px-2 py-1 rounded text-xs font-semibold bg-blue-500/20 text-blue-300">
-                          ETF
+                        <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                          getInvestmentType(holding.investment) === 'ETF' ? 'bg-blue-500/20 text-blue-300' :
+                          getInvestmentType(holding.investment) === 'Tracker' ? 'bg-purple-500/20 text-purple-300' :
+                          getInvestmentType(holding.investment) === 'Swap' ? 'bg-amber-500/20 text-amber-300' :
+                          'text-slate-500'
+                        }`}>
+                          {getInvestmentType(holding.investment)}
                         </span>
                       </td>
                       <td className="px-4 py-4 text-sm text-slate-300 font-mono">{holding.identifier}</td>
@@ -539,146 +509,7 @@ export default function BankStatementClient() {
                         £{holding.valueR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                       </td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {etfTotalValue > 0 ? ((holding.valueR / etfTotalValue) * 100).toFixed(2) : '0.00'}%
-                      </td>
-                      <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        £{holding.bookCostR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                      </td>
-                      <td className={`px-4 py-4 text-sm text-right font-semibold ${
-                        (holding.valueR - holding.bookCostR) >= 0 ? 'text-emerald-400' : 'text-red-400'
-                      }`}>
-                        {(holding.valueR - holding.bookCostR) >= 0 ? '+' : ''}£{(holding.valueR - holding.bookCostR).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                      </td>
-                      <td className={`px-4 py-4 text-sm text-right font-semibold ${
-                        holding.percentChange >= 0 ? 'text-emerald-400' : 'text-red-400'
-                      }`}>
-                        {holding.percentChange >= 0 ? '+' : ''}{holding.percentChange.toFixed(0)}%
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Stock Holdings Table */}
-          <div className="bg-slate-900/50 border border-slate-800/50 rounded-xl overflow-hidden">
-            <div className="bg-gradient-to-r from-emerald-950/50 to-emerald-900/30 px-6 py-4 border-b border-slate-800/50">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-white">Stock Holdings</h3>
-                <div className="flex gap-6 text-sm">
-                  <div>
-                    <span className="text-slate-400">Count: </span>
-                    <span className="text-white font-semibold">{stockHoldings.length}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400">Value: </span>
-                    <span className="text-white font-semibold">£{stockTotalValue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400">Gain/Loss: </span>
-                    <span className={`font-semibold ${stockTotalGainLoss >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {stockTotalGainLoss >= 0 ? '+' : ''}£{stockTotalGainLoss.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                      <span className="text-xs ml-1">({stockTotalGainLossPercent >= 0 ? '+' : ''}{stockTotalGainLossPercent.toFixed(2)}%)</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gradient-to-r from-slate-950/50 to-slate-900/50 border-b border-slate-800/50">
-                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('investment')} className="flex items-center gap-1 hover:text-white transition-colors">
-                        Investment <SortIcon field="investment" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('investmentType')} className="flex items-center gap-1 hover:text-white transition-colors">
-                        Type <SortIcon field="investmentType" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('identifier')} className="flex items-center gap-1 hover:text-white transition-colors">
-                        Identifier <SortIcon field="identifier" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('quantityHeld')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Quantity <SortIcon field="quantityHeld" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('lastPrice')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Last Price <SortIcon field="lastPrice" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('value')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Value <SortIcon field="value" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-center text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('valueCcy')} className="flex items-center gap-1 hover:text-white transition-colors mx-auto">
-                        Ccy <SortIcon field="valueCcy" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('valueR')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Value (£) <SortIcon field="valueR" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('weight')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Weight <SortIcon field="weight" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('bookCostR')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Book Cost (£) <SortIcon field="bookCostR" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('returnGBP')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Return (£) <SortIcon field="returnGBP" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('percentChange')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        % Change <SortIcon field="percentChange" />
-                      </button>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedStockHoldings.map((holding, index) => (
-                    <tr
-                      key={index}
-                      className="border-b border-slate-800/30 hover:bg-slate-800/30 transition-colors"
-                    >
-                      <td className="px-4 py-4 text-sm text-white">{holding.investment}</td>
-                      <td className="px-4 py-4 text-sm text-center">
-                        <span className="px-2 py-1 rounded text-xs font-semibold bg-emerald-500/20 text-emerald-300">
-                          Stock
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-sm text-slate-300 font-mono">{holding.identifier}</td>
-                      <td className="px-4 py-4 text-sm text-right text-slate-300">{holding.quantityHeld.toLocaleString()}</td>
-                      <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {holding.lastPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {holding.value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-center text-slate-400 font-mono text-xs">
-                        {holding.valueCcy}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-right text-white font-semibold">
-                        £{holding.valueR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {stockTotalValue > 0 ? ((holding.valueR / stockTotalValue) * 100).toFixed(2) : '0.00'}%
+                        {totalValue > 0 ? ((holding.valueR / totalValue) * 100).toFixed(2) : '0.00'}%
                       </td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
                         £{holding.bookCostR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
