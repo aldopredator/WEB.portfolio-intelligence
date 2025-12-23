@@ -185,7 +185,7 @@ export default function BankStatementClient() {
       let aVal: string | number;
       let bVal: string | number;
 
-      // Handle computed field returnGBP
+      // Handle computed fields
       if (sortField === 'returnGBP') {
         aVal = a.valueR - a.bookCostR;
         bVal = b.valueR - b.bookCostR;
@@ -195,6 +195,12 @@ export default function BankStatementClient() {
       } else if (sortField === 'investmentType') {
         aVal = getInvestmentType(a.investment);
         bVal = getInvestmentType(b.investment);
+      } else if (sortField === 'sector') {
+        aVal = stockInfo[a.identifier]?.sector || '-';
+        bVal = stockInfo[b.identifier]?.sector || '-';
+      } else if (sortField === 'industry') {
+        aVal = stockInfo[a.identifier]?.industry || '-';
+        bVal = stockInfo[b.identifier]?.industry || '-';
       } else {
         aVal = a[sortField!];
         bVal = b[sortField!];
