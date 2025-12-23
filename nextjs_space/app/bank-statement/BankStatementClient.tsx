@@ -105,12 +105,17 @@ export default function BankStatementClient() {
   // Fetch portfolio ID by name
   const fetchPortfolioIdByName = async (portfolioName: string) => {
     try {
+      console.log('Fetching portfolio ID for:', portfolioName);
       const response = await fetch(`/api/portfolios`);
       if (response.ok) {
         const portfolios = await response.json();
+        console.log('Available portfolios:', portfolios.map((p: any) => p.name));
         const portfolio = portfolios.find((p: any) => p.name === portfolioName);
         if (portfolio) {
+          console.log('Found portfolio ID:', portfolio.id);
           setPortfolioId(portfolio.id);
+        } else {
+          console.warn('Portfolio not found:', portfolioName);
         }
       }
     } catch (error) {
@@ -123,13 +128,19 @@ export default function BankStatementClient() {
     const fetchOptimalWeights = async () => {
       if (!portfolioId) return;
 
+      console.log('Fetching optimal weights for portfolio ID:', portfolioId);
       try {
         const response = await fetch(`/api/optimal-weights?portfolioId=${portfolioId}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success && data.weights) {
-            setOptimalWeights(data.weights);
-          }
+        console.log('Optimal weights response status:', response.status);
+        
+        const data = await response.json();
+        console.log('Optimal weights data:', data);
+        
+        if (response.ok && data.success && data.weights) {
+          console.log('Setting optimal weights:', data.weights);
+          setOptimalWeights(data.weights);
+        } else if (data.error) {
+          console.error('Optimal weights API error:', data.error, data.details);
         }
       } catch (error) {
         console.error('Failed to fetch optimal weights:', error);
