@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Upload, FileSpreadsheet, Trash2, Download, AlertCircle, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy' | 'returnGBP' | 'weight' | 'investmentType' | 'sector' | 'industry';
+type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy' | 'returnGBP' | 'weight' | 'investmentType' | 'sector' | 'industry' | 'ticker' | 'alternativeTicker' | 'portfolio';
 type SortDirection = 'asc' | 'desc' | null;
 
 interface SortLevel {
@@ -152,6 +152,12 @@ export default function BankStatementClient() {
       return stockInfo[holding.identifier]?.sector || '-';
     } else if (field === 'industry') {
       return stockInfo[holding.identifier]?.industry || '-';
+    } else if (field === 'ticker') {
+      return stockInfo[holding.identifier]?.ticker || '-';
+    } else if (field === 'alternativeTicker') {
+      return stockInfo[holding.identifier]?.alternativeTickers?.join(', ') || '-';
+    } else if (field === 'portfolio') {
+      return stockInfo[holding.identifier]?.portfolioName || '-';
     }
     return holding[field];
   };
@@ -776,19 +782,19 @@ export default function BankStatementClient() {
                       </button>
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                        Ticker
-                      </span>
+                      <button onClick={(e) => handleColumnClick('ticker', e)} className="flex items-center gap-1 hover:text-white transition-colors">
+                        Ticker <SortIcon field="ticker" />
+                      </button>
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                        Alt Tickers
-                      </span>
+                      <button onClick={(e) => handleColumnClick('alternativeTicker', e)} className="flex items-center gap-1 hover:text-white transition-colors">
+                        Alternative Ticker <SortIcon field="alternativeTicker" />
+                      </button>
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                        Portfolio
-                      </span>
+                      <button onClick={(e) => handleColumnClick('portfolio', e)} className="flex items-center gap-1 hover:text-white transition-colors">
+                        Portfolio <SortIcon field="portfolio" />
+                      </button>
                     </th>
                   </tr>
                 </thead>
