@@ -567,17 +567,21 @@ export default function BankStatementClient() {
                         <p className="text-lg font-bold text-white">£{value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
                         <p className="text-xs text-slate-400">{weight.toFixed(2)}% of portfolio</p>
                       </div>
-                      <div>
-                        <p className="text-xs text-slate-400">Book Cost</p>
-                        <p className="text-sm text-slate-300">£{bookCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-slate-400">Gain/Loss</p>
-                        <p className={`text-sm font-semibold ${gainLoss >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                          {gainLoss >= 0 ? '+' : ''}£{gainLoss.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                          <span className="text-xs ml-1">({gainLossPercent >= 0 ? '+' : ''}{gainLossPercent.toFixed(2)}%)</span>
-                        </p>
-                      </div>
+                      {type !== 'Cash' && (
+                        <>
+                          <div>
+                            <p className="text-xs text-slate-400">Book Cost</p>
+                            <p className="text-sm text-slate-300">£{bookCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-slate-400">Gain/Loss</p>
+                            <p className={`text-sm font-semibold ${gainLoss >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                              {gainLoss >= 0 ? '+' : ''}£{gainLoss.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                              <span className="text-xs ml-1">({gainLossPercent >= 0 ? '+' : ''}{gainLossPercent.toFixed(2)}%)</span>
+                            </p>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))}
