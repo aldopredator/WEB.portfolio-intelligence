@@ -239,7 +239,7 @@ export default function BankStatementClient() {
     setIsDragging(false);
   }, []);
 
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     if (activeStatementId) {
       setStatements(prev => prev.filter(s => s.id !== activeStatementId));
       setActiveStatementId(prev => {
@@ -247,7 +247,7 @@ export default function BankStatementClient() {
         return remaining.length > 0 ? remaining[0].id : null;
       });
     }
-  };
+  }, [activeStatementId, statements]);
 
   const exportToExcel = useCallback(() => {
     const worksheet = XLSX.utils.json_to_sheet(holdings.map(h => ({
