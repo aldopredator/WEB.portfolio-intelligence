@@ -817,12 +817,12 @@ export default function BankStatementClient() {
                   <tr className="bg-gradient-to-r from-slate-950/50 to-slate-900/50 border-b border-slate-800/50">
                     <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('identifier', e)} className="flex items-center gap-1 hover:text-white transition-colors">
-                        Identifier <SortIcon field="identifier" />
+                        Ticker <SortIcon field="identifier" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('investment', e)} className="flex items-center gap-1 hover:text-white transition-colors">
-                        Investment <SortIcon field="investment" />
+                        Name <SortIcon field="investment" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
@@ -841,28 +841,13 @@ export default function BankStatementClient() {
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={(e) => handleColumnClick('weight', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                        Actual Weight (%) <SortIcon field="weight" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('valueR', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Value (£) <SortIcon field="valueR" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={(e) => handleColumnClick('value', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Value <SortIcon field="value" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-center text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={(e) => handleColumnClick('valueCcy', e)} className="flex items-center gap-1 hover:text-white transition-colors mx-auto">
-                        Ccy <SortIcon field="valueCcy" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={(e) => handleColumnClick('weight', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Actual Weight <SortIcon field="weight" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={(e) => handleColumnClick('optimalWeight', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Optimal Weight <SortIcon field="optimalWeight" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
@@ -876,13 +861,23 @@ export default function BankStatementClient() {
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={(e) => handleColumnClick('lastPrice', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                        Last Price (£) <SortIcon field="lastPrice" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('bookCostR', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Book Cost (£) <SortIcon field="bookCostR" />
                       </button>
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('quantityHeld', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Quantity <SortIcon field="quantityHeld" />
+                        FX Rate <SortIcon field="quantityHeld" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={(e) => handleColumnClick('quantityHeld', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                        Quantity Held <SortIcon field="quantityHeld" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
@@ -890,19 +885,31 @@ export default function BankStatementClient() {
                         Last Price <SortIcon field="lastPrice" />
                       </button>
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={(e) => handleColumnClick('ticker', e)} className="flex items-center gap-1 hover:text-white transition-colors">
-                        Ticker <SortIcon field="ticker" />
+                    <th className="px-4 py-3 text-center text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <span className="text-xs">Last Price CCY</span>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={(e) => handleColumnClick('value', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                        Value <SortIcon field="value" />
                       </button>
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={(e) => handleColumnClick('alternativeTicker', e)} className="flex items-center gap-1 hover:text-white transition-colors">
-                        Alternative Ticker <SortIcon field="alternativeTicker" />
+                    <th className="px-4 py-3 text-center text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={(e) => handleColumnClick('valueCcy', e)} className="flex items-center gap-1 hover:text-white transition-colors mx-auto">
+                        Value CCY <SortIcon field="valueCcy" />
                       </button>
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={(e) => handleColumnClick('portfolio', e)} className="flex items-center gap-1 hover:text-white transition-colors">
-                        Portfolio <SortIcon field="portfolio" />
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <span className="text-xs">Book Cost</span>
+                    </th>
+                    <th className="px-4 py-3 text-center text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <span className="text-xs">Book Cost CCY</span>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <span className="text-xs">Average FX Rate</span>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={(e) => handleColumnClick('optimalWeight', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                        Optimal Weight (%) <SortIcon field="optimalWeight" />
                       </button>
                     </th>
                   </tr>
@@ -913,8 +920,11 @@ export default function BankStatementClient() {
                       key={index}
                       className="border-b border-slate-800/30 hover:bg-slate-800/30 transition-colors"
                     >
+                      {/* Ticker */}
                       <td className="px-4 py-4 text-sm text-slate-300 font-mono">{holding.identifier}</td>
+                      {/* Name */}
                       <td className="px-4 py-4 text-sm text-white">{holding.investment}</td>
+                      {/* Type */}
                       <td className="px-4 py-4 text-sm text-center">
                         <span className={`px-2 py-1 rounded text-xs font-semibold ${
                           getInvestmentType(holding.investment) === 'ETF' ? 'bg-blue-500/20 text-blue-300' : 
@@ -924,15 +934,83 @@ export default function BankStatementClient() {
                           {getInvestmentType(holding.investment)}
                         </span>
                       </td>
+                      {/* Sector */}
                       <td className="px-4 py-4 text-sm text-slate-300">
                         {stockInfo[holding.identifier]?.sector || '-'}
                       </td>
+                      {/* Industry */}
                       <td className="px-4 py-4 text-sm text-slate-300">
                         {stockInfo[holding.identifier]?.industry || '-'}
                       </td>
+                      {/* Actual Weight (%) */}
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {totalValue > 0 ? ((holding.valueR / totalValue) * 100).toFixed(2) : '0.00'}%
+                      </td>
+                      {/* Value (£) */}
                       <td className="px-4 py-4 text-sm text-right text-white font-semibold">
                         £{holding.valueR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                       </td>
+                      {/* Return (£) */}
+                      <td className={`px-4 py-4 text-sm text-right font-semibold ${
+                        (holding.valueR - holding.bookCostR) >= 0 ? 'text-emerald-400' : 'text-red-400'
+                      }`}>
+                        {getInvestmentType(holding.investment) === 'Cash' ? (
+                          <span className="text-slate-500 text-xs">-</span>
+                        ) : (
+                          <>{(holding.valueR - holding.bookCostR) >= 0 ? '+' : ''}£{(holding.valueR - holding.bookCostR).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</>
+                        )}
+                      </td>
+                      {/* % Change */}
+                      <td className={`px-4 py-4 text-sm text-right font-semibold ${
+                        holding.percentChange >= 0 ? 'text-emerald-400' : 'text-red-400'
+                      }`}>
+                        {getInvestmentType(holding.investment) === 'Cash' ? (
+                          <span className="text-slate-500 text-xs">-</span>
+                        ) : (
+                          <>{holding.percentChange >= 0 ? '+' : ''}{holding.percentChange.toFixed(0)}%</>
+                        )}
+                      </td>
+                      {/* Last Price (£) */}
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {getInvestmentType(holding.investment) === 'Cash' ? (
+                          <span className="text-slate-500 text-xs">-</span>
+                        ) : (
+                          <>£{holding.lastPriceP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</>
+                        )}
+                      </td>
+                      {/* Book Cost (£) */}
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {getInvestmentType(holding.investment) === 'Cash' ? (
+                          <span className="text-slate-500 text-xs">-</span>
+                        ) : (
+                          <>£{holding.bookCostR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</>
+                        )}
+                      </td>
+                      {/* FX Rate */}
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {holding.fxRate.toFixed(4)}
+                      </td>
+                      {/* Quantity Held */}
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {getInvestmentType(holding.investment) === 'Cash' ? (
+                          <span className="text-slate-500 text-xs">-</span>
+                        ) : (
+                          <>{holding.quantityHeld.toLocaleString()}</>
+                        )}
+                      </td>
+                      {/* Last Price */}
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {getInvestmentType(holding.investment) === 'Cash' ? (
+                          <span className="text-slate-500 text-xs">-</span>
+                        ) : (
+                          <>{holding.lastPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</>
+                        )}
+                      </td>
+                      {/* Last Price CCY */}
+                      <td className="px-4 py-4 text-sm text-center text-slate-400 font-mono text-xs">
+                        {holding.lastPriceCcy}
+                      </td>
+                      {/* Value */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
                         {getInvestmentType(holding.investment) === 'Cash' ? (
                           <span className="text-slate-500 text-xs">-</span>
@@ -940,12 +1018,23 @@ export default function BankStatementClient() {
                           <>{holding.value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</>
                         )}
                       </td>
+                      {/* Value CCY */}
                       <td className="px-4 py-4 text-sm text-center text-slate-400 font-mono text-xs">
                         {holding.valueCcy}
                       </td>
+                      {/* Book Cost */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {totalValue > 0 ? ((holding.valueR / totalValue) * 100).toFixed(2) : '0.00'}%
+                        {holding.bookCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                       </td>
+                      {/* Book Cost CCY */}
+                      <td className="px-4 py-4 text-sm text-center text-slate-400 font-mono text-xs">
+                        {holding.bookCostCcy}
+                      </td>
+                      {/* Average FX Rate */}
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {holding.averageFxRate.toFixed(4)}
+                      </td>
+                      {/* Optimal Weight (%) */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
                         {(() => {
                           const ticker = stockInfo[holding.identifier]?.ticker;
@@ -972,70 +1061,6 @@ export default function BankStatementClient() {
                             </span>
                           );
                         })()}
-                      </td>
-                      <td className={`px-4 py-4 text-sm text-right font-semibold ${
-                        (holding.valueR - holding.bookCostR) >= 0 ? 'text-emerald-400' : 'text-red-400'
-                      }`}>
-                        {getInvestmentType(holding.investment) === 'Cash' ? (
-                          <span className="text-slate-500 text-xs">-</span>
-                        ) : (
-                          <>{(holding.valueR - holding.bookCostR) >= 0 ? '+' : ''}£{(holding.valueR - holding.bookCostR).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</>
-                        )}
-                      </td>
-                      <td className={`px-4 py-4 text-sm text-right font-semibold ${
-                        holding.percentChange >= 0 ? 'text-emerald-400' : 'text-red-400'
-                      }`}>
-                        {getInvestmentType(holding.investment) === 'Cash' ? (
-                          <span className="text-slate-500 text-xs">-</span>
-                        ) : (
-                          <>{holding.percentChange >= 0 ? '+' : ''}{holding.percentChange.toFixed(0)}%</>
-                        )}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {getInvestmentType(holding.investment) === 'Cash' ? (
-                          <span className="text-slate-500 text-xs">-</span>
-                        ) : (
-                          <>£{holding.bookCostR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</>
-                        )}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {getInvestmentType(holding.investment) === 'Cash' ? (
-                          <span className="text-slate-500 text-xs">-</span>
-                        ) : (
-                          <>{holding.quantityHeld.toLocaleString()}</>
-                        )}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {getInvestmentType(holding.investment) === 'Cash' ? (
-                          <span className="text-slate-500 text-xs">-</span>
-                        ) : (
-                          <>{holding.lastPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</>
-                        )}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-slate-300 font-mono">
-                        {stockInfo[holding.identifier]?.ticker || '-'}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-slate-300">
-                        {stockInfo[holding.identifier]?.alternativeTickers?.length > 0 ? (
-                          <div className="flex flex-wrap gap-1">
-                            {stockInfo[holding.identifier].alternativeTickers.map((alt, i) => (
-                              <span key={i} className="px-1.5 py-0.5 bg-slate-700/50 text-slate-300 rounded text-xs font-mono">
-                                {alt}
-                              </span>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-slate-500 text-xs">-</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-4 text-sm">
-                        {stockInfo[holding.identifier]?.portfolioName ? (
-                          <span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs font-medium border border-blue-500/30">
-                            {stockInfo[holding.identifier].portfolioName}
-                          </span>
-                        ) : (
-                          <span className="text-slate-500 text-xs">-</span>
-                        )}
                       </td>
                     </tr>
                   ))}
