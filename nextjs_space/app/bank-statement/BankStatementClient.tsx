@@ -7,6 +7,11 @@ import * as XLSX from 'xlsx';
 type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy' | 'returnGBP' | 'weight' | 'investmentType';
 type SortDirection = 'asc' | 'desc' | null;
 
+interface SortLevel {
+  field: SortField;
+  direction: 'asc' | 'desc';
+}
+
 interface HoldingRow {
   investment: string;
   identifier: string;
@@ -37,6 +42,8 @@ export default function BankStatementClient() {
   const [statements, setStatements] = useState<Statement[]>([]);
   const [activeStatementId, setActiveStatementId] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [sortLevels, setSortLevels] = useState<SortLevel[]>([]);
+  const [showGrandTotal, setShowGrandTotal] = useState(false);
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
@@ -69,13 +76,72 @@ export default function BankStatementClient() {
     }
   };
 
+  const addSortLevel = (field: SortField) => {
+    const existingIndex = sortLevels.findIndex(s => s.field === field);
+    if (existingIndex >= 0) {
+      // Toggle direction or remove
+      const existing = sortLevels[existingIndex];
+      if (existing.direction === 'asc') {
+        setSortLevels(sortLevels.map((s, i) => i === existingIndex ? { ...s, direction: 'desc' } : s));
+      } else {
+        setSortLevels(sortLevels.filter((_, i) => i !== existingIndex));
+      }
+    } else {
+      setSortLevels([...sortLevels, { field, direction: 'asc' }]);
+    }
+  };
+
+  const clearSortLevels = () => {
+    setSortLevels([]);
+  };
+
+  const handleColumnClick = (field: SortField, e: React.MouseEvent) => {
+    if (e.shiftKey) {
+      addSortLevel(field);
+    } else {
+      handleSort(field);
+    }
+  };
+
+  const getSortValue = (holding: HoldingRow, field: SortField): string | number => {
+    if (field === 'returnGBP') {
+      return holding.valueR - holding.bookCostR;
+    } else if (field === 'weight') {
+      return totalValue > 0 ? (holding.valueR / totalValue) * 100 : 0;
+    } else if (field === 'investmentType') {
+      return getInvestmentType(holding.investment);
+    }
+    return holding[field];
+  };
+
   // Calculate totalValue before using it in sortedHoldings
   const totalValue = holdings.reduce((sum, h) => sum + (h.valueR || 0), 0);
 
   const sortedHoldings = useMemo(() => {
-    if (!sortField || !sortDirection) return holdings;
+    if (sortLevels.length === 0 && (!sortField || !sortDirection)) return holdings;
 
     return [...holdings].sort((a, b) => {
+      // Multi-level sorting
+      if (sortLevels.length > 0) {
+        for (const level of sortLevels) {
+          const aVal = getSortValue(a, level.field);
+          const bVal = getSortValue(b, level.field);
+          
+          let comparison = 0;
+          if (typeof aVal === 'string' && typeof bVal === 'string') {
+            comparison = aVal.localeCompare(bVal);
+          } else if (typeof aVal === 'number' && typeof bVal === 'number') {
+            comparison = aVal - bVal;
+          }
+          
+          if (comparison !== 0) {
+            return level.direction === 'asc' ? comparison : -comparison;
+          }
+        }
+        return 0;
+      }
+
+      // Single level sorting (legacy)
       let aVal: string | number;
       let bVal: string | number;
 
@@ -90,8 +156,8 @@ export default function BankStatementClient() {
         aVal = getInvestmentType(a.investment);
         bVal = getInvestmentType(b.investment);
       } else {
-        aVal = a[sortField];
-        bVal = b[sortField];
+        aVal = a[sortField!];
+        bVal = b[sortField!];
       }
 
       if (typeof aVal === 'string' && typeof bVal === 'string') {
@@ -106,9 +172,42 @@ export default function BankStatementClient() {
 
       return 0;
     });
-  }, [holdings, sortField, sortDirection, totalValue]);
+  }, [holdings, sortField, sortDirection, sortLevels, totalValue]);
+
+  // Calculate grand totals by type
+  const grandTotalsByType = useMemo(() => {
+    const totals = new Map<string, { count: number; value: number; bookCost: number; gainLoss: number }>();
+    
+    holdings.forEach(h => {
+      const type = getInvestmentType(h.investment);
+      const existing = totals.get(type) || { count: 0, value: 0, bookCost: 0, gainLoss: 0 };
+      totals.set(type, {
+        count: existing.count + 1,
+        value: existing.value + h.valueR,
+        bookCost: existing.bookCost + h.bookCostR,
+        gainLoss: existing.gainLoss + (h.valueR - h.bookCostR)
+      });
+    });
+    
+    return Array.from(totals.entries()).map(([type, stats]) => ({
+      type,
+      ...stats,
+      weight: totalValue > 0 ? (stats.value / totalValue) * 100 : 0,
+      gainLossPercent: stats.bookCost > 0 ? ((stats.value - stats.bookCost) / stats.bookCost) * 100 : 0
+    }));
+  }, [holdings, totalValue]);
 
   const SortIcon = ({ field }: { field: SortField }) => {
+    const sortLevel = sortLevels.find(s => s.field === field);
+    if (sortLevel) {
+      const levelIndex = sortLevels.findIndex(s => s.field === field);
+      return (
+        <span className="flex items-center gap-1">
+          {sortLevel.direction === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+          <span className="text-xs bg-blue-500/30 text-blue-300 rounded px-1">{levelIndex + 1}</span>
+        </span>
+      );
+    }
     if (sortField !== field) return <ArrowUpDown className="w-3 h-3 opacity-40" />;
     if (sortDirection === 'asc') return <ArrowUp className="w-3 h-3" />;
     if (sortDirection === 'desc') return <ArrowDown className="w-3 h-3" />;
@@ -410,6 +509,82 @@ export default function BankStatementClient() {
             </div>
           </div>
 
+          {/* Sort Controls and Grand Total Toggle */}
+          <div className="flex items-center justify-between gap-4 bg-slate-950/30 border border-slate-800/30 rounded-lg p-3">
+            <div className="flex items-center gap-4">
+              <span className="text-xs text-slate-400">
+                {sortLevels.length > 0 ? (
+                  <span className="flex items-center gap-2">
+                    <span className="font-semibold">Sort:</span>
+                    {sortLevels.map((level, i) => (
+                      <span key={i} className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs">
+                        {level.field} ({level.direction})
+                      </span>
+                    ))}
+                    <button 
+                      onClick={clearSortLevels}
+                      className="text-red-400 hover:text-red-300 underline"
+                    >
+                      Clear all
+                    </button>
+                  </span>
+                ) : (
+                  <span>Shift+Click column headers to add sort levels</span>
+                )}
+              </span>
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input 
+                type="checkbox" 
+                checked={showGrandTotal}
+                onChange={(e) => setShowGrandTotal(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="text-sm text-slate-300">Show Grand Total by Type</span>
+            </label>
+          </div>
+
+          {/* Grand Total by Type */}
+          {showGrandTotal && grandTotalsByType.length > 0 && (
+            <div className="bg-slate-950/50 border border-slate-800/50 rounded-xl p-6">
+              <h3 className="text-lg font-bold text-white mb-4">Grand Total by Investment Type</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {grandTotalsByType.map(({ type, count, value, bookCost, gainLoss, weight, gainLossPercent }) => (
+                  <div key={type} className="bg-slate-900/50 border border-slate-800/50 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className={`px-3 py-1 rounded text-sm font-semibold ${
+                        type === 'ETF' ? 'bg-blue-500/20 text-blue-300' : 
+                        type === 'Cash' ? 'bg-amber-500/20 text-amber-300' :
+                        'bg-emerald-500/20 text-emerald-300'
+                      }`}>
+                        {type}
+                      </span>
+                      <span className="text-xs text-slate-400">{count} holdings</span>
+                    </div>
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-xs text-slate-400">Total Value</p>
+                        <p className="text-lg font-bold text-white">£{value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+                        <p className="text-xs text-slate-400">{weight.toFixed(2)}% of portfolio</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400">Book Cost</p>
+                        <p className="text-sm text-slate-300">£{bookCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400">Gain/Loss</p>
+                        <p className={`text-sm font-semibold ${gainLoss >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {gainLoss >= 0 ? '+' : ''}£{gainLoss.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                          <span className="text-xs ml-1">({gainLossPercent >= 0 ? '+' : ''}{gainLossPercent.toFixed(2)}%)</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Holdings Table */}
           <div className="bg-slate-900/50 border border-slate-800/50 rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
@@ -417,62 +592,62 @@ export default function BankStatementClient() {
                 <thead>
                   <tr className="bg-gradient-to-r from-slate-950/50 to-slate-900/50 border-b border-slate-800/50">
                     <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('investment')} className="flex items-center gap-1 hover:text-white transition-colors">
+                      <button onClick={(e) => handleColumnClick('investment', e)} className="flex items-center gap-1 hover:text-white transition-colors">
                         Investment <SortIcon field="investment" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('investmentType')} className="flex items-center gap-1 hover:text-white transition-colors">
+                      <button onClick={(e) => handleColumnClick('investmentType', e)} className="flex items-center gap-1 hover:text-white transition-colors">
                         Type <SortIcon field="investmentType" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('identifier')} className="flex items-center gap-1 hover:text-white transition-colors">
+                      <button onClick={(e) => handleColumnClick('identifier', e)} className="flex items-center gap-1 hover:text-white transition-colors">
                         Identifier <SortIcon field="identifier" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('quantityHeld')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                      <button onClick={(e) => handleColumnClick('quantityHeld', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Quantity <SortIcon field="quantityHeld" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('lastPrice')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                      <button onClick={(e) => handleColumnClick('lastPrice', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Last Price <SortIcon field="lastPrice" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('value')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                      <button onClick={(e) => handleColumnClick('value', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Value <SortIcon field="value" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-center text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('valueCcy')} className="flex items-center gap-1 hover:text-white transition-colors mx-auto">
+                      <button onClick={(e) => handleColumnClick('valueCcy', e)} className="flex items-center gap-1 hover:text-white transition-colors mx-auto">
                         Ccy <SortIcon field="valueCcy" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('valueR')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                      <button onClick={(e) => handleColumnClick('valueR', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Value (£) <SortIcon field="valueR" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('weight')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                      <button onClick={(e) => handleColumnClick('weight', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Weight <SortIcon field="weight" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('bookCostR')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                      <button onClick={(e) => handleColumnClick('bookCostR', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Book Cost (£) <SortIcon field="bookCostR" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('returnGBP')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                      <button onClick={(e) => handleColumnClick('returnGBP', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Return (£) <SortIcon field="returnGBP" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={() => handleSort('percentChange')} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
+                      <button onClick={(e) => handleColumnClick('percentChange', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         % Change <SortIcon field="percentChange" />
                       </button>
                     </th>
