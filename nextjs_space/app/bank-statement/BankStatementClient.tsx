@@ -249,7 +249,7 @@ export default function BankStatementClient() {
     }
   };
 
-  const exportToExcel = (): void => {
+  const exportToExcel = useCallback(() => {
     const worksheet = XLSX.utils.json_to_sheet(holdings.map(h => ({
       'Investment': h.investment,
       'Identifier': h.identifier,
@@ -274,7 +274,7 @@ export default function BankStatementClient() {
     const now = new Date();
     const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
     XLSX.writeFile(workbook, `bank_statement_${timestamp}.xlsx`);
-  };
+  }, [holdings]);
 
   return (
     <div className="space-y-6">
