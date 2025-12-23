@@ -47,7 +47,10 @@ export default function BankStatementClient() {
 
   const getInvestmentType = (investmentName: string): string => {
     const nameLower = investmentName.toLowerCase();
-    if (nameLower.includes('etf') || nameLower.includes('tracker')) return 'ETF';
+    if (nameLower === 'cash') return 'Cash';
+    if (nameLower.includes(' etf') || nameLower.includes('etf ') || 
+        nameLower.includes(' etc') || nameLower.includes('etc ') ||
+        nameLower.includes('tracker') || nameLower.includes('funds')) return 'ETF';
     return 'Stock';
   };
 
@@ -484,7 +487,9 @@ export default function BankStatementClient() {
                       <td className="px-4 py-4 text-sm text-white">{holding.investment}</td>
                       <td className="px-4 py-4 text-sm text-center">
                         <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                          getInvestmentType(holding.investment) === 'ETF' ? 'bg-blue-500/20 text-blue-300' : 'bg-emerald-500/20 text-emerald-300'
+                          getInvestmentType(holding.investment) === 'ETF' ? 'bg-blue-500/20 text-blue-300' : 
+                          getInvestmentType(holding.investment) === 'Cash' ? 'bg-amber-500/20 text-amber-300' :
+                          'bg-emerald-500/20 text-emerald-300'
                         }`}>
                           {getInvestmentType(holding.investment)}
                         </span>
