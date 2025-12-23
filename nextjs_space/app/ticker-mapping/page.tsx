@@ -22,6 +22,7 @@ export default function TickerMappingPage() {
   const [newAltTicker, setNewAltTicker] = useState('');
   const [sortField, setSortField] = useState<SortField>('ticker');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [filterAltTickers, setFilterAltTickers] = useState<'all' | 'not-empty' | 'empty'>('not-empty');
 
   useEffect(() => {
     fetchStocks();
@@ -131,11 +132,17 @@ export default function TickerMappingPage() {
       <ArrowDown className="w-4 h-4" />;
   };
 
-  const filteredStocks = stocks.filter(stock => 
-    stock.ticker.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    stock.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    stock.alternativeTickers.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredStocks = stocks.filter(stock => {
+    const matchesSearch = stock.ticker.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      stock.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      stock.alternativeTickers.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesFilter = filterAltTickers === 'all' ? true :
+      filterAltTickers === 'not-empty' ? stock.alternativeTickers.length > 0 :
+      stock.alternativeTickers.length === 0;
+    
+    return matchesSearch && matchesFilter;
+  });
 
   const sortedStocks = [...filteredStocks].sort((a, b) => {
     // First, sort by whether they have alternative tickers (filled first)
@@ -180,9 +187,9 @@ export default function TickerMappingPage() {
           </button>
         </div>
 
-        {/* Search */}
-        <div className="mb-6">
-          <div className="relative">
+        {/* Search and Filter */}
+        <div className="mb-6 flex gap-4">
+          <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
               type="text"
@@ -191,6 +198,18 @@ export default function TickerMappingPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="text-sm text-slate-300 font-medium">Alternative Tickers:</label>
+            <select
+              value={filterAltTickers}
+              onChange={(e) => setFilterAltTickers(e.target.value as 'all' | 'not-empty' | 'empty')}
+              className="px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All</option>
+              <option value="not-empty">Not Empty</option>
+              <option value="empty">Empty</option>
+            </select>
           </div>
         </div>
 
