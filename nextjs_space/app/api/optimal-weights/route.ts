@@ -77,18 +77,9 @@ export async function GET(request: NextRequest) {
     } else {
       return NextResponse.json({ error: 'Either portfolioId or tickers parameter is required' }, { status: 400 });
     }
-      include: {
-        priceHistory: {
-          orderBy: {
-            date: 'desc'
-          },
-          take: 90
-        }
-      }
-    });
 
     if (stocks.length === 0) {
-      return NextResponse.json({ error: 'No stocks found for portfolio' }, { status: 404 });
+      return NextResponse.json({ error: 'No stocks found' }, { status: 404 });
     }
 
     // Filter stocks that have sufficient price history
