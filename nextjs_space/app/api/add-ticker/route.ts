@@ -6,6 +6,18 @@ const prisma = new PrismaClient();
 
 export const dynamic = 'force-dynamic';
 
+// Known alternative ticker mappings (bank statement format → database ticker)
+const ALTERNATIVE_TICKER_MAPPINGS: Record<string, string[]> = {
+  'BRK.B': ['BRK/B', 'BRK-B'],
+  'BRK.A': ['BRK/A', 'BRK-A'],
+  'HSBC': ['HSBA'],
+  'ENGI.PA': ['ENGI'],
+  'IBDRY': ['IBE'],
+  'NESN.SW': ['NESN'],
+  'PBR': ['PBA/A'],
+  // Add more mappings as needed
+};
+
 interface AddTickerRequest {
   ticker: string;
   name: string;
@@ -72,6 +84,9 @@ export async function POST(request: NextRequest) {
     // Fetch profile information from Yahoo Finance for sector/industry
     const profile = await fetchYahooCompanyProfile(ticker);
 
+    // Get alternative tickers if available
+    const alternativeTickers = ALTERNATIVE_TICKER_MAPPINGS[ticker] || [];
+
     // Create new stock in database
     const stock = await prisma.stock.create({
       data: {
@@ -81,6 +96,7 @@ export async function POST(request: NextRequest) {
         exchange: exchange,
         sector: profile?.sector || null,
         industry: profile?.industry || null,
+        alternativeTickers: alternativeTickers,
         isActive: true,
         portfolioId: portfolioId || null,
       },

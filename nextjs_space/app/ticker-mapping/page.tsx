@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Plus, Trash2, Save } from 'lucide-react';
+import { Search, Plus, Trash2, Save, RefreshCw } from 'lucide-react';
 
 interface Stock {
   id: string;
@@ -78,6 +78,44 @@ export default function TickerMappingPage() {
     setEditingId(null);
     setEditingTickers([]);
     setNewAltTicker('');
+  };
+
+  const handleBulkUpdate = async () => {
+    if (!confirm('This will update alternative tickers for all stocks based on the predefined mappings. Continue?')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch('/api/update-stock-sectors', {
+        method: 'POST',
+        headers: { 'Content- flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">Ticker Mapping Manager</h1>
+            <p className="text-slate-400">Manage alternative ticker symbols for bank statement matching</p>
+          </div>
+          <button
+            onClick={handleBulkUpdate}
+            disabled={loading}
+            className="flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-700 disabled:text-slate-500 rounded-lg text-white font-semibold transition-colors"
+          >
+            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+            Update All from Mappings
+          </button
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(`Successfully updated ${result.updated} stocks with alternative tickers!`);
+        await fetchStocks(); // Refresh the list
+      } else {
+        alert('Failed to update stocks');
+      }
+    } catch (error) {
+      console.error('Error updating stocks:', error);
+      alert('Error updating stocks');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filteredStocks = stocks.filter(stock => 

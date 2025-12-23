@@ -6,7 +6,8 @@ export const dynamic = 'force-dynamic';
 
 // Known alternative ticker mappings (bank statement format → database ticker)
 const ALTERNATIVE_TICKER_MAPPINGS: Record<string, string[]> = {
-  'BRK.B': ['BRK/B'],
+  'BRK.B': ['BRK/B', 'BRK-B'],
+  'BRK.A': ['BRK/A', 'BRK-A'],
   'HSBC': ['HSBA'],
   'ENGI.PA': ['ENGI'],
   'IBDRY': ['IBE'],

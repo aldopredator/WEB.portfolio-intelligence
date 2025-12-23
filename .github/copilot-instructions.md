@@ -1,62 +1,174 @@
 # Copilot / AI Agent Guidance — Portfolio Intelligence
 
-Short, actionable notes to help an AI coding agent be productive in this codebase.
+Essential knowledge for AI agents working in this Next.js 14 portfolio intelligence platform with Prisma, Postgres, and real-time financial data from multiple APIs.
 
-1. Project overview:
-   - Next.js 14 App Router project located in `nextjs_space/` (app directory uses the App Router).
-   - Single-page dashboard reading JSON data from `nextjs_space/public/stock_insights_data.json`.
-   - Components live under `nextjs_space/app/` and `nextjs_space/app/components/`.
-   - UI primitives are in `nextjs_space/app/components/ui/` (Radix-based primitives and shadcn-style wrappers).
+## 🎯 Architecture Overview
 
-2. Key files and why they matter:
-   - `nextjs_space/app/layout.tsx` — root layout, sets `html` class to `dark` and loads global font/styles.
-   - `nextjs_space/app/page.tsx` — main dashboard page (renders the stock cards and charts).
-   - `nextjs_space/public/stock_insights_data.json` — primary data source used by components; edit this file to add new stocks or test data.
-   - `nextjs_space/lib/types.ts` — canonical TypeScript types for stock data objects; import these when adding logic or components.
-   - `nextjs_space/lib/stock-utils.ts` — domain helpers (recommendation logic, price/percent formatting, sentiment helpers). Reuse these helpers rather than reimplementing business logic.
-   - `nextjs_space/lib/utils.ts` — UI helpers such as `cn(...)` (clsx + tailwind-merge) and small formatters — use consistently for class composition.
-   - `nextjs_space/package.json` — scripts: `yarn dev`, `yarn build`, `yarn start`, `yarn lint`. Prisma seed is configured under the `prisma.seed` key (run via `npx prisma db seed` after env setup).
-   - `nextjs_space/prisma/schema.prisma` — DB schema and `DATABASE_URL` dependency; the project works without a DB for the local JSON-driven dashboard, but DB features require setting `DATABASE_URL`.
+**Database-first design**: This is NOT a simple JSON dashboard. The app uses Prisma + PostgreSQL as the single source of truth. `lib/stock-data.ts::getStockData()` fetches from DB and orchestrates all data enrichment. Legacy JSON file (`public/stock_insights_data.json`) is obsolete.
 
-3. Common conventions and patterns (follow these):
-   - TypeScript-first: prefer explicit types from `lib/types.ts` for props and functions.
-   - Styling: Tailwind utility classes inline. Use `cn(...)` from `lib/utils.ts` when combining classes and `twMerge` to prevent conflicts.
-   - Components: small, focused presentational components under `app/components/*`. Reuse `app/components/ui/*` primitives for accessibility and consistent styling.
-   - Business logic: keep domain logic in `lib/stock-utils.ts` and types in `lib/types.ts`. UI components should be thin and accept typed props.
-   - Data flow: most UI reads from `public/stock_insights_data.json` (synchronous JSON import/read). If you add remote data fetching, follow the App Router conventions (server components or `fetch()` with caching options).
+**Multi-portfolio support**: Core pattern is Portfolio → Stocks → StockData/PriceHistory/Metrics. Server components fetch filtered data based on `?portfolio=<id>` query param passed from layout and filter at DB level.
 
-4. Build / dev / test commands (copyable):
-   - Install: `yarn install`
-   - Dev server: `yarn dev` (opens at http://localhost:3000)
-   - Build: `yarn build`
-   - Start (production): `yarn start`
-   - Lint: `yarn lint`
-   - Prisma seed (if using DB): set `DATABASE_URL` then `npx prisma db seed` (package.json contains `prisma.seed` entry).
+**API-driven enrichment**: Stock data is enriched from Polygon, Yahoo Finance, and Finnhub APIs using a tiered fallback approach. Cache system in `lib/cache.ts` and `lib/polygon-cache.ts` provides stale-while-revalidate semantics for rate-limited APIs.
 
-5. Integration points & external deps to watch:
-   - Radix UI primitives and a number of `@radix-ui/*` packages power the `app/components/ui` primitives.
-   - Charts: `recharts` and `react-plotly.js` are used; inspect `app/components/price-chart.tsx` for integration patterns.
-   - Optional AWS S3 usage: `@aws-sdk/*` dependencies present — any S3-related code will need credentials and env vars.
-   - Prisma + Postgres: `prisma/schema.prisma` expects `DATABASE_URL` — local JSON is used by default, but DB flows require env setup.
+## 🗂️ Critical File Map
 
-6. When editing code, do this first:
-   - Find the component under `app/components` and `app/components/ui`.
-   - Import types from `lib/types.ts` and helpers from `lib/stock-utils.ts` or `lib/utils.ts`.
-   - Use `cn(...)` for class composition; follow existing tailwind utility patterns.
-   - Prefer reusing existing presentational pieces (PriceCard, AnalystCard, SentimentCard) before adding new components.
+| File | Purpose | Why It Matters |
+|------|---------|----------------|
+| `lib/stock-data.ts` | **Data orchestration hub** | Fetches stocks from DB, enriches with API data, formats for UI. Only place that constructs `StockInsightsData`. All pages import `getStockData()`. |
+| `prisma/schema.prisma` | Database schema | Defines Portfolio, Stock, StockData, PriceHistory, AnalystRecommendation, SocialSentiment, News, Metrics models. Uses `PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL` env var. |
+| `lib/types.ts` | TypeScript contracts | `StockInsightsData`, `StockData`, `AnalystData` - import these for all data handling. 174 lines of detailed field definitions. |
+| `lib/polygon.ts` | Polygon API client | Fetches real-time stats (volume, market cap, shares outstanding). Rate-limited (5 calls/min free tier). Uses `POLYGON_API_KEY`. |
+| `lib/yahoo-finance.ts` | Yahoo Finance client | Fallback for price history, statistics, company profile when Polygon fails. Can be disabled with `ENABLE_YAHOO_FINANCE=false`. |
+| `lib/finnhub-metrics.ts` | Finnhub API client | Fetches financial metrics, analyst recommendations, balance sheets, earnings. Uses `FINNHUB_API_KEY`. |
+| `lib/cache.ts` | File-based cache | TTL-based caching in `.cache/` directory. Critical pattern: returns stale data on expiry rather than null (for serverless reliability). |
+| `app/page.tsx` | Main dashboard | Server component that calls `getStockData(portfolioId)`, fetches ratings from DB, passes to `DashboardClient` (client component). Uses `export const dynamic = 'force-dynamic'`. |
+| `app/layout.tsx` | Root layout | Dark mode enforced with `<html className="dark">`. Wraps in `PortfolioProvider` for client-side portfolio state. Includes `GlobalHeader` and `SidebarNavigation`. |
+| `app/api/add-ticker/route.ts` | Add stock API | POST endpoint to add new ticker: validates existence, fetches Yahoo data for price history, creates Stock + StockData + PriceHistory records. |
 
-7. Example quick tasks (how to implement them):
-   - Add a new stock to the dashboard: add object to `public/stock_insights_data.json`, then reuse existing components in `app/page.tsx` to render it.
-   - Update recommendation logic: edit `lib/stock-utils.ts::calculateRecommendation` — unit tests are not present, so keep changes small and test via `yarn dev`.
+## 🔧 Developer Workflows
 
-8. Pitfalls / gotchas discovered from the codebase:
-   - The app is built to run without env vars using the local JSON file — don't assume a DB is present unless `DATABASE_URL` is configured.
-   - Styling conflicts can appear if you concatenate classes manually; prefer `cn(...)` to prevent duplicate Tailwind classes.
+### Build & Run (Database Required)
+```bash
+yarn install
+yarn build  # Runs: prisma generate → prisma db push → next build
+yarn dev    # Port 3000
+```
 
-9. Where to look for more detail:
-   - UI patterns: `nextjs_space/app/components/ui/` (example primitives)
-   - Business logic: `nextjs_space/lib/stock-utils.ts`
-   - Types: `nextjs_space/lib/types.ts`
-   - Data source: `nextjs_space/public/stock_insights_data.json`
+**Critical**: Build process runs `prisma db push --accept-data-loss` automatically. Set `PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL` before building or you'll get Prisma connection errors.
 
-If any part of the codebase looks incomplete or you want guidance tailored to a specific change (new component, DB migration, or deployment), tell me which file or feature and I'll update these instructions.
+### Database Operations
+```bash
+npx prisma generate          # Generate Prisma client after schema changes
+npx prisma db push           # Push schema to DB (dev only)
+npx prisma migrate dev       # Create and apply migration (production-ready)
+npx prisma db seed           # Run scripts/seed.ts (uses tsx + dotenv)
+```
+
+Seed pattern: `package.json` has `prisma.seed` pointing to seed script. Use `tsx --require dotenv/config` for all Prisma scripts.
+
+### Testing
+```bash
+yarn test              # Run all Playwright tests
+yarn test:ui           # Interactive UI mode
+yarn test:headed       # Visible browser
+yarn test:report       # Open HTML report
+```
+
+Tests in `tests/*.spec.ts` cover navigation, criteria, screening, dashboard. All tests expect dev server running on localhost:3000.
+
+### Cache Management
+```bash
+yarn clear-cache       # Runs scripts/clear-cache.ps1 (PowerShell)
+```
+
+Cache is stored in `.cache/` (local) or `/tmp/.cache/` (Vercel). Polygon cache tracks round-robin ticker fetching to respect rate limits.
+
+## 📐 Coding Conventions
+
+### Data Fetching Pattern
+```typescript
+// Server Component (app/*/page.tsx)
+import { getStockData } from '@/lib/stock-data';
+
+export default async function Page({ searchParams }: { searchParams: { portfolio?: string } }) {
+  const stockData = await getStockData(searchParams.portfolio);
+  return <ClientComponent initialData={stockData} />;
+}
+```
+
+Always use `getStockData()` for stock data - it's the orchestrator. Never query Prisma directly in page components unless you need something `getStockData` doesn't provide.
+
+### API Route Pattern
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+export const dynamic = 'force-dynamic';
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    // ... DB operations with prisma
+    return NextResponse.json({ success: true, data });
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+```
+
+All API routes use `export const dynamic = 'force-dynamic'` to disable caching. Instantiate Prisma client at top of file (not using singleton pattern in route handlers).
+
+### Component Styling
+```tsx
+import { cn } from '@/lib/utils';
+
+<div className={cn(
+  "base-classes text-slate-300",
+  condition && "conditional-class",
+  customClassName
+)}>
+```
+
+**Always** use `cn()` from `lib/utils.ts` for class composition. It merges Tailwind classes intelligently (uses `twMerge` + `clsx`). Never concatenate class strings manually.
+
+### TypeScript Imports
+```typescript
+import type { StockInsightsData, StockData } from '@/lib/types';
+import { formatPrice, formatPercent } from '@/lib/stock-utils';
+```
+
+Use absolute imports with `@/` alias (configured in `tsconfig.json`). Import types with `type` keyword for clarity.
+
+## 🔗 External API Integration
+
+### Environment Variables (Required)
+```env
+PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL=postgresql://...
+POLYGON_API_KEY=your_key               # Free tier: 5 calls/min
+FINNHUB_API_KEY=your_key               # For metrics/recommendations
+ENABLE_YAHOO_FINANCE=true              # Default true, can disable
+SENTIMENT_CACHE_TTL_MS=1800000         # 30 min default
+ADMIN_TOKEN=secret                     # For /api/clear-cache
+```
+
+### API Rate Limits & Fallback Strategy
+1. **Polygon** (preferred): Real-time data, but rate-limited. `lib/polygon-cache.ts` implements round-robin ticker selection to stay within limits.
+2. **Yahoo Finance** (fallback): Scrapes data from Yahoo Finance API. No rate limits documented, but can be disabled via env var.
+3. **Finnhub** (supplemental): Financial metrics only. Free tier is sufficient for most use cases.
+
+Cache system ensures **stale data is returned on cache expiry** rather than failing. This is critical for serverless environments where API calls may timeout.
+
+## 🎨 UI Architecture
+
+**Dark theme enforced**: `layout.tsx` sets `<html className="dark">`. Tailwind configured for dark mode. Color scheme: slate-950/900 backgrounds, blue/violet accents.
+
+**Component structure**:
+- `app/components/ui/*` - Radix UI primitives (Dialog, Dropdown, Select, etc.)
+- `app/components/*` - Business components (PriceCard, AnalystCard, SentimentCard)
+- `components/*` - Shared layout components (GlobalHeader, SidebarNavigation)
+
+**State management**: React Context (`lib/portfolio-context.tsx`) for portfolio selection. Server state via Next.js Server Components. Client interactivity via `'use client'` boundaries.
+
+## 🚨 Common Pitfalls
+
+1. **Don't bypass `getStockData()`**: It orchestrates DB fetch + API enrichment + error handling. Direct Prisma queries in pages miss enrichment logic.
+
+2. **Prisma client instantiation**: In API routes, use `new PrismaClient()` at top. In lib files, use singleton pattern from `lib/prisma.ts` to prevent connection exhaustion.
+
+3. **Cache assumptions**: Cache returns stale data rather than `null` on expiry (see `lib/cache.ts:46`). Don't assume fresh data - check timestamps if critical.
+
+4. **Dynamic rendering**: Most pages use `export const dynamic = 'force-dynamic'` because they fetch from DB or external APIs. Don't remove this unless you understand caching implications.
+
+5. **Portfolio filtering**: `getStockData(portfolioId)` filters at DB level. If you add custom queries, ensure you respect `portfolioId` parameter to maintain filter consistency.
+
+6. **PowerShell scripts**: This project runs on Windows. Cache clearing and diagnostics use `.ps1` scripts. When adding scripts, use PowerShell or add cross-platform alternatives.
+
+## 📚 Documentation
+
+- `DESIGN_SPECIFICATION.md` - MUI design system (330 lines)
+- `docs/finnhub-metrics-mapping.md` - Finnhub API field mappings
+- `docs/data-sources.md` - Data source strategy
+- `tests/README.md` - Playwright test documentation
+
+When unclear about a feature, check these docs before asking. They contain architecture decisions and rationale.
