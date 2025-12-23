@@ -17,6 +17,7 @@ interface StockInfo {
   company: string;
   sector: string | null;
   industry: string | null;
+  alternativeTickers: string[];
   type: string | null;
   exchange: string | null;
   region: string | null;
@@ -728,7 +729,12 @@ export default function BankStatementClient() {
                         Identifier <SortIcon field="identifier" />
                       </button>
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                        Alt Tickers
+                      </span>
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('quantityHeld', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Quantity <SortIcon field="quantityHeld" />
                       </button>
@@ -798,6 +804,19 @@ export default function BankStatementClient() {
                         {stockInfo[holding.identifier]?.industry || '-'}
                       </td>
                       <td className="px-4 py-4 text-sm text-slate-300 font-mono">{holding.identifier}</td>
+                      <td className="px-4 py-4 text-sm text-slate-300">
+                        {stockInfo[holding.identifier]?.alternativeTickers?.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {stockInfo[holding.identifier].alternativeTickers.map((alt, i) => (
+                              <span key={i} className="px-1.5 py-0.5 bg-slate-700/50 text-slate-300 rounded text-xs font-mono">
+                                {alt}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-slate-500 text-xs">-</span>
+                        )}
+                      </td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">{holding.quantityHeld.toLocaleString()}</td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
                         {holding.lastPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}

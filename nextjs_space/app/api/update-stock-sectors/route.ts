@@ -68,13 +68,19 @@ export async function POST(request: NextRequest) {
         const alternativeTickers = ALTERNATIVE_TICKER_MAPPINGS[stock.ticker] || [];
         
         if (profile?.sector || profile?.industry || alternativeTickers.length > 0) {
+          const updateData: any = {
+            sector: profile?.sector || null,
+            industry: profile?.industry || null,
+          };
+          
+          // Only update alternativeTickers if we have mappings for this ticker
+          if (alternativeTickers.length > 0) {
+            updateData.alternativeTickers = alternativeTickers;
+          }
+          
           await prisma.stock.update({
             where: { id: stock.id },
-            data: {
-              sector: profile?.sector || null,
-              industry: profile?.industry || null,
-              alternativeTickers: alternativeTickers.length > 0 ? alternativeTickers : undefined,
-            }
+            data: updateData
           });
           
           successCount++;
