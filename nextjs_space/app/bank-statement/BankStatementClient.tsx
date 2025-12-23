@@ -87,9 +87,6 @@ export default function BankStatementClient() {
 
     fetchStockInfo();
   }, [holdings]);
-  const holdings = activeStatement?.holdings || [];
-  const accountId = activeStatement?.accountId || '';
-  const fileName = activeStatement?.fileName || '';
 
   const getInvestmentType = (investmentName: string): string => {
     const nameLower = investmentName.toLowerCase();
