@@ -132,9 +132,10 @@ export default function TickerMappingPage() {
   };
 
   const filteredStocks = stocks.filter(stock => 
-    stock.ticker.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (stock.ticker.toLowerCase().includes(searchTerm.toLowerCase()) ||
     stock.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    stock.alternativeTickers.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()))
+    stock.alternativeTickers.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()))) &&
+    stock.alternativeTickers.length > 0 // Only show stocks with alternative tickers
   );
 
   const sortedStocks = [...filteredStocks].sort((a, b) => {
