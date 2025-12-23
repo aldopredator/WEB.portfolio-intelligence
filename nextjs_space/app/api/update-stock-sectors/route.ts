@@ -4,8 +4,19 @@ import { fetchYahooCompanyProfile } from '@/lib/yahoo-finance';
 
 export const dynamic = 'force-dynamic';
 
+// Known alternative ticker mappings (bank statement format → database ticker)
+const ALTERNATIVE_TICKER_MAPPINGS: Record<string, string[]> = {
+  'BRK.B': ['BRK/B'],
+  'HSBC': ['HSBA'],
+  'ENGI.PA': ['ENGI'],
+  'IBDRY': ['IBE'],
+  'NESN.SW': ['NESN'],
+  'PBR': ['PBA/A'],
+  // Add more mappings as needed
+};
+
 /**
- * Update sector and industry for stocks in the database
+ * Update sector, industry, and alternative tickers for stocks in the database
  * Can update specific tickers or all stocks without sector/industry data
  */
 export async function POST(request: NextRequest) {
@@ -53,23 +64,31 @@ export async function POST(request: NextRequest) {
       try {
         const profile = await fetchYahooCompanyProfile(stock.ticker);
         
-        if (profile?.sector || profile?.industry) {
+        // Check if this ticker has known alternative tickers
+        const alternativeTickers = ALTERNATIVE_TICKER_MAPPINGS[stock.ticker] || [];
+        
+        if (profile?.sector || profile?.industry || alternativeTickers.length > 0) {
           await prisma.stock.update({
             where: { id: stock.id },
             data: {
-              sector: profile.sector || null,
-              industry: profile.industry || null,
+              sector: profile?.sector || null,
+              industry: profile?.industry || null,
+              alternativeTickers: alternativeTickers.length > 0 ? alternativeTickers : undefined,
             }
           });
           
           successCount++;
+          const altTickerInfo = alternativeTickers.length > 0 
+            ? ` [Alt: ${alternativeTickers.join(', ')}]` 
+            : '';
           results.push({
             ticker: stock.ticker,
             status: 'success',
-            sector: profile.sector,
-            industry: profile.industry
+            sector: profile?.sector,
+            industry: profile?.industry,
+            alternativeTickers: alternativeTickers
           });
-          console.log(`[Update Sectors] ✅ ${stock.ticker}: ${profile.sector} / ${profile.industry}`);
+          console.log(`[Update Sectors] ✅ ${stock.ticker}: ${profile?.sector || 'N/A'} / ${profile?.industry || 'N/A'}${altTickerInfo}`);
         } else {
           failCount++;
           results.push({

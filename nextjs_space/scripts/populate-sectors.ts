@@ -1,6 +1,6 @@
 /**
- * Migration script to populate sector and industry for all stocks
- * Run this once to fill in all missing sector/industry data
+ * Migration script to populate sector, industry, and alternative tickers for all stocks
+ * Run this once to fill in all missing data
  */
 
 import { PrismaClient } from '@prisma/client';
@@ -8,8 +8,19 @@ import { fetchYahooCompanyProfile } from '../lib/yahoo-finance';
 
 const prisma = new PrismaClient();
 
+// Known alternative ticker mappings (bank statement format → database ticker)
+const ALTERNATIVE_TICKER_MAPPINGS: Record<string, string[]> = {
+  'BRK.B': ['BRK/B'],
+  'HSBC': ['HSBA'],
+  'ENGI.PA': ['ENGI'],
+  'IBDRY': ['IBE'],
+  'NESN.SW': ['NESN'],
+  'PBR': ['PBA/A'],
+  // Add more mappings as needed
+};
+
 async function populateSectors() {
-  console.log('🚀 Starting sector/industry population...');
+  console.log('🚀 Starting sector/industry/alternative ticker population...');
 
   // Get all stocks without sector or industry
   const stocks = await prisma.stock.findMany({
@@ -24,7 +35,8 @@ async function populateSectors() {
       ticker: true,
       company: true,
       sector: true,
-      industry: true
+      industry: true,
+      alternativeTickers: true
     }
   });
 
@@ -39,6 +51,7 @@ async function populateSectors() {
   let successCount = 0;
   let failCount = 0;
   let skippedCount = 0;
+  let alternativeTickersUpdated = 0;
 
   for (let i = 0; i < stocks.length; i++) {
     const stock = stocks[i];
@@ -49,16 +62,27 @@ async function populateSectors() {
 
       const profile = await fetchYahooCompanyProfile(stock.ticker);
 
-      if (profile?.sector || profile?.industry) {
+      // Check if this ticker has known alternative tickers
+      const alternativeTickers = ALTERNATIVE_TICKER_MAPPINGS[stock.ticker] || stock.alternativeTickers;
+      const shouldUpdateAlternatives = alternativeTickers.length > 0 && 
+        JSON.stringify(alternativeTickers) !== JSON.stringify(stock.alternativeTickers);
+
+      if (profile?.sector || profile?.industry || shouldUpdateAlternatives) {
         await prisma.stock.update({
           where: { id: stock.id },
           data: {
-            sector: profile.sector || stock.sector,
-            industry: profile.industry || stock.industry,
+            sector: profile?.sector || stock.sector,
+            industry: profile?.industry || stock.industry,
+            alternativeTickers: alternativeTickers
           }
         });
 
-        console.log(`${progress} ✅ ${stock.ticker}: ${profile.sector || 'N/A'} / ${profile.industry || 'N/A'}`);
+        const altTickerInfo = shouldUpdateAlternatives 
+          ? ` [Alt: ${alternativeTickers.join(', ')}]` 
+          : '';
+        console.log(`${progress} ✅ ${stock.ticker}: ${profile?.sector || 'N/A'} / ${profile?.industry || 'N/A'}${altTickerInfo}`);
+        
+        if (shouldUpdateAlternatives) alternativeTickersUpdated++;
         successCount++;
       } else {
         console.log(`${progress} ⚠️  ${stock.ticker}: No sector/industry data available`);
@@ -79,6 +103,7 @@ async function populateSectors() {
 
   console.log('\n📈 Summary:');
   console.log(`   ✅ Successfully updated: ${successCount}`);
+  console.log(`   🔗 Alternative tickers added: ${alternativeTickersUpdated}`);
   console.log(`   ⚠️  No data available: ${skippedCount}`);
   console.log(`   ❌ Failed: ${failCount}`);
   console.log(`   📊 Total processed: ${stocks.length}`);
