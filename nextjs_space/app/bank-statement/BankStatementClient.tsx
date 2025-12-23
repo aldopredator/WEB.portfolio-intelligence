@@ -209,6 +209,15 @@ export default function BankStatementClient() {
       } else if (sortField === 'industry') {
         aVal = stockInfo[a.identifier]?.industry || '-';
         bVal = stockInfo[b.identifier]?.industry || '-';
+      } else if (sortField === 'ticker') {
+        aVal = stockInfo[a.identifier]?.ticker || '-';
+        bVal = stockInfo[b.identifier]?.ticker || '-';
+      } else if (sortField === 'alternativeTicker') {
+        aVal = stockInfo[a.identifier]?.alternativeTickers?.join(', ') || '-';
+        bVal = stockInfo[b.identifier]?.alternativeTickers?.join(', ') || '-';
+      } else if (sortField === 'portfolio') {
+        aVal = stockInfo[a.identifier]?.portfolioName || '-';
+        bVal = stockInfo[b.identifier]?.portfolioName || '-';
       } else {
         aVal = a[sortField!];
         bVal = b[sortField!];
