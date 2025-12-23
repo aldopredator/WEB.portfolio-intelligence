@@ -10,11 +10,21 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'No tickers provided' }, { status: 400 });
     }
 
+    // Search by primary ticker OR alternative tickers
     const stocks = await prisma.stock.findMany({
       where: {
-        ticker: {
-          in: tickers
-        }
+        OR: [
+          {
+            ticker: {
+              in: tickers
+            }
+          },
+          {
+            alternativeTickers: {
+              hasSome: tickers
+            }
+          }
+        ]
       },
       select: {
         ticker: true,
@@ -23,13 +33,22 @@ export async function GET(request: Request) {
         industry: true,
         type: true,
         exchange: true,
-        region: true
+        region: true,
+        alternativeTickers: true
       }
     });
 
     // Create a map for quick lookup
+    // Map both primary ticker AND alternative tickers to the same stock data
     const stockMap = stocks.reduce((acc, stock) => {
+      // Map primary ticker
       acc[stock.ticker] = stock;
+      
+      // Map all alternative tickers to the same stock data
+      stock.alternativeTickers.forEach(altTicker => {
+        acc[altTicker] = stock;
+      });
+      
       return acc;
     }, {} as Record<string, typeof stocks[0]>);
 
