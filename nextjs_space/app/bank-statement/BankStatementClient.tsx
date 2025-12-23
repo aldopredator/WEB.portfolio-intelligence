@@ -824,19 +824,41 @@ export default function BankStatementClient() {
                       <td className={`px-4 py-4 text-sm text-right font-semibold ${
                         (holding.valueR - holding.bookCostR) >= 0 ? 'text-emerald-400' : 'text-red-400'
                       }`}>
-                        {(holding.valueR - holding.bookCostR) >= 0 ? '+' : ''}£{(holding.valueR - holding.bookCostR).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                        {getInvestmentType(holding.investment) === 'Cash' ? (
+                          <span className="text-slate-500 text-xs">-</span>
+                        ) : (
+                          <>{(holding.valueR - holding.bookCostR) >= 0 ? '+' : ''}£{(holding.valueR - holding.bookCostR).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</>
+                        )}
                       </td>
                       <td className={`px-4 py-4 text-sm text-right font-semibold ${
                         holding.percentChange >= 0 ? 'text-emerald-400' : 'text-red-400'
                       }`}>
-                        {holding.percentChange >= 0 ? '+' : ''}{holding.percentChange.toFixed(0)}%
+                        {getInvestmentType(holding.investment) === 'Cash' ? (
+                          <span className="text-slate-500 text-xs">-</span>
+                        ) : (
+                          <>{holding.percentChange >= 0 ? '+' : ''}{holding.percentChange.toFixed(0)}%</>
+                        )}
                       </td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        £{holding.bookCostR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                        {getInvestmentType(holding.investment) === 'Cash' ? (
+                          <span className="text-slate-500 text-xs">-</span>
+                        ) : (
+                          <>£{holding.bookCostR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</>
+                        )}
                       </td>
-                      <td className="px-4 py-4 text-sm text-right text-slate-300">{holding.quantityHeld.toLocaleString()}</td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {holding.lastPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                        {getInvestmentType(holding.investment) === 'Cash' ? (
+                          <span className="text-slate-500 text-xs">-</span>
+                        ) : (
+                          <>{holding.quantityHeld.toLocaleString()}</>
+                        )}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {getInvestmentType(holding.investment) === 'Cash' ? (
+                          <span className="text-slate-500 text-xs">-</span>
+                        ) : (
+                          <>{holding.lastPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</>
+                        )}
                       </td>
                       <td className="px-4 py-4 text-sm text-slate-300 font-mono">
                         {stockInfo[holding.identifier]?.ticker || '-'}
