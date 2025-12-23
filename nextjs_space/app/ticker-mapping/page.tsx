@@ -138,6 +138,15 @@ export default function TickerMappingPage() {
   );
 
   const sortedStocks = [...filteredStocks].sort((a, b) => {
+    // First, sort by whether they have alternative tickers (filled first)
+    const aHasAlts = a.alternativeTickers.length > 0;
+    const bHasAlts = b.alternativeTickers.length > 0;
+    
+    if (aHasAlts !== bHasAlts) {
+      return bHasAlts ? 1 : -1; // Stocks with alt tickers come first
+    }
+    
+    // Then apply the selected sort field
     let compareValue = 0;
     
     if (sortField === 'ticker') {
