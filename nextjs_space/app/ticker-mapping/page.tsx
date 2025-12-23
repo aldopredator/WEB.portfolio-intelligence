@@ -131,9 +131,6 @@ export default function TickerMappingPage() {
             Update All from Mappings
           </button>
         </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Ticker Mapping Manager</h1>
-          <p className="text-slate-400">Manage alternative ticker symbols for bank statement matching</p>
-        </div>
 
         {/* Search */}
         <div className="mb-6">
