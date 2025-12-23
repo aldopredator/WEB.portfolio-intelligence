@@ -33,6 +33,8 @@ model Stock {
     exchange    String?  // 'NASDAQ', 'NYSE', etc.
     region      String?  // 'United States', etc.
     currency    String?  @default("USD")
+    sector      String?  // Company sector (e.g., 'Technology', 'Healthcare')
+    industry    String?  // Company industry (e.g., 'Software', 'Pharmaceuticals')
     isActive    Boolean  @default(true) // Whether the stock is in the user's portfolio
     rating      Int?     @default(0) // User's discretionary rating (0-5 stars)
     notes       String?  @db.VarChar(100) // User notes about the stock (max 100 chars)

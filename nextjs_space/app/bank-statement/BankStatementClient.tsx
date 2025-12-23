@@ -1,15 +1,25 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Upload, FileSpreadsheet, Trash2, Download, AlertCircle, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy' | 'returnGBP' | 'weight' | 'investmentType';
+type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy' | 'returnGBP' | 'weight' | 'investmentType' | 'sector' | 'industry';
 type SortDirection = 'asc' | 'desc' | null;
 
 interface SortLevel {
   field: SortField;
   direction: 'asc' | 'desc';
+}
+
+interface StockInfo {
+  ticker: string;
+  company: string;
+  sector: string | null;
+  industry: string | null;
+  type: string | null;
+  exchange: string | null;
+  region: string | null;
 }
 
 interface HoldingRow {
@@ -46,8 +56,37 @@ export default function BankStatementClient() {
   const [showGrandTotal, setShowGrandTotal] = useState(false);
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+  const [stockInfo, setStockInfo] = useState<Record<string, StockInfo>>({});
 
   const activeStatement = statements.find(s => s.id === activeStatementId);
+  const holdings = activeStatement?.holdings || [];
+  const accountId = activeStatement?.accountId || '';
+  const fileName = activeStatement?.fileName || '';
+
+  // Fetch stock information when holdings change
+  useEffect(() => {
+    const fetchStockInfo = async () => {
+      if (holdings.length === 0) return;
+
+      const tickers = holdings
+        .map(h => h.identifier)
+        .filter(id => id && id !== '-' && id !== 'CASH');
+
+      if (tickers.length === 0) return;
+
+      try {
+        const response = await fetch(`/api/stock-info?tickers=${tickers.join(',')}`);
+        if (response.ok) {
+          const data = await response.json();
+          setStockInfo(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch stock info:', error);
+      }
+    };
+
+    fetchStockInfo();
+  }, [holdings]);
   const holdings = activeStatement?.holdings || [];
   const accountId = activeStatement?.accountId || '';
   const fileName = activeStatement?.fileName || '';
@@ -110,6 +149,10 @@ export default function BankStatementClient() {
       return totalValue > 0 ? (holding.valueR / totalValue) * 100 : 0;
     } else if (field === 'investmentType') {
       return getInvestmentType(holding.investment);
+    } else if (field === 'sector') {
+      return stockInfo[holding.identifier]?.sector || '-';
+    } else if (field === 'industry') {
+      return stockInfo[holding.identifier]?.industry || '-';
     }
     return holding[field];
   };
@@ -341,6 +384,8 @@ export default function BankStatementClient() {
     const worksheet = XLSX.utils.json_to_sheet(holdings.map(h => ({
       'Investment': h.investment,
       'Type': getInvestmentType(h.investment),
+      'Sector': stockInfo[h.identifier]?.sector || '-',
+      'Industry': stockInfo[h.identifier]?.industry || '-',
       'Identifier': h.identifier,
       'Quantity Held': h.quantityHeld,
       'Last Price': h.lastPrice,
@@ -623,6 +668,16 @@ export default function BankStatementClient() {
                       </button>
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={(e) => handleColumnClick('sector', e)} className="flex items-center gap-1 hover:text-white transition-colors">
+                        Sector <SortIcon field="sector" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <button onClick={(e) => handleColumnClick('industry', e)} className="flex items-center gap-1 hover:text-white transition-colors">
+                        Industry <SortIcon field="industry" />
+                      </button>
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('identifier', e)} className="flex items-center gap-1 hover:text-white transition-colors">
                         Identifier <SortIcon field="identifier" />
                       </button>
@@ -689,6 +744,12 @@ export default function BankStatementClient() {
                         }`}>
                           {getInvestmentType(holding.investment)}
                         </span>
+                      </td>
+                      <td className="px-4 py-4 text-sm text-slate-300">
+                        {stockInfo[holding.identifier]?.sector || '-'}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-slate-300">
+                        {stockInfo[holding.identifier]?.industry || '-'}
                       </td>
                       <td className="px-4 py-4 text-sm text-slate-300 font-mono">{holding.identifier}</td>
                       <td className="px-4 py-4 text-sm text-right text-slate-300">{holding.quantityHeld.toLocaleString()}</td>
