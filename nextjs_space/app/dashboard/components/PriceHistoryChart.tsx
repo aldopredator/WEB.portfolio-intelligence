@@ -544,16 +544,6 @@ export default function PriceHistoryChart({
                 sx={{ ml: 1 }}
               />
             )}
-            {fiftyDayAverage && (
-              <Typography variant="body2" sx={{ color: 'text.secondary', ml: 1 }}>
-                50-Day MA: <strong>${fiftyDayAverage.toFixed(0)}</strong>
-              </Typography>
-            )}
-            {twoHundredDayAverage && (
-              <Typography variant="body2" sx={{ color: 'text.secondary', ml: 1 }}>
-                200-Day MA: <strong>${twoHundredDayAverage.toFixed(0)}</strong>
-              </Typography>
-            )}
           </Stack>
         </Stack>
 
