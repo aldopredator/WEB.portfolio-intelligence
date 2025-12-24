@@ -55,6 +55,25 @@ export default function PriceHistoryChart({
   const [benchmarkData, setBenchmarkData] = useState<Array<{ date: string; price: number }>>([]);
   const [isLoadingBenchmark, setIsLoadingBenchmark] = useState(false);
 
+  // Calculate 30-day return
+  const calculate30DayReturn = (): number | null => {
+    if (!data || data.length < 30) return null;
+    
+    // Sort data by date to ensure correct order
+    const sortedData = [...data].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+    // Get today's price (last entry) and 30 days ago price
+    const todayPrice = sortedData[sortedData.length - 1].price;
+    const thirtyDaysAgoPrice = sortedData[sortedData.length - 30].price;
+    
+    if (!todayPrice || !thirtyDaysAgoPrice) return null;
+    
+    // Calculate: (Price[today] / Price[today - 30d] - 1) * 100
+    return ((todayPrice / thirtyDaysAgoPrice) - 1) * 100;
+  };
+
+  const thirtyDayReturn = calculate30DayReturn();
+
   // Reset comparison when ticker changes
   useEffect(() => {
     setCompareTicker('');
@@ -268,6 +287,14 @@ export default function PriceHistoryChart({
               color={isPositive ? 'success' : 'error'}
               label={`${isPositive ? '+' : ''}${priceChangePercent.toFixed(2)}%`}
             />
+            {thirtyDayReturn !== null && (
+              <Chip
+                size="small"
+                color={thirtyDayReturn >= 0 ? 'success' : 'error'}
+                label={`30d: ${thirtyDayReturn >= 0 ? '+' : ''}${thirtyDayReturn.toFixed(2)}%`}
+                sx={{ ml: 1 }}
+              />
+            )}
             {fiftyDayAverage && (
               <Typography variant="body2" sx={{ color: 'text.secondary', ml: 1 }}>
                 50-Day MA: <strong>${fiftyDayAverage.toFixed(0)}</strong>
