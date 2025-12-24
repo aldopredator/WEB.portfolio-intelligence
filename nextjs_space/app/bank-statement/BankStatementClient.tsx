@@ -56,8 +56,8 @@ export default function BankStatementClient() {
   const [isDragging, setIsDragging] = useState(false);
   const [sortLevels, setSortLevels] = useState<SortLevel[]>([]);
   const [showGrandTotal, setShowGrandTotal] = useState(false);
-  const [sortField, setSortField] = useState<SortField | null>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+  const [sortField, setSortField] = useState<SortField | null>('weight');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [stockInfo, setStockInfo] = useState<Record<string, StockInfo>>({});
   const [optimalWeights, setOptimalWeights] = useState<Record<string, number>>({});
   const [isLoaded, setIsLoaded] = useState(false);
@@ -861,11 +861,6 @@ export default function BankStatementClient() {
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={(e) => handleColumnClick('lastPrice', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Last Price (£) <SortIcon field="lastPrice" />
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('bookCostR', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Book Cost (£) <SortIcon field="bookCostR" />
                       </button>
@@ -968,14 +963,6 @@ export default function BankStatementClient() {
                           <span className="text-slate-500 text-xs">-</span>
                         ) : (
                           <>{holding.percentChange >= 0 ? '+' : ''}{holding.percentChange.toFixed(0)}%</>
-                        )}
-                      </td>
-                      {/* Last Price (£) */}
-                      <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {getInvestmentType(holding.investment) === 'Cash' ? (
-                          <span className="text-slate-500 text-xs">-</span>
-                        ) : (
-                          <>£{holding.lastPriceP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</>
                         )}
                       </td>
                       {/* Book Cost (£) */}
