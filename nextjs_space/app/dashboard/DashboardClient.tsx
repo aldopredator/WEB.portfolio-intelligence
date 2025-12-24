@@ -78,6 +78,7 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
   const [isAddingTicker, setIsAddingTicker] = React.useState(false);
   const [panelCollapsed, setPanelCollapsed] = React.useState(false);
   const [ratingFilter, setRatingFilter] = React.useState<number>(0); // 0 = All, -1 = Not Rated, 1-5 = min stars
+  const [compareStock, setCompareStock] = React.useState<string>(''); // Benchmark comparison ticker
 
   // Sync stocks when initialStocks changes
   React.useEffect(() => {
@@ -478,6 +479,61 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
                   </FormControl>
                 </Box>
 
+                {/* Comparing Against Dropdown */}
+                <Box sx={{ mt: 2.5 }}>
+                  <FormControl
+                    fullWidth
+                    size="small"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        color: '#fff',
+                        backgroundColor: 'rgba(30, 41, 59, 0.5)',
+                        borderColor: 'rgba(148, 163, 184, 0.3)',
+                        '&:hover': {
+                          borderColor: 'rgba(148, 163, 184, 0.5)',
+                          backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                        },
+                        '&.Mui-focused': {
+                          borderColor: '#3b82f6',
+                          backgroundColor: 'rgba(30, 41, 59, 0.7)',
+                        }
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#94a3b8',
+                      }
+                    }}
+                  >
+                    <InputLabel sx={{ fontWeight: 600 }}>Comparing against</InputLabel>
+                    <Select
+                      value={compareStock}
+                      label="Comparing against"
+                      onChange={(e) => setCompareStock(e.target.value)}
+                      sx={{ fontWeight: 500 }}
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      {stocks
+                        .filter(s => s.ticker !== selectedStock)
+                        .sort((a, b) => a.ticker.localeCompare(b.ticker))
+                        .map((stock) => (
+                          <MenuItem key={stock.ticker} value={stock.ticker}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                              <Box>
+                                <strong>{stock.ticker}</strong> - {stock.company}
+                              </Box>
+                              {stock.rating && stock.rating > 0 && (
+                                <Box sx={{ ml: 1, color: '#fbbf24' }}>
+                                  {'⭐'.repeat(stock.rating)}
+                                </Box>
+                              )}
+                            </Box>
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+
                 {/* Search Tickers */}
                 <Box>
                   <Typography
@@ -630,6 +686,7 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
               stocks={stocks}
               portfolios={portfolios}
               onRatingUpdate={handleRatingUpdate}
+              compareStock={compareStock}
             />
           </Stack>
         </Box>
