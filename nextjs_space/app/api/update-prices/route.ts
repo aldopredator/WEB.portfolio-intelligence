@@ -18,14 +18,26 @@ export async function GET(request: NextRequest) {
 
     console.log(`Found ${stocks.length} active stocks`);
 
+    if (stocks.length === 0) {
+      return NextResponse.json({
+        success: true,
+        message: 'No active stocks found',
+        stats: { total: 0, success: 0, errors: 0 }
+      });
+    }
+
     let successCount = 0;
     let errorCount = 0;
+    const errors: string[] = [];
 
     for (const stock of stocks) {
       try {
+        console.log(`Fetching ${stock.ticker}...`);
         const priceHistory = await fetchYahooPriceHistory(stock.ticker);
         
         if (priceHistory && priceHistory.length > 0) {
+          console.log(`Got ${priceHistory.length} data points for ${stock.ticker}`);
+          
           await prisma.priceHistory.deleteMany({
             where: { stockId: stock.id }
           });
@@ -43,11 +55,18 @@ export async function GET(request: NextRequest) {
           });
 
           successCount++;
-          console.log(`✅ ${stock.ticker}: ${records.length} data points`);
+          console.log(`✅ ${stock.ticker}: ${records.length} data points saved`);
+        } else {
+          errorCount++;
+          const msg = `${stock.ticker}: No data returned from API`;
+          errors.push(msg);
+          console.warn(`⚠️ ${msg}`);
         }
       } catch (error) {
         errorCount++;
-        console.error(`❌ ${stock.ticker}:`, error);
+        const msg = `${stock.ticker}: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        errors.push(msg);
+        console.error(`❌ ${msg}`);
       }
       
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -56,7 +75,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: `Updated ${successCount} stocks, ${errorCount} errors`,
-      stats: { total: stocks.length, success: successCount, errors: errorCount }
+      stats: { total: stocks.length, success: successCount, errors: errorCount },
+      errors: errors.length > 0 ? errors : undefined
     });
     
   } catch (error) {
