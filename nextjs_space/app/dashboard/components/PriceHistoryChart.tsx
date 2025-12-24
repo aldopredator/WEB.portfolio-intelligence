@@ -80,7 +80,46 @@ export default function PriceHistoryChart({
     return ((todayPrice / thirtyDaysAgoPrice) - 1) * 100;
   };
 
+  // Calculate 30-day annualized volatility
+  const calculate30DayVolatility = (): number | null => {
+    if (!data || data.length < 31) return null;
+    
+    // Sort data by date to ensure correct order
+    const sortedData = [...data].sort((a, b) => {
+      const dateA = 'date' in a ? a.date : a.Date;
+      const dateB = 'date' in b ? b.date : b.Date;
+      return new Date(dateA).getTime() - new Date(dateB).getTime();
+    });
+    
+    // Get last 31 days of data (need 31 to calculate 30 daily returns)
+    const last31Days = sortedData.slice(-31);
+    
+    // Calculate daily returns
+    const dailyReturns: number[] = [];
+    for (let i = 1; i < last31Days.length; i++) {
+      const priceToday = 'price' in last31Days[i] ? last31Days[i].price : last31Days[i].Close;
+      const priceYesterday = 'price' in last31Days[i-1] ? last31Days[i-1].price : last31Days[i-1].Close;
+      
+      if (priceToday && priceYesterday) {
+        const dailyReturn = (priceToday / priceYesterday) - 1;
+        dailyReturns.push(dailyReturn);
+      }
+    }
+    
+    if (dailyReturns.length < 30) return null;
+    
+    // Calculate standard deviation of daily returns
+    const mean = dailyReturns.reduce((sum, ret) => sum + ret, 0) / dailyReturns.length;
+    const squaredDiffs = dailyReturns.map(ret => Math.pow(ret - mean, 2));
+    const variance = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / dailyReturns.length;
+    const stdDev = Math.sqrt(variance);
+    
+    // Annualize volatility: stdDev * sqrt(252) * 100 for percentage
+    return stdDev * Math.sqrt(252) * 100;
+  };
+
   const thirtyDayReturn = calculate30DayReturn();
+  const thirtyDayVolatility = calculate30DayVolatility();
 
   // Reset comparison when ticker changes
   useEffect(() => {
@@ -300,6 +339,14 @@ export default function PriceHistoryChart({
                 size="small"
                 color={thirtyDayReturn >= 0 ? 'success' : 'error'}
                 label={`30d: ${thirtyDayReturn >= 0 ? '+' : ''}${thirtyDayReturn.toFixed(2)}%`}
+                sx={{ ml: 1 }}
+              />
+            )}
+            {thirtyDayVolatility !== null && (
+              <Chip
+                size="small"
+                color="info"
+                label={`Vol: ${thirtyDayVolatility.toFixed(1)}%`}
                 sx={{ ml: 1 }}
               />
             )}
