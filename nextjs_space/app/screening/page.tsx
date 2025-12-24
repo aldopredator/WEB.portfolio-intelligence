@@ -105,7 +105,7 @@ export default async function ScreeningPage({
   // Parse criteria from URL parameters (or use defaults)
   const CRITERIA = parseCriteriaFromParams(new URLSearchParams(searchParams as Record<string, string>));
   
-  // Fetch stocks from database with portfolio information
+  // Fetch stocks from database with portfolio information and price history
   const dbStocks = await prisma.stock.findMany({
     where: { isActive: true },
     select: {
@@ -119,6 +119,16 @@ export default async function ScreeningPage({
           name: true,
           id: true
         }
+      },
+      priceHistory: {
+        select: {
+          date: true,
+          price: true,
+        },
+        orderBy: {
+          date: 'desc'
+        },
+        take: 90  // Get last 90 days for calculations
       }
     }
   });
@@ -350,10 +360,14 @@ export default async function ScreeningPage({
     const quarterlyRevenueGrowth = (stockInfo as any).quarterlyRevenueGrowth ? `${((stockInfo as any).quarterlyRevenueGrowth * 100).toFixed(2)}%` : 'N/A';
     const quarterlyEarningsGrowth = (stockInfo as any).quarterlyEarningsGrowth ? `${((stockInfo as any).quarterlyEarningsGrowth * 100).toFixed(2)}%` : 'N/A';
 
-    // Calculate 30-day metrics from price history
-    const priceHistory = data && typeof data === 'object' && 'price_movement_90_days' in data ? data.price_movement_90_days : null;
-    const return30Day = priceHistory ? calculate30DayReturn(priceHistory as any) : null;
-    const volatility30Day = priceHistory ? calculate30DayVolatility(priceHistory as any) : null;
+    // Calculate 30-day metrics from price history (from database)
+    // Use database priceHistory first, fall back to API data if available
+    let priceHistory = stock.priceHistory && stock.priceHistory.length > 0 
+      ? stock.priceHistory.map(ph => ({ date: ph.date.toISOString(), price: ph.price }))
+      : (data && typeof data === 'object' && 'price_movement_90_days' in data ? data.price_movement_90_days : null);
+    
+    const return30Day = priceHistory && priceHistory.length >= 30 ? calculate30DayReturn(priceHistory as any) : null;
+    const volatility30Day = priceHistory && priceHistory.length >= 31 ? calculate30DayVolatility(priceHistory as any) : null;
 
     return {
       ticker: stock.ticker,
