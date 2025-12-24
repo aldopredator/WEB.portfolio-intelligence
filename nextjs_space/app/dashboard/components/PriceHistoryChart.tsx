@@ -207,44 +207,42 @@ export default function PriceHistoryChart({
         }
         
         const priceHistory = data.priceHistory || [];
-        const compareStock = { ticker: compareTicker, priceHistory };
-          
-          console.log(`[PriceHistoryChart] ${compareTicker} data received:`, priceHistory.length, 'data points');
-          if (priceHistory.length > 0) {
-            console.log(`[PriceHistoryChart] First ${compareTicker} point:`, priceHistory[0]);
-          }
-          
-          // Normalize benchmark data - priceHistory has { date, price } format
-          const normalizedBenchmark = priceHistory.map((d: any) => ({
-            date: d.date instanceof Date ? d.date.toISOString().split('T')[0] : d.date,
-            price: d.price || 0,
-          }));
-          
-          console.log('[PriceHistoryChart] Normalized benchmark sample:', normalizedBenchmark.slice(0, 3));
-          console.log('[PriceHistoryChart] Stock dates sample:', normalizedData.slice(0, 3));
-          
-          // Create a map for quick date lookups (normalize dates to YYYY-MM-DD for comparison)
-          const benchmarkMap = new Map(
-            normalizedBenchmark.map((d: { date: string; price: number }) => {
-              const normalizedDate = typeof d.date === 'string' ? d.date.split('T')[0] : d.date;
-              return [normalizedDate, d.price];
-            })
-          );
-          
-          console.log('[PriceHistoryChart] Benchmark map keys sample:', Array.from(benchmarkMap.keys()).slice(0, 3));
-          
-          // Align benchmark data with the stock's date range
-          const alignedBenchmark = normalizedData.map(d => {
-            const normalizedDate = typeof d.date === 'string' ? d.date.split('T')[0] : new Date(d.date).toISOString().split('T')[0];
-            const price = benchmarkMap.get(normalizedDate) || 0;
-            return { date: d.date, price: price as number };
-          });
-          
-          console.log('[PriceHistoryChart] Aligned benchmark data sample:', alignedBenchmark.slice(0, 3));
-          console.log('[PriceHistoryChart] Non-zero benchmark prices:', alignedBenchmark.filter((d: { date: string; price: number }) => d.price > 0).length);
-          
-          setBenchmarkData(alignedBenchmark);
+        
+        console.log(`[PriceHistoryChart] ${compareTicker} data received:`, priceHistory.length, 'data points');
+        if (priceHistory.length > 0) {
+          console.log(`[PriceHistoryChart] First ${compareTicker} point:`, priceHistory[0]);
         }
+        
+        // Normalize benchmark data - priceHistory has { date, price } format
+        const normalizedBenchmark = priceHistory.map((d: any) => ({
+          date: d.date instanceof Date ? d.date.toISOString().split('T')[0] : d.date,
+          price: d.price || 0,
+        }));
+        
+        console.log('[PriceHistoryChart] Normalized benchmark sample:', normalizedBenchmark.slice(0, 3));
+        console.log('[PriceHistoryChart] Stock dates sample:', normalizedData.slice(0, 3));
+        
+        // Create a map for quick date lookups (normalize dates to YYYY-MM-DD for comparison)
+        const benchmarkMap = new Map(
+          normalizedBenchmark.map((d: { date: string; price: number }) => {
+            const normalizedDate = typeof d.date === 'string' ? d.date.split('T')[0] : d.date;
+            return [normalizedDate, d.price];
+          })
+        );
+        
+        console.log('[PriceHistoryChart] Benchmark map keys sample:', Array.from(benchmarkMap.keys()).slice(0, 3));
+        
+        // Align benchmark data with the stock's date range
+        const alignedBenchmark = normalizedData.map(d => {
+          const normalizedDate = typeof d.date === 'string' ? d.date.split('T')[0] : new Date(d.date).toISOString().split('T')[0];
+          const price = benchmarkMap.get(normalizedDate) || 0;
+          return { date: d.date, price: price as number };
+        });
+        
+        console.log('[PriceHistoryChart] Aligned benchmark data sample:', alignedBenchmark.slice(0, 3));
+        console.log('[PriceHistoryChart] Non-zero benchmark prices:', alignedBenchmark.filter((d: { date: string; price: number }) => d.price > 0).length);
+        
+        setBenchmarkData(alignedBenchmark);
       } catch (error) {
         console.error('Error fetching benchmark data:', error);
       } finally {
