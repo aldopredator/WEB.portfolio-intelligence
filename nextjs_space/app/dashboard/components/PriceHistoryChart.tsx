@@ -115,39 +115,6 @@ export default function PriceHistoryChart({
     return result;
   };
 
-  // Calculate 80-day return
-  const calculate80DayReturn = (): number | null => {
-    if (!data || data.length < 80) {
-      console.log('[PriceHistoryChart] Not enough data for 80-day return:', data?.length);
-      return null;
-    }
-    
-    // Sort data by date to ensure correct order
-    // Handle both {date, price} and {Date, Close} formats
-    const sortedData = [...data].sort((a, b) => {
-      const dateA = 'date' in a ? a.date : a.Date;
-      const dateB = 'date' in b ? b.date : b.Date;
-      return new Date(dateA).getTime() - new Date(dateB).getTime();
-    });
-    
-    // Get today's price (last entry) and 80 days ago price
-    const lastEntry = sortedData[sortedData.length - 1];
-    const eightyDaysAgoEntry = sortedData[sortedData.length - 80];
-    
-    const todayPrice = 'price' in lastEntry ? lastEntry.price : lastEntry.Close;
-    const eightyDaysAgoPrice = 'price' in eightyDaysAgoEntry ? eightyDaysAgoEntry.price : eightyDaysAgoEntry.Close;
-    
-    if (!todayPrice || !eightyDaysAgoPrice) {
-      console.log('[PriceHistoryChart] Missing price data for 80-day return');
-      return null;
-    }
-    
-    // Calculate: (Price[today] / Price[today - 80d] - 1) * 100
-    const result = ((todayPrice / eightyDaysAgoPrice) - 1) * 100;
-    console.log('[PriceHistoryChart] 80-day return calculated:', result.toFixed(2) + '%');
-    return result;
-  };
-
   // Calculate 30-day annualized volatility
   const calculate30DayVolatility = (): number | null => {
     if (!data || data.length < 31) return null;
@@ -307,7 +274,6 @@ export default function PriceHistoryChart({
 
   const thirtyDayReturn = calculate30DayReturn();
   const sixtyDayReturn = calculate60DayReturn();
-  const eightyDayReturn = calculate80DayReturn();
   const thirtyDayVolatility = calculate30DayVolatility();
   const ninetyDayMaxDrawdown = calculate90DayMaxDrawdown();
   const ninetyDayMaxDrawup = calculate90DayMaxDrawup();
@@ -551,14 +517,6 @@ export default function PriceHistoryChart({
                 size="small"
                 color={sixtyDayReturn >= 0 ? 'success' : 'error'}
                 label={`60d: ${sixtyDayReturn >= 0 ? '+' : ''}${sixtyDayReturn.toFixed(2)}%`}
-                sx={{ ml: 1 }}
-              />
-            )}
-            {eightyDayReturn !== null && (
-              <Chip
-                size="small"
-                color={eightyDayReturn >= 0 ? 'success' : 'error'}
-                label={`80d: ${eightyDayReturn >= 0 ? '+' : ''}${eightyDayReturn.toFixed(2)}%`}
                 sx={{ ml: 1 }}
               />
             )}
