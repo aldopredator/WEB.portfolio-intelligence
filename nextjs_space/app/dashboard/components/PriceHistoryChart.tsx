@@ -502,7 +502,7 @@ export default function PriceHistoryChart({
             <Chip
               size="small"
               color={isPositive ? 'success' : 'error'}
-              label={`${isPositive ? '+' : ''}${priceChangePercent.toFixed(2)}%`}
+              label={`1d: ${isPositive ? '+' : ''}${priceChangePercent.toFixed(2)}%`}
             />
             {thirtyDayReturn !== null && (
               <Chip
@@ -524,7 +524,7 @@ export default function PriceHistoryChart({
               <Chip
                 size="small"
                 color="info"
-                label={`Vol: ${thirtyDayVolatility.toFixed(1)}%`}
+                label={`30d Vol (an): ${thirtyDayVolatility.toFixed(1)}%`}
                 sx={{ ml: 1 }}
               />
             )}
