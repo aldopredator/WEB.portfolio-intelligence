@@ -84,7 +84,10 @@ export default function PriceHistoryChart({
 
   // Calculate 90-day return
   const calculate90DayReturn = (): number | null => {
-    if (!data || data.length < 90) return null;
+    if (!data || data.length < 90) {
+      console.log('[PriceHistoryChart] Not enough data for 90-day return:', data?.length);
+      return null;
+    }
     
     // Sort data by date to ensure correct order
     // Handle both {date, price} and {Date, Close} formats
@@ -101,10 +104,15 @@ export default function PriceHistoryChart({
     const todayPrice = 'price' in lastEntry ? lastEntry.price : lastEntry.Close;
     const ninetyDaysAgoPrice = 'price' in ninetyDaysAgoEntry ? ninetyDaysAgoEntry.price : ninetyDaysAgoEntry.Close;
     
-    if (!todayPrice || !ninetyDaysAgoPrice) return null;
+    if (!todayPrice || !ninetyDaysAgoPrice) {
+      console.log('[PriceHistoryChart] Missing price data for 90-day return');
+      return null;
+    }
     
     // Calculate: (Price[today] / Price[today - 90d] - 1) * 100
-    return ((todayPrice / ninetyDaysAgoPrice) - 1) * 100;
+    const result = ((todayPrice / ninetyDaysAgoPrice) - 1) * 100;
+    console.log('[PriceHistoryChart] 90-day return calculated:', result.toFixed(2) + '%');
+    return result;
   };
 
   // Calculate 30-day annualized volatility
