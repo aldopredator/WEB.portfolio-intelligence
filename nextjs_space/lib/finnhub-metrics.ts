@@ -268,41 +268,40 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
 }
 
 /**
- * Fetch company profile data - using Yahoo Finance as single source to ensure consistency
+ * Fetch company profile data - using Finnhub logo with Yahoo Finance for industry consistency
  */
 export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfile> {
-  // Use Yahoo Finance for all stocks to ensure consistent industry naming
-  console.log(`[FINNHUB] ${ticker} - Using Yahoo Finance for consistent industry data`);
-  let yahooProfile = null;
-  try {
-    yahooProfile = await fetchYahooCompanyProfile(ticker);
-    if (yahooProfile) {
-      // If Yahoo profile exists but logo is missing, try to get logo from Finnhub
-      if (!yahooProfile.logo) {
-        console.log(`[FINNHUB] ${ticker} - Yahoo profile missing logo, fetching from Finnhub`);
-        const apiKey = process.env.FINNHUB_API_KEY;
-        if (apiKey) {
-          try {
-            const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${apiKey}`;
-            const response = await fetch(url, {
-              next: { revalidate: METRICS_CACHE_TTL_SECONDS }
-            } as any);
-            if (response.ok) {
-              const data = await response.json();
-              if (data.logo) {
-                yahooProfile.logo = data.logo;
-                console.log(`[FINNHUB] ${ticker} - Added Finnhub logo: ${data.logo}`);
-              }
-            }
-          } catch (logoError) {
-            console.warn(`[FINNHUB] ${ticker} - Could not fetch Finnhub logo:`, logoError);
-          }
+  const apiKey = process.env.FINNHUB_API_KEY;
+  let finnhubLogo: string | undefined = undefined;
+  
+  // First, try to get logo from Finnhub (most reliable source)
+  if (apiKey) {
+    try {
+      console.log(`[FINNHUB] ${ticker} - Fetching logo from Finnhub API`);
+      const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${apiKey}`;
+      const response = await fetch(url, {
+        next: { revalidate: METRICS_CACHE_TTL_SECONDS }
+      } as any);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.logo && !data.error) {
+          finnhubLogo = data.logo;
+          console.log(`[FINNHUB] ${ticker} - Got logo from Finnhub: ${finnhubLogo}`);
         }
       }
-      
+    } catch (logoError) {
+      console.warn(`[FINNHUB] ${ticker} - Could not fetch Finnhub logo:`, logoError);
+    }
+  }
+  
+  // Use Yahoo Finance for all stocks to ensure consistent industry naming
+  console.log(`[FINNHUB] ${ticker} - Using Yahoo Finance for consistent industry data`);
+  try {
+    const yahooProfile = await fetchYahooCompanyProfile(ticker);
+    if (yahooProfile) {
       return {
         name: yahooProfile.name,
-        logo: yahooProfile.logo,
+        logo: finnhubLogo || yahooProfile.logo, // Prefer Finnhub logo over Clearbit
         industry: yahooProfile.industry,
         sector: yahooProfile.sector,
         country: yahooProfile.country,
