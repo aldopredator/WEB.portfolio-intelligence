@@ -15,37 +15,37 @@ Write-Host ""
 
 $batchNumber = 1
 do {
-    Write-Host "=" * 60 -ForegroundColor DarkGray
+    Write-Host ("=" * 60) -ForegroundColor DarkGray
     Write-Host "Batch #$batchNumber (offset: $offset)" -ForegroundColor Yellow
     
-    $url = "$baseUrl?batch=$BatchSize&offset=$offset"
+    $url = "https://portfolio-intelligence.co.uk/api/update-prices?batch=$BatchSize&offset=$offset"
+    Write-Host "URL: $url" -ForegroundColor Gray
     
     try {
-        $response = Invoke-WebRequest -Uri $url -Method GET -UseBasicParsing -TimeoutSec 120
-        $data = $response.Content | ConvertFrom-Json
+        $response = Invoke-RestMethod -Uri $url -Method GET -TimeoutSec 120
         
-        Write-Host "✅ Status: $($response.StatusCode)" -ForegroundColor Green
-        Write-Host "   Message: $($data.message)" -ForegroundColor White
-        Write-Host "   Success: $($data.stats.success) | Errors: $($data.stats.errors)" -ForegroundColor White
-        Write-Host "   Progress: $($data.stats.processed)/$($data.stats.total) stocks" -ForegroundColor Cyan
-        Write-Host "   Execution time: $($data.executionTime)" -ForegroundColor Gray
+        Write-Host "✅ Status: Success" -ForegroundColor Green
+        Write-Host "   Message: $($response.message)" -ForegroundColor White
+        Write-Host "   Success: $($response.stats.success) | Errors: $($response.stats.errors)" -ForegroundColor White
+        Write-Host "   Progress: $($response.stats.processed)/$($response.stats.total) stocks" -ForegroundColor Cyan
+        Write-Host "   Execution time: $($response.executionTime)" -ForegroundColor Gray
         
-        if ($data.errors -and $data.errors.Count -gt 0) {
+        if ($response.errors -and $response.errors.Count -gt 0) {
             Write-Host "   Errors encountered:" -ForegroundColor Red
-            $data.errors | ForEach-Object { Write-Host "     - $_" -ForegroundColor Red }
+            $response.errors | ForEach-Object { Write-Host "     - $_" -ForegroundColor Red }
         }
         
-        $totalProcessed += ($data.stats.success + $data.stats.errors)
-        $offset = $data.stats.processed
-        $nextBatchUrl = $data.nextBatchUrl
+        $totalProcessed += ($response.stats.success + $response.stats.errors)
+        $offset = $response.stats.processed
+        $nextBatchUrl = $response.nextBatchUrl
         
-        if ($data.stats.remaining -eq 0) {
+        if ($response.stats.remaining -eq 0) {
             Write-Host ""
-            Write-Host "=" * 60 -ForegroundColor DarkGray
+            Write-Host ("=" * 60) -ForegroundColor DarkGray
             Write-Host "✅ All stocks processed!" -ForegroundColor Green
-            Write-Host "   Total: $($data.stats.total) stocks" -ForegroundColor White
-            Write-Host "   Success: $($data.stats.success)" -ForegroundColor Green
-            Write-Host "   Errors: $($data.stats.errors)" -ForegroundColor $(if ($data.stats.errors -gt 0) { "Red" } else { "White" })
+            Write-Host "   Total: $($response.stats.total) stocks" -ForegroundColor White
+            Write-Host "   Success: $($response.stats.success)" -ForegroundColor Green
+            Write-Host "   Errors: $($response.stats.errors)" -ForegroundColor $(if ($response.stats.errors -gt 0) { "Red" } else { "White" })
             break
         }
         
@@ -55,12 +55,6 @@ do {
     } catch {
         Write-Host "❌ Error in batch #$batchNumber" -ForegroundColor Red
         Write-Host "   $($_.Exception.Message)" -ForegroundColor Red
-        
-        if ($_.Exception.Response) {
-            $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
-            $responseBody = $reader.ReadToEnd()
-            Write-Host "   Response: $responseBody" -ForegroundColor Red
-        }
         
         Write-Host ""
         Write-Host "Stopping batch process due to error" -ForegroundColor Yellow
