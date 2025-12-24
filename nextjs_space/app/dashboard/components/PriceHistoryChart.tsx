@@ -528,19 +528,24 @@ export default function PriceHistoryChart({
   return (
     <Card variant="outlined" sx={{ width: '100%' }}>
       <CardContent>
-        <Stack sx={{ justifyContent: 'space-between' }}>
+        <Stack spacing={1}>
+          {/* Line 1: Price only */}
+          <Stack>
+            <Typography variant="h4" component="p">
+              ${currentPrice.toFixed(0)}
+            </Typography>
+          </Stack>
+
+          {/* Line 2: All metrics */}
           <Stack
             direction="row"
             sx={{
-              alignContent: { xs: 'center', sm: 'flex-start' },
+              alignContent: 'center',
               alignItems: 'center',
               gap: 1,
               flexWrap: 'wrap',
             }}
           >
-            <Typography variant="h4" component="p">
-              ${currentPrice.toFixed(0)}
-            </Typography>
             <Chip
               size="small"
               color={isPositive ? 'success' : 'error'}
@@ -551,7 +556,6 @@ export default function PriceHistoryChart({
                 size="small"
                 color={thirtyDayReturn >= 0 ? 'success' : 'error'}
                 label={`30d: ${thirtyDayReturn >= 0 ? '+' : ''}${thirtyDayReturn.toFixed(2)}%`}
-                sx={{ ml: 1 }}
               />
             )}
             {thirtyDayVolatility !== null && (
@@ -559,7 +563,6 @@ export default function PriceHistoryChart({
                 size="small"
                 color="info"
                 label={`30d Vol (an): ${thirtyDayVolatility.toFixed(1)}%`}
-                sx={{ ml: 1 }}
               />
             )}
             {sixtyDayReturn !== null && (
@@ -567,7 +570,6 @@ export default function PriceHistoryChart({
                 size="small"
                 color={sixtyDayReturn >= 0 ? 'success' : 'error'}
                 label={`60d: ${sixtyDayReturn >= 0 ? '+' : ''}${sixtyDayReturn.toFixed(2)}%`}
-                sx={{ ml: 1 }}
               />
             )}
             {sixtyDayVolatility !== null && (
@@ -575,7 +577,6 @@ export default function PriceHistoryChart({
                 size="small"
                 color="info"
                 label={`60d Vol (an): ${sixtyDayVolatility.toFixed(1)}%`}
-                sx={{ ml: 1 }}
               />
             )}
             {ninetyDayMaxDrawdown !== null && (
@@ -583,7 +584,6 @@ export default function PriceHistoryChart({
                 size="small"
                 color="error"
                 label={`Max DD: ${ninetyDayMaxDrawdown.toFixed(2)}%`}
-                sx={{ ml: 1 }}
               />
             )}
             {ninetyDayMaxDrawup !== null && (
@@ -591,7 +591,6 @@ export default function PriceHistoryChart({
                 size="small"
                 color="success"
                 label={`Max DU: ${ninetyDayMaxDrawup >= 0 ? '+' : ''}${ninetyDayMaxDrawup.toFixed(2)}%`}
-                sx={{ ml: 1 }}
               />
             )}
             {cagr !== null && (
@@ -599,7 +598,6 @@ export default function PriceHistoryChart({
                 size="small"
                 color={cagr >= 0 ? 'success' : 'error'}
                 label={`CAGR: ${cagr >= 0 ? '+' : ''}${cagr.toFixed(2)}%`}
-                sx={{ ml: 1 }}
               />
             )}
           </Stack>
