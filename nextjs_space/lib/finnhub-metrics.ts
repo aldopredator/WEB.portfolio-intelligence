@@ -317,7 +317,6 @@ export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfil
   }
 
   // Fallback to Finnhub only if Yahoo Finance fails
-  const apiKey = process.env.FINNHUB_API_KEY;
   if (!apiKey) {
     console.warn(`[FINNHUB] ${ticker} - API key not configured for profile`);
     return {};
