@@ -83,6 +83,14 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
   // Sync stocks when initialStocks changes
   React.useEffect(() => {
     setStocks(initialStocks);
+    
+    // Auto-select CW8U.PA as default comparison if available
+    if (initialStocks.length > 0 && !compareStock) {
+      const cw8Stock = initialStocks.find(s => s.ticker === 'CW8U.PA');
+      if (cw8Stock) {
+        setCompareStock('CW8U.PA');
+      }
+    }
   }, [initialStocks]);
 
   // Callback to update rating in local state

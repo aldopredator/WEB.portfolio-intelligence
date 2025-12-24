@@ -59,6 +59,7 @@ export default function PriceHistoryChart({
 
   // Sync with external compare stock from sidebar
   useEffect(() => {
+    // Only sync if externalCompareStock is explicitly set (not undefined or null)
     if (externalCompareStock !== undefined) {
       setCompareTicker(externalCompareStock);
     }
