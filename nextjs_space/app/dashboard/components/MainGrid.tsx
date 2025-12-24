@@ -173,6 +173,7 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
               profitMargin={stock.profit_margin}
               quarterlyRevenueGrowth={stock.quarterlyRevenueGrowth}
               quarterlyEarningsGrowth={stock.quarterlyEarningsGrowth}
+              beta={stock.beta}
             />
           </Box>
         </Box>

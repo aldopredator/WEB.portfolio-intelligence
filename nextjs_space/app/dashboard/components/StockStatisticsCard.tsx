@@ -16,6 +16,7 @@ interface StockStatisticsCardProps {
   profitMargin?: number;
   quarterlyRevenueGrowth?: number | null;
   quarterlyEarningsGrowth?: number | null;
+  beta?: number | null;
 }
 
 export default function StockStatisticsCard({
@@ -25,6 +26,7 @@ export default function StockStatisticsCard({
   profitMargin,
   quarterlyRevenueGrowth,
   quarterlyEarningsGrowth,
+  beta,
 }: StockStatisticsCardProps) {
   const profitabilityMetrics = [
     { label: 'ROE', value: roe ? `${roe.toFixed(0)}%` : 'N/A', rawValue: roe },
@@ -154,7 +156,49 @@ export default function StockStatisticsCard({
             ))}
           </Stack>
         </Box>
-      </CardContent>
+        <Divider sx={{ my: 2 }} />
+
+        {/* Risk Metrics */}
+        <Box>
+          <Typography
+            variant="overline"
+            sx={{
+              color: 'warning.main',
+              fontWeight: 700,
+              fontSize: '0.75rem',
+              letterSpacing: 1,
+              mb: 2,
+              display: 'block',
+            }}
+          >
+            RISK METRICS
+          </Typography>
+          <Stack spacing={2}>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                Beta (5Y Monthly)
+              </Typography>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <Typography 
+                  variant={beta === null || beta === undefined ? 'body2' : 'h6'}
+                  sx={{ 
+                    fontWeight: beta === null || beta === undefined ? 400 : 700,
+                    color: beta === null || beta === undefined ? 'text.disabled' : 'inherit'
+                  }}
+                >
+                  {beta !== null && beta !== undefined ? beta.toFixed(2) : 'N/A'}
+                </Typography>
+                {(beta === null || beta === undefined) && (
+                  <Box sx={{ color: 'text.disabled', fontSize: '1rem' }}>❓</Box>
+                )}
+              </Stack>
+            </Stack>
+          </Stack>
+        </Box>      </CardContent>
     </Card>
   );
 }
