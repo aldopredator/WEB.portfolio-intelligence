@@ -97,6 +97,187 @@ function calculate30DayVolatility(priceHistory: Array<{date: string; price: numb
   return stdDev * Math.sqrt(252) * 100;
 }
 
+// Helper function to calculate daily change
+function calculateDailyChange(priceHistory: Array<{date: string; price: number} | {Date: string; Close: number}>): number | null {
+  if (!priceHistory || priceHistory.length < 2) return null;
+  
+  const sortedData = [...priceHistory].sort((a, b) => {
+    const dateA = 'date' in a ? a.date : a.Date;
+    const dateB = 'date' in b ? b.date : b.Date;
+    return new Date(dateA).getTime() - new Date(dateB).getTime();
+  });
+  
+  const lastEntry = sortedData[sortedData.length - 1];
+  const previousEntry = sortedData[sortedData.length - 2];
+  
+  const todayPrice = 'price' in lastEntry ? lastEntry.price : lastEntry.Close;
+  const yesterdayPrice = 'price' in previousEntry ? previousEntry.price : previousEntry.Close;
+  
+  if (!todayPrice || !yesterdayPrice) return null;
+  
+  return ((todayPrice / yesterdayPrice) - 1) * 100;
+}
+
+// Helper function to calculate 60-day return
+function calculate60DayReturn(priceHistory: Array<{date: string; price: number} | {Date: string; Close: number}>): number | null {
+  if (!priceHistory || priceHistory.length < 60) return null;
+  
+  const sortedData = [...priceHistory].sort((a, b) => {
+    const dateA = 'date' in a ? a.date : a.Date;
+    const dateB = 'date' in b ? b.date : b.Date;
+    return new Date(dateA).getTime() - new Date(dateB).getTime();
+  });
+  
+  const lastEntry = sortedData[sortedData.length - 1];
+  const sixtyDaysAgoEntry = sortedData[sortedData.length - 60];
+  
+  const todayPrice = 'price' in lastEntry ? lastEntry.price : lastEntry.Close;
+  const sixtyDaysAgoPrice = 'price' in sixtyDaysAgoEntry ? sixtyDaysAgoEntry.price : sixtyDaysAgoEntry.Close;
+  
+  if (!todayPrice || !sixtyDaysAgoPrice) return null;
+  
+  return ((todayPrice / sixtyDaysAgoPrice) - 1) * 100;
+}
+
+// Helper function to calculate 60-day annualized volatility
+function calculate60DayVolatility(priceHistory: Array<{date: string; price: number} | {Date: string; Close: number}>): number | null {
+  if (!priceHistory || priceHistory.length < 61) return null;
+  
+  const sortedData = [...priceHistory].sort((a, b) => {
+    const dateA = 'date' in a ? a.date : a.Date;
+    const dateB = 'date' in b ? b.date : b.Date;
+    return new Date(dateA).getTime() - new Date(dateB).getTime();
+  });
+  
+  const last61Days = sortedData.slice(-61);
+  
+  const dailyReturns: number[] = [];
+  for (let i = 1; i < last61Days.length; i++) {
+    const todayEntry = last61Days[i];
+    const yesterdayEntry = last61Days[i-1];
+    
+    const priceToday = 'price' in todayEntry ? todayEntry.price : todayEntry.Close;
+    const priceYesterday = 'price' in yesterdayEntry ? yesterdayEntry.price : yesterdayEntry.Close;
+    
+    if (priceToday && priceYesterday) {
+      const dailyReturn = (priceToday / priceYesterday) - 1;
+      dailyReturns.push(dailyReturn);
+    }
+  }
+  
+  if (dailyReturns.length < 60) return null;
+  
+  const mean = dailyReturns.reduce((sum, ret) => sum + ret, 0) / dailyReturns.length;
+  const squaredDiffs = dailyReturns.map(ret => Math.pow(ret - mean, 2));
+  const variance = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / dailyReturns.length;
+  const stdDev = Math.sqrt(variance);
+  
+  return stdDev * Math.sqrt(252) * 100;
+}
+
+// Helper function to calculate 90-day maximum drawdown
+function calculate90DayMaxDrawdown(priceHistory: Array<{date: string; price: number} | {Date: string; Close: number}>): number | null {
+  if (!priceHistory || priceHistory.length < 2) return null;
+  
+  const sortedData = [...priceHistory].sort((a, b) => {
+    const dateA = 'date' in a ? a.date : a.Date;
+    const dateB = 'date' in b ? b.date : b.Date;
+    return new Date(dateA).getTime() - new Date(dateB).getTime();
+  });
+  
+  const last90Days = sortedData.slice(-90);
+  
+  if (last90Days.length < 2) return null;
+  
+  let maxDrawdown = 0;
+  let peak = -Infinity;
+  
+  for (const entry of last90Days) {
+    const price = 'price' in entry ? entry.price : entry.Close;
+    
+    if (!price) continue;
+    
+    if (price > peak) {
+      peak = price;
+    }
+    
+    const drawdown = ((price - peak) / peak) * 100;
+    
+    if (drawdown < maxDrawdown) {
+      maxDrawdown = drawdown;
+    }
+  }
+  
+  return maxDrawdown;
+}
+
+// Helper function to calculate 90-day maximum drawup
+function calculate90DayMaxDrawup(priceHistory: Array<{date: string; price: number} | {Date: string; Close: number}>): number | null {
+  if (!priceHistory || priceHistory.length < 2) return null;
+  
+  const sortedData = [...priceHistory].sort((a, b) => {
+    const dateA = 'date' in a ? a.date : a.Date;
+    const dateB = 'date' in b ? b.date : b.Date;
+    return new Date(dateA).getTime() - new Date(dateB).getTime();
+  });
+  
+  const last90Days = sortedData.slice(-90);
+  
+  if (last90Days.length < 2) return null;
+  
+  let maxDrawup = 0;
+  let trough = Infinity;
+  
+  for (const entry of last90Days) {
+    const price = 'price' in entry ? entry.price : entry.Close;
+    
+    if (!price) continue;
+    
+    if (price < trough) {
+      trough = price;
+    }
+    
+    const drawup = ((price - trough) / trough) * 100;
+    
+    if (drawup > maxDrawup) {
+      maxDrawup = drawup;
+    }
+  }
+  
+  return maxDrawup;
+}
+
+// Helper function to calculate CAGR
+function calculateCAGR(priceHistory: Array<{date: string; price: number} | {Date: string; Close: number}>): number | null {
+  if (!priceHistory || priceHistory.length < 2) return null;
+  
+  const sortedData = [...priceHistory].sort((a, b) => {
+    const dateA = 'date' in a ? a.date : a.Date;
+    const dateB = 'date' in b ? b.date : b.Date;
+    return new Date(dateA).getTime() - new Date(dateB).getTime();
+  });
+  
+  const firstEntry = sortedData[0];
+  const lastEntry = sortedData[sortedData.length - 1];
+  
+  const firstPrice = 'price' in firstEntry ? firstEntry.price : firstEntry.Close;
+  const lastPrice = 'price' in lastEntry ? lastEntry.price : lastEntry.Close;
+  const firstDate = 'date' in firstEntry ? firstEntry.date : firstEntry.Date;
+  const lastDate = 'date' in lastEntry ? lastEntry.date : lastEntry.Date;
+  
+  if (!firstPrice || !lastPrice) return null;
+  
+  const firstDateTime = new Date(firstDate).getTime();
+  const lastDateTime = new Date(lastDate).getTime();
+  const yearsDiff = (lastDateTime - firstDateTime) / (1000 * 60 * 60 * 24 * 365.25);
+  
+  if (yearsDiff < 0.01) return null;
+  
+  const cagr = (Math.pow(lastPrice / firstPrice, 1 / yearsDiff) - 1) * 100;
+  
+  return cagr;
+}
+
 export default async function ScreeningPage({
   searchParams,
 }: {
@@ -368,6 +549,12 @@ export default async function ScreeningPage({
     
     const return30Day = priceHistory && priceHistory.length >= 30 ? calculate30DayReturn(priceHistory as any) : null;
     const volatility30Day = priceHistory && priceHistory.length >= 31 ? calculate30DayVolatility(priceHistory as any) : null;
+    const dailyChange = priceHistory && priceHistory.length >= 2 ? calculateDailyChange(priceHistory as any) : null;
+    const return60Day = priceHistory && priceHistory.length >= 60 ? calculate60DayReturn(priceHistory as any) : null;
+    const volatility60Day = priceHistory && priceHistory.length >= 61 ? calculate60DayVolatility(priceHistory as any) : null;
+    const maxDrawdown = priceHistory && priceHistory.length >= 2 ? calculate90DayMaxDrawdown(priceHistory as any) : null;
+    const maxDrawup = priceHistory && priceHistory.length >= 2 ? calculate90DayMaxDrawup(priceHistory as any) : null;
+    const cagr = priceHistory && priceHistory.length >= 2 ? calculateCAGR(priceHistory as any) : null;
 
     return {
       ticker: stock.ticker,
@@ -401,6 +588,12 @@ export default async function ScreeningPage({
       quarterlyEarningsGrowth,
       return30Day: return30Day !== null ? `${return30Day >= 0 ? '+' : ''}${return30Day.toFixed(2)}%` : 'N/A',
       volatility30Day: volatility30Day !== null ? `${volatility30Day.toFixed(1)}%` : 'N/A',
+      dailyChange: dailyChange !== null ? `${dailyChange >= 0 ? '+' : ''}${dailyChange.toFixed(2)}%` : 'N/A',
+      return60Day: return60Day !== null ? `${return60Day >= 0 ? '+' : ''}${return60Day.toFixed(2)}%` : 'N/A',
+      volatility60Day: volatility60Day !== null ? `${volatility60Day.toFixed(1)}%` : 'N/A',
+      maxDrawdown: maxDrawdown !== null ? `${maxDrawdown.toFixed(2)}%` : 'N/A',
+      maxDrawup: maxDrawup !== null ? `${maxDrawup.toFixed(2)}%` : 'N/A',
+      cagr: cagr !== null ? `${cagr >= 0 ? '+' : ''}${cagr.toFixed(2)}%` : 'N/A',
     };
   }).filter((stock): stock is NonNullable<typeof stock> => stock !== null);
 
