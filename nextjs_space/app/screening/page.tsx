@@ -366,8 +366,19 @@ export default async function ScreeningPage({
       ? stock.priceHistory.map(ph => ({ date: ph.date.toISOString(), price: ph.price }))
       : (data && typeof data === 'object' && 'price_movement_90_days' in data ? data.price_movement_90_days : null);
     
+    // Debug: Log for first stock to see what's happening
+    if (stock.ticker === dbStocks[0].ticker && priceHistory) {
+      console.log(`[SCREENING] ${stock.ticker} - priceHistory length: ${priceHistory.length}`);
+      console.log(`[SCREENING] ${stock.ticker} - first 3 entries:`, priceHistory.slice(0, 3));
+    }
+    
     const return30Day = priceHistory && priceHistory.length >= 30 ? calculate30DayReturn(priceHistory as any) : null;
     const volatility30Day = priceHistory && priceHistory.length >= 31 ? calculate30DayVolatility(priceHistory as any) : null;
+    
+    // Debug: Log calculated values
+    if (stock.ticker === dbStocks[0].ticker) {
+      console.log(`[SCREENING] ${stock.ticker} - 30d return: ${return30Day}, volatility: ${volatility30Day}`);
+    }
 
     return {
       ticker: stock.ticker,
