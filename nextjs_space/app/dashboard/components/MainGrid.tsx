@@ -203,6 +203,7 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
             volume={stock.volume}
             fiftyDayAverage={stock.fiftyDayAverage}
             twoHundredDayAverage={stock.twoHundredDayAverage}
+            stocks={stocks}
           />
         )}
         

@@ -35,6 +35,7 @@ interface PriceHistoryChartProps {
   volume?: number;
   fiftyDayAverage?: number | null;
   twoHundredDayAverage?: number | null;
+  stocks?: Array<{ ticker: string; company: string; portfolioId?: string | null }>;
 }
 
 export default function PriceHistoryChart({
@@ -48,6 +49,7 @@ export default function PriceHistoryChart({
   volume,
   fiftyDayAverage,
   twoHundredDayAverage,
+  stocks = [],
 }: PriceHistoryChartProps) {
   const theme = useTheme();
   const [compareTicker, setCompareTicker] = useState<string>('');
@@ -131,44 +133,35 @@ export default function PriceHistoryChart({
     setBenchmarkData([]);
   }, [ticker]);
 
-  // Fetch available tickers for comparison (all portfolios)
+  // Populate available tickers for comparison from stocks prop
   useEffect(() => {
-    const fetchTickers = async () => {
-      try {
-        // Fetch ALL stocks for comparison dropdown
-        const response = await fetch('/api/stock?portfolioId=all');
-        if (response.ok) {
-          const data = await response.json();
-          const stocks = data.stocks || [];
-          
-          // Show all stocks from all portfolios (excluding current ticker)
-          const tickers = stocks
-            .filter((s: any) => s.ticker !== ticker && s.isActive === true)
-            .map((s: any) => ({
-              ticker: s.ticker,
-              company: s.company || 'Unknown Company',
-              portfolioName: s.portfolio?.name || 'Unknown',
-            }))
-            .sort((a: { ticker: string; company: string; portfolioName: string }, b: { ticker: string; company: string; portfolioName: string }) => 
-              a.ticker.localeCompare(b.ticker)
-            );
-          
-          setAvailableTickers(tickers);
-          
-          // Auto-select CW8U.PA as default if available, otherwise first ticker
-          const cw8Ticker = tickers.find((t: { ticker: string; company: string; portfolioName: string }) => t.ticker === 'CW8U.PA');
-          if (cw8Ticker) {
-            setCompareTicker('CW8U.PA');
-          } else if (tickers.length > 0) {
-            setCompareTicker(tickers[0].ticker);
-          }
-        }
-      } catch (error) {
-        console.error('[PriceHistoryChart] Error fetching tickers:', error);
-      }
-    };
-    fetchTickers();
-  }, [ticker]);
+    if (!stocks || stocks.length === 0) return;
+    
+    console.log('[PriceHistoryChart] Setting up comparison tickers from stocks prop');
+    console.log('[PriceHistoryChart] Available stocks:', stocks.length);
+    
+    // Show all stocks (excluding current ticker)
+    const tickers = stocks
+      .filter((s: any) => s.ticker !== ticker)
+      .map((s: any) => ({
+        ticker: s.ticker,
+        company: s.company || 'Unknown Company',
+        portfolioName: 'Portfolio', // Generic name since we're showing all
+      }))
+      .sort((a: { ticker: string; company: string; portfolioName: string }, b: { ticker: string; company: string; portfolioName: string }) => 
+        a.ticker.localeCompare(b.ticker)
+      );
+    
+    console.log('[PriceHistoryChart] Available tickers for comparison:', tickers.length);
+    setAvailableTickers(tickers);
+    
+    // Auto-select CW8U.PA as default if available
+    const cw8Ticker = tickers.find((t: { ticker: string; company: string; portfolioName: string }) => t.ticker === 'CW8U.PA');
+    if (cw8Ticker && !compareTicker) {
+      console.log('[PriceHistoryChart] Auto-selecting CW8U.PA');
+      setCompareTicker('CW8U.PA');
+    }
+  }, [ticker, stocks]);
 
   // Normalize data format (support both lowercase and uppercase field names)
   const normalizedData = data.map(d => ({
