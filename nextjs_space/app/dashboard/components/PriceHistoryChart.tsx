@@ -123,8 +123,50 @@ export default function PriceHistoryChart({
     return stdDev * Math.sqrt(252) * 100;
   };
 
+  // Calculate 90-day maximum drawdown
+  const calculate90DayMaxDrawdown = (): number | null => {
+    if (!data || data.length < 2) return null;
+    
+    // Sort data by date to ensure correct order
+    const sortedData = [...data].sort((a, b) => {
+      const dateA = 'date' in a ? a.date : a.Date;
+      const dateB = 'date' in b ? b.date : b.Date;
+      return new Date(dateA).getTime() - new Date(dateB).getTime();
+    });
+    
+    // Get last 90 days of data (or all data if less than 90 days)
+    const last90Days = sortedData.slice(-90);
+    
+    if (last90Days.length < 2) return null;
+    
+    let maxDrawdown = 0;
+    let peak = -Infinity;
+    
+    for (const entry of last90Days) {
+      const price = 'price' in entry ? entry.price : entry.Close;
+      
+      if (!price) continue;
+      
+      // Update peak if current price is higher
+      if (price > peak) {
+        peak = price;
+      }
+      
+      // Calculate drawdown from peak
+      const drawdown = ((price - peak) / peak) * 100;
+      
+      // Update max drawdown if current drawdown is more negative
+      if (drawdown < maxDrawdown) {
+        maxDrawdown = drawdown;
+      }
+    }
+    
+    return maxDrawdown;
+  };
+
   const thirtyDayReturn = calculate30DayReturn();
   const thirtyDayVolatility = calculate30DayVolatility();
+  const ninetyDayMaxDrawdown = calculate90DayMaxDrawdown();
 
   // Reset comparison when ticker changes
   useEffect(() => {
@@ -364,6 +406,14 @@ export default function PriceHistoryChart({
                 size="small"
                 color="info"
                 label={`Vol: ${thirtyDayVolatility.toFixed(1)}%`}
+                sx={{ ml: 1 }}
+              />
+            )}
+            {ninetyDayMaxDrawdown !== null && (
+              <Chip
+                size="small"
+                color="error"
+                label={`Max DD: ${ninetyDayMaxDrawdown.toFixed(2)}%`}
                 sx={{ ml: 1 }}
               />
             )}
