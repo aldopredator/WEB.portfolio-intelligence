@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown, ExternalLink, Download, Database } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-type SortField = 'ticker' | 'sector' | 'industry' | 'portfolio' | 'rating' | 'updatedAt' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'avgAnnualVolume10D' | 'avgAnnualVolume3M' | 'beta' | 'roe' | 'profitMargin' | 'debtToEquity' | 'sentiment' | 'matchScore';
+type SortField = 'ticker' | 'sector' | 'industry' | 'portfolio' | 'rating' | 'updatedAt' | 'pe' | 'pb' | 'priceToSales' | 'marketCap' | 'avgVolume' | 'avgAnnualVolume10D' | 'avgAnnualVolume3M' | 'beta' | 'roe' | 'profitMargin' | 'debtToEquity' | 'sentiment' | 'matchScore' | 'return30Day' | 'volatility30Day';
 type SortDirection = 'asc' | 'desc';
 
 interface Stock {
@@ -38,6 +38,8 @@ interface Stock {
   roa: string;
   quarterlyRevenueGrowth: string;
   quarterlyEarningsGrowth: string;
+  return30Day: string;
+  volatility30Day: string;
 }
 
 interface ScreeningTableProps {
@@ -107,6 +109,9 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
       } else if (sortField === 'pe' || sortField === 'pb' || sortField === 'priceToSales' || sortField === 'beta' || sortField === 'roe' || sortField === 'profitMargin' || sortField === 'debtToEquity') {
         aVal = parseFloat(aVal);
         bVal = parseFloat(bVal);
+      } else if (sortField === 'return30Day' || sortField === 'volatility30Day') {
+        aVal = parseFloat(aVal.replace(/[%+]/g, ''));
+        bVal = parseFloat(bVal.replace(/[%+]/g, ''));
       } else if (sortField === 'marketCap') {
         aVal = parseFloat(aVal.replace(/[$B]/g, ''));
         bVal = parseFloat(bVal.replace(/[$B]/g, ''));
@@ -168,6 +173,8 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
       ...(criteria.profitMarginEnabled && { 'Profit Margin': stock.profitMargin }),
       ...(criteria.debtToEquityEnabled && { 'Debt/Equity': stock.debtToEquity }),
       ...(criteria.sentimentEnabled && { 'Sentiment': stock.sentiment }),
+      '30d Return': stock.return30Day,
+      '30d Volatility': stock.volatility30Day,
       'Match Score': `${stock.matchScore}%`,
     }));
 
@@ -226,6 +233,8 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
       'Quarterly Earnings Growth': stock.quarterlyEarningsGrowth,
       'Debt/Equity': stock.debtToEquity,
       'Sentiment': stock.sentiment,
+      '30d Return': stock.return30Day,
+      '30d Volatility': stock.volatility30Day,
       'Match Score': `${stock.matchScore}%`,
     }));
 
@@ -451,6 +460,24 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                 </th>
               )}
               <th 
+                className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('return30Day')}
+              >
+                <div className="flex items-center justify-end gap-2">
+                  30d Return
+                  <SortIcon field="return30Day" />
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('volatility30Day')}
+              >
+                <div className="flex items-center justify-end gap-2">
+                  30d Vol
+                  <SortIcon field="volatility30Day" />
+                </div>
+              </th>
+              <th 
                 className="px-6 py-4 text-center text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
                 onClick={() => handleSort('matchScore')}
               >
@@ -576,6 +603,18 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                     </span>
                   </td>
                 )}
+                <td className="px-6 py-5 text-right">
+                  <span className={`font-mono font-bold text-lg ${
+                    stock.return30Day.startsWith('+') ? 'text-emerald-400' : 
+                    stock.return30Day.startsWith('-') ? 'text-red-400' : 
+                    'text-slate-400'
+                  }`}>
+                    {stock.return30Day}
+                  </span>
+                </td>
+                <td className="px-6 py-5 text-right">
+                  <span className="text-blue-400 font-mono font-bold text-lg">{stock.volatility30Day}</span>
+                </td>
                 <td className="px-6 py-5">
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/20">

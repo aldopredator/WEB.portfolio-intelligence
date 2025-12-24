@@ -69,6 +69,12 @@ export interface ScreeningCriteria {
   countryFilter: string[];
   minMatchScore: number;
   matchScoreEnabled: boolean;
+  minReturn30Day: number;
+  maxReturn30Day: number;
+  return30DayEnabled: boolean;
+  minVolatility30Day: number;
+  maxVolatility30Day: number;
+  volatility30DayEnabled: boolean;
 }
 
 export const DEFAULT_CRITERIA: ScreeningCriteria = {
@@ -141,6 +147,12 @@ export const DEFAULT_CRITERIA: ScreeningCriteria = {
   countryFilter: [],
   minMatchScore: 50,
   matchScoreEnabled: false,
+  minReturn30Day: -100,
+  maxReturn30Day: 100,
+  return30DayEnabled: false,
+  minVolatility30Day: 0,
+  maxVolatility30Day: 100,
+  volatility30DayEnabled: false,
 };
 
 // Parse criteria from URL search params
@@ -215,6 +227,12 @@ export function parseCriteriaFromParams(searchParams: URLSearchParams): Screenin
     countryFilter: searchParams.get('countryFilter')?.split(',').filter(s => s) || DEFAULT_CRITERIA.countryFilter,
     minMatchScore: parseFloat(searchParams.get('minMatchScore') || String(DEFAULT_CRITERIA.minMatchScore)),
     matchScoreEnabled: searchParams.get('matchScoreEnabled') === 'true',
+    minReturn30Day: parseFloat(searchParams.get('minReturn30Day') || String(DEFAULT_CRITERIA.minReturn30Day)),
+    maxReturn30Day: parseFloat(searchParams.get('maxReturn30Day') || String(DEFAULT_CRITERIA.maxReturn30Day)),
+    return30DayEnabled: searchParams.get('return30DayEnabled') === 'true',
+    minVolatility30Day: parseFloat(searchParams.get('minVolatility30Day') || String(DEFAULT_CRITERIA.minVolatility30Day)),
+    maxVolatility30Day: parseFloat(searchParams.get('maxVolatility30Day') || String(DEFAULT_CRITERIA.maxVolatility30Day)),
+    volatility30DayEnabled: searchParams.get('volatility30DayEnabled') === 'true',
   };
 }
 

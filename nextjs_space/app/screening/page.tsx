@@ -40,6 +40,63 @@ const COUNTRY_NAMES: Record<string, string> = {
 
 const getCountryName = (code: string): string => COUNTRY_NAMES[code] || code;
 
+// Helper function to calculate 30-day return from price history
+function calculate30DayReturn(priceHistory: Array<{date: string; price: number} | {Date: string; Close: number}>): number | null {
+  if (!priceHistory || priceHistory.length < 30) return null;
+  
+  const sortedData = [...priceHistory].sort((a, b) => {
+    const dateA = 'date' in a ? a.date : a.Date;
+    const dateB = 'date' in b ? b.date : b.Date;
+    return new Date(dateA).getTime() - new Date(dateB).getTime();
+  });
+  
+  const lastEntry = sortedData[sortedData.length - 1];
+  const thirtyDaysAgoEntry = sortedData[sortedData.length - 30];
+  
+  const todayPrice = 'price' in lastEntry ? lastEntry.price : lastEntry.Close;
+  const thirtyDaysAgoPrice = 'price' in thirtyDaysAgoEntry ? thirtyDaysAgoEntry.price : thirtyDaysAgoEntry.Close;
+  
+  if (!todayPrice || !thirtyDaysAgoPrice) return null;
+  
+  return ((todayPrice / thirtyDaysAgoPrice) - 1) * 100;
+}
+
+// Helper function to calculate 30-day annualized volatility
+function calculate30DayVolatility(priceHistory: Array<{date: string; price: number} | {Date: string; Close: number}>): number | null {
+  if (!priceHistory || priceHistory.length < 31) return null;
+  
+  const sortedData = [...priceHistory].sort((a, b) => {
+    const dateA = 'date' in a ? a.date : a.Date;
+    const dateB = 'date' in b ? b.date : b.Date;
+    return new Date(dateA).getTime() - new Date(dateB).getTime();
+  });
+  
+  const last31Days = sortedData.slice(-31);
+  
+  const dailyReturns: number[] = [];
+  for (let i = 1; i < last31Days.length; i++) {
+    const todayEntry = last31Days[i];
+    const yesterdayEntry = last31Days[i-1];
+    
+    const priceToday = 'price' in todayEntry ? todayEntry.price : todayEntry.Close;
+    const priceYesterday = 'price' in yesterdayEntry ? yesterdayEntry.price : yesterdayEntry.Close;
+    
+    if (priceToday && priceYesterday) {
+      const dailyReturn = (priceToday / priceYesterday) - 1;
+      dailyReturns.push(dailyReturn);
+    }
+  }
+  
+  if (dailyReturns.length < 30) return null;
+  
+  const mean = dailyReturns.reduce((sum, ret) => sum + ret, 0) / dailyReturns.length;
+  const squaredDiffs = dailyReturns.map(ret => Math.pow(ret - mean, 2));
+  const variance = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / dailyReturns.length;
+  const stdDev = Math.sqrt(variance);
+  
+  return stdDev * Math.sqrt(252) * 100;
+}
+
 export default async function ScreeningPage({
   searchParams,
 }: {
@@ -293,6 +350,11 @@ export default async function ScreeningPage({
     const quarterlyRevenueGrowth = (stockInfo as any).quarterlyRevenueGrowth ? `${((stockInfo as any).quarterlyRevenueGrowth * 100).toFixed(2)}%` : 'N/A';
     const quarterlyEarningsGrowth = (stockInfo as any).quarterlyEarningsGrowth ? `${((stockInfo as any).quarterlyEarningsGrowth * 100).toFixed(2)}%` : 'N/A';
 
+    // Calculate 30-day metrics from price history
+    const priceHistory = data && typeof data === 'object' && 'price_movement_90_days' in data ? data.price_movement_90_days : null;
+    const return30Day = priceHistory ? calculate30DayReturn(priceHistory as any) : null;
+    const volatility30Day = priceHistory ? calculate30DayVolatility(priceHistory as any) : null;
+
     return {
       ticker: stock.ticker,
       name: stock.company,
@@ -323,6 +385,8 @@ export default async function ScreeningPage({
       roa,
       quarterlyRevenueGrowth,
       quarterlyEarningsGrowth,
+      return30Day: return30Day !== null ? `${return30Day >= 0 ? '+' : ''}${return30Day.toFixed(2)}%` : 'N/A',
+      volatility30Day: volatility30Day !== null ? `${volatility30Day.toFixed(1)}%` : 'N/A',
     };
   }).filter((stock): stock is NonNullable<typeof stock> => stock !== null);
 
