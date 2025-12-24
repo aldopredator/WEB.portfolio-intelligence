@@ -489,6 +489,17 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
 
                 {/* Comparing Against Dropdown */}
                 <Box sx={{ mt: 2.5 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: '#fff',
+                      mb: 1.5,
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Comparing against
+                  </Typography>
                   <FormControl
                     fullWidth
                     size="small"
@@ -511,15 +522,14 @@ function DashboardClientContent({ initialData, stocks: initialStocks }: Dashboar
                       }
                     }}
                   >
-                    <InputLabel sx={{ fontWeight: 600 }}>Comparing against</InputLabel>
                     <Select
                       value={compareStock}
-                      label="Comparing against"
                       onChange={(e) => setCompareStock(e.target.value)}
                       sx={{ fontWeight: 500 }}
+                      displayEmpty
                     >
                       <MenuItem value="">
-                        <em>None</em>
+                        <em>None - No comparison</em>
                       </MenuItem>
                       {stocks
                         .filter(s => s.ticker !== selectedStock)
