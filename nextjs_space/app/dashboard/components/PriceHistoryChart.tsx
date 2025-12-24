@@ -60,11 +60,19 @@ export default function PriceHistoryChart({
     if (!data || data.length < 30) return null;
     
     // Sort data by date to ensure correct order
-    const sortedData = [...data].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    // Handle both {date, price} and {Date, Close} formats
+    const sortedData = [...data].sort((a, b) => {
+      const dateA = 'date' in a ? a.date : a.Date;
+      const dateB = 'date' in b ? b.date : b.Date;
+      return new Date(dateA).getTime() - new Date(dateB).getTime();
+    });
     
     // Get today's price (last entry) and 30 days ago price
-    const todayPrice = sortedData[sortedData.length - 1].price;
-    const thirtyDaysAgoPrice = sortedData[sortedData.length - 30].price;
+    const lastEntry = sortedData[sortedData.length - 1];
+    const thirtyDaysAgoEntry = sortedData[sortedData.length - 30];
+    
+    const todayPrice = 'price' in lastEntry ? lastEntry.price : lastEntry.Close;
+    const thirtyDaysAgoPrice = 'price' in thirtyDaysAgoEntry ? thirtyDaysAgoEntry.price : thirtyDaysAgoEntry.Close;
     
     if (!todayPrice || !thirtyDaysAgoPrice) return null;
     
