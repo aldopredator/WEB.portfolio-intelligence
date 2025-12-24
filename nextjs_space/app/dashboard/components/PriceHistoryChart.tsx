@@ -82,6 +82,31 @@ export default function PriceHistoryChart({
     return ((todayPrice / thirtyDaysAgoPrice) - 1) * 100;
   };
 
+  // Calculate 90-day return
+  const calculate90DayReturn = (): number | null => {
+    if (!data || data.length < 90) return null;
+    
+    // Sort data by date to ensure correct order
+    // Handle both {date, price} and {Date, Close} formats
+    const sortedData = [...data].sort((a, b) => {
+      const dateA = 'date' in a ? a.date : a.Date;
+      const dateB = 'date' in b ? b.date : b.Date;
+      return new Date(dateA).getTime() - new Date(dateB).getTime();
+    });
+    
+    // Get today's price (last entry) and 90 days ago price
+    const lastEntry = sortedData[sortedData.length - 1];
+    const ninetyDaysAgoEntry = sortedData[sortedData.length - 90];
+    
+    const todayPrice = 'price' in lastEntry ? lastEntry.price : lastEntry.Close;
+    const ninetyDaysAgoPrice = 'price' in ninetyDaysAgoEntry ? ninetyDaysAgoEntry.price : ninetyDaysAgoEntry.Close;
+    
+    if (!todayPrice || !ninetyDaysAgoPrice) return null;
+    
+    // Calculate: (Price[today] / Price[today - 90d] - 1) * 100
+    return ((todayPrice / ninetyDaysAgoPrice) - 1) * 100;
+  };
+
   // Calculate 30-day annualized volatility
   const calculate30DayVolatility = (): number | null => {
     if (!data || data.length < 31) return null;
@@ -240,6 +265,7 @@ export default function PriceHistoryChart({
   };
 
   const thirtyDayReturn = calculate30DayReturn();
+  const ninetyDayReturn = calculate90DayReturn();
   const thirtyDayVolatility = calculate30DayVolatility();
   const ninetyDayMaxDrawdown = calculate90DayMaxDrawdown();
   const ninetyDayMaxDrawup = calculate90DayMaxDrawup();
@@ -475,6 +501,14 @@ export default function PriceHistoryChart({
                 size="small"
                 color={thirtyDayReturn >= 0 ? 'success' : 'error'}
                 label={`30d: ${thirtyDayReturn >= 0 ? '+' : ''}${thirtyDayReturn.toFixed(2)}%`}
+                sx={{ ml: 1 }}
+              />
+            )}
+            {ninetyDayReturn !== null && (
+              <Chip
+                size="small"
+                color={ninetyDayReturn >= 0 ? 'success' : 'error'}
+                label={`90d: ${ninetyDayReturn >= 0 ? '+' : ''}${ninetyDayReturn.toFixed(2)}%`}
                 sx={{ ml: 1 }}
               />
             )}
