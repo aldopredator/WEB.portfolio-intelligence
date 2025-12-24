@@ -10,34 +10,32 @@ export async function GET(request: NextRequest) {
 
     console.log('[API /stock-list] Portfolio filter:', portfolioId || 'ALL');
 
-    // Build where clause
+    // Build where clause - always fetch ALL stocks regardless of portfolio filter
     const where: any = { isActive: true };
-    if (portfolioId) {
-      where.portfolioId = portfolioId;
-    }
 
-    // Fetch stocks from database
+    // Fetch stocks from database with portfolio info
     const stocks = await prisma.stock.findMany({
       where,
       select: {
         ticker: true,
         company: true,
+        isActive: true,
+        portfolio: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
       orderBy: { ticker: 'asc' },
     });
 
     console.log(`[API /stock-list] Found ${stocks.length} stocks`);
 
-    // Enrich with change_percent if needed (can be fetched from StockData table)
-    const enrichedStocks = stocks.map(stock => ({
-      ticker: stock.ticker,
-      change_percent: 0, // TODO: Fetch from StockData if needed
-    }));
-
     return NextResponse.json({
       success: true,
-      stocks: enrichedStocks,
-      count: enrichedStocks.length,
+      stocks,
+      count: stocks.length,
     });
   } catch (error) {
     console.error('[API /stock-list] Error:', error);
