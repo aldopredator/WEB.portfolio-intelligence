@@ -156,6 +156,47 @@ export default function PriceHistoryChart({
     return stdDev * Math.sqrt(252) * 100;
   };
 
+  // Calculate 60-day annualized volatility
+  const calculate60DayVolatility = (): number | null => {
+    if (!data || data.length < 61) return null;
+    
+    // Sort data by date to ensure correct order
+    const sortedData = [...data].sort((a, b) => {
+      const dateA = 'date' in a ? a.date : a.Date;
+      const dateB = 'date' in b ? b.date : b.Date;
+      return new Date(dateA).getTime() - new Date(dateB).getTime();
+    });
+    
+    // Get last 61 days of data (need 61 to calculate 60 daily returns)
+    const last61Days = sortedData.slice(-61);
+    
+    // Calculate daily returns
+    const dailyReturns: number[] = [];
+    for (let i = 1; i < last61Days.length; i++) {
+      const todayEntry = last61Days[i];
+      const yesterdayEntry = last61Days[i-1];
+      
+      const priceToday = 'price' in todayEntry ? todayEntry.price : todayEntry.Close;
+      const priceYesterday = 'price' in yesterdayEntry ? yesterdayEntry.price : yesterdayEntry.Close;
+      
+      if (priceToday && priceYesterday) {
+        const dailyReturn = (priceToday / priceYesterday) - 1;
+        dailyReturns.push(dailyReturn);
+      }
+    }
+    
+    if (dailyReturns.length < 60) return null;
+    
+    // Calculate standard deviation of daily returns
+    const mean = dailyReturns.reduce((sum, ret) => sum + ret, 0) / dailyReturns.length;
+    const squaredDiffs = dailyReturns.map(ret => Math.pow(ret - mean, 2));
+    const variance = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / dailyReturns.length;
+    const stdDev = Math.sqrt(variance);
+    
+    // Annualize volatility: stdDev * sqrt(252) * 100 for percentage
+    return stdDev * Math.sqrt(252) * 100;
+  };
+
   // Calculate 90-day maximum drawdown
   const calculate90DayMaxDrawdown = (): number | null => {
     if (!data || data.length < 2) return null;
@@ -275,6 +316,7 @@ export default function PriceHistoryChart({
   const thirtyDayReturn = calculate30DayReturn();
   const sixtyDayReturn = calculate60DayReturn();
   const thirtyDayVolatility = calculate30DayVolatility();
+  const sixtyDayVolatility = calculate60DayVolatility();
   const ninetyDayMaxDrawdown = calculate90DayMaxDrawdown();
   const ninetyDayMaxDrawup = calculate90DayMaxDrawup();
   const cagr = calculateCAGR();
@@ -512,6 +554,14 @@ export default function PriceHistoryChart({
                 sx={{ ml: 1 }}
               />
             )}
+            {thirtyDayVolatility !== null && (
+              <Chip
+                size="small"
+                color="info"
+                label={`30d Vol (an): ${thirtyDayVolatility.toFixed(1)}%`}
+                sx={{ ml: 1 }}
+              />
+            )}
             {sixtyDayReturn !== null && (
               <Chip
                 size="small"
@@ -520,11 +570,11 @@ export default function PriceHistoryChart({
                 sx={{ ml: 1 }}
               />
             )}
-            {thirtyDayVolatility !== null && (
+            {sixtyDayVolatility !== null && (
               <Chip
                 size="small"
                 color="info"
-                label={`30d Vol (an): ${thirtyDayVolatility.toFixed(1)}%`}
+                label={`60d Vol (an): ${sixtyDayVolatility.toFixed(1)}%`}
                 sx={{ ml: 1 }}
               />
             )}
