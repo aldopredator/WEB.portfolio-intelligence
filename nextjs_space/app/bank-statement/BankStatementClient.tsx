@@ -428,12 +428,12 @@ export default function BankStatementClient() {
           parsedHoldings.push(holding);
         }
 
-        // Create new statement
+        // Create new statement using file's actual timestamp
         const newStatement: Statement = {
           id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           accountId: accountIdFromFile,
           fileName: file.name,
-          uploadDate: new Date(),
+          uploadDate: new Date(file.lastModified), // Use file's actual timestamp
           holdings: parsedHoldings,
         };
 
@@ -491,6 +491,22 @@ export default function BankStatementClient() {
         localStorage.removeItem('bankStatements');
         localStorage.removeItem('activeBankStatementId');
       }
+    }
+  };
+
+  const handleDeleteStatement = (statementId: string) => {
+    const updatedStatements = statements.filter(s => s.id !== statementId);
+    setStatements(updatedStatements);
+    
+    if (updatedStatements.length > 0) {
+      // If we deleted the active statement, switch to the first one
+      if (activeStatementId === statementId) {
+        setActiveStatementId(updatedStatements[0].id);
+      }
+    } else {
+      setActiveStatementId(null);
+      localStorage.removeItem('bankStatements');
+      localStorage.removeItem('activeBankStatementId');
     }
   };
 
@@ -584,16 +600,18 @@ export default function BankStatementClient() {
           <div className="flex items-center gap-3 flex-wrap">
             <span className="text-sm font-semibold text-slate-400">Statements:</span>
             {statements.map((statement) => (
-              <button
+              <div
                 key={statement.id}
-                onClick={() => setActiveStatementId(statement.id)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   activeStatementId === statement.id
                     ? 'bg-blue-500 text-white'
                     : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800'
                 }`}
               >
-                <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setActiveStatementId(statement.id)}
+                  className="flex items-center gap-2"
+                >
                   <FileSpreadsheet className="w-4 h-4" />
                   <div className="text-left">
                     <div className="font-semibold">{statement.fileName}</div>
@@ -601,8 +619,18 @@ export default function BankStatementClient() {
                       {statement.uploadDate.toLocaleDateString()} {statement.uploadDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
-                </div>
-              </button>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteStatement(statement.id);
+                  }}
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors shadow-lg"
+                  title="Delete statement"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              </div>
             ))}
             {statements.length < 3 && (
               <label className="px-4 py-2 rounded-lg text-sm font-medium bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 cursor-pointer transition-all flex items-center gap-2">
