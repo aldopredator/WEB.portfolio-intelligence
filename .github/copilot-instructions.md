@@ -164,6 +164,8 @@ Cache system ensures **stale data is returned on cache expiry** rather than fail
 
 6. **PowerShell scripts**: This project runs on Windows. Cache clearing and diagnostics use `.ps1` scripts. When adding scripts, use PowerShell or add cross-platform alternatives.
 
+7. **🔥 CRITICAL - Comparison Dropdown Portfolio Independence**: The comparison dropdown in `PriceHistoryChart.tsx` MUST fetch ALL tickers from ALL portfolios, regardless of the current portfolio filter. This has broken TWICE due to using the `stocks` prop (which is portfolio-filtered) or using `/api/stock?portfolioId=all` (which times out loading all relations). **CORRECT APPROACH**: Use `/api/stock-list` which is lightweight and returns all stocks with portfolio info but no heavy relations. Never use the `stocks` prop for this dropdown - it defeats cross-portfolio comparison. See commits 12a92f5 and a4a52a2 for the fix pattern.
+
 ## 📚 Documentation
 
 - `DESIGN_SPECIFICATION.md` - MUI design system (330 lines)
