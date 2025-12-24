@@ -35,7 +35,6 @@ interface PriceHistoryChartProps {
   volume?: number;
   fiftyDayAverage?: number | null;
   twoHundredDayAverage?: number | null;
-  compareStock?: string;
 }
 
 export default function PriceHistoryChart({
@@ -49,21 +48,12 @@ export default function PriceHistoryChart({
   volume,
   fiftyDayAverage,
   twoHundredDayAverage,
-  compareStock: externalCompareStock,
 }: PriceHistoryChartProps) {
   const theme = useTheme();
   const [compareTicker, setCompareTicker] = useState<string>('');
   const [availableTickers, setAvailableTickers] = useState<Array<{ ticker: string; company: string; portfolioName: string }>>([]);
   const [benchmarkData, setBenchmarkData] = useState<Array<{ date: string; price: number }>>([]);
   const [isLoadingBenchmark, setIsLoadingBenchmark] = useState(false);
-
-  // Sync with external compare stock from sidebar
-  useEffect(() => {
-    // Only sync if externalCompareStock is explicitly set (not undefined or null)
-    if (externalCompareStock !== undefined) {
-      setCompareTicker(externalCompareStock);
-    }
-  }, [externalCompareStock]);
 
   // Calculate 30-day return
   const calculate30DayReturn = (): number | null => {
@@ -374,6 +364,57 @@ export default function PriceHistoryChart({
               </Typography>
             )}
           </Stack>
+        </Stack>
+
+        {/* Compare to Another Ticker Dropdown - Inside Chart */}
+        <Stack 
+          direction="row" 
+          alignItems="center" 
+          justifyContent="center"
+          spacing={2} 
+          sx={{ 
+            mt: 3, 
+            mb: 2,
+            p: 2,
+            backgroundColor: 'action.hover',
+            borderRadius: 1,
+          }}
+        >
+          <FormControl size="medium" sx={{ minWidth: 400 }}>
+            <InputLabel id="compare-ticker-label" sx={{ fontWeight: 600 }}>Compare to</InputLabel>
+            <Select
+              labelId="compare-ticker-label"
+              value={compareTicker}
+              label="Compare to"
+              onChange={(e) => setCompareTicker(e.target.value)}
+              disabled={isLoadingBenchmark}
+              sx={{ 
+                backgroundColor: 'background.paper',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderWidth: 2,
+                },
+              }}
+            >
+              <MenuItem value="">
+                <em>None - Show absolute price</em>
+              </MenuItem>
+              {availableTickers.map((t) => (
+                <MenuItem key={t.ticker} value={t.ticker}>
+                  <strong>{t.ticker}</strong> - {t.company}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {isLoadingBenchmark && (
+            <Typography variant="body2" sx={{ color: 'warning.main', fontWeight: 600 }}>
+              Loading...
+            </Typography>
+          )}
+          {compareTicker && (
+            <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 600 }}>
+              📊 % change comparison
+            </Typography>
+          )}
         </Stack>
 
         {/* 52 Week Range and Volume Section */}
