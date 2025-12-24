@@ -327,17 +327,14 @@ export default async function ScreeningPage({
       return null;
     }
 
-    // Debug: Log AMZN data to check field availability
+    // Debug: Log AMZN data to check field availability (server-side)
     if (stock.ticker === 'AMZN') {
-      console.log('[Screening] AMZN stockInfo:', {
-        priceToSales: stockInfo.priceToSales,
-        ps_ratio: stockInfo.ps_ratio,
-        averageVolume: stockInfo.averageVolume,
-        averageVolume10Day: stockInfo.averageVolume10Day,
-        trailingPE: (stockInfo as any).trailingPE,
-        priceToBook: (stockInfo as any).priceToBook,
-        pb_ratio: stockInfo.pb_ratio,
-      });
+      console.log('[Screening SERVER] AMZN stockInfo keys:', Object.keys(stockInfo));
+      console.log('[Screening SERVER] AMZN priceToSales:', stockInfo.priceToSales);
+      console.log('[Screening SERVER] AMZN ps_ratio:', stockInfo.ps_ratio);
+      console.log('[Screening SERVER] AMZN averageVolume:', stockInfo.averageVolume);
+      console.log('[Screening SERVER] AMZN stockInfo type:', typeof stockInfo);
+      console.log('[Screening SERVER] AMZN data keys:', data ? Object.keys(data) : 'no data');
     }
 
     // Apply screening criteria (only check enabled criteria)
