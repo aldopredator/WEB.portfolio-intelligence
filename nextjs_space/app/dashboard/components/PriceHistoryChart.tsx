@@ -188,23 +188,31 @@ export default function PriceHistoryChart({
     const fetchBenchmarkData = async () => {
       setIsLoadingBenchmark(true);
       try {
-        // Fetch all stocks (no portfolio filter) to find the selected comparison ticker
-        const response = await fetch('/api/stock?portfolioId=all');
-        if (response.ok) {
-          const data = await response.json();
-          const stocks = data.stocks || [];
-          const compareStock = stocks.find((s: any) => s.ticker === compareTicker);
-          
-          if (!compareStock) {
-            console.warn(`[PriceHistoryChart] ${compareTicker} not found in portfolio`);
-            setBenchmarkData([]);
-            return;
-          }
-          
-          const priceHistory = compareStock.priceHistory || [];
+        console.log(`[PriceHistoryChart] Fetching price history for ${compareTicker}`);
+        // Fetch just the specific stock's data to get price history
+        const response = await fetch(`/api/stock-prices?ticker=${compareTicker}`);
+        if (!response.ok) {
+          console.error(`[PriceHistoryChart] API error: ${response.status} ${response.statusText}`);
+          setBenchmarkData([]);
+          setIsLoadingBenchmark(false);
+          return;
+        }
+        
+        const data = await response.json();
+        if (!data.success || !data.priceHistory) {
+          console.warn(`[PriceHistoryChart] No price history for ${compareTicker}`);
+          setBenchmarkData([]);
+          setIsLoadingBenchmark(false);
+          return;
+        }
+        
+        const priceHistory = data.priceHistory || [];
+        const compareStock = { ticker: compareTicker, priceHistory };
           
           console.log(`[PriceHistoryChart] ${compareTicker} data received:`, priceHistory.length, 'data points');
-          console.log(`[PriceHistoryChart] First ${compareTicker} point:`, priceHistory[0]);
+          if (priceHistory.length > 0) {
+            console.log(`[PriceHistoryChart] First ${compareTicker} point:`, priceHistory[0]);
+          }
           
           // Normalize benchmark data - priceHistory has { date, price } format
           const normalizedBenchmark = priceHistory.map((d: any) => ({
