@@ -495,72 +495,60 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                   <SortIcon field="volatility30Day" />
                 </div>
               </th>
-              {criteria.betaEnabled && (
-                <th 
-                  className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
-                  onClick={() => handleSort('dailyChange')}
-                >
-                  <div className="flex items-center justify-end gap-2">
-                    1d Change
-                    <SortIcon field="dailyChange" />
-                  </div>
-                </th>
-              )}
-              {criteria.betaEnabled && (
-                <th 
-                  className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
-                  onClick={() => handleSort('return60Day')}
-                >
-                  <div className="flex items-center justify-end gap-2">
-                    60d Return
-                    <SortIcon field="return60Day" />
-                  </div>
-                </th>
-              )}
-              {criteria.betaEnabled && (
-                <th 
-                  className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
-                  onClick={() => handleSort('volatility60Day')}
-                >
-                  <div className="flex items-center justify-end gap-2">
-                    60d Vol
-                    <SortIcon field="volatility60Day" />
-                  </div>
-                </th>
-              )}
-              {criteria.betaEnabled && (
-                <th 
-                  className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
-                  onClick={() => handleSort('maxDrawdown')}
-                >
-                  <div className="flex items-center justify-end gap-2">
-                    Max DD
-                    <SortIcon field="maxDrawdown" />
-                  </div>
-                </th>
-              )}
-              {criteria.betaEnabled && (
-                <th 
-                  className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
-                  onClick={() => handleSort('maxDrawup')}
-                >
-                  <div className="flex items-center justify-end gap-2">
-                    Max DU
-                    <SortIcon field="maxDrawup" />
-                  </div>
-                </th>
-              )}
-              {criteria.betaEnabled && (
-                <th 
-                  className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
-                  onClick={() => handleSort('cagr')}
-                >
-                  <div className="flex items-center justify-end gap-2">
-                    CAGR
-                    <SortIcon field="cagr" />
-                  </div>
-                </th>
-              )}
+              <th 
+                className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('dailyChange')}
+              >
+                <div className="flex items-center justify-end gap-2">
+                  1d Change
+                  <SortIcon field="dailyChange" />
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('return60Day')}
+              >
+                <div className="flex items-center justify-end gap-2">
+                  60d Return
+                  <SortIcon field="return60Day" />
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('volatility60Day')}
+              >
+                <div className="flex items-center justify-end gap-2">
+                  60d Vol
+                  <SortIcon field="volatility60Day" />
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('maxDrawdown')}
+              >
+                <div className="flex items-center justify-end gap-2">
+                  Max DD
+                  <SortIcon field="maxDrawdown" />
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('maxDrawup')}
+              >
+                <div className="flex items-center justify-end gap-2">
+                  Max DU
+                  <SortIcon field="maxDrawup" />
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
+                onClick={() => handleSort('cagr')}
+              >
+                <div className="flex items-center justify-end gap-2">
+                  CAGR
+                  <SortIcon field="cagr" />
+                </div>
+              </th>
               <th 
                 className="px-6 py-4 text-center text-xs font-bold text-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-800/30 transition-colors"
                 onClick={() => handleSort('matchScore')}
@@ -699,62 +687,50 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
                 <td className="px-6 py-5 text-right">
                   <span className="text-blue-400 font-mono font-bold text-lg">{stock.volatility30Day}</span>
                 </td>
-                {criteria.betaEnabled && (
-                  <td className="px-6 py-5 text-right">
-                    <span className={`font-mono font-bold text-lg ${
-                      stock.dailyChange.startsWith('+') ? 'text-emerald-400' : 
-                      stock.dailyChange.startsWith('-') ? 'text-red-400' : 
-                      'text-slate-400'
-                    }`}>
-                      {stock.dailyChange}
-                    </span>
-                  </td>
-                )}
-                {criteria.betaEnabled && (
-                  <td className="px-6 py-5 text-right">
-                    <span className={`font-mono font-bold text-lg ${
-                      stock.return60Day.startsWith('+') ? 'text-emerald-400' : 
-                      stock.return60Day.startsWith('-') ? 'text-red-400' : 
-                      'text-slate-400'
-                    }`}>
-                      {stock.return60Day}
-                    </span>
-                  </td>
-                )}
-                {criteria.betaEnabled && (
-                  <td className="px-6 py-5 text-right">
-                    <span className="text-blue-400 font-mono font-bold text-lg">{stock.volatility60Day}</span>
-                  </td>
-                )}
-                {criteria.betaEnabled && (
-                  <td className="px-6 py-5 text-right">
-                    <span className={`font-mono font-bold text-lg ${
-                      stock.maxDrawdown.startsWith('-') ? 'text-red-400' : 'text-slate-400'
-                    }`}>
-                      {stock.maxDrawdown}
-                    </span>
-                  </td>
-                )}
-                {criteria.betaEnabled && (
-                  <td className="px-6 py-5 text-right">
-                    <span className={`font-mono font-bold text-lg ${
-                      stock.maxDrawup.startsWith('+') ? 'text-emerald-400' : 'text-slate-400'
-                    }`}>
-                      {stock.maxDrawup}
-                    </span>
-                  </td>
-                )}
-                {criteria.betaEnabled && (
-                  <td className="px-6 py-5 text-right">
-                    <span className={`font-mono font-bold text-lg ${
-                      stock.cagr.startsWith('+') ? 'text-emerald-400' : 
-                      stock.cagr.startsWith('-') ? 'text-red-400' : 
-                      'text-slate-400'
-                    }`}>
-                      {stock.cagr}
-                    </span>
-                  </td>
-                )}
+                <td className="px-6 py-5 text-right">
+                  <span className={`font-mono font-bold text-lg ${
+                    stock.dailyChange.startsWith('+') ? 'text-emerald-400' : 
+                    stock.dailyChange.startsWith('-') ? 'text-red-400' : 
+                    'text-slate-400'
+                  }`}>
+                    {stock.dailyChange}
+                  </span>
+                </td>
+                <td className="px-6 py-5 text-right">
+                  <span className={`font-mono font-bold text-lg ${
+                    stock.return60Day.startsWith('+') ? 'text-emerald-400' : 
+                    stock.return60Day.startsWith('-') ? 'text-red-400' : 
+                    'text-slate-400'
+                  }`}>
+                    {stock.return60Day}
+                  </span>
+                </td>
+                <td className="px-6 py-5 text-right">
+                  <span className="text-blue-400 font-mono font-bold text-lg">{stock.volatility60Day}</span>
+                </td>
+                <td className="px-6 py-5 text-right">
+                  <span className={`font-mono font-bold text-lg ${
+                    stock.maxDrawdown.startsWith('-') ? 'text-red-400' : 'text-slate-400'
+                  }`}>
+                    {stock.maxDrawdown}
+                  </span>
+                </td>
+                <td className="px-6 py-5 text-right">
+                  <span className={`font-mono font-bold text-lg ${
+                    stock.maxDrawup.startsWith('+') ? 'text-emerald-400' : 'text-slate-400'
+                  }`}>
+                    {stock.maxDrawup}
+                  </span>
+                </td>
+                <td className="px-6 py-5 text-right">
+                  <span className={`font-mono font-bold text-lg ${
+                    stock.cagr.startsWith('+') ? 'text-emerald-400' : 
+                    stock.cagr.startsWith('-') ? 'text-red-400' : 
+                    'text-slate-400'
+                  }`}>
+                    {stock.cagr}
+                  </span>
+                </td>
                 <td className="px-6 py-5">
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/20">
