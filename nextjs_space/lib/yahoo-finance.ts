@@ -378,9 +378,17 @@ export async function fetchYahooCompanyProfile(ticker: string) {
 
     console.log(`[YAHOO] ✅ ${ticker} - Successfully fetched profile`);
 
+    // Generate logo URL - try multiple approaches
+    let logoUrl = undefined;
+    if (assetProfile.website) {
+      const domain = assetProfile.website.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+      logoUrl = `https://logo.clearbit.com/${domain}`;
+      console.log(`[YAHOO] ${ticker} - Generated Clearbit logo URL: ${logoUrl}`);
+    }
+
     return {
       name: price.longName || price.shortName,
-      logo: assetProfile.website ? `https://logo.clearbit.com/${assetProfile.website.replace(/^https?:\/\//, '').split('/')[0]}` : undefined,
+      logo: logoUrl,
       industry: assetProfile.industry,
       sector: assetProfile.sector,
       country: normalizeCountry(assetProfile.country),
