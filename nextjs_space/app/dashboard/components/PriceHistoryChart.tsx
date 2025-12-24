@@ -82,10 +82,10 @@ export default function PriceHistoryChart({
     return ((todayPrice / thirtyDaysAgoPrice) - 1) * 100;
   };
 
-  // Calculate 90-day return
-  const calculate90DayReturn = (): number | null => {
-    if (!data || data.length < 90) {
-      console.log('[PriceHistoryChart] Not enough data for 90-day return:', data?.length);
+  // Calculate 60-day return
+  const calculate60DayReturn = (): number | null => {
+    if (!data || data.length < 60) {
+      console.log('[PriceHistoryChart] Not enough data for 60-day return:', data?.length);
       return null;
     }
     
@@ -97,21 +97,21 @@ export default function PriceHistoryChart({
       return new Date(dateA).getTime() - new Date(dateB).getTime();
     });
     
-    // Get today's price (last entry) and 90 days ago price
+    // Get today's price (last entry) and 60 days ago price
     const lastEntry = sortedData[sortedData.length - 1];
-    const ninetyDaysAgoEntry = sortedData[sortedData.length - 90];
+    const sixtyDaysAgoEntry = sortedData[sortedData.length - 60];
     
     const todayPrice = 'price' in lastEntry ? lastEntry.price : lastEntry.Close;
-    const ninetyDaysAgoPrice = 'price' in ninetyDaysAgoEntry ? ninetyDaysAgoEntry.price : ninetyDaysAgoEntry.Close;
+    const sixtyDaysAgoPrice = 'price' in sixtyDaysAgoEntry ? sixtyDaysAgoEntry.price : sixtyDaysAgoEntry.Close;
     
-    if (!todayPrice || !ninetyDaysAgoPrice) {
-      console.log('[PriceHistoryChart] Missing price data for 90-day return');
+    if (!todayPrice || !sixtyDaysAgoPrice) {
+      console.log('[PriceHistoryChart] Missing price data for 60-day return');
       return null;
     }
     
-    // Calculate: (Price[today] / Price[today - 90d] - 1) * 100
-    const result = ((todayPrice / ninetyDaysAgoPrice) - 1) * 100;
-    console.log('[PriceHistoryChart] 90-day return calculated:', result.toFixed(2) + '%');
+    // Calculate: (Price[today] / Price[today - 60d] - 1) * 100
+    const result = ((todayPrice / sixtyDaysAgoPrice) - 1) * 100;
+    console.log('[PriceHistoryChart] 60-day return calculated:', result.toFixed(2) + '%');
     return result;
   };
 
@@ -273,7 +273,7 @@ export default function PriceHistoryChart({
   };
 
   const thirtyDayReturn = calculate30DayReturn();
-  const ninetyDayReturn = calculate90DayReturn();
+  const sixtyDayReturn = calculate60DayReturn();
   const thirtyDayVolatility = calculate30DayVolatility();
   const ninetyDayMaxDrawdown = calculate90DayMaxDrawdown();
   const ninetyDayMaxDrawup = calculate90DayMaxDrawup();
@@ -512,11 +512,11 @@ export default function PriceHistoryChart({
                 sx={{ ml: 1 }}
               />
             )}
-            {ninetyDayReturn !== null && (
+            {sixtyDayReturn !== null && (
               <Chip
                 size="small"
-                color={ninetyDayReturn >= 0 ? 'success' : 'error'}
-                label={`90d: ${ninetyDayReturn >= 0 ? '+' : ''}${ninetyDayReturn.toFixed(2)}%`}
+                color={sixtyDayReturn >= 0 ? 'success' : 'error'}
+                label={`60d: ${sixtyDayReturn >= 0 ? '+' : ''}${sixtyDayReturn.toFixed(2)}%`}
                 sx={{ ml: 1 }}
               />
             )}
