@@ -257,6 +257,25 @@ export default function CompanyInfoCard({
             
             {/* Buttons on the right */}
             <Stack direction="row" spacing={1}>
+              {portfolios.length > 0 && !isLocked && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<DriveFileMoveIcon />}
+                  onClick={handleMoveClick}
+                  sx={{
+                    borderColor: 'primary.main',
+                    color: 'primary.main',
+                    '&:hover': {
+                      borderColor: 'primary.light',
+                      backgroundColor: 'primary.main',
+                      color: 'white',
+                    },
+                  }}
+                >
+                  Transfer
+                </Button>
+              )}
               <Button
                 variant="contained"
                 size="small"
@@ -343,25 +362,6 @@ export default function CompanyInfoCard({
               >
                 Reset
               </Button>
-              {portfolios.length > 0 && !isLocked && (
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<DriveFileMoveIcon />}
-                  onClick={handleMoveClick}
-                  sx={{
-                    borderColor: 'primary.main',
-                    color: 'primary.main',
-                    '&:hover': {
-                      borderColor: 'primary.light',
-                      backgroundColor: 'primary.main',
-                      color: 'white',
-                    },
-                  }}
-                >
-                  Transfer
-                </Button>
-              )}
             </Stack>
           </Box>
 
