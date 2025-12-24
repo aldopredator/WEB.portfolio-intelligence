@@ -52,13 +52,13 @@ export default function PriceHistoryChart({
   compareStock: externalCompareStock,
 }: PriceHistoryChartProps) {
   const theme = useTheme();
-  const [compareTicker, setCompareTicker] = React.useState<string>('');
-  const [availableTickers, setAvailableTickers] = React.useState<Array<{ ticker: string; company: string; portfolioName: string }>>([]);
-  const [benchmarkData, setBenchmarkData] = React.useState<Array<{ date: string; price: number }>>([]);
-  const [isLoadingBenchmark, setIsLoadingBenchmark] = React.useState(false);
+  const [compareTicker, setCompareTicker] = useState<string>('');
+  const [availableTickers, setAvailableTickers] = useState<Array<{ ticker: string; company: string; portfolioName: string }>>([]);
+  const [benchmarkData, setBenchmarkData] = useState<Array<{ date: string; price: number }>>([]);
+  const [isLoadingBenchmark, setIsLoadingBenchmark] = useState(false);
 
   // Sync with external compare stock from sidebar
-  React.useEffect(() => {
+  useEffect(() => {
     if (externalCompareStock !== undefined) {
       setCompareTicker(externalCompareStock);
     }
