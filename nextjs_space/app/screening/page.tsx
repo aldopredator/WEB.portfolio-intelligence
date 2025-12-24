@@ -327,6 +327,19 @@ export default async function ScreeningPage({
       return null;
     }
 
+    // Debug: Log AMZN data to check field availability
+    if (stock.ticker === 'AMZN') {
+      console.log('[Screening] AMZN stockInfo:', {
+        priceToSales: stockInfo.priceToSales,
+        ps_ratio: stockInfo.ps_ratio,
+        averageVolume: stockInfo.averageVolume,
+        averageVolume10Day: stockInfo.averageVolume10Day,
+        trailingPE: (stockInfo as any).trailingPE,
+        priceToBook: (stockInfo as any).priceToBook,
+        pb_ratio: stockInfo.pb_ratio,
+      });
+    }
+
     // Apply screening criteria (only check enabled criteria)
     const passes: Record<string, boolean> = {};
     const hardFilters: Record<string, boolean> = {}; // Filters that must pass 100%
