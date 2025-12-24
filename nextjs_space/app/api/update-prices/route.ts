@@ -4,25 +4,47 @@ import { fetchYahooPriceHistory } from '@/lib/yahoo-finance';
 
 const prisma = new PrismaClient();
 
+// Vercel timeout: Free tier = 10s, Hobby = 10s, Pro = 60s (with config)
+// We'll process stocks in batches to respect timeout limits
+export const maxDuration = 60; // 1 minute max
 export const dynamic = 'force-dynamic';
-export const maxDuration = 300; // 5 minutes max (Vercel Pro limit)
 
 export async function GET(request: NextRequest) {
+  const startTime = Date.now();
+  const MAX_EXECUTION_TIME = 55000; // 55 seconds to be safe
+  
   try {
     console.log('🔄 Starting price history update...');
     
+    // Get URL parameters for batch processing
+    const { searchParams } = new URL(request.url);
+    const batchSize = parseInt(searchParams.get('batch') || '5');
+    const offset = parseInt(searchParams.get('offset') || '0');
+    
     const stocks = await prisma.stock.findMany({
       where: { isActive: true },
-      select: { id: true, ticker: true }
+      select: { id: true, ticker: true },
+      skip: offset,
+      take: batchSize
     });
 
-    console.log(`Found ${stocks.length} active stocks`);
+    const totalStocks = await prisma.stock.count({
+      where: { isActive: true }
+    });
+
+    console.log(`Processing batch: ${offset + 1} to ${offset + stocks.length} of ${totalStocks} stocks`);
 
     if (stocks.length === 0) {
       return NextResponse.json({
         success: true,
-        message: 'No active stocks found',
-        stats: { total: 0, success: 0, errors: 0 }
+        message: 'No more stocks to process',
+        stats: { 
+          total: totalStocks, 
+          processed: offset,
+          remaining: 0,
+          success: 0, 
+          errors: 0 
+        }
       });
     }
 
@@ -31,6 +53,12 @@ export async function GET(request: NextRequest) {
     const errors: string[] = [];
 
     for (const stock of stocks) {
+      // Check if we're running out of time
+      if (Date.now() - startTime > MAX_EXECUTION_TIME) {
+        console.log('⏱️ Approaching timeout, stopping early');
+        break;
+      }
+
       try {
         console.log(`Fetching ${stock.ticker}...`);
         const priceHistory = await fetchYahooPriceHistory(stock.ticker);
@@ -69,20 +97,38 @@ export async function GET(request: NextRequest) {
         console.error(`❌ ${msg}`);
       }
       
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Small delay to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
+
+    const remainingStocks = totalStocks - (offset + successCount + errorCount);
+    const nextOffset = offset + successCount + errorCount;
 
     return NextResponse.json({
       success: true,
-      message: `Updated ${successCount} stocks, ${errorCount} errors`,
-      stats: { total: stocks.length, success: successCount, errors: errorCount },
-      errors: errors.length > 0 ? errors : undefined
+      message: `Processed ${successCount + errorCount} stocks in batch`,
+      stats: { 
+        total: totalStocks,
+        processed: nextOffset,
+        remaining: remainingStocks,
+        success: successCount, 
+        errors: errorCount 
+      },
+      nextBatchUrl: remainingStocks > 0 
+        ? `/api/update-prices?batch=${batchSize}&offset=${nextOffset}` 
+        : null,
+      errors: errors.length > 0 ? errors : undefined,
+      executionTime: `${((Date.now() - startTime) / 1000).toFixed(2)}s`
     });
     
   } catch (error) {
     console.error('Fatal error:', error);
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
+      { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        executionTime: `${((Date.now() - startTime) / 1000).toFixed(2)}s`
+      },
       { status: 500 }
     );
   } finally {
