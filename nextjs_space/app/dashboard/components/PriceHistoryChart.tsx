@@ -165,11 +165,11 @@ export default function PriceHistoryChart({
         console.log('[PriceHistoryChart] Available tickers for dropdown:', tickers.length);
         setAvailableTickers(tickers);
 
-        // Auto-select CW8U.PA as default if available
-        const cw8Ticker = tickers.find((t: { ticker: string; company: string; portfolioName: string }) => t.ticker === 'CW8U.PA');
-        if (cw8Ticker) {
-          console.log('[PriceHistoryChart] Auto-selecting CW8U.PA');
-          setCompareTicker('CW8U.PA');
+        // Auto-select MWRL.L as default if available
+        const defaultTicker = tickers.find((t: { ticker: string; company: string; portfolioName: string }) => t.ticker === 'MWRL.L');
+        if (defaultTicker) {
+          console.log('[PriceHistoryChart] Auto-selecting MWRL.L');
+          setCompareTicker('MWRL.L');
         }
       } catch (error) {
         console.error('[PriceHistoryChart] Error fetching tickers:', error);
