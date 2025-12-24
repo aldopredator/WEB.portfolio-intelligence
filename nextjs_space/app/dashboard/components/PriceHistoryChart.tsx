@@ -164,9 +164,44 @@ export default function PriceHistoryChart({
     return maxDrawdown;
   };
 
+  // Calculate CAGR (Compound Annual Growth Rate)
+  const calculateCAGR = (): number | null => {
+    if (!data || data.length < 2) return null;
+    
+    // Sort data by date to ensure correct order
+    const sortedData = [...data].sort((a, b) => {
+      const dateA = 'date' in a ? a.date : a.Date;
+      const dateB = 'date' in b ? b.date : b.Date;
+      return new Date(dateA).getTime() - new Date(dateB).getTime();
+    });
+    
+    const firstEntry = sortedData[0];
+    const lastEntry = sortedData[sortedData.length - 1];
+    
+    const firstPrice = 'price' in firstEntry ? firstEntry.price : firstEntry.Close;
+    const lastPrice = 'price' in lastEntry ? lastEntry.price : lastEntry.Close;
+    const firstDate = 'date' in firstEntry ? firstEntry.date : firstEntry.Date;
+    const lastDate = 'date' in lastEntry ? lastEntry.date : lastEntry.Date;
+    
+    if (!firstPrice || !lastPrice) return null;
+    
+    // Calculate number of years between first and last date
+    const firstDateTime = new Date(firstDate).getTime();
+    const lastDateTime = new Date(lastDate).getTime();
+    const yearsDiff = (lastDateTime - firstDateTime) / (1000 * 60 * 60 * 24 * 365.25);
+    
+    if (yearsDiff < 0.01) return null; // Need at least a few days of data
+    
+    // CAGR = (Ending Value / Beginning Value) ^ (1 / Years) - 1
+    const cagr = (Math.pow(lastPrice / firstPrice, 1 / yearsDiff) - 1) * 100;
+    
+    return cagr;
+  };
+
   const thirtyDayReturn = calculate30DayReturn();
   const thirtyDayVolatility = calculate30DayVolatility();
   const ninetyDayMaxDrawdown = calculate90DayMaxDrawdown();
+  const cagr = calculateCAGR();
 
   // Reset comparison when ticker changes
   useEffect(() => {
@@ -414,6 +449,14 @@ export default function PriceHistoryChart({
                 size="small"
                 color="error"
                 label={`Max DD: ${ninetyDayMaxDrawdown.toFixed(2)}%`}
+                sx={{ ml: 1 }}
+              />
+            )}
+            {cagr !== null && (
+              <Chip
+                size="small"
+                color={cagr >= 0 ? 'success' : 'error'}
+                label={`CAGR: ${cagr >= 0 ? '+' : ''}${cagr.toFixed(2)}%`}
                 sx={{ ml: 1 }}
               />
             )}
