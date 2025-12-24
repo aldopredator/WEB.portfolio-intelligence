@@ -97,8 +97,11 @@ export default function PriceHistoryChart({
     // Calculate daily returns
     const dailyReturns: number[] = [];
     for (let i = 1; i < last31Days.length; i++) {
-      const priceToday = 'price' in last31Days[i] ? last31Days[i].price : last31Days[i].Close;
-      const priceYesterday = 'price' in last31Days[i-1] ? last31Days[i-1].price : last31Days[i-1].Close;
+      const todayEntry = last31Days[i];
+      const yesterdayEntry = last31Days[i-1];
+      
+      const priceToday = 'price' in todayEntry ? todayEntry.price : todayEntry.Close;
+      const priceYesterday = 'price' in yesterdayEntry ? yesterdayEntry.price : yesterdayEntry.Close;
       
       if (priceToday && priceYesterday) {
         const dailyReturn = (priceToday / priceYesterday) - 1;
