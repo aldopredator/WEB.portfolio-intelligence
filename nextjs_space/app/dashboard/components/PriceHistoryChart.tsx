@@ -164,6 +164,47 @@ export default function PriceHistoryChart({
     return maxDrawdown;
   };
 
+  // Calculate 90-day maximum drawup (largest gain from trough to peak)
+  const calculate90DayMaxDrawup = (): number | null => {
+    if (!data || data.length < 2) return null;
+    
+    // Sort data by date to ensure correct order
+    const sortedData = [...data].sort((a, b) => {
+      const dateA = 'date' in a ? a.date : a.Date;
+      const dateB = 'date' in b ? b.date : b.Date;
+      return new Date(dateA).getTime() - new Date(dateB).getTime();
+    });
+    
+    // Get last 90 days of data (or all data if less than 90 days)
+    const last90Days = sortedData.slice(-90);
+    
+    if (last90Days.length < 2) return null;
+    
+    let maxDrawup = 0;
+    let trough = Infinity;
+    
+    for (const entry of last90Days) {
+      const price = 'price' in entry ? entry.price : entry.Close;
+      
+      if (!price) continue;
+      
+      // Update trough if current price is lower
+      if (price < trough) {
+        trough = price;
+      }
+      
+      // Calculate drawup from trough
+      const drawup = ((price - trough) / trough) * 100;
+      
+      // Update max drawup if current drawup is more positive
+      if (drawup > maxDrawup) {
+        maxDrawup = drawup;
+      }
+    }
+    
+    return maxDrawup;
+  };
+
   // Calculate CAGR (Compound Annual Growth Rate)
   const calculateCAGR = (): number | null => {
     if (!data || data.length < 2) return null;
@@ -201,6 +242,7 @@ export default function PriceHistoryChart({
   const thirtyDayReturn = calculate30DayReturn();
   const thirtyDayVolatility = calculate30DayVolatility();
   const ninetyDayMaxDrawdown = calculate90DayMaxDrawdown();
+  const ninetyDayMaxDrawup = calculate90DayMaxDrawup();
   const cagr = calculateCAGR();
 
   // Reset comparison when ticker changes
@@ -449,6 +491,14 @@ export default function PriceHistoryChart({
                 size="small"
                 color="error"
                 label={`Max DD: ${ninetyDayMaxDrawdown.toFixed(2)}%`}
+                sx={{ ml: 1 }}
+              />
+            )}
+            {ninetyDayMaxDrawup !== null && (
+              <Chip
+                size="small"
+                color="success"
+                label={`Max DU: ${ninetyDayMaxDrawup >= 0 ? '+' : ''}${ninetyDayMaxDrawup.toFixed(2)}%`}
                 sx={{ ml: 1 }}
               />
             )}
