@@ -70,8 +70,8 @@ export async function fetchYahooQuote(ticker: string): Promise<StockQuote | null
     }
     
     try {
-        // Yahoo Finance query API endpoint with historical data
-        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=1mo&interval=1d`;
+        // Yahoo Finance query API endpoint with historical data (90 days)
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=3mo&interval=1d`;
 
         const response = await fetch(url, {
             headers: {
@@ -178,7 +178,7 @@ export async function fetchYahooPriceHistory(ticker: string): Promise<{ Date: st
     }
     
     try {
-        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=1mo&interval=1d`;
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=3mo&interval=1d`;
         const response = await fetch(url, {
             headers: {
                 'User-Agent': 'Mozilla/5.0',
