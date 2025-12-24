@@ -13,7 +13,8 @@
     "postinstall": "prisma generate",
     "diagnose": "powershell -ExecutionPolicy Bypass -File ./scripts/diagnose.ps1",
     "clear-cache": "powershell -ExecutionPolicy Bypass -File ./scripts/clear-cache.ps1",
-    "populate-sectors": "tsx --require dotenv/config scripts/populate-sectors.ts"
+    "populate-sectors": "tsx --require dotenv/config scripts/populate-sectors.ts",
+    "update-prices": "tsx --require dotenv/config scripts/update-price-history.ts"
   },
   "prisma": {
     "seed": "tsx --require dotenv/config scripts/seed.ts"
