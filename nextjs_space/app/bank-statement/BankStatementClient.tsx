@@ -867,13 +867,11 @@ export default function BankStatementClient() {
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('quantityHeld', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        FX Rate <SortIcon field="quantityHeld" />
+                        Quantity Held <SortIcon field="quantityHeld" />
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <button onClick={(e) => handleColumnClick('quantityHeld', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
-                        Quantity Held <SortIcon field="quantityHeld" />
-                      </button>
+                      <span className="text-xs">FX Rate</span>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('lastPrice', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
@@ -973,10 +971,6 @@ export default function BankStatementClient() {
                           <>£{holding.bookCostR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</>
                         )}
                       </td>
-                      {/* FX Rate */}
-                      <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {holding.fxRate.toFixed(4)}
-                      </td>
                       {/* Quantity Held */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
                         {getInvestmentType(holding.investment) === 'Cash' ? (
@@ -984,6 +978,10 @@ export default function BankStatementClient() {
                         ) : (
                           <>{holding.quantityHeld.toLocaleString()}</>
                         )}
+                      </td>
+                      {/* FX Rate */}
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {holding.fxRate.toFixed(4)}
                       </td>
                       {/* Last Price */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
