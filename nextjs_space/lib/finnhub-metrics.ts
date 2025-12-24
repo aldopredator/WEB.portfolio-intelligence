@@ -273,9 +273,33 @@ export async function fetchFinnhubMetrics(ticker: string): Promise<FinnhubMetric
 export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfile> {
   // Use Yahoo Finance for all stocks to ensure consistent industry naming
   console.log(`[FINNHUB] ${ticker} - Using Yahoo Finance for consistent industry data`);
+  let yahooProfile = null;
   try {
-    const yahooProfile = await fetchYahooCompanyProfile(ticker);
+    yahooProfile = await fetchYahooCompanyProfile(ticker);
     if (yahooProfile) {
+      // If Yahoo profile exists but logo is missing, try to get logo from Finnhub
+      if (!yahooProfile.logo) {
+        console.log(`[FINNHUB] ${ticker} - Yahoo profile missing logo, fetching from Finnhub`);
+        const apiKey = process.env.FINNHUB_API_KEY;
+        if (apiKey) {
+          try {
+            const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${apiKey}`;
+            const response = await fetch(url, {
+              next: { revalidate: METRICS_CACHE_TTL_SECONDS }
+            } as any);
+            if (response.ok) {
+              const data = await response.json();
+              if (data.logo) {
+                yahooProfile.logo = data.logo;
+                console.log(`[FINNHUB] ${ticker} - Added Finnhub logo: ${data.logo}`);
+              }
+            }
+          } catch (logoError) {
+            console.warn(`[FINNHUB] ${ticker} - Could not fetch Finnhub logo:`, logoError);
+          }
+        }
+      }
+      
       return {
         name: yahooProfile.name,
         logo: yahooProfile.logo,
