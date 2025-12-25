@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { CheckCircle2, ArrowUpDown, ArrowUp, ArrowDown, ExternalLink, Download, Database } from 'lucide-react';
 import * as XLSX from 'xlsx';
@@ -69,6 +69,50 @@ interface ScreeningTableProps {
 export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps) {
   const [sortField, setSortField] = useState<SortField>('matchScore');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const topScrollRef = useRef<HTMLDivElement>(null);
+  const bottomScrollRef = useRef<HTMLDivElement>(null);
+  const tableRef = useRef<HTMLTableElement>(null);
+
+  // Sync scrolling between top and bottom scrollbars
+  useEffect(() => {
+    const topScroll = topScrollRef.current;
+    const bottomScroll = bottomScrollRef.current;
+    const table = tableRef.current;
+
+    if (!topScroll || !bottomScroll || !table) return;
+
+    // Set the top scrollbar width to match table width
+    const updateScrollbarWidth = () => {
+      const topScrollContent = topScroll.firstElementChild as HTMLElement;
+      if (topScrollContent) {
+        topScrollContent.style.width = `${table.offsetWidth}px`;
+      }
+    };
+
+    updateScrollbarWidth();
+    window.addEventListener('resize', updateScrollbarWidth);
+
+    const handleTopScroll = () => {
+      if (bottomScroll) {
+        bottomScroll.scrollLeft = topScroll.scrollLeft;
+      }
+    };
+
+    const handleBottomScroll = () => {
+      if (topScroll) {
+        topScroll.scrollLeft = bottomScroll.scrollLeft;
+      }
+    };
+
+    topScroll.addEventListener('scroll', handleTopScroll);
+    bottomScroll.addEventListener('scroll', handleBottomScroll);
+
+    return () => {
+      topScroll.removeEventListener('scroll', handleTopScroll);
+      bottomScroll.removeEventListener('scroll', handleBottomScroll);
+      window.removeEventListener('resize', updateScrollbarWidth);
+    };
+  }, [stocks]);
 
   const formatDate = (date: Date) => {
     const d = new Date(date);
@@ -275,6 +319,15 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
 
   return (
     <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl overflow-hidden">
+      {/* Top Scrollbar */}
+      <div 
+        ref={topScrollRef}
+        className="overflow-x-auto overflow-y-hidden border-b border-slate-800/50"
+        style={{ height: '17px' }}
+      >
+        <div style={{ height: '1px', width: 'max-content', minWidth: '100%' }}></div>
+      </div>
+
       {/* Export Buttons */}
       <div className="px-6 py-4 border-b border-slate-800/50 flex justify-end gap-3">
         <button
@@ -292,8 +345,8 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
           Export Raw Data
         </button>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
+      <div ref={bottomScrollRef} className="overflow-x-auto">
+        <table ref={tableRef} className="w-full">
           <thead>
             <tr className="bg-gradient-to-r from-slate-950/50 to-slate-900/50 border-b border-slate-800/50">
               <th 
