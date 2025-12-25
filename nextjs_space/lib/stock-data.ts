@@ -71,6 +71,7 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
       const stockData = stock.stockData;
       const analystRec = stock.analystRecommendations?.[0]; // Get first element since it's an array
       const socialSent = stock.socialSentiments?.[0]; // Get first element since it's an array
+      const metrics = stock.metrics; // Get metrics from database
 
       (mergedData as any)[stock.ticker] = {
         stock_data: {
@@ -85,6 +86,20 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
             Date: ph.date.toISOString().split('T')[0],
             Close: ph.price,
           })),
+          // Add metrics from database
+          averageVolume: metrics?.averageVolume,
+          averageVolume10Day: metrics?.averageVolume10Day,
+          floatShares: metrics?.floatShares,
+          beta: metrics?.beta,
+          market_cap: metrics?.marketCap || stockData?.marketCap,
+          pe_ratio: metrics?.peRatio,
+          pb_ratio: metrics?.pbRatio,
+          ps_ratio: metrics?.psRatio,
+          priceToBook: metrics?.priceToBook,
+          priceToSales: metrics?.psRatio,
+          debtToEquity: metrics?.debtToEquity,
+          roe: metrics?.roe,
+          profit_margin: metrics?.profitMargin,
         },
         analyst_recommendations: {
           buy: analystRec?.buy || 0,

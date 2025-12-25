@@ -177,9 +177,16 @@ model Metrics {
     revenueGrowthQoQ        Float?
     earningsGrowthQoQ       Float?
     
+    // Volume metrics
+    averageVolume           Float?   // Average daily volume (3 month)
+    averageVolume10Day      Float?   // Average daily volume (10 day)
+    floatShares             Float?   // Float shares outstanding
+    
     // Other
     dividendYield           Float?
     payoutRatio             Float?
+    beta                    Float?   // Standard beta
+    marketCap               Float?   // Market capitalization
     
     lastUpdated             DateTime @default(now())
 
