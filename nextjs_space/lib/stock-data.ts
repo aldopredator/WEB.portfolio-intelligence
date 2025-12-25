@@ -171,6 +171,16 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
 
       (mergedData as any)[stock.ticker] = {
         stock_data: stockDataObj,
+        company_profile: {
+          // Use cached company profile data from Stock table
+          industry: stock.industry || null,
+          sector: stock.sector || null,
+          country: stock.country || null,
+          longBusinessSummary: stock.description || null,
+          website: stock.website || null,
+          fullTimeEmployees: stock.employees || null,
+          logo: stock.logoUrl || null,
+        },
         analyst_recommendations: {
           buy: analystRec?.buy || 0,
           hold: analystRec?.hold || 0,
@@ -213,11 +223,8 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
         try {
           const stockEntry = mergedData[ticker];
 
-          // Fetch company profile
-          const profile = await fetchCompanyProfile(ticker);
-          if (profile && isRecord(stockEntry)) {
-            stockEntry.company_profile = profile as any;
-          }
+          // Company profile is now cached in Stock table - no need to fetch
+          // Profile data was already added from stock.industry, stock.sector, stock.country above
 
           // Fetch financial metrics (only if not already cached)
           const metrics = await fetchFinnhubMetrics(ticker);
@@ -225,7 +232,7 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
             Object.assign(stockEntry.stock_data, metrics);
           }
 
-          // Fetch balance sheet
+          // Fetch balance sheet (if company profile exists)
           const balanceSheet = await fetchBalanceSheet(ticker);
           if (balanceSheet && isRecord(stockEntry) && stockEntry.company_profile) {
             Object.assign(stockEntry.company_profile, balanceSheet);
@@ -266,19 +273,14 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
     
     // Always enrich company profiles and news for all stocks (these change frequently)
     const validTickers = stocks.map((s: any) => s.ticker);
-    console.log('[STOCK-DATA] 📰 Fetching company profiles and news for all stocks...');
+    console.log('[STOCK-DATA] 📰 Fetching news for all stocks...');
     
     await Promise.allSettled(validTickers.map(async (ticker: string) => {
       try {
         const stockEntry = mergedData[ticker];
 
-        // Fetch company profile (always fresh) - skip if we already fetched during enrichment
-        if (!tickersNeedingEnrichment.includes(ticker)) {
-          const profile = await fetchCompanyProfile(ticker);
-          if (profile && isRecord(stockEntry)) {
-            stockEntry.company_profile = profile as any;
-          }
-        }
+        // Company profile is now cached in Stock table - no need to fetch
+        // Profile data was already added from stock.industry, stock.sector, stock.country above
 
         // Fetch balance sheet (always fresh) - skip if we already fetched during enrichment
         if (!tickersNeedingEnrichment.includes(ticker)) {

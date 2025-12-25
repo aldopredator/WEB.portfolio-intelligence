@@ -35,6 +35,11 @@ model Stock {
     currency    String?  @default("USD")
     sector      String?  // Company sector (e.g., 'Technology', 'Healthcare')
     industry    String?  // Company industry (e.g., 'Software', 'Pharmaceuticals')
+    country     String?  // Company country (e.g., 'United States')
+    description String?  @db.Text // Company description
+    website     String?  // Company website URL
+    employees   Int?     // Number of employees
+    logoUrl     String?  // Company logo URL from Clearbit
     alternativeTickers String[] @default([]) // Alternative ticker symbols for matching (e.g., ['GOOGL'] for GOOG)
     isActive    Boolean  @default(true) // Whether the stock is in the user's portfolio
     rating      Int?     @default(0) // User's discretionary rating (0-5 stars)

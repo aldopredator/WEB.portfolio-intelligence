@@ -166,6 +166,40 @@ async function fetchComprehensiveMetrics(ticker: string): Promise<MetricsSnapsho
 }
 
 /**
+ * Fetch and update company profile information
+ */
+async function updateCompanyProfile(stockId: string, ticker: string) {
+  try {
+    console.log(`  🏢 Fetching company profile for ${ticker}...`);
+    
+    // Fetch company profile from Yahoo Finance/Finnhub via fetchCompanyProfile
+    const profile = await fetchCompanyProfile(ticker);
+    
+    if (profile) {
+      // Update Stock record with company profile data
+      await prisma.stock.update({
+        where: { id: stockId },
+        data: {
+          sector: profile.sector || undefined,
+          industry: profile.industry || undefined,
+          country: profile.country || undefined,
+          description: profile.description || undefined,
+          website: profile.weburl || undefined,
+          employees: profile.totalEmployees || undefined,
+          logoUrl: profile.logo || undefined,
+        },
+      });
+      
+      console.log(`    ✅ ${ticker}: Profile updated`);
+    } else {
+      console.log(`    ⚠️  ${ticker}: No profile data available`);
+    }
+  } catch (error) {
+    console.error(`    ⚠️  ${ticker}: Profile fetch failed:`, error);
+  }
+}
+
+/**
  * Main function to populate metrics for all active stocks
  */
 async function populateMetrics() {
@@ -212,8 +246,11 @@ async function populateMetrics() {
           },
         });
         
+        // Update company profile (sector, industry, country) - runs once daily regardless of metrics
+        await updateCompanyProfile(stock.id, stock.ticker);
+        
         if (existing) {
-          console.log(`⏭️  ${stock.ticker}: Metrics already exist for today, skipping...`);
+          console.log(`⏭️  ${stock.ticker}: Metrics already exist for today, skipping metrics update...`);
           skipCount++;
           continue;
         }
