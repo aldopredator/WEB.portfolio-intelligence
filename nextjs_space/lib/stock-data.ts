@@ -92,6 +92,7 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
           Date: ph.date.toISOString().split('T')[0],
           Close: ph.price,
         })),
+        totalEmployees: stock.employees || null, // Add employee count from cached data
       };
 
       // Merge cached metrics from database if available
