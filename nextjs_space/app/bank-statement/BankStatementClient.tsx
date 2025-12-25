@@ -531,7 +531,7 @@ export default function BankStatementClient() {
       'Weight (%)': totalVal > 0 ? ((h.valueR / totalVal) * 100).toFixed(2) : '0.00',
       'Return (£)': h.valueR - h.bookCostR,
       '% Change': h.percentChange,
-      'Cost price CCY': h.averageFxRate * h.quantityHeld !== 0 ? (h.bookCostR / (h.averageFxRate * h.quantityHeld)).toFixed(0) : '0',
+      'Cost price CCY': h.quantityHeld !== 0 ? ((h.bookCostR * h.averageFxRate) / h.quantityHeld).toFixed(0) : '0',
       'Book Cost (£)': h.bookCostR,
       'Book Cost': h.bookCost,
       'Book Cost CCY': h.bookCostCcy,
@@ -1021,10 +1021,10 @@ export default function BankStatementClient() {
                       </td>
                       {/* Cost price CCY */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {getInvestmentType(holding.investment) === 'Cash' || holding.averageFxRate * holding.quantityHeld === 0 ? (
+                        {getInvestmentType(holding.investment) === 'Cash' || holding.quantityHeld === 0 ? (
                           <span className="text-slate-500 text-xs">-</span>
                         ) : (
-                          <>{(holding.bookCostR / (holding.averageFxRate * holding.quantityHeld)).toFixed(0)}</>
+                          <>{((holding.bookCostR * holding.averageFxRate) / holding.quantityHeld).toFixed(0)}</>
                         )}
                       </td>
                       {/* Book Cost (£) */}
