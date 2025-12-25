@@ -52,13 +52,9 @@ export default function PriceHistoryChart({
   volume,
   fiftyDayAverage,
   twoHundredDayAverage,
-  costPrice,
   stocks = [],
   costPrice,
   costPriceUpdatedAt,
-}: PriceHistoryChartProps) {
-  twoHundredDayAverage,
-  stocks = [],
 }: PriceHistoryChartProps) {
   const theme = useTheme();
   const [compareTicker, setCompareTicker] = useState<string>('');
