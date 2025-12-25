@@ -546,38 +546,53 @@ export default function BankStatementClient() {
     XLSX.writeFile(workbook, `bank_statement_${timestamp}.xlsx`);
   };
 
-  const updateSectorsForHoldings = async () => {
-    const tickers = holdings
-      .map(h => h.identifier)
-      .filter(id => id && id !== '-' && id !== 'CASH');
+  const saveSnapshotToDatabase = async () => {
+    // Calculate cost prices for all holdings
+    const costPrices = holdings
+      .filter(h => {
+        const type = getInvestmentType(h.investment);
+        return type !== 'Cash' && h.identifier && h.identifier !== '-' && h.quantityHeld > 0;
+      })
+      .map(h => ({
+        identifier: h.identifier,
+        costPrice: (h.bookCostR * h.averageFxRate) / h.quantityHeld
+      }));
 
-    if (tickers.length === 0) return;
+    if (costPrices.length === 0) {
+      alert('No valid holdings to save');
+      return;
+    }
 
     try {
-      const response = await fetch('/api/update-stock-sectors', {
+      const response = await fetch('/api/save-cost-prices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tickers })
+        body: JSON.stringify({ costPrices })
       });
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Sector update result:', result);
+        console.log('Cost price snapshot result:', result);
         
-        // Refresh stock info
-        const refreshResponse = await fetch(`/api/stock-info?tickers=${tickers.join(',')}`);
-        if (refreshResponse.ok) {
-          const data = await refreshResponse.json();
-          setStockInfo(data);
+        let message = `Successfully saved cost prices for ${result.updated} stock(s)`;
+        if (result.skipped > 0) {
+          message += `\nSkipped ${result.skipped} item(s)`;
+        }
+        if (result.errors && result.errors.length > 0) {
+          message += `\n\nWarnings:\n${result.errors.slice(0, 5).join('\n')}`;
+          if (result.errors.length > 5) {
+            message += `\n... and ${result.errors.length - 5} more`;
+          }
         }
         
-        alert(`Updated ${result.updated} stocks successfully!`);
+        alert(message);
       } else {
-        alert('Failed to update sectors');
+        const error = await response.json();
+        alert(`Failed to save cost prices: ${error.error || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error('Error updating sectors:', error);
-      alert('Error updating sectors');
+      console.error('Error saving cost prices:', error);
+      alert('Error saving cost prices to database');
     }
   };
 
@@ -712,12 +727,12 @@ export default function BankStatementClient() {
               </div>
               <div className="flex gap-3">
                 <button
-                  onClick={updateSectorsForHoldings}
+                  onClick={saveSnapshotToDatabase}
                   className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-lg text-blue-400 transition-colors"
-                  title="Fetch sector and industry data from Yahoo Finance"
+                  title="Save cost price snapshots to database for each ticker"
                 >
                   <FileSpreadsheet className="w-4 h-4" />
-                  Update Sectors
+                  Take snapshot into database
                 </button>
                 <button
                   onClick={exportToExcel}

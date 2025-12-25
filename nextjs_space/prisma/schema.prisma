@@ -45,6 +45,8 @@ model Stock {
     rating      Int?     @default(0) // User's discretionary rating (0-5 stars)
     notes       String?  @db.VarChar(100) // User notes about the stock (max 100 chars)
     ratingUpdatedAt DateTime? // Last time the rating was updated
+    costPrice   Float?   // Snapshot of cost price from bank statement (bookCostR * averageFxRate / quantityHeld)
+    costPriceUpdatedAt DateTime? // Last time the cost price was updated
     addedAt     DateTime @default(now())
     updatedAt   DateTime @updatedAt
     

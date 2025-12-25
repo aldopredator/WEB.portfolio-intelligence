@@ -24,6 +24,8 @@ Essential knowledge for AI agents working in this Next.js 14 portfolio intellige
 | `app/page.tsx` | Main dashboard | Server component that calls `getStockData(portfolioId)`, fetches ratings from DB, passes to `DashboardClient` (client component). Uses `export const dynamic = 'force-dynamic'`. |
 | `app/layout.tsx` | Root layout | Dark mode enforced with `<html className="dark">`. Wraps in `PortfolioProvider` for client-side portfolio state. Includes `GlobalHeader` and `SidebarNavigation`. |
 | `app/api/add-ticker/route.ts` | Add stock API | POST endpoint to add new ticker: validates existence, fetches Yahoo data for price history, creates Stock + StockData + PriceHistory records. |
+| `app/api/save-cost-prices/route.ts` | Save cost prices API | POST endpoint to save cost price snapshots from bank statement. Matches tickers using `Stock.ticker` or `Stock.alternativeTickers`. Updates `Stock.costPrice` and `Stock.costPriceUpdatedAt`. |
+| `app/bank-statement/page.tsx` | Bank statement page | Upload broker statements (Excel/CSV), calculate cost prices, and snapshot to database. Uses "Take snapshot into database" button to save cost prices. |
 
 ## 🔧 Developer Workflows
 
@@ -166,11 +168,24 @@ Cache system ensures **stale data is returned on cache expiry** rather than fail
 
 7. **🔥 CRITICAL - Comparison Dropdown Portfolio Independence**: The comparison dropdown in `PriceHistoryChart.tsx` MUST fetch ALL tickers from ALL portfolios, regardless of the current portfolio filter. This has broken TWICE due to using the `stocks` prop (which is portfolio-filtered) or using `/api/stock?portfolioId=all` (which times out loading all relations). **CORRECT APPROACH**: Use `/api/stock-list` which is lightweight and returns all stocks with portfolio info but no heavy relations. Never use the `stocks` prop for this dropdown - it defeats cross-portfolio comparison. See commits 12a92f5 and a4a52a2 for the fix pattern.
 
+8. **Cost Price Tracking**: The `Stock.costPrice` field stores snapshots from bank statements calculated as `(bookCostR × averageFxRate) / quantityHeld`. This is updated via the bank statement page's "Take snapshot into database" button. The system matches tickers using both `Stock.ticker` and `Stock.alternativeTickers` array to handle broker-specific ticker naming. `costPriceUpdatedAt` tracks when each snapshot was taken.
+
 ## 📚 Documentation
 
 - `DESIGN_SPECIFICATION.md` - MUI design system (330 lines)
 - `docs/finnhub-metrics-mapping.md` - Finnhub API field mappings
 - `docs/data-sources.md` - Data source strategy
 - `tests/README.md` - Playwright test documentation
+
+## 🗄️ Database Schema Notes
+
+### Stock Model Key Fields
+- `ticker`: Primary ticker symbol (unique)
+- `alternativeTickers`: Array of alternative ticker symbols for matching with broker statements
+- `costPrice`: Snapshot of cost price from bank statement (formula: bookCostR × averageFxRate / quantityHeld)
+- `costPriceUpdatedAt`: Timestamp of last cost price snapshot
+- `rating`: User's discretionary rating (0-5 stars)
+- `notes`: User notes about the stock (max 100 chars)
+- `portfolioId`: Foreign key to Portfolio model (nullable)
 
 When unclear about a feature, check these docs before asking. They contain architecture decisions and rationale.
