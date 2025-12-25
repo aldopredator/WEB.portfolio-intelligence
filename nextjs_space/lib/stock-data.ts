@@ -230,6 +230,7 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
       await Promise.allSettled(tickersNeedingEnrichment.map(async (ticker: string) => {
         try {
           const stockEntry = mergedData[ticker];
+          const stockFromDb = stocks.find((s: any) => s.ticker === ticker);
 
           // Company profile is now cached in Stock table - no need to fetch
           // Profile data was already added from stock.industry, stock.sector, stock.country above
@@ -253,8 +254,8 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
           }
 
           // Use earnings surprises from database (if available)
-          if (stock.earningsSurprises && stock.earningsSurprises.length > 0 && isRecord(stockEntry)) {
-            stockEntry.earnings_surprises = stock.earningsSurprises.map((es: any) => ({
+          if (stockFromDb?.earningsSurprises && stockFromDb.earningsSurprises.length > 0 && isRecord(stockEntry)) {
+            stockEntry.earnings_surprises = stockFromDb.earningsSurprises.map((es: any) => ({
               period: es.period.toISOString().split('T')[0],
               actual: es.actual,
               estimate: es.estimate,
