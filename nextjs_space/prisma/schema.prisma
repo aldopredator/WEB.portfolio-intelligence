@@ -59,6 +59,7 @@ model Stock {
     socialSentiments    SocialSentiment[]
     news                News[]
     metrics             Metrics[]
+    earningsSurprises   EarningsSurprise[]
     
     // Large text fields at the end
     notes       String?  @db.VarChar(100) // User notes about the stock (max 100 chars)
@@ -201,6 +202,26 @@ model Metrics {
     @@unique([stockId, snapshotDate])
     @@index([stockId, snapshotDate])
     @@index([snapshotDate])
+}
+
+// Earnings surprises data (quarterly reports)
+model EarningsSurprise {
+    id              String   @id @default(cuid())
+    stockId         String
+    stock           Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+    
+    period          DateTime // Fiscal quarter end date (e.g., 2025-03-31)
+    actual          Float?   // Actual EPS
+    estimate        Float?   // Estimated EPS
+    surprise        Float?   // Surprise amount (actual - estimate)
+    surprisePercent Float?   // Surprise percentage
+    
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+
+    @@unique([stockId, period])
+    @@index([stockId])
+    @@index([period])
 }
 
 // Industry master list for diversification tracking

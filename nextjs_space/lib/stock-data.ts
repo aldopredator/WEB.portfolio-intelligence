@@ -50,6 +50,10 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
           orderBy: { snapshotDate: 'desc' },
           take: 1, // Get the latest snapshot
         },
+        earningsSurprises: {
+          orderBy: { period: 'desc' },
+          take: 8, // Last 8 quarters (2 years)
+        },
       },
     });
 
@@ -248,10 +252,15 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
             Object.assign(stockEntry.stock_data, polygonStats);
           }
 
-          // Fetch earnings surprises
-          const earningsSurprises = await fetchEarningsSurprises(ticker);
-          if (earningsSurprises && isRecord(stockEntry)) {
-            stockEntry.earnings_surprises = earningsSurprises as any;
+          // Use earnings surprises from database (if available)
+          if (stock.earningsSurprises && stock.earningsSurprises.length > 0 && isRecord(stockEntry)) {
+            stockEntry.earnings_surprises = stock.earningsSurprises.map((es: any) => ({
+              period: es.period.toISOString().split('T')[0],
+              actual: es.actual,
+              estimate: es.estimate,
+              surprise: es.surprise,
+              surprisePercent: es.surprisePercent,
+            }));
           }
 
           // Fetch recommendation trends
