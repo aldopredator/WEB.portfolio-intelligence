@@ -294,6 +294,7 @@ export default async function ScreeningPage({
       company: true,
       type: true,
       rating: true,
+      notes: true,
       updatedAt: true,
       portfolio: {
         select: { 
@@ -600,6 +601,7 @@ export default async function ScreeningPage({
       portfolio: stock.portfolio.name,
       portfolioId: stock.portfolio.id,
       rating: stock.rating || 0,
+      notes: stock.notes || '',
       updatedAt: stock.updatedAt,
       pe: pe || 'N/A',
       pb: pb || 'N/A',

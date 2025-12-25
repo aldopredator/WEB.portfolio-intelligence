@@ -16,6 +16,7 @@ interface Stock {
   portfolio: string;
   portfolioId: string;
   rating: number;
+  notes: string;
   updatedAt: Date;
   pe: string;
   pb: string;
