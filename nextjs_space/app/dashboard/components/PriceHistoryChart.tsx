@@ -726,6 +726,52 @@ export default function PriceHistoryChart({
                         ${currentPrice.toFixed(2)}
                       </Typography>
                     </Stack>
+                    
+                    {/* Cost Price Marker (if exists and in range) */}
+                    {costPrice && costPrice >= weekLow52 && costPrice <= weekHigh52 && (
+                      <Stack
+                        sx={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: `${((costPrice - weekLow52) / (weekHigh52 - weekLow52)) * 100}%`,
+                          transform: 'translate(-50%, -50%)',
+                          zIndex: 1,
+                        }}
+                      >
+                        {/* Dashed Line Vertical */}
+                        <Stack
+                          sx={{
+                            position: 'absolute',
+                            width: 2,
+                            height: 40,
+                            top: -20,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            background: `repeating-linear-gradient(to bottom, ${theme.palette.info.main} 0, ${theme.palette.info.main} 4px, transparent 4px, transparent 8px)`,
+                            opacity: 0.7,
+                          }}
+                        />
+                        {/* Cost Price Label */}
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            position: 'absolute',
+                            bottom: -24,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            fontWeight: 600,
+                            color: theme.palette.info.main,
+                            whiteSpace: 'nowrap',
+                            fontSize: '0.65rem',
+                            backgroundColor: 'rgba(0,0,0,0.6)',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                          }}
+                        >
+                          Cost ${costPrice.toFixed(0)}
+                        </Typography>
+                      </Stack>
+                    )}
                   </Stack>
                   
                   {/* Max Value */}
@@ -760,63 +806,95 @@ export default function PriceHistoryChart({
           </Stack>
         ) : null}
 
-        <LineChart
-          colors={showComparison ? [theme.palette.primary.main, theme.palette.warning.main] : colorPalette}
-          xAxis={[
-            {
-              scaleType: 'point',
-              data: dates,
-              tickInterval: (index, i) => (i + 1) % 5 === 0,
-            },
-          ]}
-          yAxis={[
-            {
-              min: yMin,
-              max: yMax,
-              valueFormatter: (value) => showComparison 
-                ? `${value.toFixed(1)}%` 
-                : `${currencySymbol}${value.toFixed(0)}`,
-            },
-          ]}
-          series={[
-            {
-              id: 'price',
-              label: ticker,
-              showMark: false,
-              curve: 'linear',
-              area: !showComparison,
-              data: chartData,
-            },
-            ...(showComparison && benchmarkChartData.length > 0
-              ? [
-                  {
-                    id: 'benchmark',
-                    label: compareTicker,
-                    showMark: false,
-                    curve: 'linear' as const,
-                    area: false,
-                    data: benchmarkChartData,
-                  },
-                ]
-              : []),
-          ]}
-          height={300}
-          margin={{ left: 60, right: 20, top: 20, bottom: 20 }}
-          slotProps={{
-            legend: { 
-              hidden: !showComparison,
-              direction: 'row',
-              position: { vertical: 'top', horizontal: 'middle' },
-            },
-          }}
-          sx={{
-            '& .MuiAreaElement-series-price': {
-              fill: "url('#price-gradient')",
-            },
-          }}
-        >
-          <AreaGradient color={theme.palette.primary.main} id="price-gradient" />
-        </LineChart>
+        {/* Chart Container with Cost Price Line Overlay */}
+        <Stack sx={{ position: 'relative' }}>
+          <LineChart
+            colors={showComparison ? [theme.palette.primary.main, theme.palette.warning.main] : colorPalette}
+            xAxis={[
+              {
+                scaleType: 'point',
+                data: dates,
+                tickInterval: (index, i) => (i + 1) % 5 === 0,
+              },
+            ]}
+            yAxis={[
+              {
+                min: yMin,
+                max: yMax,
+                valueFormatter: (value) => showComparison 
+                  ? `${value.toFixed(1)}%` 
+                  : `${currencySymbol}${value.toFixed(0)}`,
+              },
+            ]}
+            series={[
+              {
+                id: 'price',
+                label: ticker,
+                showMark: false,
+                curve: 'linear',
+                area: !showComparison,
+                data: chartData,
+              },
+              ...(showComparison && benchmarkChartData.length > 0
+                ? [
+                    {
+                      id: 'benchmark',
+                      label: compareTicker,
+                      showMark: false,
+                      curve: 'linear' as const,
+                      area: false,
+                      data: benchmarkChartData,
+                    },
+                  ]
+                : []),
+            ]}
+            height={300}
+            margin={{ left: 60, right: 20, top: 20, bottom: 20 }}
+            slotProps={{
+              legend: { 
+                hidden: !showComparison,
+                direction: 'row',
+                position: { vertical: 'top', horizontal: 'middle' },
+              },
+            }}
+            sx={{
+              '& .MuiAreaElement-series-price': {
+                fill: "url('#price-gradient')",
+              },
+            }}
+          >
+            <AreaGradient color={theme.palette.primary.main} id="price-gradient" />
+          </LineChart>
+          
+          {/* Cost Price Horizontal Line Overlay (only when not comparing) */}
+          {costPrice && !showComparison && costPrice >= yMin && costPrice <= yMax && (
+            <Stack
+              sx={{
+                position: 'absolute',
+                left: 60,
+                right: 20,
+                top: 20 + ((yMax - costPrice) / (yMax - yMin)) * 300,
+                height: 2,
+                background: `repeating-linear-gradient(to right, ${theme.palette.info.main} 0, ${theme.palette.info.main} 8px, transparent 8px, transparent 16px)`,
+                opacity: 0.8,
+                pointerEvents: 'none',
+                '&::before': {
+                  content: '"Cost Price"',
+                  position: 'absolute',
+                  right: -10,
+                  top: -10,
+                  fontSize: '0.7rem',
+                  fontWeight: 600,
+                  color: theme.palette.info.main,
+                  backgroundColor: 'rgba(0,0,0,0.7)',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  whiteSpace: 'nowrap',
+                },
+              }}
+            />
+          )}
+        </Stack>
       </CardContent>
     </Card>
   );
