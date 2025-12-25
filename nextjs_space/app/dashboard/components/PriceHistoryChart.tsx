@@ -35,6 +35,7 @@ interface PriceHistoryChartProps {
   volume?: number;
   fiftyDayAverage?: number | null;
   twoHundredDayAverage?: number | null;
+  costPrice?: number | null;
   stocks?: Array<{ ticker: string; company: string; portfolioId?: string | null }>;
 }
 
@@ -49,6 +50,7 @@ export default function PriceHistoryChart({
   volume,
   fiftyDayAverage,
   twoHundredDayAverage,
+  costPrice,
   stocks = [],
 }: PriceHistoryChartProps) {
   const theme = useTheme();

@@ -21,7 +21,7 @@ import type { StockInsightsData } from '@/lib/types';
 interface MainGridProps {
   stockData: StockInsightsData;
   selectedStock: string;
-  stocks?: Array<{ ticker: string; company: string; change_percent?: number; rating?: number; notes?: string; portfolioId?: string | null; isLocked?: boolean; ratingUpdatedAt?: Date | null }>;
+  stocks?: Array<{ ticker: string; company: string; change_percent?: number; rating?: number; notes?: string; portfolioId?: string | null; isLocked?: boolean; ratingUpdatedAt?: Date | null; costPrice?: number | null }>;
   portfolios?: Array<{ id: string; name: string; description?: string | null }>;
   onRatingUpdate?: (ticker: string, rating: number) => void;
 }
@@ -204,6 +204,7 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
             volume={stock.volume}
             fiftyDayAverage={stock.fiftyDayAverage}
             twoHundredDayAverage={stock.twoHundredDayAverage}
+            costPrice={stocks.find(s => s.ticker === selectedStock)?.costPrice}
             stocks={stocks}
           />
         )}
