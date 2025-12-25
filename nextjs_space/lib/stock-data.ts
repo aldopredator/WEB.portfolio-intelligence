@@ -155,6 +155,19 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
             stockDataObj.heldByInstitutions = latestMetrics.heldByInstitutions;
             stockDataObj.heldPercentInstitutions = latestMetrics.heldByInstitutions; // UI expects this name
           }
+        } else {
+          console.log(`[STOCK-DATA] ⏰ Metrics for ${stock.ticker} are stale (${Math.round(metricsAge / (1000 * 60 * 60 * 24))}d old), will enrich with APIs`);
+        }
+      } else {
+        console.log(`[STOCK-DATA] 📭 No cached metrics for ${stock.ticker}, will enrich with APIs`);
+      }
+
+      (mergedData as any)[stock.ticker] = {
+        stock_data: stockDataObj,
+        company_profile: {
+          // Use cached company profile data from Stock table
+          name: stock.company || null,
+          industry: stock.industry || null,
           sector: stock.sector || null,
           country: stock.country || null,
           longBusinessSummary: stock.description || null,
