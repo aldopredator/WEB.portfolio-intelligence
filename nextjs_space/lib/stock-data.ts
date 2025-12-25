@@ -104,13 +104,25 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
           console.log(`[STOCK-DATA] 💾 Using cached metrics for ${stock.ticker} (${Math.round(metricsAge / (1000 * 60 * 60))}h old)`);
           
           // Valuation metrics
-          if (latestMetrics.peRatio !== null) stockDataObj.pe_ratio = latestMetrics.peRatio;
+          if (latestMetrics.peRatio !== null) {
+            stockDataObj.pe_ratio = latestMetrics.peRatio;
+            stockDataObj.trailingPE = latestMetrics.peRatio; // UI expects this name
+          }
           if (latestMetrics.forwardPE !== null) stockDataObj.forwardPE = latestMetrics.forwardPE;
           if (latestMetrics.pbRatio !== null) stockDataObj.pb_ratio = latestMetrics.pbRatio;
-          if (latestMetrics.psRatio !== null) stockDataObj.ps_ratio = latestMetrics.psRatio;
+          if (latestMetrics.psRatio !== null) {
+            stockDataObj.ps_ratio = latestMetrics.psRatio;
+            stockDataObj.priceToSales = latestMetrics.psRatio; // UI expects this name
+          }
           if (latestMetrics.priceToBook !== null) stockDataObj.priceToBook = latestMetrics.priceToBook;
-          if (latestMetrics.evToRevenue !== null) stockDataObj.evToRevenue = latestMetrics.evToRevenue;
-          if (latestMetrics.evToEbitda !== null) stockDataObj.evToEbitda = latestMetrics.evToEbitda;
+          if (latestMetrics.evToRevenue !== null) {
+            stockDataObj.evToRevenue = latestMetrics.evToRevenue;
+            stockDataObj.enterpriseToRevenue = latestMetrics.evToRevenue; // UI expects this name
+          }
+          if (latestMetrics.evToEbitda !== null) {
+            stockDataObj.evToEbitda = latestMetrics.evToEbitda;
+            stockDataObj.enterpriseToEbitda = latestMetrics.evToEbitda; // UI expects this name
+          }
           if (latestMetrics.pegRatio !== null) stockDataObj.pegRatio = latestMetrics.pegRatio;
           
           // Performance metrics
