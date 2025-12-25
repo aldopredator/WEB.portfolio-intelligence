@@ -84,6 +84,9 @@ async function fetchComprehensiveMetrics(ticker: string): Promise<MetricsSnapsho
       snapshot.pbRatio = finnhubData.pb_ratio;
       snapshot.psRatio = finnhubData.ps_ratio;
       
+      // Market cap
+      snapshot.marketCap = finnhubData.market_cap;
+      
       // Financial health
       snapshot.debtToEquity = finnhubData.debt_to_equity;
       snapshot.roe = finnhubData.roe;
@@ -118,6 +121,7 @@ async function fetchComprehensiveMetrics(ticker: string): Promise<MetricsSnapsho
     const polygonData = await fetchPolygonStockStats(ticker);
     if (polygonData) {
       // Market data
+      snapshot.marketCap = polygonData.market_cap || snapshot.marketCap; // Prefer Polygon if available
       snapshot.averageVolume = polygonData.averageVolume;
       snapshot.averageVolume10Day = polygonData.averageVolume10Day;
       snapshot.sharesOutstanding = polygonData.sharesOutstanding;

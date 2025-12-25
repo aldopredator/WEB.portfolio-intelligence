@@ -181,6 +181,14 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
           website: stock.website || null,
           fullTimeEmployees: stock.employees || null,
           logo: stock.logoUrl || null,
+          // Market cap from cached metrics (if available)
+          marketCapitalization: latestMetrics?.marketCap || null,
+          // Balance sheet fields will be enriched from API calls below
+          assets: null,
+          liabilities: null,
+          currency: null,
+          weburl: stock.website || null,
+          ipoDate: null,
         },
         analyst_recommendations: {
           buy: analystRec?.buy || 0,
