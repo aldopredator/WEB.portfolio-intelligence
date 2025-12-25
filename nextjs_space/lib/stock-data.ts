@@ -180,6 +180,7 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
         stock_data: stockDataObj,
         company_profile: {
           // Use cached company profile data from Stock table
+          name: stock.company || null,
           industry: stock.industry || null,
           sector: stock.sector || null,
           country: stock.country || null,
