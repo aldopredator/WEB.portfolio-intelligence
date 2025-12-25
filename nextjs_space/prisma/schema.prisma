@@ -171,32 +171,22 @@ model Metrics {
     priceToBook             Float?
     evToRevenue             Float?
     evToEbitda              Float?
-    pegRatio                Float?
     
     // Performance metrics
     beta                    Float?
-    ytdReturn               Float?
-    week52Return            Float?
     
     // Financial health
     debtToEquity            Float?
     roe                     Float?   // Return on Equity
     roa                     Float?   // Return on Assets
-    operatingMargin         Float?
     profitMargin            Float?
-    grossMargin             Float?
-    currentRatio            Float?
-    quickRatio              Float?
     
     // Growth metrics
     revenueGrowthQoQ        Float?
     earningsGrowthQoQ       Float?
-    revenueGrowthYoY        Float?
-    earningsGrowthYoY       Float?
     
     // Market data
     marketCap               Float?
-    volume                  Float?
     averageVolume           Float?
     averageVolume10Day      Float?
     sharesOutstanding       Float?
@@ -205,14 +195,6 @@ model Metrics {
     // Ownership
     heldByInsiders          Float?
     heldByInstitutions      Float?
-    
-    // Dividend metrics
-    dividendYield           Float?
-    payoutRatio             Float?
-    
-    // Per share metrics
-    eps                     Float?
-    bookValuePerShare       Float?
     
     createdAt               DateTime @default(now())
 
