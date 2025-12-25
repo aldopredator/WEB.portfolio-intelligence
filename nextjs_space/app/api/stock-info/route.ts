@@ -33,7 +33,6 @@ export async function GET(request: Request) {
         industry: true,
         type: true,
         exchange: true,
-        region: true,
         alternativeTickers: true,
         portfolio: {
           select: {
@@ -53,7 +52,6 @@ export async function GET(request: Request) {
         industry: stock.industry,
         type: stock.type,
         exchange: stock.exchange,
-        region: stock.region,
         alternativeTickers: stock.alternativeTickers,
         portfolioName: stock.portfolio?.name || null
       };
