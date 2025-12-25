@@ -56,6 +56,8 @@ export interface YahooStockStatistics {
     forwardPE?: number | null;                // Forward P/E
     pegRatio?: number | null;                 // PEG Ratio (5yr expected)
     priceToBook?: number | null;              // Price/Book
+    beta?: number | null;                     // Beta (volatility vs market)
+    marketCap?: number | null;                // Market Capitalization
 }
 
 /**
@@ -263,6 +265,8 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
         const sharesOutstanding = stats?.sharesOutstanding || null;
         const heldPercentInsiders = stats?.heldPercentInsiders ? stats.heldPercentInsiders * 100 : null;
         const heldPercentInstitutions = stats?.heldPercentInstitutions ? stats.heldPercentInstitutions * 100 : null;
+        const beta = stats?.beta || summary?.beta || null; // Add beta from Yahoo Finance
+        const marketCap = stats?.marketCap || summary?.marketCap || null; // Add marketCap from Yahoo Finance
         
         // Extract values from summaryDetail
         const fiftyTwoWeekHigh = summary?.fiftyTwoWeekHigh || null;
@@ -290,7 +294,7 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
         const pegRatio = stats?.pegRatio || null;
         const priceToBook = stats?.priceToBook || null;
         
-        console.log(`[YAHOO] ✅ ${ticker} - Float: ${floatShares}, Outstanding: ${sharesOutstanding}, ROA: ${returnOnAssets}%, ROE: ${returnOnEquity}%, Profit Margin: ${profitMargins}%, D/E: ${debtToEquity}, P/S: ${priceToSales}`);
+        console.log(`[YAHOO] ✅ ${ticker} - Float: ${floatShares}, Outstanding: ${sharesOutstanding}, Beta: ${beta}, Market Cap: ${marketCap}, ROA: ${returnOnAssets}%, ROE: ${returnOnEquity}%, Profit Margin: ${profitMargins}%, D/E: ${debtToEquity}, P/S: ${priceToSales}`);
         
         return {
             floatShares,
@@ -316,7 +320,9 @@ export async function fetchYahooStatistics(ticker: string): Promise<YahooStockSt
             trailingPE,
             forwardPE,
             pegRatio,
-            priceToBook
+            priceToBook,
+            beta, // Add beta to return value
+            marketCap, // Add market cap to return value
         };
     } catch (error) {
         console.error(`[YAHOO] ❌ Error fetching statistics for ${ticker}:`, error);

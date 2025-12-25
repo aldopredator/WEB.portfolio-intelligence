@@ -127,6 +127,7 @@ async function fetchComprehensiveMetrics(ticker: string): Promise<MetricsSnapsho
       snapshot.sharesOutstanding = polygonData.sharesOutstanding;
       snapshot.floatShares = polygonData.floatShares;
       snapshot.volume = polygonData.dailyVolume;
+      snapshot.beta = polygonData.beta || snapshot.beta; // Use Yahoo's beta if Polygon doesn't have it
       
       // Ownership metrics
       snapshot.heldByInsiders = polygonData.heldPercentInsiders;

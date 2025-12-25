@@ -189,12 +189,16 @@ export async function fetchPolygonStockStats(ticker: string): Promise<PolygonSto
         const stats: PolygonStockStats = {
             // Use Yahoo Finance for float shares (most accurate source)
             floatShares: yahooStats?.floatShares || null,
-            // Use Polygon for shares outstanding (weighted across all classes)
-            sharesOutstanding: details?.weighted_shares_outstanding || null,
+            // Use Polygon for shares outstanding, fallback to Yahoo if Polygon unavailable
+            sharesOutstanding: details?.weighted_shares_outstanding || yahooStats?.sharesOutstanding || null,
             // Use Polygon for daily volume
             dailyVolume: aggregates?.volume || null,
             // Use Polygon for employee count
             totalEmployees: details?.total_employees || null,
+            // Use Polygon for market cap, fallback to Yahoo 
+            market_cap: details?.market_cap ? details.market_cap * 1000000000 : yahooStats?.marketCap || null,
+            // Use Yahoo Finance for beta
+            beta: yahooStats?.beta || null,
             // Use Yahoo Finance for average volume metrics
             averageVolume10Day: yahooStats?.averageVolume10Day || null,
             averageVolume: yahooStats?.averageVolume || null,
