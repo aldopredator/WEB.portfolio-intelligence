@@ -90,6 +90,9 @@ export interface StockData {
   // Finnhub per share metrics
   eps?: number;
   book_value_per_share?: number;
+  // Cost price tracking
+  cost_price?: number | null;
+  cost_price_updated_at?: Date | string | null;
 }
 
 export interface SocialSentiment {
