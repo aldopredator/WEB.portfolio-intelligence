@@ -459,7 +459,7 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                     <div className="mt-2 h-2 bg-slate-700 rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
-                        style={{ width: `${weight * 100}%` }}
+                        style={{ width: `${Math.min((weight * 100) / 10, 100)}%` }}
                       ></div>
                     </div>
                     {isToBuyPortfolio && (
