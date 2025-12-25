@@ -393,10 +393,14 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
               </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-              {tickers
-                .map((ticker, i) => ({ ticker, weight: optimalWeights[i] || 0, index: i }))
-                .sort((a, b) => b.weight - a.weight)
-                .map(({ ticker, weight, index }) => {
+              {(() => {
+                // Calculate max weight for scaling bars
+                const maxWeight = Math.max(...optimalWeights);
+                
+                return tickers
+                  .map((ticker, i) => ({ ticker, weight: optimalWeights[i] || 0, index: i }))
+                  .sort((a, b) => b.weight - a.weight)
+                  .map(({ ticker, weight, index }) => {
                 const stock = stocksMap.get(ticker);
                 const stockPortfolioId = stock?.portfolioId || selectedPortfolioId;
                 const capital = parseFloat(capitalAmount) || 0;
@@ -459,7 +463,7 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                     <div className="mt-2 h-2 bg-slate-700 rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
-                        style={{ width: `${Math.min((weight * 100) / 10, 100)}%` }}
+                        style={{ width: `${maxWeight > 0 ? (weight / maxWeight) * 100 : 0}%` }}
                       ></div>
                     </div>
                     {isToBuyPortfolio && (
@@ -489,6 +493,7 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                     )}
                   </div>
                 );
+              })();
               })}
             </div>
             <div className="mt-6 pt-6 border-t border-slate-700">
