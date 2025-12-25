@@ -37,6 +37,8 @@ interface PriceHistoryChartProps {
   twoHundredDayAverage?: number | null;
   costPrice?: number | null;
   stocks?: Array<{ ticker: string; company: string; portfolioId?: string | null }>;
+  costPrice?: number | null;
+  costPriceUpdatedAt?: Date | string | null;
 }
 
 export default function PriceHistoryChart({
@@ -51,6 +53,11 @@ export default function PriceHistoryChart({
   fiftyDayAverage,
   twoHundredDayAverage,
   costPrice,
+  stocks = [],
+  costPrice,
+  costPriceUpdatedAt,
+}: PriceHistoryChartProps) {
+  twoHundredDayAverage,
   stocks = [],
 }: PriceHistoryChartProps) {
   const theme = useTheme();
@@ -531,11 +538,31 @@ export default function PriceHistoryChart({
     <Card variant="outlined" sx={{ width: '100%' }}>
       <CardContent>
         <Stack spacing={1}>
-          {/* Line 1: Price only */}
-          <Stack>
-            <Typography variant="h4" component="p">
-              ${currentPrice.toFixed(0)}
-            </Typography>
+          {/* Line 1: Current Price and Cost Price side by side */}
+          <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+            <Stack>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                Current Price
+              </Typography>
+              <Typography variant="h4" component="p">
+                ${currentPrice.toFixed(0)}
+              </Typography>
+            </Stack>
+            {costPrice && (
+              <Stack alignItems="flex-end">
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                  Cost Price
+                  {costPriceUpdatedAt && (
+                    <span style={{ marginLeft: '4px', fontSize: '0.65rem', opacity: 0.7 }}>
+                      ({new Date(costPriceUpdatedAt).toLocaleDateString()})
+                    </span>
+                  )}
+                </Typography>
+                <Typography variant="h5" component="p" sx={{ color: 'primary.light' }}>
+                  ${costPrice.toFixed(0)}
+                </Typography>
+              </Stack>
+            )}
           </Stack>
 
           {/* Line 2: All metrics */}
