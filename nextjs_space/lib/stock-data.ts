@@ -38,13 +38,13 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
         stockData: true,
         priceHistory: {
           orderBy: { date: 'asc' },
-          take: 30, // Reduced from 90 to stay under 5MB limit
+          take: 90,
         },
         analystRecommendations: true,
         socialSentiments: true,
         news: {
           orderBy: { publishedAt: 'desc' },
-          take: 2, // Reduced from 5 to stay under 5MB limit
+          take: 5,
         },
         metrics: {
           orderBy: { snapshotDate: 'desc' },
