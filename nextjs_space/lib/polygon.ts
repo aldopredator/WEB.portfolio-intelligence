@@ -26,6 +26,8 @@ export interface PolygonStockStats {
     sharesOutstanding?: number | null;
     dailyVolume?: number | null;
     totalEmployees?: number | null;
+    market_cap?: number | null;
+    beta?: number | null;
     heldPercentInsiders?: number | null;
     heldPercentInstitutions?: number | null;
     fiftyTwoWeekHigh?: number | null;

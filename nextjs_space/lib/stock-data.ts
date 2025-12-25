@@ -152,9 +152,15 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
           if (latestMetrics.sharesOutstanding !== null) stockDataObj.sharesOutstanding = latestMetrics.sharesOutstanding;
           if (latestMetrics.floatShares !== null) stockDataObj.floatShares = latestMetrics.floatShares;
           
-          // Ownership
-          if (latestMetrics.heldByInsiders !== null) stockDataObj.heldByInsiders = latestMetrics.heldByInsiders;
-          if (latestMetrics.heldByInstitutions !== null) stockDataObj.heldByInstitutions = latestMetrics.heldByInstitutions;
+          // Ownership - Add both field name variants for compatibility
+          if (latestMetrics.heldByInsiders !== null) {
+            stockDataObj.heldByInsiders = latestMetrics.heldByInsiders;
+            stockDataObj.heldPercentInsiders = latestMetrics.heldByInsiders; // UI expects this name
+          }
+          if (latestMetrics.heldByInstitutions !== null) {
+            stockDataObj.heldByInstitutions = latestMetrics.heldByInstitutions;
+            stockDataObj.heldPercentInstitutions = latestMetrics.heldByInstitutions; // UI expects this name
+          }
           
           // Dividend metrics
           if (latestMetrics.dividendYield !== null) stockDataObj.dividendYield = latestMetrics.dividendYield;

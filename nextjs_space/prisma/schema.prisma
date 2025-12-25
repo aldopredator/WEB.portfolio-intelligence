@@ -76,8 +76,8 @@ model StockData {
     changePercent   Float?
     week52High      Float?
     week52Low       Float?
-    volume          Float?
-    marketCap       Float?
+    udf1            Float?   // User Defined Field 1 (formerly volume)
+    udf2            Float?   // User Defined Field 2 (formerly marketCap)
     
     lastUpdated     DateTime @default(now())
 
