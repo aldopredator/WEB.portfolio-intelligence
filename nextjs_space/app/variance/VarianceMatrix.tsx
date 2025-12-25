@@ -493,8 +493,8 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
                     )}
                   </div>
                 );
-              })();
-              })}
+              });
+              })()}
             </div>
             <div className="mt-6 pt-6 border-t border-slate-700">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
