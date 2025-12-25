@@ -51,6 +51,8 @@ interface Statement {
 }
 
 export default function BankStatementClient() {
+  const topScrollRef = useRef<HTMLDivElement>(null);
+  const bottomScrollRef = useRef<HTMLDivElement>(null);
   const [statements, setStatements] = useState<Statement[]>([]);
   const [activeStatementId, setActiveStatementId] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -529,7 +531,7 @@ export default function BankStatementClient() {
       'Weight (%)': totalVal > 0 ? ((h.valueR / totalVal) * 100).toFixed(2) : '0.00',
       'Return (£)': h.valueR - h.bookCostR,
       '% Change': h.percentChange,
-      'Cost price CCY': h.averageFxRate * h.quantityHeld !== 0 ? (h.bookCostR / (h.averageFxRate * h.quantityHeld)).toFixed(2) : '0.00',
+      'Cost price CCY': h.averageFxRate * h.quantityHeld !== 0 ? (h.bookCostR / (h.averageFxRate * h.quantityHeld)).toFixed(0) : '0',
       'Book Cost (£)': h.bookCostR,
       'Book Cost': h.bookCost,
       'Book Cost CCY': h.bookCostCcy,
@@ -841,12 +843,28 @@ export default function BankStatementClient() {
           {/* Holdings Table */}
           <div className="bg-slate-900/50 border border-slate-800/50 rounded-xl overflow-hidden">
             {/* Top scrollbar */}
-            <div className="overflow-x-auto border-b border-slate-800/30">
+            <div 
+              ref={topScrollRef}
+              className="overflow-x-auto border-b border-slate-800/30"
+              onScroll={(e) => {
+                if (bottomScrollRef.current) {
+                  bottomScrollRef.current.scrollLeft = e.currentTarget.scrollLeft;
+                }
+              }}
+            >
               <div style={{ height: '1px', width: 'fit-content', minWidth: '100%' }}>
                 <div style={{ width: '2000px', height: '1px' }}></div>
               </div>
             </div>
-            <div className="overflow-x-auto">
+            <div 
+              ref={bottomScrollRef}
+              className="overflow-x-auto"
+              onScroll={(e) => {
+                if (topScrollRef.current) {
+                  topScrollRef.current.scrollLeft = e.currentTarget.scrollLeft;
+                }
+              }}
+            >
               <table className="w-full">
                 <thead>
                   <tr className="bg-gradient-to-r from-slate-950/50 to-slate-900/50 border-b border-slate-800/50">
@@ -1006,7 +1024,7 @@ export default function BankStatementClient() {
                         {getInvestmentType(holding.investment) === 'Cash' || holding.averageFxRate * holding.quantityHeld === 0 ? (
                           <span className="text-slate-500 text-xs">-</span>
                         ) : (
-                          <>{(holding.bookCostR / (holding.averageFxRate * holding.quantityHeld)).toFixed(2)}</>
+                          <>{(holding.bookCostR / (holding.averageFxRate * holding.quantityHeld)).toFixed(0)}</>
                         )}
                       </td>
                       {/* Book Cost (£) */}
@@ -1027,14 +1045,14 @@ export default function BankStatementClient() {
                       </td>
                       {/* FX Rate */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {holding.fxRate.toFixed(4)}
+                        {holding.fxRate.toFixed(2)}
                       </td>
                       {/* Last Price */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
                         {getInvestmentType(holding.investment) === 'Cash' ? (
                           <span className="text-slate-500 text-xs">-</span>
                         ) : (
-                          <>{holding.lastPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</>
+                          <>{holding.lastPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</>
                         )}
                       </td>
                       {/* Last Price CCY */}
@@ -1063,7 +1081,7 @@ export default function BankStatementClient() {
                       </td>
                       {/* Average FX Rate */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {holding.averageFxRate.toFixed(4)}
+                        {holding.averageFxRate.toFixed(2)}
                       </td>
                       {/* Optimal Weight (%) */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
