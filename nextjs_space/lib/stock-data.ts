@@ -124,7 +124,6 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
             stockDataObj.evToEbitda = latestMetrics.evToEbitda;
             stockDataObj.enterpriseToEbitda = latestMetrics.evToEbitda; // UI expects this name
           }
-          if (latestMetrics.pegRatio !== null) stockDataObj.pegRatio = latestMetrics.pegRatio;
           
           // Performance metrics
           if (latestMetrics.beta !== null) stockDataObj.beta = latestMetrics.beta;
@@ -133,12 +132,8 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
           if (latestMetrics.debtToEquity !== null) stockDataObj.debtToEquity = latestMetrics.debtToEquity;
           if (latestMetrics.roe !== null) stockDataObj.roe = latestMetrics.roe;
           if (latestMetrics.roa !== null) stockDataObj.returnOnAssets = latestMetrics.roa;
-          if (latestMetrics.operatingMargin !== null) stockDataObj.operatingMargin = latestMetrics.operatingMargin;
           if (latestMetrics.profitMargin !== null) stockDataObj.profit_margin = latestMetrics.profitMargin;
           if (latestMetrics.profitMargin !== null) stockDataObj.profitMargins = latestMetrics.profitMargin; // Yahoo format
-          if (latestMetrics.grossMargin !== null) stockDataObj.grossMargin = latestMetrics.grossMargin;
-          if (latestMetrics.currentRatio !== null) stockDataObj.currentRatio = latestMetrics.currentRatio;
-          if (latestMetrics.quickRatio !== null) stockDataObj.quickRatio = latestMetrics.quickRatio;
           
           // Growth metrics
           if (latestMetrics.revenueGrowthQoQ !== null) stockDataObj.quarterlyRevenueGrowth = latestMetrics.revenueGrowthQoQ;
@@ -146,7 +141,6 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
           
           // Market data
           if (latestMetrics.marketCap !== null) stockDataObj.market_cap = latestMetrics.marketCap;
-          if (latestMetrics.volume !== null) stockDataObj.volume = latestMetrics.volume;
           if (latestMetrics.averageVolume !== null) stockDataObj.averageVolume = latestMetrics.averageVolume;
           if (latestMetrics.averageVolume10Day !== null) stockDataObj.averageVolume10Day = latestMetrics.averageVolume10Day;
           if (latestMetrics.sharesOutstanding !== null) stockDataObj.sharesOutstanding = latestMetrics.sharesOutstanding;
@@ -161,27 +155,6 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
             stockDataObj.heldByInstitutions = latestMetrics.heldByInstitutions;
             stockDataObj.heldPercentInstitutions = latestMetrics.heldByInstitutions; // UI expects this name
           }
-          
-          // Dividend metrics
-          if (latestMetrics.dividendYield !== null) stockDataObj.dividendYield = latestMetrics.dividendYield;
-          if (latestMetrics.payoutRatio !== null) stockDataObj.payoutRatio = latestMetrics.payoutRatio;
-          
-          // Per share metrics
-          if (latestMetrics.eps !== null) stockDataObj.eps = latestMetrics.eps;
-          if (latestMetrics.bookValuePerShare !== null) stockDataObj.bookValuePerShare = latestMetrics.bookValuePerShare;
-        } else {
-          console.log(`[STOCK-DATA] ⏰ Metrics for ${stock.ticker} are stale (${Math.round(metricsAge / (1000 * 60 * 60 * 24))}d old), will enrich with APIs`);
-        }
-      } else {
-        console.log(`[STOCK-DATA] 📭 No cached metrics for ${stock.ticker}, will enrich with APIs`);
-      }
-
-      (mergedData as any)[stock.ticker] = {
-        stock_data: stockDataObj,
-        company_profile: {
-          // Use cached company profile data from Stock table
-          name: stock.company || null,
-          industry: stock.industry || null,
           sector: stock.sector || null,
           country: stock.country || null,
           longBusinessSummary: stock.description || null,
