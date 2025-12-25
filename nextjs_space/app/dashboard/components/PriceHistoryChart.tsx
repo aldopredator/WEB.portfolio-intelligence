@@ -35,7 +35,6 @@ interface PriceHistoryChartProps {
   volume?: number;
   fiftyDayAverage?: number | null;
   twoHundredDayAverage?: number | null;
-  costPrice?: number | null;
   stocks?: Array<{ ticker: string; company: string; portfolioId?: string | null }>;
   costPrice?: number | null;
   costPriceUpdatedAt?: Date | string | null;
