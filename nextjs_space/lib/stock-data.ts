@@ -88,6 +88,8 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
         change_percent: stockData?.changePercent || 0,
         '52_week_high': stockData?.week52High || 0,
         '52_week_low': stockData?.week52Low || 0,
+        cost_price: stock.costPrice || null,
+        cost_price_updated_at: stock.costPriceUpdatedAt || null,
         price_movement_90_days: stock.priceHistory.map((ph: any) => ({
           Date: ph.date.toISOString().split('T')[0],
           Close: ph.price,
