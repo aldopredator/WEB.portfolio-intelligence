@@ -29,15 +29,12 @@ async function updateStockPrices() {
         // Fetch current quote from Yahoo Finance
         const quote = await fetchYahooQuote(stock.ticker);
         
-        if (quote && quote.price !== undefined && quote.price !== null) {
-          const currentPrice = quote.price;
+        if (quote && quote.current_price !== undefined && quote.current_price !== null && quote.current_price > 0) {
+          const currentPrice = quote.current_price;
           const change = quote.change || 0;
-          const changePercent = quote.changePercent || 0;
-
-          // Fetch statistics for 52-week high/low
-          const stats = await fetchYahooStatistics(stock.ticker);
-          const week52High = stats?.fiftyTwoWeekHigh || 0;
-          const week52Low = stats?.fiftyTwoWeekLow || 0;
+          const changePercent = quote.change_percent || 0;
+          const week52High = quote['52_week_high'] || 0;
+          const week52Low = quote['52_week_low'] || 0;
 
           // Update StockData
           if (stock.stockData) {
@@ -66,10 +63,10 @@ async function updateStockPrices() {
             });
           }
 
-          console.log(`   ✅ ${currentPrice} (${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%) | 52w: ${week52Low}-${week52High}`);
+          console.log(`   ✅ $${currentPrice} (${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%) | 52w: $${week52Low}-$${week52High}`);
           successCount++;
         } else {
-          console.log(`   ⚠️  No quote data returned`);
+          console.log(`   ⚠️  No valid quote data (might be invalid ticker)`);
           errorCount++;
         }
       } catch (error) {
