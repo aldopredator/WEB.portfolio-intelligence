@@ -372,10 +372,10 @@ export default function VarianceMatrix({ stocks, portfolios, selectedPortfolioId
               <div>
                 <h2 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
                   <span className="text-2xl">⚖️</span>
-                  Optimal Portfolio Allocation (Minimum Variance)
+                  Optimal Portfolio Allocation (Minimum Variance - 90-day)
                 </h2>
                 <p className="text-slate-300 text-sm">
-                  Based on Modern Portfolio Theory, these weights minimize portfolio variance while maintaining full investment (100% allocation).
+                  Based on Modern Portfolio Theory using 90-day historical returns, these weights minimize portfolio variance while maintaining full investment (100% allocation).
                 </p>
               </div>
               <div className="flex flex-col items-end gap-1">
