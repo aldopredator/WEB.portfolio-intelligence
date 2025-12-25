@@ -296,12 +296,18 @@ export default async function ScreeningPage({
       rating: true,
       notes: true,
       updatedAt: true,
+      currency: true,
+      employees: true,
+      sector: true,
+      industry: true,
+      country: true,
       portfolio: {
         select: { 
           name: true,
           id: true
         }
       },
+      stockData: true,
       priceHistory: {
         select: {
           date: true,
