@@ -530,6 +530,7 @@ export default function BankStatementClient() {
       'Book Cost': h.bookCost,
       'Book Cost CCY': h.bookCostCcy,
       'Average FX Rate': h.averageFxRate,
+      'Cost price CCY': h.averageFxRate * h.quantityHeld !== 0 ? (h.bookCostR / (h.averageFxRate * h.quantityHeld)).toFixed(2) : '0.00',
       'Book Cost (£)': h.bookCostR,
       'Return (£)': h.valueR - h.bookCostR,
       '% Change': h.percentChange,
@@ -929,6 +930,9 @@ export default function BankStatementClient() {
                       <span className="text-xs">Average FX Rate</span>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <span className="text-xs">Cost price CCY</span>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('optimalWeight', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Optimal Weight (%) <SortIcon field="optimalWeight" />
                       </button>
@@ -1046,6 +1050,14 @@ export default function BankStatementClient() {
                       {/* Average FX Rate */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
                         {holding.averageFxRate.toFixed(4)}
+                      </td>
+                      {/* Cost price CCY */}
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {(() => {
+                          const denominator = holding.averageFxRate * holding.quantityHeld;
+                          const costPriceCcy = denominator !== 0 ? holding.bookCostR / denominator : 0;
+                          return costPriceCcy.toFixed(2);
+                        })()}
                       </td>
                       {/* Optimal Weight (%) */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
