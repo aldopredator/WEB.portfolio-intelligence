@@ -7,6 +7,7 @@ async function testFetchProfile() {
   try {
     const profile = await fetchCompanyProfile('NVDA');
     console.log('✅ Profile fetched for NVDA:');
+    console.log('  - Full Profile Object:', JSON.stringify(profile, null, 2));
     console.log('  - Industry:', profile.industry);
     console.log('  - Sector:', profile.sector);
     console.log('  - Country:', profile.country);

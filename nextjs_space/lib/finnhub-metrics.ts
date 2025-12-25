@@ -16,6 +16,7 @@ export interface CompanyProfile {
   currency?: string;
   weburl?: string;
   description?: string;
+  totalEmployees?: number;
   ipoDate?: string;
 }
 
@@ -309,6 +310,7 @@ export async function fetchCompanyProfile(ticker: string): Promise<CompanyProfil
         currency: yahooProfile.currency,
         weburl: yahooProfile.weburl,
         description: yahooProfile.description,
+        totalEmployees: yahooProfile.totalEmployees,
         ipoDate: yahooProfile.ipoDate,
       };
     }

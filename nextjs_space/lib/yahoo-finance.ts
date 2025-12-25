@@ -377,6 +377,7 @@ export async function fetchYahooCompanyProfile(ticker: string) {
     const keyStats = modules.defaultKeyStatistics as any || {};
 
     console.log(`[YAHOO] ✅ ${ticker} - Successfully fetched profile`);
+    console.log(`[YAHOO] ${ticker} - fullTimeEmployees from assetProfile:`, assetProfile.fullTimeEmployees);
 
     // Generate logo URL - try multiple approaches
     let logoUrl = undefined;
@@ -396,6 +397,7 @@ export async function fetchYahooCompanyProfile(ticker: string) {
       currency: price.currency,
       weburl: assetProfile.website,
       description: assetProfile.longBusinessSummary,
+      totalEmployees: assetProfile.fullTimeEmployees,
       ipoDate: keyStats.lastSplitDate || price.firstTradeDateEpochUtc 
         ? new Date((keyStats.lastSplitDate || price.firstTradeDateEpochUtc) * 1000).toISOString().split('T')[0]
         : undefined,
