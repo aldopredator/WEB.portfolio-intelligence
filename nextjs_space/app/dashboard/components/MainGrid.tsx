@@ -204,7 +204,6 @@ export default function MainGrid({ stockData, selectedStock, stocks = [], portfo
             volume={stock.volume}
             fiftyDayAverage={stock.fiftyDayAverage}
             twoHundredDayAverage={stock.twoHundredDayAverage}
-            costPrice={stocks.find(s => s.ticker === selectedStock)?.costPrice}
             stocks={stocks}
             costPrice={stock.cost_price}
             costPriceUpdatedAt={stock.cost_price_updated_at}
