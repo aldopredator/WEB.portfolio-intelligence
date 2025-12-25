@@ -632,6 +632,20 @@ export default async function ScreeningPage({
       maxDrawdown: maxDrawdown !== null ? `${maxDrawdown.toFixed(2)}%` : 'N/A',
       maxDrawup: maxDrawup !== null ? `${maxDrawup.toFixed(2)}%` : 'N/A',
       cagr: cagr !== null ? `${cagr >= 0 ? '+' : ''}${cagr.toFixed(2)}%` : 'N/A',
+      floatShares: latestMetrics?.floatShares ? latestMetrics.floatShares.toLocaleString() : 'N/A',
+      heldByInsiders: latestMetrics?.heldByInsiders ? `${(latestMetrics.heldByInsiders * 100).toFixed(2)}%` : 'N/A',
+      heldByInstitutions: latestMetrics?.heldByInstitutions ? `${(latestMetrics.heldByInstitutions * 100).toFixed(2)}%` : 'N/A',
+      pbRatio: latestMetrics?.pbRatio ? latestMetrics.pbRatio.toFixed(2) : 'N/A',
+      psRatio: latestMetrics?.psRatio ? latestMetrics.psRatio.toFixed(2) : 'N/A',
+      sharesOutstanding: latestMetrics?.sharesOutstanding ? latestMetrics.sharesOutstanding.toLocaleString() : 'N/A',
+      currency: stock.currency || 'N/A',
+      employees: stock.employees?.toString() || 'N/A',
+      type: stock.type || 'N/A',
+      change: stock.stockData?.change ? `$${stock.stockData.change.toFixed(2)}` : 'N/A',
+      changePercent: stock.stockData?.changePercent ? `${stock.stockData.changePercent >= 0 ? '+' : ''}${stock.stockData.changePercent.toFixed(2)}%` : 'N/A',
+      currentPrice: stock.stockData?.currentPrice ? `$${stock.stockData.currentPrice.toFixed(2)}` : 'N/A',
+      week52High: stock.stockData?.week52High ? `$${stock.stockData.week52High.toFixed(2)}` : 'N/A',
+      week52Low: stock.stockData?.week52Low ? `$${stock.stockData.week52Low.toFixed(2)}` : 'N/A',
     };
   }).filter((stock): stock is NonNullable<typeof stock> => stock !== null);
 

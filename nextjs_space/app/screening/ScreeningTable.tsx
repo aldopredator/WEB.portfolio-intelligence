@@ -47,6 +47,20 @@ interface Stock {
   maxDrawdown: string;
   maxDrawup: string;
   cagr: string;
+  floatShares: string;
+  heldByInsiders: string;
+  heldByInstitutions: string;
+  pbRatio: string;
+  psRatio: string;
+  sharesOutstanding: string;
+  currency: string;
+  employees: string;
+  type: string;
+  change: string;
+  changePercent: string;
+  currentPrice: string;
+  week52High: string;
+  week52Low: string;
 }
 
 interface ScreeningTableProps {
@@ -299,6 +313,20 @@ export default function ScreeningTable({ stocks, criteria }: ScreeningTableProps
       'Max Drawup': stock.maxDrawup,
       'CAGR': stock.cagr,
       'Match Score': `${stock.matchScore}%`,
+      'Float Shares': stock.floatShares,
+      'Held By Insiders': stock.heldByInsiders,
+      'Held By Institutions': stock.heldByInstitutions,
+      'P/B Ratio': stock.pbRatio,
+      'P/S Ratio': stock.psRatio,
+      'Shares Outstanding': stock.sharesOutstanding,
+      'Currency': stock.currency,
+      'Employees': stock.employees,
+      'Type': stock.type,
+      'Price Change ($)': stock.change,
+      'Price Change (%)': stock.changePercent,
+      'Current Price': stock.currentPrice,
+      '52 Week High': stock.week52High,
+      '52 Week Low': stock.week52Low,
     }));
 
     // Create workbook and worksheet
