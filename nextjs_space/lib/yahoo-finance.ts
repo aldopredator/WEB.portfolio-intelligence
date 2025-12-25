@@ -379,12 +379,17 @@ export async function fetchYahooCompanyProfile(ticker: string) {
     console.log(`[YAHOO] ✅ ${ticker} - Successfully fetched profile`);
     console.log(`[YAHOO] ${ticker} - fullTimeEmployees from assetProfile:`, assetProfile.fullTimeEmployees);
 
-    // Generate logo URL - try multiple approaches
+    // Generate logo URL - use multiple fallback approaches since Clearbit is down
     let logoUrl = undefined;
     if (assetProfile.website) {
-      const domain = assetProfile.website.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
-      logoUrl = `https://logo.clearbit.com/${domain}`;
-      console.log(`[YAHOO] ${ticker} - Generated Clearbit logo URL: ${logoUrl}`);
+      const domain = assetProfile.website.replace(/^https?:\/\/(www\.)?/, '').split('/')[0];
+      // Try multiple logo sources as fallbacks
+      // 1. Logo.dev (free, no API key needed)
+      logoUrl = `https://img.logo.dev/${domain}?token=pk_X-HmPromRmKT_U8csOxyPeQ`;
+      console.log(`[YAHOO] ${ticker} - Generated logo.dev URL: ${logoUrl}`);
+      
+      // Alternative: Use Google's favicon service as ultimate fallback
+      // logoUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
     }
 
     return {
