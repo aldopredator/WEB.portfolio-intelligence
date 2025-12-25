@@ -53,7 +53,7 @@ model Stock {
     analystRecommendations AnalystRecommendation[]
     socialSentiments    SocialSentiment[]
     news                News[]
-    metrics             Metrics?
+    metrics             Metrics[]
 
     @@index([ticker])
     @@index([isActive])
@@ -147,11 +147,12 @@ model News {
     @@index([stockId, publishedAt])
 }
 
-// Financial metrics
+// Financial metrics - Daily snapshots for historical analysis and ML training
 model Metrics {
     id                      String   @id @default(cuid())
-    stockId                 String   @unique
+    stockId                 String
     stock                   Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+    snapshotDate            DateTime @default(now()) @db.Date
     
     // Valuation metrics
     peRatio                 Float?
@@ -161,36 +162,54 @@ model Metrics {
     priceToBook             Float?
     evToRevenue             Float?
     evToEbitda              Float?
+    pegRatio                Float?
     
     // Performance metrics
-    beta5Y                  Float?
+    beta                    Float?
     ytdReturn               Float?
     week52Return            Float?
     
     // Financial health
     debtToEquity            Float?
     roe                     Float?   // Return on Equity
+    roa                     Float?   // Return on Assets
     operatingMargin         Float?
     profitMargin            Float?
+    grossMargin             Float?
+    currentRatio            Float?
+    quickRatio              Float?
     
     // Growth metrics
     revenueGrowthQoQ        Float?
     earningsGrowthQoQ       Float?
+    revenueGrowthYoY        Float?
+    earningsGrowthYoY       Float?
     
-    // Volume metrics
-    averageVolume           Float?   // Average daily volume (3 month)
-    averageVolume10Day      Float?   // Average daily volume (10 day)
-    floatShares             Float?   // Float shares outstanding
+    // Market data
+    marketCap               Float?
+    volume                  Float?
+    averageVolume           Float?
+    averageVolume10Day      Float?
+    sharesOutstanding       Float?
+    floatShares             Float?
     
-    // Other
+    // Ownership
+    heldByInsiders          Float?
+    heldByInstitutions      Float?
+    
+    // Dividend metrics
     dividendYield           Float?
     payoutRatio             Float?
-    beta                    Float?   // Standard beta
-    marketCap               Float?   // Market capitalization
     
-    lastUpdated             DateTime @default(now())
+    // Per share metrics
+    eps                     Float?
+    bookValuePerShare       Float?
+    
+    createdAt               DateTime @default(now())
 
-    @@index([stockId])
+    @@unique([stockId, snapshotDate])
+    @@index([stockId, snapshotDate])
+    @@index([snapshotDate])
 }
 
 // Industry master list for diversification tracking

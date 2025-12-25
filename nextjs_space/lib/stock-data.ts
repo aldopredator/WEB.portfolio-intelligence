@@ -28,7 +28,7 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
       console.log('[STOCK-DATA] 📋 Fetching ALL active stocks (no portfolio filter)');
     }
     
-    // Fetch all active stocks with their related data
+    // Fetch all active stocks with their related data AND latest metrics
     const stocks = await prisma.stock.findMany({
       where: { 
         isActive: true,
@@ -38,15 +38,18 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
         stockData: true,
         priceHistory: {
           orderBy: { date: 'asc' },
-          take: 90, // Last 90 days
+          take: 30, // Reduced from 90 to stay under 5MB limit
         },
         analystRecommendations: true,
         socialSentiments: true,
         news: {
           orderBy: { publishedAt: 'desc' },
-          take: 5,
+          take: 2, // Reduced from 5 to stay under 5MB limit
         },
-        metrics: true,
+        metrics: {
+          orderBy: { snapshotDate: 'desc' },
+          take: 1, // Get the latest snapshot
+        },
       },
     });
 
@@ -71,36 +74,91 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
       const stockData = stock.stockData;
       const analystRec = stock.analystRecommendations?.[0]; // Get first element since it's an array
       const socialSent = stock.socialSentiments?.[0]; // Get first element since it's an array
-      const metrics = stock.metrics; // Get metrics from database
+      const latestMetrics = stock.metrics?.[0]; // Get the latest snapshot
+      
+      // DEBUG: Log metrics loading
+      console.log(`[STOCK-DATA-DEBUG] ${stock.ticker}: metrics loaded = ${stock.metrics?.length || 0}, latest = ${latestMetrics ? 'YES' : 'NO'}`);
+
+      // Build stock_data object with cached metrics from database
+      const stockDataObj: any = {
+        ticker: stock.ticker,
+        company: stock.company,
+        current_price: stockData?.currentPrice || 0,
+        change: stockData?.change || 0,
+        change_percent: stockData?.changePercent || 0,
+        '52_week_high': stockData?.week52High || 0,
+        '52_week_low': stockData?.week52Low || 0,
+        price_movement_90_days: stock.priceHistory.map((ph: any) => ({
+          Date: ph.date.toISOString().split('T')[0],
+          Close: ph.price,
+        })),
+      };
+
+      // Merge cached metrics from database if available
+      if (latestMetrics) {
+        // Check if metrics are fresh (< 2 days old)
+        const metricsAge = Date.now() - latestMetrics.snapshotDate.getTime();
+        const isMetricsFresh = metricsAge < 2 * 24 * 60 * 60 * 1000; // 2 days
+        
+        if (isMetricsFresh) {
+          console.log(`[STOCK-DATA] 💾 Using cached metrics for ${stock.ticker} (${Math.round(metricsAge / (1000 * 60 * 60))}h old)`);
+          
+          // Valuation metrics
+          if (latestMetrics.peRatio !== null) stockDataObj.pe_ratio = latestMetrics.peRatio;
+          if (latestMetrics.forwardPE !== null) stockDataObj.forwardPE = latestMetrics.forwardPE;
+          if (latestMetrics.pbRatio !== null) stockDataObj.pb_ratio = latestMetrics.pbRatio;
+          if (latestMetrics.psRatio !== null) stockDataObj.ps_ratio = latestMetrics.psRatio;
+          if (latestMetrics.priceToBook !== null) stockDataObj.priceToBook = latestMetrics.priceToBook;
+          if (latestMetrics.evToRevenue !== null) stockDataObj.evToRevenue = latestMetrics.evToRevenue;
+          if (latestMetrics.evToEbitda !== null) stockDataObj.evToEbitda = latestMetrics.evToEbitda;
+          if (latestMetrics.pegRatio !== null) stockDataObj.pegRatio = latestMetrics.pegRatio;
+          
+          // Performance metrics
+          if (latestMetrics.beta !== null) stockDataObj.beta = latestMetrics.beta;
+          
+          // Financial health
+          if (latestMetrics.debtToEquity !== null) stockDataObj.debtToEquity = latestMetrics.debtToEquity;
+          if (latestMetrics.roe !== null) stockDataObj.roe = latestMetrics.roe;
+          if (latestMetrics.roa !== null) stockDataObj.returnOnAssets = latestMetrics.roa;
+          if (latestMetrics.operatingMargin !== null) stockDataObj.operatingMargin = latestMetrics.operatingMargin;
+          if (latestMetrics.profitMargin !== null) stockDataObj.profit_margin = latestMetrics.profitMargin;
+          if (latestMetrics.profitMargin !== null) stockDataObj.profitMargins = latestMetrics.profitMargin; // Yahoo format
+          if (latestMetrics.grossMargin !== null) stockDataObj.grossMargin = latestMetrics.grossMargin;
+          if (latestMetrics.currentRatio !== null) stockDataObj.currentRatio = latestMetrics.currentRatio;
+          if (latestMetrics.quickRatio !== null) stockDataObj.quickRatio = latestMetrics.quickRatio;
+          
+          // Growth metrics
+          if (latestMetrics.revenueGrowthQoQ !== null) stockDataObj.quarterlyRevenueGrowth = latestMetrics.revenueGrowthQoQ;
+          if (latestMetrics.earningsGrowthQoQ !== null) stockDataObj.quarterlyEarningsGrowth = latestMetrics.earningsGrowthQoQ;
+          
+          // Market data
+          if (latestMetrics.marketCap !== null) stockDataObj.market_cap = latestMetrics.marketCap;
+          if (latestMetrics.volume !== null) stockDataObj.volume = latestMetrics.volume;
+          if (latestMetrics.averageVolume !== null) stockDataObj.averageVolume = latestMetrics.averageVolume;
+          if (latestMetrics.averageVolume10Day !== null) stockDataObj.averageVolume10Day = latestMetrics.averageVolume10Day;
+          if (latestMetrics.sharesOutstanding !== null) stockDataObj.sharesOutstanding = latestMetrics.sharesOutstanding;
+          if (latestMetrics.floatShares !== null) stockDataObj.floatShares = latestMetrics.floatShares;
+          
+          // Ownership
+          if (latestMetrics.heldByInsiders !== null) stockDataObj.heldByInsiders = latestMetrics.heldByInsiders;
+          if (latestMetrics.heldByInstitutions !== null) stockDataObj.heldByInstitutions = latestMetrics.heldByInstitutions;
+          
+          // Dividend metrics
+          if (latestMetrics.dividendYield !== null) stockDataObj.dividendYield = latestMetrics.dividendYield;
+          if (latestMetrics.payoutRatio !== null) stockDataObj.payoutRatio = latestMetrics.payoutRatio;
+          
+          // Per share metrics
+          if (latestMetrics.eps !== null) stockDataObj.eps = latestMetrics.eps;
+          if (latestMetrics.bookValuePerShare !== null) stockDataObj.bookValuePerShare = latestMetrics.bookValuePerShare;
+        } else {
+          console.log(`[STOCK-DATA] ⏰ Metrics for ${stock.ticker} are stale (${Math.round(metricsAge / (1000 * 60 * 60 * 24))}d old), will enrich with APIs`);
+        }
+      } else {
+        console.log(`[STOCK-DATA] 📭 No cached metrics for ${stock.ticker}, will enrich with APIs`);
+      }
 
       (mergedData as any)[stock.ticker] = {
-        stock_data: {
-          ticker: stock.ticker,
-          company: stock.company,
-          current_price: stockData?.currentPrice || 0,
-          change: stockData?.change || 0,
-          change_percent: stockData?.changePercent || 0,
-          '52_week_high': stockData?.week52High || 0,
-          '52_week_low': stockData?.week52Low || 0,
-          price_movement_90_days: stock.priceHistory.map((ph: any) => ({
-            Date: ph.date.toISOString().split('T')[0],
-            Close: ph.price,
-          })),
-          // Add metrics from database
-          averageVolume: metrics?.averageVolume,
-          averageVolume10Day: metrics?.averageVolume10Day,
-          floatShares: metrics?.floatShares,
-          beta: metrics?.beta,
-          market_cap: metrics?.marketCap || stockData?.marketCap,
-          pe_ratio: metrics?.peRatio,
-          pb_ratio: metrics?.pbRatio,
-          ps_ratio: metrics?.psRatio,
-          priceToBook: metrics?.priceToBook,
-          priceToSales: metrics?.psRatio,
-          debtToEquity: metrics?.debtToEquity,
-          roe: metrics?.roe,
-          profit_margin: metrics?.profitMargin,
-        },
+        stock_data: stockDataObj,
         analyst_recommendations: {
           buy: analystRec?.buy || 0,
           hold: analystRec?.hold || 0,
@@ -125,63 +183,120 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
       };
     }
 
-    // Enrich with real-time APIs (optional - can be disabled for faster loading)
+    // Enrich with real-time APIs only for stocks with stale/missing metrics
+    const tickersNeedingEnrichment = stocks
+      .filter((s: any) => {
+        const latestMetrics = s.metrics?.[0];
+        if (!latestMetrics) return true;
+        const metricsAge = Date.now() - latestMetrics.snapshotDate.getTime();
+        return metricsAge >= 2 * 24 * 60 * 60 * 1000; // > 2 days old
+      })
+      .map((s: any) => s.ticker);
+    
+    if (tickersNeedingEnrichment.length > 0) {
+      console.log(`[STOCK-DATA] 🔄 Enriching ${tickersNeedingEnrichment.length} stocks with stale/missing metrics...`);
+      
+      // Process other APIs in parallel (Finnhub, sentiment, Polygon) - only for stocks needing enrichment
+      await Promise.allSettled(tickersNeedingEnrichment.map(async (ticker: string) => {
+        try {
+          const stockEntry = mergedData[ticker];
+
+          // Fetch company profile
+          const profile = await fetchCompanyProfile(ticker);
+          if (profile && isRecord(stockEntry)) {
+            stockEntry.company_profile = profile as any;
+          }
+
+          // Fetch financial metrics (only if not already cached)
+          const metrics = await fetchFinnhubMetrics(ticker);
+          if (metrics && isRecord(stockEntry) && stockEntry.stock_data) {
+            Object.assign(stockEntry.stock_data, metrics);
+          }
+
+          // Fetch balance sheet
+          const balanceSheet = await fetchBalanceSheet(ticker);
+          if (balanceSheet && isRecord(stockEntry) && stockEntry.company_profile) {
+            Object.assign(stockEntry.company_profile, balanceSheet);
+          }
+
+          // Fetch Polygon data (only if not already cached)
+          const polygonStats = await fetchPolygonStockStats(ticker);
+          if (polygonStats && isRecord(stockEntry) && stockEntry.stock_data) {
+            Object.assign(stockEntry.stock_data, polygonStats);
+          }
+
+          // Fetch earnings surprises
+          const earningsSurprises = await fetchEarningsSurprises(ticker);
+          if (earningsSurprises && isRecord(stockEntry)) {
+            stockEntry.earnings_surprises = earningsSurprises as any;
+          }
+
+          // Fetch recommendation trends
+          const recommendationTrends = await fetchRecommendationTrends(ticker);
+          if (recommendationTrends && isRecord(stockEntry)) {
+            stockEntry.recommendation_trends = recommendationTrends as any;
+          }
+
+          // Fetch company news
+          const news = await fetchCompanyNews(ticker, 10);
+          if (news && news.length > 0 && isRecord(stockEntry)) {
+            stockEntry.latest_news = news as any;
+          }
+        } catch (error) {
+          console.error(`Error enriching ${ticker}:`, error);
+        }
+      }));
+      
+      console.log('[STOCK-DATA] ✅ Completed API enrichment for stale stocks');
+    } else {
+      console.log('[STOCK-DATA] ✅ All stocks have fresh cached metrics, skipping API enrichment');
+    }
+    
+    // Always enrich company profiles and news for all stocks (these change frequently)
     const validTickers = stocks.map((s: any) => s.ticker);
+    console.log('[STOCK-DATA] 📰 Fetching company profiles and news for all stocks...');
     
-    console.log('[STOCK-DATA] 🔄 Enriching with real-time data...');
-    
-    // Process other APIs in parallel (Finnhub, sentiment, Polygon)
     await Promise.allSettled(validTickers.map(async (ticker: string) => {
       try {
         const stockEntry = mergedData[ticker];
 
-        // Fetch company profile
-        const profile = await fetchCompanyProfile(ticker);
-        if (profile && isRecord(stockEntry)) {
-          stockEntry.company_profile = profile as any;
+        // Fetch company profile (always fresh) - skip if we already fetched during enrichment
+        if (!tickersNeedingEnrichment.includes(ticker)) {
+          const profile = await fetchCompanyProfile(ticker);
+          if (profile && isRecord(stockEntry)) {
+            stockEntry.company_profile = profile as any;
+          }
         }
 
-        // Fetch financial metrics
-        const metrics = await fetchFinnhubMetrics(ticker);
-        if (metrics && isRecord(stockEntry) && stockEntry.stock_data) {
-          Object.assign(stockEntry.stock_data, metrics);
+        // Fetch balance sheet (always fresh) - skip if we already fetched during enrichment
+        if (!tickersNeedingEnrichment.includes(ticker)) {
+          const balanceSheet = await fetchBalanceSheet(ticker);
+          if (balanceSheet && isRecord(stockEntry) && stockEntry.company_profile) {
+            Object.assign(stockEntry.company_profile, balanceSheet);
+          }
         }
 
-        // Fetch balance sheet
-        const balanceSheet = await fetchBalanceSheet(ticker);
-        if (balanceSheet && isRecord(stockEntry) && stockEntry.company_profile) {
-          Object.assign(stockEntry.company_profile, balanceSheet);
+        // Fetch recommendation trends (always fresh) - skip if we already fetched during enrichment
+        if (!tickersNeedingEnrichment.includes(ticker)) {
+          const recommendationTrends = await fetchRecommendationTrends(ticker);
+          if (recommendationTrends && isRecord(stockEntry)) {
+            stockEntry.recommendation_trends = recommendationTrends as any;
+          }
         }
 
-        // Fetch Polygon data
-        const polygonStats = await fetchPolygonStockStats(ticker);
-        if (polygonStats && isRecord(stockEntry) && stockEntry.stock_data) {
-          Object.assign(stockEntry.stock_data, polygonStats);
-        }
-
-        // Fetch earnings surprises
-        const earningsSurprises = await fetchEarningsSurprises(ticker);
-        if (earningsSurprises && isRecord(stockEntry)) {
-          stockEntry.earnings_surprises = earningsSurprises as any;
-        }
-
-        // Fetch recommendation trends
-        const recommendationTrends = await fetchRecommendationTrends(ticker);
-        if (recommendationTrends && isRecord(stockEntry)) {
-          stockEntry.recommendation_trends = recommendationTrends as any;
-        }
-
-        // Fetch company news
-        const news = await fetchCompanyNews(ticker, 10);
-        if (news && news.length > 0 && isRecord(stockEntry)) {
-          stockEntry.latest_news = news as any;
+        // Fetch company news (always fresh) - skip if we already fetched during enrichment
+        if (!tickersNeedingEnrichment.includes(ticker)) {
+          const news = await fetchCompanyNews(ticker, 10);
+          if (news && news.length > 0 && isRecord(stockEntry)) {
+            stockEntry.latest_news = news as any;
+          }
         }
       } catch (error) {
-        console.error(`Error enriching ${ticker}:`, error);
+        console.error(`Error fetching profile/news for ${ticker}:`, error);
       }
     }));
     
-    console.log('[STOCK-DATA] ✅ Completed data enrichment');
+    console.log('[STOCK-DATA] ✅ Completed profile and news enrichment');
 
     return mergedData;
   } catch (error) {

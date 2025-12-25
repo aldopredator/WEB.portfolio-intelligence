@@ -14,6 +14,7 @@
     "diagnose": "powershell -ExecutionPolicy Bypass -File ./scripts/diagnose.ps1",
     "clear-cache": "powershell -ExecutionPolicy Bypass -File ./scripts/clear-cache.ps1",
     "populate-sectors": "tsx --require dotenv/config scripts/populate-sectors.ts",
+    "populate-metrics": "tsx --require dotenv/config scripts/populate-metrics.ts",
     "update-prices": "tsx --require dotenv/config scripts/update-price-history.ts",
     "test-update": "tsx --require dotenv/config scripts/test-update-prices.ts"
   },
@@ -99,7 +100,7 @@
     "csv": "6.3.11",
     "date-fns": "3.6.0",
     "dayjs": "1.11.13",
-    "dotenv": "16.5.0",
+    "dotenv": "^16.5.0",
     "embla-carousel-react": "8.3.0",
     "formik": "2.4.5",
     "framer-motion": "10.18.0",

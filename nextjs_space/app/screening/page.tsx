@@ -286,7 +286,7 @@ export default async function ScreeningPage({
   // Parse criteria from URL parameters (or use defaults)
   const CRITERIA = parseCriteriaFromParams(new URLSearchParams(searchParams as Record<string, string>));
   
-  // Fetch stocks from database with portfolio information and price history
+  // Fetch stocks from database with portfolio information, price history, AND latest metrics
   const dbStocks = await prisma.stock.findMany({
     where: { isActive: true },
     select: {
@@ -310,99 +310,125 @@ export default async function ScreeningPage({
           date: 'desc'
         },
         take: 90  // Get last 90 days for calculations
+      },
+      metrics: {
+        orderBy: {
+          snapshotDate: 'desc'
+        },
+        take: 1  // Get the latest metrics snapshot
       }
     }
   });
   
-  // Fetch real stock data
+  // Fetch real stock data (for company profiles, news, etc. - metrics now from DB)
   const allStockData = await getStockData();
   
-  // Build screening results from real data with actual filtering
+  // Build screening results from DB metrics + API data with actual filtering
   const recommendedStocks = dbStocks.map((stock) => {
     const data: any = allStockData[stock.ticker];
     const stockInfo = data && typeof data === 'object' && 'stock_data' in data ? data.stock_data : null;
     const companyProfile = data && typeof data === 'object' && 'company_profile' in data ? data.company_profile : null;
+    const latestMetrics = stock.metrics?.[0]; // Get latest metrics snapshot from DB
     
     if (!stockInfo) {
       return null;
     }
 
-    // Debug: Log AMZN data to check field availability (server-side)
-    if (stock.ticker === 'AMZN') {
-      console.log('[Screening SERVER] AMZN stockInfo keys:', Object.keys(stockInfo));
-      console.log('[Screening SERVER] AMZN priceToSales:', stockInfo.priceToSales);
-      console.log('[Screening SERVER] AMZN ps_ratio:', stockInfo.ps_ratio);
-      console.log('[Screening SERVER] AMZN averageVolume:', stockInfo.averageVolume);
-      console.log('[Screening SERVER] AMZN stockInfo type:', typeof stockInfo);
-      console.log('[Screening SERVER] AMZN data keys:', data ? Object.keys(data) : 'no data');
+    // Build enriched stockInfo by merging cached metrics from DB with API data
+    const enrichedStockInfo = { ...stockInfo };
+    
+    if (latestMetrics) {
+      // Prefer DB metrics over API data (more consistent and faster)
+      if (latestMetrics.peRatio !== null) enrichedStockInfo.pe_ratio = latestMetrics.peRatio;
+      if (latestMetrics.peRatio !== null) enrichedStockInfo.trailingPE = latestMetrics.peRatio;
+      if (latestMetrics.forwardPE !== null) enrichedStockInfo.forwardPE = latestMetrics.forwardPE;
+      if (latestMetrics.pbRatio !== null) enrichedStockInfo.pb_ratio = latestMetrics.pbRatio;
+      if (latestMetrics.pbRatio !== null) enrichedStockInfo.priceToBook = latestMetrics.pbRatio;
+      if (latestMetrics.psRatio !== null) enrichedStockInfo.ps_ratio = latestMetrics.psRatio;
+      if (latestMetrics.psRatio !== null) enrichedStockInfo.priceToSales = latestMetrics.psRatio;
+      if (latestMetrics.beta !== null) enrichedStockInfo.beta = latestMetrics.beta;
+      if (latestMetrics.roe !== null) enrichedStockInfo.roe = latestMetrics.roe;
+      if (latestMetrics.roe !== null) enrichedStockInfo.returnOnEquity = latestMetrics.roe;
+      if (latestMetrics.profitMargin !== null) enrichedStockInfo.profit_margin = latestMetrics.profitMargin;
+      if (latestMetrics.profitMargin !== null) enrichedStockInfo.profitMargins = latestMetrics.profitMargin;
+      if (latestMetrics.debtToEquity !== null) enrichedStockInfo.debtToEquity = latestMetrics.debtToEquity;
+      if (latestMetrics.marketCap !== null) enrichedStockInfo.market_cap = latestMetrics.marketCap;
+      if (latestMetrics.averageVolume !== null) enrichedStockInfo.averageVolume = latestMetrics.averageVolume;
+      if (latestMetrics.averageVolume10Day !== null) enrichedStockInfo.averageVolume10Day = latestMetrics.averageVolume10Day;
+      if (latestMetrics.floatShares !== null) enrichedStockInfo.floatShares = latestMetrics.floatShares;
+      if (latestMetrics.roa !== null) enrichedStockInfo.returnOnAssets = latestMetrics.roa;
+      if (latestMetrics.revenueGrowthQoQ !== null) enrichedStockInfo.quarterlyRevenueGrowth = latestMetrics.revenueGrowthQoQ;
+      if (latestMetrics.earningsGrowthQoQ !== null) enrichedStockInfo.quarterlyEarningsGrowth = latestMetrics.earningsGrowthQoQ;
+      if (latestMetrics.evToRevenue !== null) enrichedStockInfo.enterpriseToRevenue = latestMetrics.evToRevenue;
+      if (latestMetrics.evToEbitda !== null) enrichedStockInfo.enterpriseToEbitda = latestMetrics.evToEbitda;
     }
 
-    // Apply screening criteria (only check enabled criteria)
+    // Apply screening criteria using enrichedStockInfo (only check enabled criteria)
     const passes: Record<string, boolean> = {};
     const hardFilters: Record<string, boolean> = {}; // Filters that must pass 100%
     
     if (CRITERIA.peEnabled) {
-      // Prioritize Yahoo Finance trailingPE over Finnhub pe_ratio
-      const peValue = (stockInfo as any).trailingPE || stockInfo.pe_ratio;
+      // Use enriched data (DB metrics preferred)
+      const peValue = enrichedStockInfo.trailingPE || enrichedStockInfo.pe_ratio;
       passes.pe = !peValue || peValue < CRITERIA.maxPE;
     }
     
     if (CRITERIA.pbEnabled) {
-      // Prioritize Yahoo Finance priceToBook over Finnhub pb_ratio
-      const pbValue = (stockInfo as any).priceToBook || stockInfo.pb_ratio;
+      // Use enriched data (DB metrics preferred)
+      const pbValue = enrichedStockInfo.priceToBook || enrichedStockInfo.pb_ratio;
       passes.pb = !pbValue || pbValue < CRITERIA.maxPB;
     }
     
-    if (CRITERIA.marketCapEnabled && stockInfo.market_cap) {
-      const marketCapB = stockInfo.market_cap / 1e9; // Convert to billions
+    if (CRITERIA.marketCapEnabled && enrichedStockInfo.market_cap) {
+      const marketCapB = enrichedStockInfo.market_cap / 1e9; // Convert to billions
       passes.marketCap = marketCapB >= CRITERIA.minMarketCap && marketCapB <= CRITERIA.maxMarketCap;
     }
     
-    if (CRITERIA.betaEnabled && stockInfo.beta !== undefined) {
-      passes.beta = stockInfo.beta >= CRITERIA.minBeta && stockInfo.beta <= CRITERIA.maxBeta;
+    if (CRITERIA.betaEnabled && enrichedStockInfo.beta !== undefined) {
+      passes.beta = enrichedStockInfo.beta >= CRITERIA.minBeta && enrichedStockInfo.beta <= CRITERIA.maxBeta;
     }
     
     if (CRITERIA.roeEnabled) {
-      // Prioritize Yahoo Finance returnOnEquity over Finnhub roe
-      const roeValue = (stockInfo as any).returnOnEquity || stockInfo.roe;
+      // Use enriched data (DB metrics preferred)
+      const roeValue = enrichedStockInfo.returnOnEquity || enrichedStockInfo.roe;
       if (roeValue !== undefined) {
         passes.roe = roeValue >= CRITERIA.minROE;
       }
     }
     
     if (CRITERIA.profitMarginEnabled) {
-      // Prioritize Yahoo Finance profitMargins over Finnhub profit_margin
-      const profitMarginValue = (stockInfo as any).profitMargins || stockInfo.profit_margin;
+      // Use enriched data (DB metrics preferred)
+      const profitMarginValue = enrichedStockInfo.profitMargins || enrichedStockInfo.profit_margin;
       if (profitMarginValue !== undefined) {
         passes.profitMargin = profitMarginValue >= CRITERIA.minProfitMargin;
       }
     }
     
     if (CRITERIA.priceToSalesEnabled) {
-      // Prioritize Yahoo Finance priceToSales over Finnhub ps_ratio
-      const psValue = stockInfo.priceToSales || stockInfo.ps_ratio;
+      // Use enriched data (DB metrics preferred)
+      const psValue = enrichedStockInfo.priceToSales || enrichedStockInfo.ps_ratio;
       if (psValue !== undefined) {
         passes.priceToSales = psValue >= CRITERIA.minPriceToSales && psValue <= CRITERIA.maxPriceToSales;
       }
     }
     
-    if (CRITERIA.avgDailyVolumeEnabled && stockInfo.averageVolume !== undefined) {
-      const avgVolumeM = stockInfo.averageVolume / 1e6; // Convert to millions
+    if (CRITERIA.avgDailyVolumeEnabled && enrichedStockInfo.averageVolume !== undefined) {
+      const avgVolumeM = enrichedStockInfo.averageVolume / 1e6; // Convert to millions
       passes.avgVolume = avgVolumeM >= CRITERIA.minAvgDailyVolume && avgVolumeM <= CRITERIA.maxAvgDailyVolume;
     }
     
-    if (CRITERIA.avgAnnualVolume10DEnabled && stockInfo.averageVolume10Day !== undefined && stockInfo.floatShares !== undefined && stockInfo.floatShares > 0) {
-      const annualVolume10D = (stockInfo.averageVolume10Day * 250 / stockInfo.floatShares) * 100;
+    if (CRITERIA.avgAnnualVolume10DEnabled && enrichedStockInfo.averageVolume10Day !== undefined && enrichedStockInfo.floatShares !== undefined && enrichedStockInfo.floatShares > 0) {
+      const annualVolume10D = (enrichedStockInfo.averageVolume10Day * 250 / enrichedStockInfo.floatShares) * 100;
       passes.avgAnnualVolume10D = annualVolume10D >= CRITERIA.minAvgAnnualVolume10D && annualVolume10D <= CRITERIA.maxAvgAnnualVolume10D;
     }
     
-    if (CRITERIA.avgAnnualVolume3MEnabled && stockInfo.averageVolume !== undefined && stockInfo.floatShares !== undefined && stockInfo.floatShares > 0) {
-      const annualVolume3M = (stockInfo.averageVolume * 250 / stockInfo.floatShares) * 100;
+    if (CRITERIA.avgAnnualVolume3MEnabled && enrichedStockInfo.averageVolume !== undefined && enrichedStockInfo.floatShares !== undefined && enrichedStockInfo.floatShares > 0) {
+      const annualVolume3M = (enrichedStockInfo.averageVolume * 250 / enrichedStockInfo.floatShares) * 100;
       passes.avgAnnualVolume3M = annualVolume3M >= CRITERIA.minAvgAnnualVolume3M && annualVolume3M <= CRITERIA.maxAvgAnnualVolume3M;
     }
     
-    if (CRITERIA.debtToEquityEnabled && stockInfo.debtToEquity !== undefined) {
-      passes.debtToEquity = stockInfo.debtToEquity <= CRITERIA.maxDebtToEquity;
+    if (CRITERIA.debtToEquityEnabled && enrichedStockInfo.debtToEquity !== undefined) {
+      passes.debtToEquity = enrichedStockInfo.debtToEquity <= CRITERIA.maxDebtToEquity;
     }
     
     if (CRITERIA.sentimentEnabled && CRITERIA.sentimentFilter !== 'all') {
@@ -511,22 +537,22 @@ export default async function ScreeningPage({
     const industry = companyProfile?.industry || stock.type;
     const sector = companyProfile?.sector || 'N/A';
     // Prioritize Yahoo Finance fields over Finnhub fields
-    const pe = (stockInfo as any).trailingPE?.toFixed(0) || stockInfo.pe_ratio?.toFixed(0);
-    const pb = (stockInfo as any).priceToBook?.toFixed(0) || stockInfo.pb_ratio?.toFixed(0);
-    const priceToSales = stockInfo.priceToSales?.toFixed(0) || stockInfo.ps_ratio?.toFixed(0);
-    const marketCap = stockInfo.market_cap ? `$${(stockInfo.market_cap / 1e9).toFixed(0)}B` : null;
-    const avgVolume = stockInfo.averageVolume ? `${(stockInfo.averageVolume / 1e6).toFixed(0)}M` : null;
-    const avgAnnualVolume10D = (stockInfo.averageVolume10Day && stockInfo.floatShares && stockInfo.floatShares > 0)
-      ? `${((stockInfo.averageVolume10Day * 250 / stockInfo.floatShares) * 100).toFixed(0)}%`
+    const pe = enrichedStockInfo.trailingPE?.toFixed(0) || enrichedStockInfo.pe_ratio?.toFixed(0);
+    const pb = enrichedStockInfo.priceToBook?.toFixed(0) || enrichedStockInfo.pb_ratio?.toFixed(0);
+    const priceToSales = enrichedStockInfo.priceToSales?.toFixed(0) || enrichedStockInfo.ps_ratio?.toFixed(0);
+    const marketCap = enrichedStockInfo.market_cap ? `$${(enrichedStockInfo.market_cap / 1e9).toFixed(0)}B` : null;
+    const avgVolume = enrichedStockInfo.averageVolume ? `${(enrichedStockInfo.averageVolume / 1e6).toFixed(0)}M` : null;
+    const avgAnnualVolume10D = (enrichedStockInfo.averageVolume10Day && enrichedStockInfo.floatShares && enrichedStockInfo.floatShares > 0)
+      ? `${((enrichedStockInfo.averageVolume10Day * 250 / enrichedStockInfo.floatShares) * 100).toFixed(0)}%`
       : null;
-    const avgAnnualVolume3M = (stockInfo.averageVolume && stockInfo.floatShares && stockInfo.floatShares > 0)
-      ? `${((stockInfo.averageVolume * 250 / stockInfo.floatShares) * 100).toFixed(0)}%`
+    const avgAnnualVolume3M = (enrichedStockInfo.averageVolume && enrichedStockInfo.floatShares && enrichedStockInfo.floatShares > 0)
+      ? `${((enrichedStockInfo.averageVolume * 250 / enrichedStockInfo.floatShares) * 100).toFixed(0)}%`
       : null;
-    const beta = stockInfo.beta?.toFixed(2);
-    // Prioritize Yahoo Finance ROE and Profit Margin over Finnhub
-    const roe = (stockInfo as any).returnOnEquity ? `${(stockInfo as any).returnOnEquity.toFixed(0)}%` : (stockInfo.roe ? `${stockInfo.roe.toFixed(0)}%` : null);
-    const profitMargin = (stockInfo as any).profitMargins ? `${(stockInfo as any).profitMargins.toFixed(0)}%` : (stockInfo.profit_margin ? `${stockInfo.profit_margin.toFixed(0)}%` : null);
-    const debtToEquity = stockInfo.debtToEquity?.toFixed(0);
+    const beta = enrichedStockInfo.beta?.toFixed(2);
+    // Use enriched data (DB metrics preferred)
+    const roe = enrichedStockInfo.returnOnEquity ? `${enrichedStockInfo.returnOnEquity.toFixed(0)}%` : (enrichedStockInfo.roe ? `${enrichedStockInfo.roe.toFixed(0)}%` : null);
+    const profitMargin = enrichedStockInfo.profitMargins ? `${enrichedStockInfo.profitMargins.toFixed(0)}%` : (enrichedStockInfo.profit_margin ? `${enrichedStockInfo.profit_margin.toFixed(0)}%` : null);
+    const debtToEquity = enrichedStockInfo.debtToEquity?.toFixed(0);
     const sentiment = data && typeof data === 'object' && 'sentiment_data' in data
       ? (data.sentiment_data as any)?.overall_sentiment
       : null;
@@ -541,15 +567,15 @@ export default async function ScreeningPage({
     // If stock passes criteria filters but has missing data, reduce match score proportionally
     const adjustedMatchScore = Math.round((matchScore * dataCompletenessScore) / 100);
 
-    // Extract additional fields for export
+    // Extract additional fields for export (using enriched data)
     const country = companyProfile?.country || 'N/A';
-    const trailingPE = (stockInfo as any).trailingPE?.toFixed(2) || 'N/A';
-    const forwardPE = (stockInfo as any).forwardPE?.toFixed(2) || 'N/A';
-    const enterpriseToRevenue = (stockInfo as any).enterpriseToRevenue?.toFixed(2) || 'N/A';
-    const enterpriseToEbitda = (stockInfo as any).enterpriseToEbitda?.toFixed(2) || 'N/A';
-    const roa = (stockInfo as any).returnOnAssets ? `${((stockInfo as any).returnOnAssets * 100).toFixed(2)}%` : 'N/A';
-    const quarterlyRevenueGrowth = (stockInfo as any).quarterlyRevenueGrowth ? `${((stockInfo as any).quarterlyRevenueGrowth * 100).toFixed(2)}%` : 'N/A';
-    const quarterlyEarningsGrowth = (stockInfo as any).quarterlyEarningsGrowth ? `${((stockInfo as any).quarterlyEarningsGrowth * 100).toFixed(2)}%` : 'N/A';
+    const trailingPE = enrichedStockInfo.trailingPE?.toFixed(2) || 'N/A';
+    const forwardPE = enrichedStockInfo.forwardPE?.toFixed(2) || 'N/A';
+    const enterpriseToRevenue = enrichedStockInfo.enterpriseToRevenue?.toFixed(2) || 'N/A';
+    const enterpriseToEbitda = enrichedStockInfo.enterpriseToEbitda?.toFixed(2) || 'N/A';
+    const roa = enrichedStockInfo.returnOnAssets ? `${(enrichedStockInfo.returnOnAssets * 100).toFixed(2)}%` : 'N/A';
+    const quarterlyRevenueGrowth = enrichedStockInfo.quarterlyRevenueGrowth ? `${(enrichedStockInfo.quarterlyRevenueGrowth * 100).toFixed(2)}%` : 'N/A';
+    const quarterlyEarningsGrowth = enrichedStockInfo.quarterlyEarningsGrowth ? `${(enrichedStockInfo.quarterlyEarningsGrowth * 100).toFixed(2)}%` : 'N/A';
 
     // Calculate 30-day metrics from price history (from database)
     // Use database priceHistory first, fall back to API data if available
