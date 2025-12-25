@@ -527,13 +527,13 @@ export default function BankStatementClient() {
       'Last Price (£)': h.lastPriceP,
       'Value (£)': h.valueR,
       'Weight (%)': totalVal > 0 ? ((h.valueR / totalVal) * 100).toFixed(2) : '0.00',
+      'Return (£)': h.valueR - h.bookCostR,
+      '% Change': h.percentChange,
+      'Cost price CCY': h.averageFxRate * h.quantityHeld !== 0 ? (h.bookCostR / (h.averageFxRate * h.quantityHeld)).toFixed(2) : '0.00',
+      'Book Cost (£)': h.bookCostR,
       'Book Cost': h.bookCost,
       'Book Cost CCY': h.bookCostCcy,
       'Average FX Rate': h.averageFxRate,
-      'Cost price CCY': h.averageFxRate * h.quantityHeld !== 0 ? (h.bookCostR / (h.averageFxRate * h.quantityHeld)).toFixed(2) : '0.00',
-      'Book Cost (£)': h.bookCostR,
-      'Return (£)': h.valueR - h.bookCostR,
-      '% Change': h.percentChange,
     })));
     
     const workbook = XLSX.utils.book_new();
@@ -840,6 +840,12 @@ export default function BankStatementClient() {
 
           {/* Holdings Table */}
           <div className="bg-slate-900/50 border border-slate-800/50 rounded-xl overflow-hidden">
+            {/* Top scrollbar */}
+            <div className="overflow-x-auto border-b border-slate-800/30">
+              <div style={{ height: '1px', width: 'fit-content', minWidth: '100%' }}>
+                <div style={{ width: '2000px', height: '1px' }}></div>
+              </div>
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -890,6 +896,9 @@ export default function BankStatementClient() {
                       </button>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      <span className="text-xs">Cost price CCY</span>
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('bookCostR', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
                         Book Cost (£) <SortIcon field="bookCostR" />
                       </button>
@@ -928,9 +937,6 @@ export default function BankStatementClient() {
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <span className="text-xs">Average FX Rate</span>
-                    </th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      <span className="text-xs">Cost price CCY</span>
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">
                       <button onClick={(e) => handleColumnClick('optimalWeight', e)} className="flex items-center gap-1 hover:text-white transition-colors ml-auto">
@@ -995,6 +1001,14 @@ export default function BankStatementClient() {
                           <>{holding.percentChange >= 0 ? '+' : ''}{holding.percentChange.toFixed(0)}%</>
                         )}
                       </td>
+                      {/* Cost price CCY */}
+                      <td className="px-4 py-4 text-sm text-right text-slate-300">
+                        {getInvestmentType(holding.investment) === 'Cash' || holding.averageFxRate * holding.quantityHeld === 0 ? (
+                          <span className="text-slate-500 text-xs">-</span>
+                        ) : (
+                          <>{(holding.bookCostR / (holding.averageFxRate * holding.quantityHeld)).toFixed(2)}</>
+                        )}
+                      </td>
                       {/* Book Cost (£) */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
                         {getInvestmentType(holding.investment) === 'Cash' ? (
@@ -1050,14 +1064,6 @@ export default function BankStatementClient() {
                       {/* Average FX Rate */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
                         {holding.averageFxRate.toFixed(4)}
-                      </td>
-                      {/* Cost price CCY */}
-                      <td className="px-4 py-4 text-sm text-right text-slate-300">
-                        {(() => {
-                          const denominator = holding.averageFxRate * holding.quantityHeld;
-                          const costPriceCcy = denominator !== 0 ? holding.bookCostR / denominator : 0;
-                          return costPriceCcy.toFixed(2);
-                        })()}
                       </td>
                       {/* Optimal Weight (%) */}
                       <td className="px-4 py-4 text-sm text-right text-slate-300">
