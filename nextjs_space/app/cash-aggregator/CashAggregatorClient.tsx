@@ -50,7 +50,13 @@ export default function CashAggregatorClient() {
   const [chartPeriod, setChartPeriod] = useState<'7D' | '1M' | '3M' | '1Y'>('1Y');
   const [expandedChargesFees, setExpandedChargesFees] = useState(false);
   const [expandedRevenuesIncome, setExpandedRevenuesIncome] = useState(false);
-  const [stocks, setStocks] = useState<Array<{ ticker: string; company: string; alternativeTickers: string[] }>>([]);
+  const [stocks, setStocks] = useState<Array<{ 
+    ticker: string; 
+    company: string; 
+    alternativeTickers: string[];
+    website?: string;
+    description?: string;
+  }>>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch stocks for ticker matching
@@ -62,7 +68,9 @@ export default function CashAggregatorClient() {
           setStocks(data.stocks.map((s: any) => ({ 
             ticker: s.ticker, 
             company: s.company,
-            alternativeTickers: s.alternativeTickers || []
+            alternativeTickers: s.alternativeTickers || [],
+            website: s.website,
+            description: s.description
           })));
         }
       })
@@ -151,6 +159,37 @@ export default function CashAggregatorClient() {
       // Check if full company name appears
       if (detailsLower.includes(companyLower)) {
         score += 20;
+      }
+      
+      // Extract and check website domain (e.g., "chubb" from "chubb.com")
+      if (stock.website) {
+        try {
+          const domain = stock.website.replace(/^https?:\/\/(www\.)?/, '').split('/')[0].split('.')[0];
+          if (domain && domain.length > 2) {
+            const domainRegex = new RegExp(`\\b${domain}\\b`, 'i');
+            if (domainRegex.test(details)) {
+              score += 15; // Good score for domain match
+            }
+          }
+        } catch (e) {
+          // Invalid website format, skip
+        }
+      }
+      
+      // Check description as last resort (split into words and check significant matches)
+      if (stock.description && score < 10) {
+        const descWords = stock.description.toLowerCase().split(/[\s,.-]+/).filter(w => w.length > 4);
+        let descMatches = 0;
+        for (const word of descWords) {
+          const wordRegex = new RegExp(`\\b${word}\\b`, 'i');
+          if (wordRegex.test(details)) {
+            descMatches++;
+          }
+        }
+        // Award points based on number of description words found
+        if (descMatches >= 2) {
+          score += Math.min(descMatches * 3, 12); // Max 12 points from description
+        }
       }
       
       // Also check alternative tickers in the details

@@ -23,6 +23,8 @@ export async function GET(request: NextRequest) {
         ticker: true,
         company: true,
         alternativeTickers: true,
+        website: true,
+        description: true,
         costPrice: true,
         isActive: true,
         portfolio: {
