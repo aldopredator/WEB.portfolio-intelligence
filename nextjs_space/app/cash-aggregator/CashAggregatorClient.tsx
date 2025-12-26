@@ -41,7 +41,8 @@ export default function CashAggregatorClient() {
   const [activeStatementId, setActiveStatementId] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [chartPeriod, setChartPeriod] = useState<'7D' | '1M' | '3M' | '1Y'>('1M');
+  const [chartPeriod, setChartPeriod] = useState<'7D' | '1M' | '3M' | '1Y'>('1Y');
+  const [expandedChargesFees, setExpandedChargesFees] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load statements from localStorage on mount
@@ -389,7 +390,7 @@ export default function CashAggregatorClient() {
 
   const getCategoryLabel = (key: string): string => {
     const labels: Record<string, string> = {
-      fasterPaymentWithdrawal: 'FASTER Payment Withdrawal',
+      fasterPaymentWithdrawal: 'Money Top-up',
       bought: 'Bought (Securities)',
       sold: 'Sold (Securities)',
       onlineTransactionFee: 'Online Transaction Fee',
@@ -607,7 +608,7 @@ export default function CashAggregatorClient() {
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-green-400"></div>
                       <p className="text-sm text-slate-300">
-                        FASTER Payment: <span className="font-bold text-green-400">{formatCurrency(activeStatement.totals.fasterPaymentWithdrawal)}</span>
+                        Money Top-up: <span className="font-bold text-green-400">{formatCurrency(activeStatement.totals.fasterPaymentWithdrawal)}</span>
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -648,7 +649,7 @@ export default function CashAggregatorClient() {
                       }}
                       formatter={(value: number, name: string) => [
                         `£${value.toLocaleString()}`, 
-                        name === 'fasterPayment' ? 'FASTER Payment' : 'Bought Securities'
+                        name === 'fasterPayment' ? 'Money Top-up' : 'Bought Securities'
                       ]}
                     />
                     <Line 
@@ -696,28 +697,93 @@ export default function CashAggregatorClient() {
 
           {/* Category Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            {Object.entries(activeStatement.totals).map(([key, value]) => (
-              <div
-                key={key}
-                className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-slate-400 text-sm">
-                    {getCategoryLabel(key)}
-                  </span>
-                  {value < 0 ? (
-                    <TrendingDown className="w-4 h-4 text-red-400" />
-                  ) : value > 0 ? (
-                    <TrendingUp className="w-4 h-4 text-green-400" />
-                  ) : null}
+            {Object.entries(activeStatement.totals).map(([key, value]) => {
+              // Skip individual fee categories if they should be grouped
+              if (['onlineTransactionFee', 'internationalTradingCharge', 'fxCharge'].includes(key)) {
+                return null;
+              }
+
+              return (
+                <div
+                  key={key}
+                  className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-slate-400 text-sm">
+                      {getCategoryLabel(key)}
+                    </span>
+                    {value < 0 ? (
+                      <TrendingDown className="w-4 h-4 text-red-400" />
+                    ) : value > 0 ? (
+                      <TrendingUp className="w-4 h-4 text-green-400" />
+                    ) : null}
+                  </div>
+                  <p className={`text-2xl font-bold text-right ${
+                    value < 0 ? 'text-red-400' : value > 0 ? 'text-green-400' : 'text-slate-400'
+                  }`}>
+                    {formatCurrency(value)}
+                  </p>
                 </div>
-                <p className={`text-2xl font-bold text-right ${
-                  value < 0 ? 'text-red-400' : value > 0 ? 'text-green-400' : 'text-slate-400'
-                }`}>
-                  {formatCurrency(value)}
-                </p>
-              </div>
-            ))}
+              );
+            })}
+
+            {/* Grouped Charges/Fees Card */}
+            {(() => {
+              const totalChargesFees = 
+                activeStatement.totals.onlineTransactionFee + 
+                activeStatement.totals.internationalTradingCharge + 
+                activeStatement.totals.fxCharge;
+              
+              if (totalChargesFees === 0) return null;
+
+              return (
+                <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
+                  <button
+                    onClick={() => setExpandedChargesFees(!expandedChargesFees)}
+                    className="w-full"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-slate-400 text-sm flex items-center gap-2">
+                        Charges/Fees
+                        <span className="text-xs text-slate-500">
+                          {expandedChargesFees ? '▼' : '▶'}
+                        </span>
+                      </span>
+                      {totalChargesFees < 0 ? (
+                        <TrendingDown className="w-4 h-4 text-red-400" />
+                      ) : totalChargesFees > 0 ? (
+                        <TrendingUp className="w-4 h-4 text-green-400" />
+                      ) : null}
+                    </div>
+                    <p className={`text-2xl font-bold text-right ${
+                      totalChargesFees < 0 ? 'text-red-400' : totalChargesFees > 0 ? 'text-green-400' : 'text-slate-400'
+                    }`}>
+                      {formatCurrency(totalChargesFees)}
+                    </p>
+                  </button>
+
+                  {/* Expanded Drill-Down */}
+                  {expandedChargesFees && (
+                    <div className="mt-4 pt-4 border-t border-slate-700/50 space-y-2">
+                      {[
+                        { key: 'onlineTransactionFee', label: 'Online Transaction Fee', value: activeStatement.totals.onlineTransactionFee },
+                        { key: 'internationalTradingCharge', label: 'International Trading Charge', value: activeStatement.totals.internationalTradingCharge },
+                        { key: 'fxCharge', label: 'FX Charge', value: activeStatement.totals.fxCharge }
+                      ].map(({ key, label, value }) => (
+                        value !== 0 && (
+                          <div key={key} className="flex items-center justify-between text-sm">
+                            <span className="text-slate-500">{label}</span>
+                            <span className={value < 0 ? 'text-red-400' : 'text-green-400'}>
+                              {formatCurrency(value)}
+                            </span>
+                          </div>
+                        )
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Net Cash Flow */}
@@ -764,31 +830,46 @@ export default function CashAggregatorClient() {
                   <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Paid In
                   </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    Flag
+                  </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Withdrawn
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50">
-                {activeStatement.transactions.map((transaction, index) => (
-                  <tr key={index} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
-                      {transaction.date}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-slate-300">
-                      {transaction.details}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
-                      {transaction.account}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-green-400">
-                      {transaction.paidIn > 0 ? formatCurrency(transaction.paidIn) : '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-red-400">
-                      {transaction.withdrawn > 0 ? `(${formatCurrency(transaction.withdrawn)})` : '-'}
-                    </td>
-                  </tr>
-                ))}
+                {activeStatement.transactions.map((transaction, index) => {
+                  const categorized = categorizeTransaction(transaction.details, transaction.withdrawn, transaction.paidIn);
+                  const isUnclassified = 'other' in categorized;
+                  
+                  return (
+                    <tr key={index} className="hover:bg-slate-800/30 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {transaction.date}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-300">
+                        {transaction.details}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
+                        {transaction.account}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-green-400">
+                        {transaction.paidIn > 0 ? formatCurrency(transaction.paidIn) : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        {isUnclassified && (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                            ⚠️ Unclassified
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-red-400">
+                        {transaction.withdrawn > 0 ? `(${formatCurrency(transaction.withdrawn)})` : '-'}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
