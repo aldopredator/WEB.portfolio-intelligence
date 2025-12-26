@@ -249,17 +249,6 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
             Object.assign(stockEntry.stock_data, polygonStats);
           }
 
-          // Use earnings surprises from database (if available)
-          if (stockFromDb?.earningsSurprises && stockFromDb.earningsSurprises.length > 0 && isRecord(stockEntry)) {
-            stockEntry.earnings_surprises = stockFromDb.earningsSurprises.map((es: any) => ({
-              period: es.period.toISOString().split('T')[0],
-              actual: es.actual,
-              estimate: es.estimate,
-              surprise: es.surprise,
-              surprisePercent: es.surprisePercent,
-            }));
-          }
-
           // Fetch recommendation trends
           const recommendationTrends = await fetchRecommendationTrends(ticker);
           if (recommendationTrends && isRecord(stockEntry)) {
