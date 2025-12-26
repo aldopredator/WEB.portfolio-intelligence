@@ -11,6 +11,7 @@ interface TransactionRow {
   account: string;
   paidIn: number;
   withdrawn: number;
+  ticker?: string;
 }
 
 interface CategorizedTotals {
@@ -45,7 +46,23 @@ export default function CashAggregatorClient() {
   const [chartPeriod, setChartPeriod] = useState<'7D' | '1M' | '3M' | '1Y'>('1Y');
   const [expandedChargesFees, setExpandedChargesFees] = useState(false);
   const [expandedRevenuesIncome, setExpandedRevenuesIncome] = useState(false);
+  const [stocks, setStocks] = useState<Array<{ ticker: string; company: string }>>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch stocks for ticker matching
+  useEffect(() => {
+    fetch('/api/stock-list')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setStocks(data.stocks.map((s: any) => ({ 
+            ticker: s.ticker, 
+            company: s.company 
+          })));
+        }
+      })
+      .catch(err => console.error('Failed to fetch stocks:', err));
+  }, []);
 
   // Load statements from localStorage on mount
   useEffect(() => {
@@ -84,6 +101,29 @@ export default function CashAggregatorClient() {
   }, [activeStatementId, isLoaded]);
 
   const activeStatement = statements.find(s => s.id === activeStatementId);
+
+  // Extract ticker from transaction details
+  const extractTicker = (details: string): string | undefined => {
+    if (!stocks.length) return undefined;
+    
+    const detailsLower = details.toLowerCase();
+    
+    // Try to find company name match in details
+    for (const stock of stocks) {
+      const companyLower = stock.company.toLowerCase();
+      // Check if company name appears in details
+      if (detailsLower.includes(companyLower)) {
+        return stock.ticker;
+      }
+      // Also check for partial matches (first word of company name)
+      const firstWord = companyLower.split(' ')[0];
+      if (firstWord.length > 3 && detailsLower.includes(firstWord)) {
+        return stock.ticker;
+      }
+    }
+    
+    return undefined;
+  };
 
   // Categorization logic based on transaction details text
   const categorizeTransaction = (details: string, withdrawn: number, paidIn: number): Partial<CategorizedTotals> => {
@@ -274,12 +314,14 @@ export default function CashAggregatorClient() {
               return Math.abs(num); // Always return positive for withdrawn column
             };
 
+            const detailsStr = String(detailsValue);
             const transaction: TransactionRow = {
               date: String(dateValue),
-              details: String(detailsValue),
+              details: detailsStr,
               account: accountIndex !== -1 ? String(row[accountIndex] || '') : '',
               paidIn: paidInIndex !== -1 ? parseMoney(row[paidInIndex]) : 0,
               withdrawn: withdrawnIndex !== -1 ? parseMoney(row[withdrawnIndex]) : 0,
+              ticker: extractTicker(detailsStr),
             };
 
             transactions.push(transaction);
@@ -964,6 +1006,9 @@ export default function CashAggregatorClient() {
                     Details
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    Ticker
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Account
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
@@ -982,13 +1027,22 @@ export default function CashAggregatorClient() {
                   const categorized = categorizeTransaction(transaction.details, transaction.withdrawn, transaction.paidIn);
                   const isUnclassified = 'other' in categorized;
                   
+                  const formattedDate = parseExcelDate(transaction.date).toLocaleDateString('en-GB', { 
+                    day: '2-digit', 
+                    month: 'short', 
+                    year: 'numeric' 
+                  });
+                  
                   return (
                     <tr key={index} className="hover:bg-slate-800/30 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
-                        {transaction.date}
+                        {formattedDate}
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-300">
                         {transaction.details}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-400 font-mono">
+                        {transaction.ticker || '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                         {transaction.account}
