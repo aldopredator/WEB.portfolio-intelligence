@@ -4,6 +4,23 @@ import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Upload, FileSpreadsheet, Trash2, Download, AlertCircle, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
+// Helper function to parse numbers with accounting format (brackets for negative)
+function parseAccountingNumber(value: any): number {
+  if (typeof value === 'number') return value;
+  if (!value) return 0;
+  
+  const str = String(value).trim();
+  // Check if value is in brackets (accounting format for negative)
+  if (str.startsWith('(') && str.endsWith(')')) {
+    // Remove brackets and parse as negative
+    const numStr = str.slice(1, -1).replace(/[£$,]/g, '');
+    return -Math.abs(parseFloat(numStr) || 0);
+  }
+  
+  // Normal parsing
+  return parseFloat(str.replace(/[£$,]/g, '')) || 0;
+}
+
 type SortField = 'investment' | 'identifier' | 'quantityHeld' | 'lastPrice' | 'value' | 'valueR' | 'bookCostR' | 'percentChange' | 'valueCcy' | 'returnGBP' | 'weight' | 'optimalWeight' | 'investmentType' | 'sector' | 'industry' | 'ticker' | 'alternativeTicker' | 'portfolio';
 type SortDirection = 'asc' | 'desc' | null;
 
@@ -412,19 +429,19 @@ export default function BankStatementClient() {
           const holding: HoldingRow = {
             investment: row[0] || '',
             identifier: row[1] || '',
-            quantityHeld: parseFloat(row[2]) || 0,
-            lastPrice: parseFloat(row[3]) || 0,
+            quantityHeld: parseAccountingNumber(row[2]),
+            lastPrice: parseAccountingNumber(row[3]),
             lastPriceCcy: row[4] || '',
-            value: parseFloat(row[5]) || 0,
+            value: parseAccountingNumber(row[5]),
             valueCcy: row[6] || '',
-            fxRate: parseFloat(row[7]) || 0,
-            lastPriceP: parseFloat(row[8]) || 0,
-            valueR: parseFloat(row[9]) || 0,
-            bookCost: parseFloat(row[10]) || 0,
+            fxRate: parseAccountingNumber(row[7]),
+            lastPriceP: parseAccountingNumber(row[8]),
+            valueR: parseAccountingNumber(row[9]),
+            bookCost: parseAccountingNumber(row[10]),
             bookCostCcy: row[11] || '',
-            averageFxRate: parseFloat(row[12]) || 0,
-            bookCostR: parseFloat(row[13]) || 0,
-            percentChange: parseFloat(row[14]) || 0,
+            averageFxRate: parseAccountingNumber(row[12]),
+            bookCostR: parseAccountingNumber(row[13]),
+            percentChange: parseAccountingNumber(row[14]),
           };
 
           parsedHoldings.push(holding);
