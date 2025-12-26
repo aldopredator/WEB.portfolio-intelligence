@@ -20,7 +20,8 @@ import {
   FileSpreadsheet,
   Link2,
   Calculator,
-  PieChart
+  PieChart,
+  AlertTriangle
 } from 'lucide-react';
 import { usePortfolio } from '@/lib/portfolio-context';
 import {
@@ -49,6 +50,7 @@ export function SidebarNavigation() {
     { name: 'Bank Statement', href: '/bank-statement', icon: FileSpreadsheet, description: 'Upload & view statements' },
     { name: 'Cash Aggregator', href: '/cash-aggregator', icon: TrendingUp, description: 'Categorize cash flows' },
     { name: 'Performance Attribution', href: '/performance-attribution', icon: PieChart, description: 'Portfolio performance analysis' },
+    { name: 'Value at Risk', href: '/value-at-risk', icon: AlertTriangle, description: 'Portfolio risk metrics (VaR)' },
     { name: 'Ticker Mapping', href: '/ticker-mapping', icon: Link2, description: 'Alternative ticker symbols' },
     { name: 'Screening', href: '/screening', icon: Filter, description: 'Stock screening results' },
     { name: 'Sectors', href: '/sectors', icon: Grid3x3, description: 'Sector matrix visualization' },
