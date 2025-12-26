@@ -440,6 +440,38 @@ export default function CashAggregatorClient() {
     });
   }, [activeStatement]);
 
+  // Calculate Bought Securities trend over time
+  const boughtSecuritiesTrend = useMemo(() => {
+    if (!activeStatement) return [];
+
+    const boughtTransactions = activeStatement.transactions.filter(t => 
+      (t.details.toLowerCase().includes('bought') || t.details.toLowerCase().includes('buy')) && t.withdrawn > 0
+    );
+
+    // Group by date
+    const dateMap = new Map<string, number>();
+    boughtTransactions.forEach(transaction => {
+      const existing = dateMap.get(transaction.date) || 0;
+      dateMap.set(transaction.date, existing + transaction.withdrawn);
+    });
+
+    // Convert to array and sort by date
+    const sorted = Array.from(dateMap.entries())
+      .map(([date, amount]) => ({ date, amount }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    // Calculate cumulative values
+    let cumulative = 0;
+    return sorted.map(item => {
+      cumulative += item.amount;
+      return {
+        date: item.date,
+        amount: cumulative,
+        label: new Date(item.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+      };
+    });
+  }, [activeStatement]);
+
   // Filter chart data by period
   const filteredChartData = useMemo(() => {
     if (fasterPaymentTrend.length === 0) return [];
@@ -458,6 +490,24 @@ export default function CashAggregatorClient() {
       new Date(item.date) >= cutoffDate
     );
   }, [fasterPaymentTrend, chartPeriod]);
+
+  const filteredBoughtData = useMemo(() => {
+    if (boughtSecuritiesTrend.length === 0) return [];
+
+    const now = new Date();
+    const periodDays: Record<typeof chartPeriod, number> = {
+      '7D': 7,
+      '1M': 30,
+      '3M': 90,
+      '1Y': 365
+    };
+
+    const cutoffDate = new Date(now.getTime() - periodDays[chartPeriod] * 24 * 60 * 60 * 1000);
+    
+    return boughtSecuritiesTrend.filter(item => 
+      new Date(item.date) >= cutoffDate
+    );
+  }, [boughtSecuritiesTrend, chartPeriod]);
 
   return (
     <div className="space-y-6">
@@ -615,6 +665,80 @@ export default function CashAggregatorClient() {
                       px-4 py-2 rounded-lg text-sm font-medium transition-colors
                       ${chartPeriod === period
                         ? 'bg-green-500 text-white'
+                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                      }
+                    `}
+                  >
+                    {period}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Bought Securities - Evolution Chart */}
+          {activeStatement.totals.bought < 0 && filteredBoughtData.length > 0 && (
+            <div className="bg-gradient-to-r from-red-500/10 to-rose-500/10 border border-red-500/30 rounded-lg p-6 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-red-400 text-sm font-medium mb-1">📊 Bought (Securities)</p>
+                  <p className="text-4xl font-bold text-red-400">
+                    {formatCurrency(activeStatement.totals.bought)}
+                  </p>
+                </div>
+                <TrendingDown className="w-10 h-10 text-red-400" />
+              </div>
+
+              <p className="text-slate-400 text-xs mb-4">Total value over time</p>
+              
+              {/* Chart */}
+              <div className="h-64 mb-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={filteredBoughtData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+                    <XAxis 
+                      dataKey="label" 
+                      stroke="#64748b" 
+                      fontSize={11}
+                      tickLine={false}
+                    />
+                    <YAxis 
+                      stroke="#64748b" 
+                      fontSize={11}
+                      tickLine={false}
+                      tickFormatter={(value) => `£${(value / 1000).toFixed(0)}k`}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#1e293b',
+                        border: '1px solid #334155',
+                        borderRadius: '8px',
+                        fontSize: '12px'
+                      }}
+                      formatter={(value: number) => [`£${value.toLocaleString()}`, 'Total']}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="amount" 
+                      stroke="#ef4444" 
+                      strokeWidth={3}
+                      dot={{ fill: '#ef4444', r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Period Selector */}
+              <div className="flex items-center justify-center gap-2">
+                {(['7D', '1M', '3M', '1Y'] as const).map(period => (
+                  <button
+                    key={period}
+                    onClick={() => setChartPeriod(period)}
+                    className={`
+                      px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                      ${chartPeriod === period
+                        ? 'bg-red-500 text-white'
                         : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                       }
                     `}
