@@ -131,10 +131,32 @@ export default function CashAggregatorClient() {
       return 'Cash';
     }
     
-    // ETF - Contains ETF, ETC, UCITS, fund, tracker keywords
-    if (detailsLower.includes('etf') || detailsLower.includes('etc') ||
-        detailsLower.includes('ucits') || detailsLower.includes('tracker') ||
-        (detailsLower.includes('fund') && !detailsLower.includes('fund distribution'))) {
+    // ETF - Check for explicit ETF keywords and patterns
+    // 1. Contains "ETF" word (case insensitive)
+    if (detailsLower.includes(' etf') || detailsLower.includes('etf ') || 
+        detailsLower.includes('(etf)') || detailsLower.match(/\betf\b/)) {
+      return 'ETF';
+    }
+    
+    // 2. Contains "UCITS" (common ETF structure)
+    if (detailsLower.includes('ucits')) {
+      return 'ETF';
+    }
+    
+    // 3. Contains "ETC" (Exchange Traded Commodity)
+    if (detailsLower.includes(' etc') || detailsLower.includes('etc ') || detailsLower.match(/\betc\b/)) {
+      return 'ETF';
+    }
+    
+    // 4. Contains tracker or index fund keywords
+    if (detailsLower.includes('tracker') || detailsLower.includes('index fund')) {
+      return 'ETF';
+    }
+    
+    // 5. Known ETF providers (VanEck, iShares, etc.)
+    if ((detailsLower.includes('vaneck') || detailsLower.includes('ishares') || 
+         detailsLower.includes('spdr') || detailsLower.includes('vanguard')) &&
+        (detailsLower.includes('fund') || detailsLower.includes('quantum'))) {
       return 'ETF';
     }
     
