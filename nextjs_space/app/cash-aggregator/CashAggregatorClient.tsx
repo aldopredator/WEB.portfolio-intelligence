@@ -47,6 +47,8 @@ export default function CashAggregatorClient() {
   const [expandedChargesFees, setExpandedChargesFees] = useState(false);
   const [expandedRevenuesIncome, setExpandedRevenuesIncome] = useState(false);
   const [stocks, setStocks] = useState<Array<{ ticker: string; company: string; alternativeTickers: string[] }>>([]);
+  const [sortColumn, setSortColumn] = useState<'date' | 'details' | 'ticker' | 'account' | 'paidIn' | 'withdrawn'>('date');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch stocks for ticker matching
@@ -480,6 +482,48 @@ export default function CashAggregatorClient() {
       maximumFractionDigits: 0,
     }).format(value);
   };
+
+  const handleSort = (column: typeof sortColumn) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedTransactions = useMemo(() => {
+    if (!activeStatement) return [];
+    
+    const sorted = [...activeStatement.transactions].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortColumn) {
+        case 'date':
+          comparison = parseExcelDate(a.date).getTime() - parseExcelDate(b.date).getTime();
+          break;
+        case 'details':
+          comparison = a.details.localeCompare(b.details);
+          break;
+        case 'ticker':
+          comparison = (a.ticker || '').localeCompare(b.ticker || '');
+          break;
+        case 'account':
+          comparison = a.account.localeCompare(b.account);
+          break;
+        case 'paidIn':
+          comparison = a.paidIn - b.paidIn;
+          break;
+        case 'withdrawn':
+          comparison = a.withdrawn - b.withdrawn;
+          break;
+      }
+      
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+    
+    return sorted;
+  }, [activeStatement, sortColumn, sortDirection]);
 
   const getCategoryLabel = (key: string): string => {
     const labels: Record<string, string> = {
@@ -1040,31 +1084,79 @@ export default function CashAggregatorClient() {
             <table className="w-full">
               <thead className="bg-slate-800/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Date
+                  <th 
+                    className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300 transition-colors"
+                    onClick={() => handleSort('date')}
+                  >
+                    <div className="flex items-center gap-2">
+                      Date
+                      {sortColumn === 'date' && (
+                        <span className="text-blue-400">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </div>
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Details
+                  <th 
+                    className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300 transition-colors"
+                    onClick={() => handleSort('details')}
+                  >
+                    <div className="flex items-center gap-2">
+                      Details
+                      {sortColumn === 'details' && (
+                        <span className="text-blue-400">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </div>
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Ticker
+                  <th 
+                    className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300 transition-colors"
+                    onClick={() => handleSort('ticker')}
+                  >
+                    <div className="flex items-center gap-2">
+                      Ticker
+                      {sortColumn === 'ticker' && (
+                        <span className="text-blue-400">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </div>
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Account
+                  <th 
+                    className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300 transition-colors"
+                    onClick={() => handleSort('account')}
+                  >
+                    <div className="flex items-center gap-2">
+                      Account
+                      {sortColumn === 'account' && (
+                        <span className="text-blue-400">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </div>
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Paid In
+                  <th 
+                    className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300 transition-colors"
+                    onClick={() => handleSort('paidIn')}
+                  >
+                    <div className="flex items-center justify-end gap-2">
+                      Paid In
+                      {sortColumn === 'paidIn' && (
+                        <span className="text-blue-400">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </div>
                   </th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Flag
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Withdrawn
+                  <th 
+                    className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300 transition-colors"
+                    onClick={() => handleSort('withdrawn')}
+                  >
+                    <div className="flex items-center justify-end gap-2">
+                      Withdrawn
+                      {sortColumn === 'withdrawn' && (
+                        <span className="text-blue-400">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </div>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50">
-                {activeStatement.transactions.map((transaction, index) => {
+                {sortedTransactions.map((transaction, index) => {
                   const categorized = categorizeTransaction(transaction.details, transaction.withdrawn, transaction.paidIn);
                   const isUnclassified = 'other' in categorized;
                   
