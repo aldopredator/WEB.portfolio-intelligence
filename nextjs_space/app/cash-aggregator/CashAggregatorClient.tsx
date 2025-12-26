@@ -244,12 +244,23 @@ export default function CashAggregatorClient() {
             // Skip empty rows or rows without date/details
             if (!dateValue || !detailsValue) continue;
 
+            // Parse monetary values, handling parentheses for negative numbers
+            const parseMoney = (value: any): number => {
+              if (!value) return 0;
+              const str = String(value).trim();
+              // Handle parentheses format: (123.45) means negative
+              const isNegative = str.startsWith('(') && str.endsWith(')');
+              const cleanStr = str.replace(/[(),£$\s]/g, '');
+              const num = parseFloat(cleanStr) || 0;
+              return isNegative ? Math.abs(num) : num; // Always return positive for withdrawn column
+            };
+
             const transaction: TransactionRow = {
               date: String(dateValue),
               details: String(detailsValue),
               account: accountIndex !== -1 ? String(row[accountIndex] || '') : '',
-              paidIn: paidInIndex !== -1 ? (parseFloat(row[paidInIndex]) || 0) : 0,
-              withdrawn: withdrawnIndex !== -1 ? (parseFloat(row[withdrawnIndex]) || 0) : 0,
+              paidIn: paidInIndex !== -1 ? parseMoney(row[paidInIndex]) : 0,
+              withdrawn: withdrawnIndex !== -1 ? parseMoney(row[withdrawnIndex]) : 0,
             };
 
             transactions.push(transaction);
