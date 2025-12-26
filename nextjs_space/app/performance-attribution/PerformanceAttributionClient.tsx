@@ -49,9 +49,16 @@ interface DailyReturn {
   cumulativeReturn: number;
 }
 
+interface StockInfo {
+  ticker: string;
+  costPrice: number | null;
+  company: string;
+}
+
 export default function PerformanceAttributionClient() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [priceHistory, setPriceHistory] = useState<Record<string, PricePoint[]>>({});
+  const [stocks, setStocks] = useState<Record<string, StockInfo>>({});
   const [attribution, setAttribution] = useState<StockAttribution[]>([]);
   const [dailyReturns, setDailyReturns] = useState<DailyReturn[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,6 +89,9 @@ export default function PerformanceAttributionClient() {
         // Get unique tickers
         const tickers = [...new Set(stockTransactions.map(t => t.ticker).filter(Boolean))] as string[];
         
+        // Fetch stock info (costPrice) from database
+        await fetchStockInfo(tickers);
+        
         // Fetch price history for each ticker
         await fetchPriceHistory(tickers);
         
@@ -98,6 +108,32 @@ export default function PerformanceAttributionClient() {
     
     loadData();
   }, []);
+
+  // Fetch stock info from database
+  const fetchStockInfo = async (tickers: string[]) => {
+    const stockData: Record<string, StockInfo> = {};
+    
+    try {
+      const response = await fetch('/api/stock-list');
+      const data = await response.json();
+      
+      if (data.success) {
+        data.stocks.forEach((stock: any) => {
+          if (tickers.includes(stock.ticker)) {
+            stockData[stock.ticker] = {
+              ticker: stock.ticker,
+              costPrice: stock.costPrice,
+              company: stock.company
+            };
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch stock info:', error);
+    }
+    
+    setStocks(stockData);
+  };
 
   // Fetch price history from API
   const fetchPriceHistory = async (tickers: string[]) => {
@@ -126,10 +162,10 @@ export default function PerformanceAttributionClient() {
 
   // Calculate performance attribution
   useEffect(() => {
-    if (transactions.length === 0 || Object.keys(priceHistory).length === 0) return;
+    if (transactions.length === 0 || Object.keys(priceHistory).length === 0 || Object.keys(stocks).length === 0) return;
     
     calculateAttribution();
-  }, [transactions, priceHistory]);
+  }, [transactions, priceHistory, stocks]);
 
   const calculateAttribution = () => {
     // Group transactions by ticker
@@ -145,18 +181,15 @@ export default function PerformanceAttributionClient() {
     
     Object.entries(tickerGroups).forEach(([ticker, txs]) => {
       let totalQuantity = 0;
-      let totalCost = 0;
       let dividends = 0;
       let fees = 0;
       
-      // Calculate current holdings and costs
+      // Calculate current holdings
       txs.forEach(tx => {
         if (tx.direction === 'Buy') {
           totalQuantity += tx.quantity || 0;
-          totalCost += Math.abs(tx.amount);
         } else if (tx.direction === 'Sell') {
           totalQuantity -= tx.quantity || 0;
-          // Realized gains not tracked here
         }
         
         // Track dividends and fees
@@ -168,15 +201,18 @@ export default function PerformanceAttributionClient() {
         }
       });
       
-      // Get current price
+      // Get current price from price history
       const prices = priceHistory[ticker];
       const currentPrice = prices && prices.length > 0 ? prices[prices.length - 1].close : 0;
-      const avgCost = totalQuantity > 0 ? totalCost / totalQuantity : 0;
+      
+      // Use costPrice from database, fallback to 0
+      const avgCost = stocks[ticker]?.costPrice || 0;
       
       // Calculate returns
       const currentValue = totalQuantity * currentPrice;
-      const totalReturn = currentValue - totalCost + dividends + fees;
-      const contribution = (totalReturn / totalCost) * 100; // Percentage contribution
+      const costBasis = totalQuantity * avgCost;
+      const totalReturn = currentValue - costBasis + dividends + fees;
+      const contribution = costBasis > 0 ? (totalReturn / costBasis) * 100 : 0; // Percentage contribution
       
       attributionResults.push({
         ticker,
