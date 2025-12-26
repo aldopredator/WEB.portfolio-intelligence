@@ -184,7 +184,7 @@ export default function InternalScoringPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 lg:ml-64 p-6">
       <PageHeader
         title="Internal Scoring"
         description="Multi-factor quantitative scoring model to rank stocks from highest to lowest priority"
