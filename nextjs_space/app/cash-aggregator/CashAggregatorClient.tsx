@@ -115,6 +115,11 @@ export default function CashAggregatorClient() {
 
   const activeStatement = statements.find(s => s.id === activeStatementId);
 
+  // Helper function to escape regex special characters
+  const escapeRegex = (str: string): string => {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  };
+
   // Extract ticker from transaction details
   const extractTicker = (details: string): string | undefined => {
     if (!stocks.length) return undefined;
@@ -135,9 +140,13 @@ export default function CashAggregatorClient() {
       
       // Check if ticker symbol appears as a word boundary (e.g., "CB" for Chubb)
       // This helps when company name in DB doesn't match transaction description
-      const tickerRegex = new RegExp(`\\b${stock.ticker}\\b`, 'i');
-      if (tickerRegex.test(details)) {
-        score += 25; // High score for exact ticker match
+      try {
+        const tickerRegex = new RegExp(`\\b${escapeRegex(stock.ticker)}\\b`, 'i');
+        if (tickerRegex.test(details)) {
+          score += 25; // High score for exact ticker match
+        }
+      } catch (e) {
+        // Invalid regex, skip
       }
       
       // Split company name into words for better matching
@@ -147,10 +156,15 @@ export default function CashAggregatorClient() {
       for (const word of companyWords) {
         if (detailsLower.includes(word)) {
           // Exact word match gets higher score
-          const wordRegex = new RegExp(`\\b${word}\\b`, 'i');
-          if (wordRegex.test(details)) {
-            score += 10;
-          } else {
+          try {
+            const wordRegex = new RegExp(`\\b${escapeRegex(word)}\\b`, 'i');
+            if (wordRegex.test(details)) {
+              score += 10;
+            } else {
+              score += 5;
+            }
+          } catch (e) {
+            // Invalid regex, just use partial match score
             score += 5;
           }
         }
@@ -166,13 +180,13 @@ export default function CashAggregatorClient() {
         try {
           const domain = stock.website.replace(/^https?:\/\/(www\.)?/, '').split('/')[0].split('.')[0];
           if (domain && domain.length > 2) {
-            const domainRegex = new RegExp(`\\b${domain}\\b`, 'i');
+            const domainRegex = new RegExp(`\\b${escapeRegex(domain)}\\b`, 'i');
             if (domainRegex.test(details)) {
               score += 15; // Good score for domain match
             }
           }
         } catch (e) {
-          // Invalid website format, skip
+          // Invalid website format or regex, skip
         }
       }
       
@@ -181,9 +195,13 @@ export default function CashAggregatorClient() {
         const descWords = stock.description.toLowerCase().split(/[\s,.-]+/).filter(w => w.length > 4);
         let descMatches = 0;
         for (const word of descWords) {
-          const wordRegex = new RegExp(`\\b${word}\\b`, 'i');
-          if (wordRegex.test(details)) {
-            descMatches++;
+          try {
+            const wordRegex = new RegExp(`\\b${escapeRegex(word)}\\b`, 'i');
+            if (wordRegex.test(details)) {
+              descMatches++;
+            }
+          } catch (e) {
+            // Invalid regex, skip this word
           }
         }
         // Award points based on number of description words found
@@ -194,9 +212,13 @@ export default function CashAggregatorClient() {
       
       // Also check alternative tickers in the details
       for (const altTicker of stock.alternativeTickers) {
-        const altRegex = new RegExp(`\\b${altTicker}\\b`, 'i');
-        if (altRegex.test(details)) {
-          score += 15;
+        try {
+          const altRegex = new RegExp(`\\b${escapeRegex(altTicker)}\\b`, 'i');
+          if (altRegex.test(details)) {
+            score += 15;
+          }
+        } catch (e) {
+          // Invalid regex, skip
         }
       }
       
