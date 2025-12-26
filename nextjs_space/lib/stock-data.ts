@@ -20,22 +20,16 @@ export let STOCK_CONFIG: Array<{ ticker: string; name: string; sector: string }>
  * @param portfolioId - Optional portfolio ID to filter stocks
  */
 export async function getStockData(portfolioId?: string | null): Promise<StockInsightsData> {
-  let retryCount = 0;
-  const maxRetries = 2;
-
-  while (retryCount <= maxRetries) {
-    try {
-      console.log(`[STOCK-DATA] 📊 Fetching stock data from database... (attempt ${retryCount + 1}/${maxRetries + 1})`);
-      if (portfolioId) {
-        console.log(`[STOCK-DATA] 🎯 Filtering by portfolio ID: ${portfolioId}`);
-      } else {
-        console.log('[STOCK-DATA] 📋 Fetching ALL active stocks (no portfolio filter)');
-      }
-      
-      const queryStartTime = Date.now();
-      
-      // Fetch all active stocks with their related data AND latest metrics
-      const stocks = await prisma.stock.findMany({
+  try {
+    console.log('[STOCK-DATA] 📊 Fetching stock data from database...');
+    if (portfolioId) {
+      console.log(`[STOCK-DATA] 🎯 Filtering by portfolio ID: ${portfolioId}`);
+    } else {
+      console.log('[STOCK-DATA] 📋 Fetching ALL active stocks (no portfolio filter)');
+    }
+    
+    // Fetch all active stocks with their related data AND latest metrics
+    const stocks = await prisma.stock.findMany({
       where: { 
         isActive: true,
         ...(portfolioId ? { portfolioId } : {}),
@@ -337,40 +331,18 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
     console.log('[STOCK-DATA] ✅ Completed profile and news enrichment');
 
     return mergedData;
-    } catch (error) {
-      console.error(`❌ [STOCK-DATA] Error loading stock data from database (attempt ${retryCount + 1}/${maxRetries + 1}):`, error);
-      console.error('❌ [STOCK-DATA] Error details:', {
-        name: error instanceof Error ? error.name : 'Unknown',
-        message: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack?.split('\n').slice(0, 3).join('\n') : undefined,
-      });
-      
-      // Retry on connection errors
-      if (retryCount < maxRetries && error instanceof Error && 
-          (error.message.includes('timed out') || 
-           error.message.includes('connection') || 
-           error.message.includes('ECONNREFUSED') ||
-           error.message.includes('P1001'))) {
-        retryCount++;
-        console.log(`[STOCK-DATA] 🔄 Retrying after connection error... (attempt ${retryCount + 1}/${maxRetries + 1})`);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
-        continue;
-      }
-      
-      // Fallback to JSON file if all retries fail
-      try {
-        console.log('[STOCK-DATA] ⚠️ All retries exhausted. Falling back to JSON file...');
-        const filePath = path.join(process.cwd(), 'public', 'stock_insights_data.json');
-        const fileContents = await fs.readFile(filePath, 'utf8');
-        return JSON.parse(fileContents);
-      } catch (fallbackError) {
-        console.error('Error loading fallback JSON data:', fallbackError);
-        return {};
-      }
+  } catch (error) {
+    console.error('❌ [STOCK-DATA] Error loading stock data from database:', error);
+    
+    // Fallback to JSON file
+    try {
+      console.log('[STOCK-DATA] ⚠️ Falling back to JSON file...');
+      const filePath = path.join(process.cwd(), 'public', 'stock_insights_data.json');
+      const fileContents = await fs.readFile(filePath, 'utf8');
+      return JSON.parse(fileContents);
+    } catch (fallbackError) {
+      console.error('Error loading fallback JSON data:', fallbackError);
+      return {};
     }
   }
-
-  // Fallback if loop exits without returning (shouldn't happen but satisfies TypeScript)
-  console.error('[STOCK-DATA] ❌ Unexpected: while loop exited without return');
-  return {};
 }
