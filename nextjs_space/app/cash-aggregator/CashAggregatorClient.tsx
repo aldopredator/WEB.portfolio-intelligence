@@ -181,57 +181,69 @@ export default function CashAggregatorClient() {
     const detailsLower = details.toLowerCase();
     
     // Score each stock based on how well it matches
-    const matches: Array<{ ticker: string; score: number }> = [];
+    const matches: Array<{ ticker: string; score: number; debug: string }> = [];
     
     for (const stock of stocks) {
       let score = 0;
+      let debugInfo: string[] = [];
       const companyLower = stock.company.toLowerCase();
       
-      // Check if ticker symbol appears as a word boundary (e.g., "CB" for Chubb)
-      // This helps when company name in DB doesn't match transaction description
+      // Check if ticker symbol appears as a word boundary (e.g., "CB" for Chubb, "PBR" for Petrobras)
       try {
         const tickerRegex = new RegExp(`\\b${escapeRegex(stock.ticker)}\\b`, 'i');
         if (tickerRegex.test(details)) {
-          score += 25; // High score for exact ticker match
+          score += 50; // Very high score for exact ticker match (increased from 25)
+          debugInfo.push(`ticker:+50`);
         }
       } catch (e) {
         // Invalid regex, skip
       }
       
-      // Split company name into words for better matching
-      const companyWords = companyLower.split(/[\s,.-]+/).filter(w => w.length > 2);
+      // Split company name into significant words (ignore common words)
+      const commonWords = ['ltd', 'inc', 'corp', 'corporation', 'company', 'group', 'plc', 'llc', 'the', 'and', 'class'];
+      const companyWords = companyLower.split(/[\s,.-]+/).filter(w => w.length > 3 && !commonWords.includes(w));
       
+      let matchedWords = 0;
       // Check each word of company name
       for (const word of companyWords) {
         if (detailsLower.includes(word)) {
+          matchedWords++;
           // Exact word match gets higher score
           try {
             const wordRegex = new RegExp(`\\b${escapeRegex(word)}\\b`, 'i');
             if (wordRegex.test(details)) {
-              score += 10;
+              // Longer words get more points (more specific)
+              const wordScore = Math.min(word.length * 2, 20);
+              score += wordScore;
+              debugInfo.push(`word(${word}):+${wordScore}`);
             } else {
-              score += 5;
+              score += 3; // Partial match
+              debugInfo.push(`partial(${word}):+3`);
             }
           } catch (e) {
             // Invalid regex, just use partial match score
-            score += 5;
+            score += 3;
+            debugInfo.push(`partial(${word}):+3`);
           }
         }
       }
       
-      // Check if full company name appears
-      if (detailsLower.includes(companyLower)) {
-        score += 20;
+      // Bonus for matching multiple words (indicates strong match)
+      if (matchedWords >= 2) {
+        const multiWordBonus = matchedWords * 15;
+        score += multiWordBonus;
+        debugInfo.push(`multiWord(${matchedWords}):+${multiWordBonus}`);
       }
       
-      // Extract and check website domain (e.g., "chubb" from "chubb.com")
+      // Extract and check website domain (e.g., "petrobras" from "petrobras.com.br")
       if (stock.website) {
         try {
           const domain = stock.website.replace(/^https?:\/\/(www\.)?/, '').split('/')[0].split('.')[0];
-          if (domain && domain.length > 2) {
+          if (domain && domain.length > 3) {
             const domainRegex = new RegExp(`\\b${escapeRegex(domain)}\\b`, 'i');
             if (domainRegex.test(details)) {
-              score += 15; // Good score for domain match
+              score += 20;
+              debugInfo.push(`domain(${domain}):+20`);
             }
           }
         } catch (e) {
@@ -239,8 +251,8 @@ export default function CashAggregatorClient() {
         }
       }
       
-      // Check description as last resort (split into words and check significant matches)
-      if (stock.description && score < 10) {
+      // Check description only if score is still low
+      if (stock.description && score < 15) {
         const descWords = stock.description.toLowerCase().split(/[\s,.-]+/).filter(w => w.length > 4);
         let descMatches = 0;
         for (const word of descWords) {
@@ -255,16 +267,19 @@ export default function CashAggregatorClient() {
         }
         // Award points based on number of description words found
         if (descMatches >= 2) {
-          score += Math.min(descMatches * 3, 12); // Max 12 points from description
+          const descScore = Math.min(descMatches * 3, 12);
+          score += descScore;
+          debugInfo.push(`desc(${descMatches}):+${descScore}`);
         }
       }
       
-      // Also check alternative tickers in the details
+      // Check alternative tickers with high priority
       for (const altTicker of stock.alternativeTickers) {
         try {
           const altRegex = new RegExp(`\\b${escapeRegex(altTicker)}\\b`, 'i');
           if (altRegex.test(details)) {
-            score += 15;
+            score += 40;
+            debugInfo.push(`altTicker(${altTicker}):+40`);
           }
         } catch (e) {
           // Invalid regex, skip
@@ -272,11 +287,27 @@ export default function CashAggregatorClient() {
       }
       
       if (score > 0) {
-        matches.push({ ticker: stock.ticker, score });
+        matches.push({ ticker: stock.ticker, score, debug: debugInfo.join(', ') });
       }
     }
     
-    // Return ticker with highest score (minimum threshold of 10)
+    // Return ticker with highest score (minimum threshold of 15 to avoid false positives)
+    if (matches.length > 0) {
+      matches.sort((a, b) => b.score - a.score);
+      
+      // Log top 3 matches for debugging
+      console.log(`Ticker matching for: "${details.substring(0, 80)}..."`);
+      matches.slice(0, 3).forEach(m => {
+        console.log(`  ${m.ticker}: ${m.score} (${m.debug})`);
+      });
+      
+      if (matches[0].score >= 15) {
+        return matches[0].ticker;
+      }
+    }
+    
+    return undefined;
+  };
     if (matches.length > 0) {
       matches.sort((a, b) => b.score - a.score);
       if (matches[0].score >= 10) {
