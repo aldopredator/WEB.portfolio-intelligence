@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { Upload, FileSpreadsheet, Trash2, Download, AlertCircle, TrendingDown, TrendingUp, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Upload, FileSpreadsheet, Trash2, Download, AlertCircle, TrendingDown, TrendingUp } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
@@ -47,8 +47,6 @@ export default function CashAggregatorClient() {
   const [expandedChargesFees, setExpandedChargesFees] = useState(false);
   const [expandedRevenuesIncome, setExpandedRevenuesIncome] = useState(false);
   const [stocks, setStocks] = useState<Array<{ ticker: string; company: string; alternativeTickers: string[] }>>([]);
-  const [sortField, setSortField] = useState<'date' | 'details' | 'ticker' | 'account' | 'paidIn' | 'withdrawn' | null>('date');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>('desc');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch stocks for ticker matching
@@ -482,62 +480,6 @@ export default function CashAggregatorClient() {
       maximumFractionDigits: 0,
     }).format(value);
   };
-
-  type SortFieldType = 'date' | 'details' | 'ticker' | 'account' | 'paidIn' | 'withdrawn';
-
-  const handleSort = (field: SortFieldType) => {
-    if (sortField === field) {
-      // Cycle through: asc -> desc -> null
-      if (sortDirection === 'asc') {
-        setSortDirection('desc');
-      } else if (sortDirection === 'desc') {
-        setSortDirection(null);
-        setSortField(null);
-      }
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
-
-  const SortIcon = ({ field }: { field: SortFieldType }) => {
-    if (sortField !== field) return <ArrowUpDown className="w-3 h-3 opacity-40" />;
-    if (sortDirection === 'asc') return <ArrowUp className="w-3 h-3" />;
-    if (sortDirection === 'desc') return <ArrowDown className="w-3 h-3" />;
-    return <ArrowUpDown className="w-3 h-3 opacity-40" />;
-  };
-
-  const sortedTransactions = useMemo(() => {
-    if (!activeStatement || !sortField || !sortDirection) return activeStatement?.transactions || [];
-
-    return [...activeStatement.transactions].sort((a, b) => {
-      let aVal: string | number;
-      let bVal: string | number;
-
-      if (sortField === 'date') {
-        aVal = parseExcelDate(a.date).getTime();
-        bVal = parseExcelDate(b.date).getTime();
-      } else if (sortField === 'ticker') {
-        aVal = a.ticker || '';
-        bVal = b.ticker || '';
-      } else {
-        aVal = a[sortField];
-        bVal = b[sortField];
-      }
-
-      if (typeof aVal === 'string' && typeof bVal === 'string') {
-        return sortDirection === 'asc' 
-          ? aVal.localeCompare(bVal)
-          : bVal.localeCompare(aVal);
-      }
-
-      if (typeof aVal === 'number' && typeof bVal === 'number') {
-        return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
-      }
-
-      return 0;
-    });
-  }, [activeStatement, sortField, sortDirection]);
 
   const getCategoryLabel = (key: string): string => {
     const labels: Record<string, string> = {
@@ -1098,67 +1040,31 @@ export default function CashAggregatorClient() {
             <table className="w-full">
               <thead className="bg-slate-800/50">
                 <tr>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300"
-                    onClick={() => handleSort('date')}
-                  >
-                    <div className="flex items-center gap-2">
-                      Date
-                      <SortIcon field="date" />
-                    </div>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    Date
                   </th>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300"
-                    onClick={() => handleSort('details')}
-                  >
-                    <div className="flex items-center gap-2">
-                      Details
-                      <SortIcon field="details" />
-                    </div>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    Details
                   </th>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300"
-                    onClick={() => handleSort('ticker')}
-                  >
-                    <div className="flex items-center gap-2">
-                      Ticker
-                      <SortIcon field="ticker" />
-                    </div>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    Ticker
                   </th>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300"
-                    onClick={() => handleSort('account')}
-                  >
-                    <div className="flex items-center gap-2">
-                      Account
-                      <SortIcon field="account" />
-                    </div>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    Account
                   </th>
-                  <th 
-                    className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300"
-                    onClick={() => handleSort('paidIn')}
-                  >
-                    <div className="flex items-center justify-end gap-2">
-                      Paid In
-                      <SortIcon field="paidIn" />
-                    </div>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    Paid In
                   </th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Flag
                   </th>
-                  <th 
-                    className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-300"
-                    onClick={() => handleSort('withdrawn')}
-                  >
-                    <div className="flex items-center justify-end gap-2">
-                      Withdrawn
-                      <SortIcon field="withdrawn" />
-                    </div>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    Withdrawn
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50">
-                {sortedTransactions.map((transaction, index) => {
+                {activeStatement.transactions.map((transaction, index) => {
                   const categorized = categorizeTransaction(transaction.details, transaction.withdrawn, transaction.paidIn);
                   const isUnclassified = 'other' in categorized;
                   
