@@ -244,15 +244,21 @@ export default function CashAggregatorClient() {
             // Skip empty rows or rows without date/details
             if (!dateValue || !detailsValue) continue;
 
-            // Parse monetary values, handling parentheses for negative numbers
+            // Parse monetary values, handling parentheses for negative numbers and actual negative values
             const parseMoney = (value: any): number => {
               if (!value) return 0;
+              
+              // If it's already a number (Excel might parse negative values as numbers)
+              if (typeof value === 'number') {
+                return Math.abs(value); // Always return positive for withdrawn column
+              }
+              
               const str = String(value).trim();
               // Handle parentheses format: (123.45) means negative
               const isNegative = str.startsWith('(') && str.endsWith(')');
               const cleanStr = str.replace(/[(),£$\s]/g, '');
               const num = parseFloat(cleanStr) || 0;
-              return isNegative ? Math.abs(num) : num; // Always return positive for withdrawn column
+              return Math.abs(num); // Always return positive for withdrawn column
             };
 
             const transaction: TransactionRow = {
