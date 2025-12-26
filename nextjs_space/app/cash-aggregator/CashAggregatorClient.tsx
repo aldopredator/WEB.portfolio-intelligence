@@ -171,7 +171,10 @@ export default function CashAggregatorClient() {
 
   // Extract ticker from transaction details
   const extractTicker = (details: string): string | undefined => {
-    if (!stocks.length) return undefined;
+    if (!stocks.length) {
+      console.log('⚠️ Stocks not loaded yet, cannot extract ticker');
+      return undefined;
+    }
     
     // Only process lines containing "Order Id" and NOT containing "ETF"
     if (!details.includes('Order Id') || details.toUpperCase().includes('ETF')) {
@@ -186,11 +189,13 @@ export default function CashAggregatorClient() {
     const companyNameFromTransaction = (buyMatch || sellMatch)?.[1]?.trim();
     
     if (!companyNameFromTransaction) {
+      console.log('⚠️ Could not extract company name from:', details);
       return undefined;
     }
     
     const companyNameLower = companyNameFromTransaction.toLowerCase();
-    console.log(`Extracted company name: "${companyNameFromTransaction}"`);
+    console.log(`✅ Extracted company name: "${companyNameFromTransaction}"`);
+    console.log(`📊 Searching among ${stocks.length} stocks...`);
     
     // Score each stock based on how well it matches
     const matches: Array<{ ticker: string; score: number; debug: string }> = [];
@@ -308,14 +313,19 @@ export default function CashAggregatorClient() {
       matches.sort((a, b) => b.score - a.score);
       
       // Log top 3 matches for debugging
-      console.log(`Ticker matching for: "${companyNameFromTransaction}"`);
+      console.log(`🔍 Top matches for: "${companyNameFromTransaction}"`);
       matches.slice(0, 3).forEach(m => {
-        console.log(`  ${m.ticker}: ${m.score} (${m.debug})`);
+        console.log(`  ${m.ticker}: ${m.score} points (${m.debug})`);
       });
       
       if (matches[0].score >= 15) {
+        console.log(`✅ Matched to: ${matches[0].ticker}`);
         return matches[0].ticker;
+      } else {
+        console.log(`❌ Best score (${matches[0].score}) below threshold (15)`);
       }
+    } else {
+      console.log(`❌ No matches found for: "${companyNameFromTransaction}"`);
     }
     
     return undefined;
