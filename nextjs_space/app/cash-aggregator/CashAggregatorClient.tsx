@@ -1090,9 +1090,6 @@ export default function CashAggregatorClient() {
               <thead className="bg-slate-800/50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Details
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
@@ -1119,6 +1116,9 @@ export default function CashAggregatorClient() {
                   <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Withdrawn
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    Date
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50">
@@ -1134,9 +1134,6 @@ export default function CashAggregatorClient() {
                   
                   return (
                     <tr key={index} className="hover:bg-slate-800/30 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
-                        {formattedDate}
-                      </td>
                       <td className="px-6 py-4 text-sm text-slate-300">
                         {transaction.details}
                       </td>
@@ -1175,6 +1172,9 @@ export default function CashAggregatorClient() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-red-400">
                         {transaction.withdrawn > 0 ? `(${formatCurrency(transaction.withdrawn)})` : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {formattedDate}
                       </td>
                     </tr>
                   );
