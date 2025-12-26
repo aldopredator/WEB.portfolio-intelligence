@@ -363,4 +363,8 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
       }
     }
   }
+
+  // Fallback if loop exits without returning (shouldn't happen but satisfies TypeScript)
+  console.error('[STOCK-DATA] ❌ Unexpected: while loop exited without return');
+  return {};
 }
