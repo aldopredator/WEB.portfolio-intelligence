@@ -125,6 +125,13 @@ export default function CashAggregatorClient() {
       let score = 0;
       const companyLower = stock.company.toLowerCase();
       
+      // Check if ticker symbol appears as a word boundary (e.g., "CB" for Chubb)
+      // This helps when company name in DB doesn't match transaction description
+      const tickerRegex = new RegExp(`\\b${stock.ticker}\\b`, 'i');
+      if (tickerRegex.test(details)) {
+        score += 25; // High score for exact ticker match
+      }
+      
       // Split company name into words for better matching
       const companyWords = companyLower.split(/[\s,.-]+/).filter(w => w.length > 2);
       
