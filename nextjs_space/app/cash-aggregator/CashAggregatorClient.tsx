@@ -906,64 +906,6 @@ export default function CashAggregatorClient() {
               );
             })()}
 
-            {/* 7. Grouped Revenues/Income Card */}
-            {(() => {
-              const totalRevenuesIncome = 
-                activeStatement.totals.interest + 
-                activeStatement.totals.dividend + 
-                activeStatement.totals.fundDistribution;
-              
-              if (totalRevenuesIncome === 0) return null;
-
-              return (
-                <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
-                  <button
-                    onClick={() => setExpandedRevenuesIncome(!expandedRevenuesIncome)}
-                    className="w-full"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-slate-400 text-sm flex items-center gap-2">
-                        Revenues/Income
-                        <span className="text-xs text-slate-500">
-                          {expandedRevenuesIncome ? '▼' : '▶'}
-                        </span>
-                      </span>
-                      {totalRevenuesIncome < 0 ? (
-                        <TrendingDown className="w-4 h-4 text-red-400" />
-                      ) : totalRevenuesIncome > 0 ? (
-                        <TrendingUp className="w-4 h-4 text-green-400" />
-                      ) : null}
-                    </div>
-                    <p className={`text-2xl font-bold text-right ${
-                      totalRevenuesIncome < 0 ? 'text-red-400' : totalRevenuesIncome > 0 ? 'text-green-400' : 'text-slate-400'
-                    }`}>
-                      {formatCurrency(totalRevenuesIncome)}
-                    </p>
-                  </button>
-
-                  {/* Expanded Drill-Down */}
-                  {expandedRevenuesIncome && (
-                    <div className="mt-4 pt-4 border-t border-slate-700/50 space-y-2">
-                      {[
-                        { key: 'interest', label: 'Interest', value: activeStatement.totals.interest },
-                        { key: 'dividend', label: 'Dividend', value: activeStatement.totals.dividend },
-                        { key: 'fundDistribution', label: 'Fund Distribution', value: activeStatement.totals.fundDistribution }
-                      ].map(({ key, label, value }) => (
-                        value !== 0 && (
-                          <div key={key} className="flex items-center justify-between text-sm">
-                            <span className="text-slate-500">{label}</span>
-                            <span className={value < 0 ? 'text-red-400' : 'text-green-400'}>
-                              {formatCurrency(value)}
-                            </span>
-                          </div>
-                        )
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-
             {/* 7. Other/Unclassified */}
             <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
