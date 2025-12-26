@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
         website: true,
         description: true,
         costPrice: true,
+        currency: true,
         isActive: true,
         portfolio: {
           select: {

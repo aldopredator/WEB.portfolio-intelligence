@@ -40,6 +40,7 @@ interface StockAttribution {
   currentHolding: number;
   avgCost: number;
   currentPrice: number;
+  currency?: string;
 }
 
 interface DailyReturn {
@@ -53,6 +54,7 @@ interface StockInfo {
   ticker: string;
   costPrice: number | null;
   company: string;
+  currency?: string;
 }
 
 export default function PerformanceAttributionClient() {
@@ -123,7 +125,8 @@ export default function PerformanceAttributionClient() {
             stockData[stock.ticker] = {
               ticker: stock.ticker,
               costPrice: stock.costPrice,
-              company: stock.company
+              company: stock.company,
+              currency: stock.currency
             };
           }
         });
@@ -222,7 +225,8 @@ export default function PerformanceAttributionClient() {
         fees,
         currentHolding: totalQuantity,
         avgCost,
-        currentPrice
+        currentPrice,
+        currency: stocks[ticker]?.currency
       });
     });
     
@@ -467,6 +471,7 @@ export default function PerformanceAttributionClient() {
                   <th className="text-right py-3 px-4 text-slate-300 font-semibold">Holding</th>
                   <th className="text-right py-3 px-4 text-slate-300 font-semibold">Avg Cost</th>
                   <th className="text-right py-3 px-4 text-slate-300 font-semibold">Current Price</th>
+                  <th className="text-left py-3 px-4 text-slate-300 font-semibold">CCY</th>
                   <th className="text-right py-3 px-4 text-slate-300 font-semibold">Return %</th>
                   <th className="text-right py-3 px-4 text-slate-300 font-semibold">Total Return</th>
                   <th className="text-right py-3 px-4 text-slate-300 font-semibold">Dividends</th>
@@ -478,8 +483,9 @@ export default function PerformanceAttributionClient() {
                   <tr key={index} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
                     <td className="py-3 px-4 text-white font-semibold">{attr.ticker}</td>
                     <td className="py-3 px-4 text-right text-slate-300">{attr.currentHolding.toFixed(2)}</td>
-                    <td className="py-3 px-4 text-right text-slate-300">{formatCurrency(attr.avgCost)}</td>
-                    <td className="py-3 px-4 text-right text-slate-300">{formatCurrency(attr.currentPrice)}</td>
+                    <td className="py-3 px-4 text-right text-slate-300 font-mono">{attr.avgCost.toFixed(2)}</td>
+                    <td className="py-3 px-4 text-right text-slate-300 font-mono">{attr.currentPrice.toFixed(2)}</td>
+                    <td className="py-3 px-4 text-left text-slate-400 font-mono text-sm">{attr.currency || '-'}</td>
                     <td className={`py-3 px-4 text-right font-semibold ${attr.contribution >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                       {formatPercent(attr.contribution)}
                     </td>
@@ -494,6 +500,7 @@ export default function PerformanceAttributionClient() {
               <tfoot>
                 <tr className="border-t-2 border-slate-700 font-bold">
                   <td className="py-3 px-4 text-white">TOTAL</td>
+                  <td className="py-3 px-4"></td>
                   <td className="py-3 px-4"></td>
                   <td className="py-3 px-4"></td>
                   <td className="py-3 px-4"></td>
