@@ -253,7 +253,7 @@ export default function CashAggregatorClient() {
           const domain = stock.website.replace(/^https?:\/\/(www\.)?/, '').split('/')[0].split('.')[0];
           if (domain && domain.length > 3) {
             const domainRegex = new RegExp(`\\b${escapeRegex(domain)}\\b`, 'i');
-            if (domainRegex.test(details)) {
+            if (domainRegex.test(companyNameFromTransaction)) {
               score += 20;
               debugInfo.push(`domain(${domain}):+20`);
             }
@@ -270,7 +270,7 @@ export default function CashAggregatorClient() {
         for (const word of descWords) {
           try {
             const wordRegex = new RegExp(`\\b${escapeRegex(word)}\\b`, 'i');
-            if (wordRegex.test(details)) {
+            if (wordRegex.test(companyNameFromTransaction)) {
               descMatches++;
             }
           } catch (e) {
@@ -289,7 +289,7 @@ export default function CashAggregatorClient() {
       for (const altTicker of stock.alternativeTickers) {
         try {
           const altRegex = new RegExp(`\\b${escapeRegex(altTicker)}\\b`, 'i');
-          if (altRegex.test(details)) {
+          if (altRegex.test(companyNameFromTransaction)) {
             score += 40;
             debugInfo.push(`altTicker(${altTicker}):+40`);
           }
@@ -308,21 +308,12 @@ export default function CashAggregatorClient() {
       matches.sort((a, b) => b.score - a.score);
       
       // Log top 3 matches for debugging
-      console.log(`Ticker matching for: "${details.substring(0, 80)}..."`);
+      console.log(`Ticker matching for: "${companyNameFromTransaction}"`);
       matches.slice(0, 3).forEach(m => {
         console.log(`  ${m.ticker}: ${m.score} (${m.debug})`);
       });
       
       if (matches[0].score >= 15) {
-        return matches[0].ticker;
-      }
-    }
-    
-    return undefined;
-  };
-    if (matches.length > 0) {
-      matches.sort((a, b) => b.score - a.score);
-      if (matches[0].score >= 10) {
         return matches[0].ticker;
       }
     }
