@@ -85,42 +85,7 @@ export default function CashAggregatorClient() {
     const detailsLower = details.toLowerCase();
     const amount = withdrawn > 0 ? -withdrawn : paidIn;
 
-    // FASTER Payment withdrawals
-    if (detailsLower.includes('faster payment') && withdrawn > 0) {
-      return { fasterPaymentWithdrawal: amount };
-    }
-
-    // Buy transactions
-    if (detailsLower.includes('bought') || detailsLower.includes('buy')) {
-      return { bought: amount };
-    }
-
-    // Sell transactions
-    if (detailsLower.includes('sold') || detailsLower.includes('sell')) {
-      return { sold: amount };
-    }
-
-    // Online transaction fees (VanEck, etc.)
-    if (detailsLower.includes('online transaction fee')) {
-      return { onlineTransactionFee: amount };
-    }
-
-    // International Trading Charge
-    if (detailsLower.includes('international trading charge')) {
-      return { internationalTradingCharge: amount };
-    }
-
-    // FX Charge
-    if (detailsLower.includes('fx charge')) {
-      return { fxCharge: amount };
-    }
-
-    // Customer fee
-    if (detailsLower.includes('customer fee')) {
-      return { customerFee: amount };
-    }
-
-    // Interest
+    // Interest (check first as it's common)
     if (detailsLower.includes('interest')) {
       return { interest: amount };
     }
@@ -131,8 +96,62 @@ export default function CashAggregatorClient() {
     }
 
     // Fund distribution
-    if (detailsLower.includes('fund distribution')) {
+    if (detailsLower.includes('fund distribution') || detailsLower.includes('distribution')) {
       return { fundDistribution: amount };
+    }
+
+    // FX Charge (check before trading charges)
+    if (detailsLower.includes('fx charge') || detailsLower.includes('fx fee') || 
+        detailsLower.includes('foreign exchange')) {
+      return { fxCharge: amount };
+    }
+
+    // International Trading Charge
+    if (detailsLower.includes('international trading charge') || 
+        detailsLower.includes('international charge') ||
+        detailsLower.includes('intl trading')) {
+      return { internationalTradingCharge: amount };
+    }
+
+    // Online transaction fees
+    if (detailsLower.includes('online transaction fee') || 
+        detailsLower.includes('online fee') ||
+        detailsLower.includes('transaction fee')) {
+      return { onlineTransactionFee: amount };
+    }
+
+    // Customer fee
+    if (detailsLower.includes('customer fee') || 
+        detailsLower.includes('service fee') ||
+        detailsLower.includes('account fee')) {
+      return { customerFee: amount };
+    }
+
+    // Buy transactions (check before sold to avoid matching "buy" in "Chubb")
+    if ((detailsLower.includes('bought') || 
+         (detailsLower.includes(' buy') || detailsLower.includes('buy ')) ||
+         detailsLower.includes('purchase')) &&
+        !detailsLower.includes('sell') && !detailsLower.includes('sold')) {
+      return { bought: amount };
+    }
+
+    // Sell transactions
+    if (detailsLower.includes('sold') || detailsLower.includes('sell') || detailsLower.includes('sale')) {
+      return { sold: amount };
+    }
+
+    // FASTER Payment withdrawals
+    if ((detailsLower.includes('faster payment') || 
+         detailsLower.includes('faster pmt') ||
+         detailsLower.includes('fast payment')) && withdrawn > 0) {
+      return { fasterPaymentWithdrawal: amount };
+    }
+
+    // FASTER Payment deposits (paidIn)
+    if ((detailsLower.includes('faster payment') || 
+         detailsLower.includes('faster pmt') ||
+         detailsLower.includes('fast payment')) && paidIn > 0) {
+      return { fasterPaymentWithdrawal: amount };
     }
 
     // Other/unclassified
