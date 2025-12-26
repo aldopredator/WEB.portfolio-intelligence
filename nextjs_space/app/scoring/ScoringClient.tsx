@@ -28,8 +28,12 @@ type ScoredStock = {
 
 export default function ScoringClient() {
   const { selectedPortfolio, portfolios } = usePortfolio();
-  const [selectedTheme, setSelectedTheme] = useState<ScoringTheme>(SCORING_THEMES[0]);
-  const [customWeights, setCustomWeights] = useState(SCORING_THEMES[0].factors);
+  // Default to internal-score theme
+  const internalScoreTheme = SCORING_THEMES.find(t => t.id === 'internal-score') || SCORING_THEMES[0];
+  const [selectedTheme, setSelectedTheme] = useState<ScoringTheme>(internalScoreTheme);
+  const [customWeights, setCustomWeights] = useState(internalScoreTheme.factors);
+  const [selectedPortfolioId, setSelectedPortfolioId] = useState<string | null>(null);
+  const [selectedPortfolioId2, setSelectedPortfolioId2] = useState<string | null>(null);
   const [scoredStocks, setScoredStocks] = useState<ScoredStock[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,18 +41,26 @@ export default function ScoringClient() {
   // Calculate scores whenever theme or weights change
   useEffect(() => {
     calculateScores();
-  }, [selectedTheme, customWeights, selectedPortfolio]);
+  }, [selectedTheme, customWeights, selectedPortfolioId, selectedPortfolioId2]);
   
   const calculateScores = async () => {
     setLoading(true);
     setError(null);
     
     try {
+      // Combine portfolio IDs if both are selected
+      let portfolioId = 'all';
+      if (selectedPortfolioId && selectedPortfolioId2) {
+        portfolioId = `${selectedPortfolioId},${selectedPortfolioId2}`;
+      } else if (selectedPortfolioId) {
+        portfolioId = selectedPortfolioId;
+      }
+      
       const response = await fetch('/api/scoring/calculate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          portfolioId: selectedPortfolio?.id || 'all',
+          portfolioId,
           themeFactors: selectedTheme.id === 'custom' ? customWeights : selectedTheme.factors,
         }),
       });
@@ -130,13 +142,74 @@ export default function ScoringClient() {
   const totalWeight = Object.values(customWeights).reduce((sum, w) => sum + w, 0);
   const isWeightValid = Math.abs(totalWeight - 1.0) < 0.01;
   
+  // Get portfolio names for display
+  const portfolio1Name = portfolios.find(p => p.id === selectedPortfolioId)?.name;
+  const portfolio2Name = portfolios.find(p => p.id === selectedPortfolioId2)?.name;
+
   return (
     <div className="space-y-6">
+      {/* Portfolio Filtering Toolbar */}
+      <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
+        <h2 className="text-lg font-semibold mb-4 text-white">Portfolio Filter</h2>
+        <div className="flex gap-4 items-start flex-wrap">
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Portfolio 1 (Base)
+            </label>
+            <select
+              value={selectedPortfolioId || ''}
+              onChange={(e) => setSelectedPortfolioId(e.target.value || null)}
+              className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Stocks</option>
+              {portfolios.map(portfolio => (
+                <option key={portfolio.id} value={portfolio.id}>
+                  {portfolio.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Portfolio 2 (Combine) - Optional
+            </label>
+            <select
+              value={selectedPortfolioId2 || ''}
+              onChange={(e) => setSelectedPortfolioId2(e.target.value || null)}
+              className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="">None</option>
+              {portfolios
+                .filter(p => p.id !== selectedPortfolioId)
+                .map(portfolio => (
+                  <option key={portfolio.id} value={portfolio.id}>
+                    {portfolio.name}
+                  </option>
+                ))}
+            </select>
+            {selectedPortfolioId2 && (
+              <p className="text-xs text-green-400 mt-1">
+                📊 Analyzing combined portfolios
+              </p>
+            )}
+          </div>
+        </div>
+        {selectedPortfolioId2 && portfolio1Name && portfolio2Name && (
+          <p className="text-green-400 text-sm mt-4">
+            📊 Scoring combined portfolio: <span className="font-semibold">{portfolio1Name}</span> + <span className="font-semibold">{portfolio2Name}</span>
+          </p>
+        )}
+      </div>
+
       {/* Theme Selection */}
       <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
         <h2 className="text-lg font-semibold mb-4 text-white flex items-center gap-2">
           <Calculator className="w-5 h-5 text-blue-400" />
-          Select Scoring Theme
+          Scoring Theme Preset
+          <span className="text-xs text-slate-400 font-normal ml-2">
+            Data-driven weights optimized for realized returns using statistical regression analysis
+          </span>
         </h2>
         
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
