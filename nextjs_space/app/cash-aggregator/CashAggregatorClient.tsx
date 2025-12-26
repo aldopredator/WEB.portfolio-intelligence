@@ -380,7 +380,8 @@ export default function CashAggregatorClient() {
     return new Intl.NumberFormat('en-GB', {
       style: 'currency',
       currency: 'GBP',
-      minimumFractionDigits: 2,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(value);
   };
 
@@ -515,7 +516,7 @@ export default function CashAggregatorClient() {
                     <TrendingUp className="w-4 h-4 text-green-400" />
                   ) : null}
                 </div>
-                <p className={`text-2xl font-bold ${
+                <p className={`text-2xl font-bold text-right ${
                   value < 0 ? 'text-red-400' : value > 0 ? 'text-green-400' : 'text-slate-400'
                 }`}>
                   {formatCurrency(value)}
@@ -529,7 +530,7 @@ export default function CashAggregatorClient() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-slate-400 text-sm mb-1">Net Cash Flow</p>
-                <p className={`text-3xl font-bold ${
+                <p className={`text-3xl font-bold text-right ${
                   netCashFlow < 0 ? 'text-red-400' : netCashFlow > 0 ? 'text-green-400' : 'text-white'
                 }`}>
                   {formatCurrency(netCashFlow)}
