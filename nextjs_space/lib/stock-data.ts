@@ -42,21 +42,21 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
         stockData: true,
         priceHistory: {
           orderBy: { date: 'asc' },
-          take: 60, // Balanced: enough for 2-3 months chart
+          take: 30,
         },
         analystRecommendations: true,
         socialSentiments: true,
         news: {
           orderBy: { publishedAt: 'desc' },
-          take: 3, // Balanced: show recent news without overloading
+          take: 2,
         },
         metrics: {
           orderBy: { snapshotDate: 'desc' },
-          take: 1, // Get the latest snapshot
+          take: 1,
         },
         earningsSurprises: {
           orderBy: { period: 'desc' },
-          take: 8, // Last 8 quarters (2 years)
+          take: 8,
         },
       },
     });
