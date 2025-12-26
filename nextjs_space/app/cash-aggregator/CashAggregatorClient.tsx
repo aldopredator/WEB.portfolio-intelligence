@@ -1155,7 +1155,7 @@ export default function CashAggregatorClient() {
                         {transaction.quantity ? transaction.quantity.toLocaleString() : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-slate-300 font-mono">
-                        {transaction.transactionPrice ? transaction.transactionPrice.toFixed(4) : '-'}
+                        {transaction.transactionPrice ? transaction.transactionPrice.toFixed(2) : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400 font-mono">
                         {transaction.ccy || '-'}
