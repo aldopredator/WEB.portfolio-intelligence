@@ -1095,10 +1095,10 @@ export default function CashAggregatorClient() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Ticker
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Direction
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Quantity
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
@@ -1140,7 +1140,7 @@ export default function CashAggregatorClient() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-400 font-mono">
                         {transaction.ticker || '-'}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                      <td className="px-3 py-4 whitespace-nowrap text-sm text-slate-300">
                         {transaction.direction ? (
                           <span className={`px-2 py-1 rounded text-xs font-medium ${
                             transaction.direction === 'Buy' 
@@ -1151,7 +1151,7 @@ export default function CashAggregatorClient() {
                           </span>
                         ) : '-'}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-slate-300 font-mono">
+                      <td className="px-3 py-4 whitespace-nowrap text-sm text-right text-slate-300 font-mono">
                         {transaction.quantity ? transaction.quantity.toLocaleString() : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-slate-300 font-mono">
