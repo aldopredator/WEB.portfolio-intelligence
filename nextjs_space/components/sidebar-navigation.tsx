@@ -18,7 +18,8 @@ import {
   Globe,
   Building2,
   FileSpreadsheet,
-  Link2
+  Link2,
+  Calculator
 } from 'lucide-react';
 import { usePortfolio } from '@/lib/portfolio-context';
 import {
@@ -51,6 +52,7 @@ export function SidebarNavigation() {
     { name: 'Industries', href: '/industries', icon: Building2, description: 'Industry matrix visualization' },
     { name: 'Countries', href: '/countries', icon: Globe, description: 'Country matrix visualization' },
     { name: 'Variance Matrix', href: '/variance', icon: Grid3x3, description: 'Variance-covariance matrix' },
+    { name: 'Internal Scoring', href: '/internal-scoring', icon: Calculator, description: 'Multi-factor quantitative model' },
   ];
 
   const SidebarContent = () => (
