@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { clearCache } from '@/lib/cache';
 import { clearPolygonCache } from '@/lib/polygon-cache';
 
+export const dynamic = 'force-dynamic';
+
 function unauthorized() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 }
