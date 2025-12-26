@@ -58,6 +58,9 @@ export default function CashAggregatorClient() {
     website?: string;
     description?: string;
   }>>([]);
+  const [filterType, setFilterType] = useState<string>('all');
+  const [filterTicker, setFilterTicker] = useState<string>('all');
+  const [filterDirection, setFilterDirection] = useState<string>('all');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch stocks for ticker matching
@@ -1172,10 +1175,86 @@ export default function CashAggregatorClient() {
       )}
 
       {/* Transactions Table */}
-      {activeStatement && (
+      {activeStatement && (() => {
+        // Get unique values for filters
+        const uniqueTypes = Array.from(new Set(activeStatement.transactions.map(t => t.type))).sort();
+        const uniqueTickers = Array.from(new Set(activeStatement.transactions.map(t => t.ticker).filter(Boolean))).sort();
+        const uniqueDirections = Array.from(new Set(activeStatement.transactions.map(t => t.direction).filter(Boolean))).sort();
+
+        // Apply filters
+        const filteredTransactions = activeStatement.transactions.filter(transaction => {
+          if (filterType !== 'all' && transaction.type !== filterType) return false;
+          if (filterTicker !== 'all' && transaction.ticker !== filterTicker) return false;
+          if (filterDirection !== 'all' && transaction.direction !== filterDirection) return false;
+          return true;
+        });
+
+        return (
         <div className="bg-slate-900/50 border border-slate-800/50 rounded-xl overflow-hidden">
           <div className="p-6 border-b border-slate-800/50">
-            <h2 className="text-xl font-bold text-white">Transaction Details</h2>
+            <h2 className="text-xl font-bold text-white mb-4">Transaction Details</h2>
+            
+            {/* Filters */}
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-slate-400">Type:</label>
+                <select
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">All</option>
+                  {uniqueTypes.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-slate-400">Ticker:</label>
+                <select
+                  value={filterTicker}
+                  onChange={(e) => setFilterTicker(e.target.value)}
+                  className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">All</option>
+                  {uniqueTickers.map(ticker => (
+                    <option key={ticker} value={ticker}>{ticker}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-slate-400">Direction:</label>
+                <select
+                  value={filterDirection}
+                  onChange={(e) => setFilterDirection(e.target.value)}
+                  className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">All</option>
+                  {uniqueDirections.map(direction => (
+                    <option key={direction} value={direction}>{direction}</option>
+                  ))}
+                </select>
+              </div>
+
+              {(filterType !== 'all' || filterTicker !== 'all' || filterDirection !== 'all') && (
+                <button
+                  onClick={() => {
+                    setFilterType('all');
+                    setFilterTicker('all');
+                    setFilterDirection('all');
+                  }}
+                  className="px-3 py-1.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-sm hover:bg-red-500/30 transition-colors"
+                >
+                  Clear Filters
+                </button>
+              )}
+
+              <span className="text-sm text-slate-500">
+                Showing {filteredTransactions.length} of {activeStatement.transactions.length} transactions
+              </span>
+            </div>
           </div>
           
           <div className="overflow-x-auto">
@@ -1218,7 +1297,7 @@ export default function CashAggregatorClient() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50">
-                {activeStatement.transactions.map((transaction, index) => {
+                {filteredTransactions.map((transaction, index) => {
                   const categorized = categorizeTransaction(transaction.details, transaction.withdrawn, transaction.paidIn);
                   const isUnclassified = 'other' in categorized;
                   
@@ -1289,7 +1368,8 @@ export default function CashAggregatorClient() {
             </table>
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {/* Empty State */}
       {statements.length === 0 && (
