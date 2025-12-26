@@ -50,10 +50,6 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
           orderBy: { snapshotDate: 'desc' },
           take: 1,
         },
-        earningsSurprises: {
-          orderBy: { period: 'desc' },
-          take: 8,
-        },
       },
     });
 
