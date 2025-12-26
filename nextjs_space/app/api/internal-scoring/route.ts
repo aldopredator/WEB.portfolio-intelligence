@@ -9,6 +9,8 @@ export async function POST(request: NextRequest) {
   try {
     const { portfolioId, weights } = await request.json();
 
+    console.log('Internal Scoring API called with:', { portfolioId, weights });
+
     // Fetch stocks with their latest metrics
     const stocks = await prisma.stock.findMany({
       where: portfolioId && portfolioId !== 'all' ? { portfolioId } : {},
@@ -23,13 +25,14 @@ export async function POST(request: NextRequest) {
           orderBy: { snapshotDate: 'desc' },
           take: 1,
         },
-        stockData: true,
         priceHistory: {
           orderBy: { date: 'desc' },
           take: 60, // Get last 60 days for volatility calculation
         },
       },
     });
+
+    console.log(`Found ${stocks.length} stocks for scoring`);
 
     // Calculate returns and volatility from price history
     const stocksWithCalculatedMetrics = stocks.map(stock => {
