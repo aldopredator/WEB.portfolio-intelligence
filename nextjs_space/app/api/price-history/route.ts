@@ -32,11 +32,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch price history for the stock
+    // Fetch price history for the stock (last 90 days)
     const priceHistory = await prisma.priceHistory.findMany({
       where: { stockId: stock.id },
       orderBy: { date: 'desc' },
-      take: 30,
+      take: 90,
       select: {
         date: true,
         price: true,
@@ -46,7 +46,18 @@ export async function GET(request: NextRequest) {
 
     await prisma.$disconnect();
 
-    return NextResponse.json(priceHistory);
+    // Format response to include 'close' field (alias for 'price')
+    const formattedHistory = priceHistory.map(ph => ({
+      date: ph.date,
+      close: ph.price,
+      price: ph.price,
+      volume: ph.volume,
+    }));
+
+    return NextResponse.json({
+      success: true,
+      priceHistory: formattedHistory
+    });
   } catch (error: any) {
     console.error('[Price History API] Error:', error);
     await prisma.$disconnect();
