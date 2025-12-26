@@ -67,7 +67,7 @@ export default function InternalScoringPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          portfolioId: selectedPortfolio || 'all',
+          portfolioId: selectedPortfolio?.id || 'all',
           weights,
         }),
       });
@@ -75,6 +75,8 @@ export default function InternalScoringPage() {
       const data = await response.json();
       if (data.success) {
         setScoredStocks(data.stocks);
+      } else {
+        console.error('Scoring API error:', data.error);
       }
     } catch (error) {
       console.error('Failed to calculate scores:', error);
