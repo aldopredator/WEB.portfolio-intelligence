@@ -178,7 +178,19 @@ export default function CashAggregatorClient() {
       return undefined;
     }
     
-    const detailsLower = details.toLowerCase();
+    // Extract company name between "Bought/Sold [quantity]" and "@"
+    // Pattern: "Bought 25 Petroleo Brasileiro SA-Petrobras Class A @ USD..."
+    // We want: "Petroleo Brasileiro SA-Petrobras Class A"
+    const buyMatch = details.match(/Bought\s+\d+(?:\.\d+)?\s+([^@]+?)\s+@/i);
+    const sellMatch = details.match(/Sold\s+\d+(?:\.\d+)?\s+([^@]+?)\s+@/i);
+    const companyNameFromTransaction = (buyMatch || sellMatch)?.[1]?.trim();
+    
+    if (!companyNameFromTransaction) {
+      return undefined;
+    }
+    
+    const companyNameLower = companyNameFromTransaction.toLowerCase();
+    console.log(`Extracted company name: "${companyNameFromTransaction}"`);
     
     // Score each stock based on how well it matches
     const matches: Array<{ ticker: string; score: number; debug: string }> = [];
@@ -188,11 +200,11 @@ export default function CashAggregatorClient() {
       let debugInfo: string[] = [];
       const companyLower = stock.company.toLowerCase();
       
-      // Check if ticker symbol appears as a word boundary (e.g., "CB" for Chubb, "PBR" for Petrobras)
+      // Check if ticker symbol appears in the extracted company name
       try {
         const tickerRegex = new RegExp(`\\b${escapeRegex(stock.ticker)}\\b`, 'i');
-        if (tickerRegex.test(details)) {
-          score += 50; // Very high score for exact ticker match (increased from 25)
+        if (tickerRegex.test(companyNameFromTransaction)) {
+          score += 50;
           debugInfo.push(`ticker:+50`);
         }
       } catch (e) {
@@ -200,18 +212,18 @@ export default function CashAggregatorClient() {
       }
       
       // Split company name into significant words (ignore common words)
-      const commonWords = ['ltd', 'inc', 'corp', 'corporation', 'company', 'group', 'plc', 'llc', 'the', 'and', 'class'];
+      const commonWords = ['ltd', 'inc', 'corp', 'corporation', 'company', 'group', 'plc', 'llc', 'the', 'and', 'class', 'common', 'shares'];
       const companyWords = companyLower.split(/[\s,.-]+/).filter(w => w.length > 3 && !commonWords.includes(w));
       
       let matchedWords = 0;
-      // Check each word of company name
+      // Check each word of company name against extracted company name
       for (const word of companyWords) {
-        if (detailsLower.includes(word)) {
+        if (companyNameLower.includes(word)) {
           matchedWords++;
           // Exact word match gets higher score
           try {
             const wordRegex = new RegExp(`\\b${escapeRegex(word)}\\b`, 'i');
-            if (wordRegex.test(details)) {
+            if (wordRegex.test(companyNameFromTransaction)) {
               // Longer words get more points (more specific)
               const wordScore = Math.min(word.length * 2, 20);
               score += wordScore;
