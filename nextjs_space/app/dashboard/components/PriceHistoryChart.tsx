@@ -60,6 +60,9 @@ export default function PriceHistoryChart({
   const [availableTickers, setAvailableTickers] = useState<Array<{ ticker: string; company: string; portfolioName: string }>>([]);
   const [benchmarkData, setBenchmarkData] = useState<Array<{ date: string; price: number }>>([]);
   const [isLoadingBenchmark, setIsLoadingBenchmark] = useState(false);
+  const [timeRange, setTimeRange] = useState<'30d' | '90d'>('30d');
+  const [fullPriceHistory, setFullPriceHistory] = useState<Array<{ date: string; price: number }>>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   // Calculate 30-day return
   const calculate30DayReturn = (): number | null => {
@@ -377,8 +380,36 @@ export default function PriceHistoryChart({
     fetchTickers();
   }, [ticker]);
 
+  // Fetch full price history when switching to 90d
+  useEffect(() => {
+    if (timeRange === '90d' && fullPriceHistory.length === 0) {
+      const fetchFullHistory = async () => {
+        setIsLoadingHistory(true);
+        try {
+          const response = await fetch(`/api/stock-prices?ticker=${ticker}`);
+          if (response.ok) {
+            const result = await response.json();
+            if (result.success && result.priceHistory) {
+              // Take last 90 days
+              const last90 = result.priceHistory.slice(-90);
+              setFullPriceHistory(last90);
+            }
+          }
+        } catch (error) {
+          console.error('[PriceHistoryChart] Error fetching 90d data:', error);
+        } finally {
+          setIsLoadingHistory(false);
+        }
+      };
+      fetchFullHistory();
+    }
+  }, [timeRange, ticker, fullPriceHistory.length]);
+
+  // Use filtered data based on time range
+  const displayData = timeRange === '90d' && fullPriceHistory.length > 0 ? fullPriceHistory : data;
+
   // Normalize data format (support both lowercase and uppercase field names)
-  const normalizedData = data.map(d => ({
+  const normalizedData = displayData.map(d => ({
     date: 'date' in d ? d.date : d.Date,
     price: 'price' in d ? d.price : d.Close,
   }));
@@ -627,14 +658,44 @@ export default function PriceHistoryChart({
           </Stack>
         </Stack>
 
-        {/* Compare to Another Ticker Dropdown - Inside Chart */}
-        <Stack 
+        {/* Time Range Selector */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="center"
+          spacing={1}
+          sx={{ mt: 2, mb: 1 }}
+        >
+          <Chip
+            label="30 Days"
+            onClick={() => setTimeRange('30d')}
+            color={timeRange === '30d' ? 'primary' : 'default'}
+            variant={timeRange === '30d' ? 'filled' : 'outlined'}
+            sx={{ fontWeight: 600, cursor: 'pointer' }}
+          />
+          <Chip
+            label="90 Days"
+            onClick={() => setTimeRange('90d')}
+            color={timeRange === '90d' ? 'primary' : 'default'}
+            variant={timeRange === '90d' ? 'filled' : 'outlined'}
+            sx={{ fontWeight: 600, cursor: 'pointer' }}
+            disabled={isLoadingHistory}
+          />
+          {isLoadingHistory && (
+            <Typography variant="caption" sx={{ color: 'warning.main' }}>
+              Loading...
+            </Typography>
+          )}
+        </Stack>
+
+        {/* Comparison Dropdown */}
+        <Stack
           direction="row" 
           alignItems="center" 
           justifyContent="center"
           spacing={2} 
           sx={{ 
-            mt: 3, 
+            mt: 2, 
             mb: 2,
             p: 2,
             backgroundColor: 'action.hover',

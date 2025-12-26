@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
       themeFactors: ScoringTheme['factors'];
     };
     
-    // Fetch stocks with metrics and price history
+    // Fetch stocks with metrics only (no price history to reduce payload size)
     const stocks = await prisma.stock.findMany({
       where: portfolioId && portfolioId !== 'all' ? { portfolioId } : { isActive: true },
       select: {
@@ -155,16 +155,6 @@ export async function POST(request: NextRequest) {
             week52High: true,
             week52Low: true,
           },
-        },
-        priceHistory: {
-          select: {
-            date: true,
-            price: true,
-          },
-          orderBy: {
-            date: 'desc',
-          },
-          take: 30, // Last 30 days for momentum calculations
         },
         metrics: {
           select: {
@@ -192,13 +182,16 @@ export async function POST(request: NextRequest) {
       },
     });
     
-    // Calculate returns and enrich data
+    // Enrich data (no price history, so returns will be null)
     const enrichedStocks = stocks.map(stock => {
-      const calculated = calculateReturns(stock.priceHistory);
       return {
         ...stock,
         latestMetrics: stock.metrics[0] || null,
-        calculated,
+        calculated: {
+          return30d: null,
+          return60d: null,
+          volatility30d: null,
+        },
       };
     });
     
