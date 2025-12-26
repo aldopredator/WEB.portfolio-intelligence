@@ -499,6 +499,37 @@ export default function CashAggregatorClient() {
             </button>
           </div>
 
+          {/* FASTER Payment Withdrawal - Highlighted Card with Visual Bar */}
+          {activeStatement.totals.fasterPaymentWithdrawal > 0 && (
+            <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-lg p-6 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-green-400 text-sm font-medium mb-1">💰 FASTER Payment Withdrawal</p>
+                  <p className="text-4xl font-bold text-green-400">
+                    {formatCurrency(activeStatement.totals.fasterPaymentWithdrawal)}
+                  </p>
+                </div>
+                <TrendingUp className="w-10 h-10 text-green-400" />
+              </div>
+              
+              {/* Visual Progress Bar */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-slate-400">
+                  <span>Cash In</span>
+                  <span>{Math.round((activeStatement.totals.fasterPaymentWithdrawal / Math.abs(netCashFlow || 1)) * 100)}% of net flow</span>
+                </div>
+                <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full transition-all duration-500"
+                    style={{ 
+                      width: `${Math.min(100, (activeStatement.totals.fasterPaymentWithdrawal / (activeStatement.totals.fasterPaymentWithdrawal + Math.abs(activeStatement.totals.bought || 0) + Math.abs(activeStatement.totals.sold || 0))) * 100)}%` 
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Category Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             {Object.entries(activeStatement.totals).map(([key, value]) => (
