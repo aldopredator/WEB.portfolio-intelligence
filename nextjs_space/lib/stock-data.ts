@@ -7,9 +7,7 @@ import { fetchFinnhubMetrics, fetchBalanceSheet, fetchCompanyProfile, fetchEarni
 import { fetchPolygonStockStats } from '@/lib/polygon';
 import { getPolygonCached, setPolygonCached, getNextTickerToFetch } from '@/lib/polygon-cache';
 import { isRecord } from '@/lib/utils';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // Dynamic STOCK_CONFIG - will be loaded from database
 export let STOCK_CONFIG: Array<{ ticker: string; name: string; sector: string }> = [];
