@@ -708,7 +708,7 @@ export default function CashAggregatorClient() {
 
           {/* Category Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            {/* Money Top-up (always first) */}
+            {/* 1. Money Top-up */}
             {activeStatement.totals.fasterPaymentWithdrawal !== 0 && (
               <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
@@ -728,7 +728,65 @@ export default function CashAggregatorClient() {
               </div>
             )}
 
-            {/* Money Withdrawal (right after Top-up) */}
+            {/* 2. Bought (Securities) */}
+            {activeStatement.totals.bought !== 0 && (
+              <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-slate-400 text-sm">Bought (Securities)</span>
+                  {activeStatement.totals.bought < 0 ? (
+                    <TrendingDown className="w-4 h-4 text-red-400" />
+                  ) : activeStatement.totals.bought > 0 ? (
+                    <TrendingUp className="w-4 h-4 text-green-400" />
+                  ) : null}
+                </div>
+                <p className={`text-2xl font-bold text-right ${
+                  activeStatement.totals.bought < 0 ? 'text-red-400' : 
+                  activeStatement.totals.bought > 0 ? 'text-green-400' : 'text-slate-400'
+                }`}>
+                  {formatCurrency(activeStatement.totals.bought)}
+                </p>
+              </div>
+            )}
+
+            {/* 3. Other/Unclassified */}
+            <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-slate-400 text-sm">Other/Unclassified</span>
+                {activeStatement.totals.other < 0 ? (
+                  <TrendingDown className="w-4 h-4 text-red-400" />
+                ) : activeStatement.totals.other > 0 ? (
+                  <TrendingUp className="w-4 h-4 text-green-400" />
+                ) : null}
+              </div>
+              <p className={`text-2xl font-bold text-right ${
+                activeStatement.totals.other < 0 ? 'text-red-400' : 
+                activeStatement.totals.other > 0 ? 'text-green-400' : 'text-slate-400'
+              }`}>
+                {formatCurrency(activeStatement.totals.other)}
+              </p>
+            </div>
+
+            {/* 4. Sold (Securities) */}
+            {activeStatement.totals.sold !== 0 && (
+              <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-slate-400 text-sm">Sold (Securities)</span>
+                  {activeStatement.totals.sold < 0 ? (
+                    <TrendingDown className="w-4 h-4 text-red-400" />
+                  ) : activeStatement.totals.sold > 0 ? (
+                    <TrendingUp className="w-4 h-4 text-green-400" />
+                  ) : null}
+                </div>
+                <p className={`text-2xl font-bold text-right ${
+                  activeStatement.totals.sold < 0 ? 'text-red-400' : 
+                  activeStatement.totals.sold > 0 ? 'text-green-400' : 'text-slate-400'
+                }`}>
+                  {formatCurrency(activeStatement.totals.sold)}
+                </p>
+              </div>
+            )}
+
+            {/* 5. Money Withdrawal */}
             {activeStatement.totals.moneyWithdrawal !== 0 && (
               <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
@@ -748,40 +806,7 @@ export default function CashAggregatorClient() {
               </div>
             )}
 
-            {/* Other categories (excluding grouped ones) */}
-            {Object.entries(activeStatement.totals).map(([key, value]) => {
-              // Skip categories that are shown separately or grouped
-              if (['fasterPaymentWithdrawal', 'moneyWithdrawal', 'onlineTransactionFee', 
-                   'internationalTradingCharge', 'fxCharge', 'customerFee', 
-                   'interest', 'dividend', 'fundDistribution'].includes(key)) {
-                return null;
-              }
-
-              return (
-                <div
-                  key={key}
-                  className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-slate-400 text-sm">
-                      {getCategoryLabel(key)}
-                    </span>
-                    {value < 0 ? (
-                      <TrendingDown className="w-4 h-4 text-red-400" />
-                    ) : value > 0 ? (
-                      <TrendingUp className="w-4 h-4 text-green-400" />
-                    ) : null}
-                  </div>
-                  <p className={`text-2xl font-bold text-right ${
-                    value < 0 ? 'text-red-400' : value > 0 ? 'text-green-400' : 'text-slate-400'
-                  }`}>
-                    {formatCurrency(value)}
-                  </p>
-                </div>
-              );
-            })}
-
-            {/* Grouped Charges/Fees Card */}
+            {/* 6. Grouped Charges/Fees Card */}
             {(() => {
               const totalChargesFees = 
                 activeStatement.totals.onlineTransactionFee + 
@@ -841,7 +866,7 @@ export default function CashAggregatorClient() {
               );
             })()}
 
-            {/* Grouped Revenues/Income Card */}
+            {/* 7. Grouped Revenues/Income Card */}
             {(() => {
               const totalRevenuesIncome = 
                 activeStatement.totals.interest + 
