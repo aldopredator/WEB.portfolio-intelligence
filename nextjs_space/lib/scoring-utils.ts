@@ -154,7 +154,7 @@ export function calculateComponentScores(
   stockMetrics: ScoringMetrics
 ): ComponentScores {
   // Extract arrays for each metric
-  const peValues = allMetrics.map(m => m.forwardPe || m.pe || m.trailingPe || NaN);
+  const peValues = allMetrics.map(m => m.forwardPe || m.pe || NaN);
   const pbValues = allMetrics.map(m => m.pb || NaN);
   const psValues = allMetrics.map(m => m.ps || NaN);
   
