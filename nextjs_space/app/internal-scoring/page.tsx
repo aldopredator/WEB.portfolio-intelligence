@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { usePortfolio } from '@/lib/portfolio-context';
-import PageHeader from '@/components/page-header';
+import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';

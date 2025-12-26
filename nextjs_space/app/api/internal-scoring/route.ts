@@ -88,7 +88,6 @@ export async function POST(request: NextRequest) {
       return {
         pe: latestMetrics?.peRatio || undefined,
         forwardPe: latestMetrics?.forwardPE || undefined,
-        trailingPe: latestMetrics?.trailingPE || undefined,
         pb: latestMetrics?.pbRatio || undefined,
         ps: latestMetrics?.psRatio || undefined,
         evToRevenue: latestMetrics?.enterpriseValueRevenue || undefined,

@@ -124,7 +124,6 @@ export interface ScoringMetrics {
   // Value metrics (lower is better for most)
   pe?: number;
   forwardPe?: number;
-  trailingPe?: number;
   pb?: number;
   ps?: number;
   evToRevenue?: number;
