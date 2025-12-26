@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { usePortfolio } from '@/lib/portfolio-context';
 import PageHeader from '@/components/page-header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
-import { Slider } from '@/app/components/ui/slider';
-import { Button } from '@/app/components/ui/button';
-import { Label } from '@/app/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { THEME_PRESETS, type ThemePreset, type FactorWeights } from '@/lib/scoring-utils';
 import { Download, RefreshCw, TrendingUp, TrendingDown } from 'lucide-react';
 import * as XLSX from 'xlsx';
