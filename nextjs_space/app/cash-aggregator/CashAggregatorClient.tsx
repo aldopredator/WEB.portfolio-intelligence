@@ -8,6 +8,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 interface TransactionRow {
   date: string;
   details: string;
+  type: string;
   account: string;
   paidIn: number;
   withdrawn: number;
@@ -114,6 +115,38 @@ export default function CashAggregatorClient() {
   }, [activeStatementId, isLoaded]);
 
   const activeStatement = statements.find(s => s.id === activeStatementId);
+
+  // Get transaction type for display
+  const getTransactionType = (details: string): string => {
+    const detailsLower = details.toLowerCase();
+    
+    // Income
+    if (detailsLower.includes('dividend') || detailsLower.includes('interest') || 
+        detailsLower.includes('fund distribution') || detailsLower.includes('distribution')) {
+      return 'Income';
+    }
+    
+    // Securities (Buy/Sell)
+    if (detailsLower.includes('bought') || detailsLower.includes('sold') ||
+        detailsLower.includes(' buy') || detailsLower.includes('buy ') ||
+        detailsLower.includes('sell') || detailsLower.includes('purchase') || detailsLower.includes('sale')) {
+      return 'Securities';
+    }
+    
+    // Fees
+    if (detailsLower.includes('fee') || detailsLower.includes('charge') ||
+        detailsLower.includes('fx charge') || detailsLower.includes('customer fee')) {
+      return 'Fees';
+    }
+    
+    // Cash Transfer
+    if (detailsLower.includes('faster payment') || detailsLower.includes('faster pmt') ||
+        detailsLower.includes('fast payment') || detailsLower.includes('transfer')) {
+      return 'Cash Transfer';
+    }
+    
+    return 'Other';
+  };
 
   // Helper function to escape regex special characters
   const escapeRegex = (str: string): string => {
@@ -472,6 +505,7 @@ export default function CashAggregatorClient() {
             const transaction: TransactionRow = {
               date: String(dateValue),
               details: detailsStr,
+              type: getTransactionType(detailsStr),
               account: accountIndex !== -1 ? String(row[accountIndex] || '') : '',
               paidIn: paidInIndex !== -1 ? parseMoney(row[paidInIndex]) : 0,
               withdrawn: withdrawnIndex !== -1 ? parseMoney(row[withdrawnIndex]) : 0,
@@ -1160,6 +1194,9 @@ export default function CashAggregatorClient() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Details
                   </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    Type
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Ticker
                   </th>
@@ -1204,6 +1241,17 @@ export default function CashAggregatorClient() {
                     <tr key={index} className="hover:bg-slate-800/30 transition-colors">
                       <td className="px-6 py-4 text-sm text-slate-300">
                         {transaction.details}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          transaction.type === 'Income' ? 'text-green-400 bg-green-400/10' :
+                          transaction.type === 'Securities' ? 'text-blue-400 bg-blue-400/10' :
+                          transaction.type === 'Fees' ? 'text-red-400 bg-red-400/10' :
+                          transaction.type === 'Cash Transfer' ? 'text-purple-400 bg-purple-400/10' :
+                          'text-slate-400 bg-slate-400/10'
+                        }`}>
+                          {transaction.type}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-400 font-mono">
                         {transaction.ticker || '-'}
