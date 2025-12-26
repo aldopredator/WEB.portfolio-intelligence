@@ -408,6 +408,37 @@ export default function CashAggregatorClient() {
     ? Object.entries(activeStatement.totals).reduce((sum, [_, value]) => sum + value, 0)
     : 0;
 
+  // Helper function to parse Excel date strings
+  const parseExcelDate = (dateStr: string): Date => {
+    // Excel dates might come as:
+    // 1. DD/MM/YYYY format (e.g., "25/12/2024")
+    // 2. Excel serial number (e.g., 45291)
+    // 3. ISO format (e.g., "2024-12-25")
+    
+    // Try parsing as Excel serial number first
+    const asNumber = Number(dateStr);
+    if (!isNaN(asNumber) && asNumber > 1000) {
+      // Excel serial date (days since 1900-01-01, with 1900-01-01 being 1)
+      const excelEpoch = new Date(1899, 11, 30); // Excel's epoch is actually Dec 30, 1899
+      const date = new Date(excelEpoch.getTime() + asNumber * 24 * 60 * 60 * 1000);
+      return date;
+    }
+    
+    // Try parsing DD/MM/YYYY format
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+      const year = parseInt(parts[2], 10);
+      if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+        return new Date(year, month, day);
+      }
+    }
+    
+    // Fallback to default Date parsing
+    return new Date(dateStr);
+  };
+
   // Combine data for both charts with aligned dates
   const combinedChartData = useMemo(() => {
     if (!activeStatement) return [];
@@ -416,7 +447,7 @@ export default function CashAggregatorClient() {
     const allDates = new Set<string>();
     activeStatement.transactions.forEach(t => allDates.add(t.date));
     const sortedDates = Array.from(allDates).sort((a, b) => 
-      new Date(a).getTime() - new Date(b).getTime()
+      parseExcelDate(a).getTime() - parseExcelDate(b).getTime()
     );
 
     // Calculate cumulative values for each category
@@ -444,13 +475,16 @@ export default function CashAggregatorClient() {
     });
 
     // Convert to array format for chart
-    return Array.from(dateMap.entries()).map(([date, values]) => ({
-      date,
-      dateObj: new Date(date),
-      label: new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
-      fasterPayment: values.fasterPayment,
-      bought: values.bought
-    }));
+    return Array.from(dateMap.entries()).map(([date, values]) => {
+      const dateObj = parseExcelDate(date);
+      return {
+        date,
+        dateObj,
+        label: dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+        fasterPayment: values.fasterPayment,
+        bought: values.bought
+      };
+    });
   }, [activeStatement]);
 
   // Filter combined chart data by period
