@@ -57,14 +57,10 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
       },
     });
 
-    const queryTime = Date.now() - queryStartTime;
-    console.log(`[STOCK-DATA] ✅ Query completed in ${queryTime}ms - Found ${stocks.length} active stocks`);
-    console.log(`[STOCK-DATA] 📊 Sample stock relations:`, {
-      ticker: stocks[0]?.ticker,
-      hasStockData: !!stocks[0]?.stockData,
-      hasPriceHistory: stocks[0]?.priceHistory?.length || 0,
-      hasMetrics: stocks[0]?.metrics?.length || 0,
-    });
+    console.log(`[STOCK-DATA] ✅ Found ${stocks.length} active stocks in database`);
+    if (stocks.length > 0) {
+      console.log(`[STOCK-DATA] 📋 Tickers: ${stocks.map((s: any) => s.ticker).join(', ')}`);
+    }
 
     // Update STOCK_CONFIG dynamically
     STOCK_CONFIG = stocks.map((stock: any) => ({
