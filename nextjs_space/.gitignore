@@ -39,3 +39,6 @@ next-env.d.ts
 # Logs
 *.log
 /logs
+
+# Internal Score History (daily snapshots kept locally)
+.internal-score-history/

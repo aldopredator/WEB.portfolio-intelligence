@@ -1,0 +1,91 @@
+name: Internal Score Daily Update
+
+on:
+  schedule:
+    # Run daily at 2:00 AM UTC (adjust timezone as needed)
+    - cron: '0 2 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  update-internal-score:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+          cache-dependency-path: nextjs_space/yarn.lock
+      
+      - name: Install dependencies
+        working-directory: ./nextjs_space
+        run: yarn install --frozen-lockfile
+      
+      - name: Generate Prisma Client
+        working-directory: ./nextjs_space
+        run: npx prisma generate
+        env:
+          PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL: ${{ secrets.PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL }}
+      
+      - name: Run Internal Score Analysis
+        working-directory: ./nextjs_space
+        run: npx tsx --require dotenv/config scripts/calculate-internal-score.ts
+        env:
+          PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL: ${{ secrets.PORTFOLIO_INTELLIGENCE_PRISMA_DATABASE_URL }}
+          POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+      
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # Add analysis results
+          git add nextjs_space/internal-score-analysis.json
+          git add nextjs_space/.internal-score-history/
+          
+          # Check if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: update internal score analysis [automated]"
+            git push
+          fi
+      
+      - name: Create summary
+        if: always()
+        run: |
+          echo "## Internal Score Analysis Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "nextjs_space/internal-score-analysis.json" ]; then
+            echo "✅ Analysis completed successfully" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            # Extract and display factor weights
+            echo "### Factor Weights (90-day returns)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            # Use jq to parse and format the results
+            if command -v jq &> /dev/null; then
+              jq -r '.return90d.ridgeRegression.factors | to_entries | .[] | "- **\(.key | ascii_upcase)**: \(.value * 100 | . * 10 | round / 10)%"' nextjs_space/internal-score-analysis.json >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "❌ Analysis failed - no output file generated" >> $GITHUB_STEP_SUMMARY
+          fi
+      
+      - name: Upload analysis artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: internal-score-analysis
+          path: |
+            nextjs_space/internal-score-analysis.json
+            nextjs_space/.internal-score-history/
+          retention-days: 90

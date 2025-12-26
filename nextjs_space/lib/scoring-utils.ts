@@ -1,6 +1,6 @@
 // Scoring utilities for multi-factor quantitative analysis
 
-export type ThemePreset = 'stability' | 'growth' | 'value' | 'quality' | 'momentum' | 'all-weather' | 'custom';
+export type ThemePreset = 'stability' | 'growth' | 'value' | 'quality' | 'momentum' | 'all-weather' | 'internal-score' | 'custom';
 
 export interface FactorWeights {
   value: number;
@@ -82,6 +82,17 @@ export const THEME_PRESETS: Record<ThemePreset, ThemeDefinition> = {
       growth: 0.20,
       momentum: 0.20,
       risk: 0.20,
+    },
+  },
+  'internal-score': {
+    name: 'Internal Score',
+    description: 'Data-driven weights optimized for realized returns using statistical regression analysis',
+    weights: {
+      value: 0.200,
+      quality: 0.339,
+      growth: 0.246,
+      momentum: 0.005,
+      risk: 0.210,
     },
   },
   'custom': {

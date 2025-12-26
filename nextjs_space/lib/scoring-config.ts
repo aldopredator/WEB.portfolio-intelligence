@@ -156,6 +156,19 @@ export const SCORING_THEMES: ScoringTheme[] = [
       risk: 0.20,
     },
   },
+  {
+    id: 'internal-score',
+    name: 'Internal Score',
+    description: 'Data-driven weights optimized for realized returns using Ridge Regression',
+    emoji: '🎯',
+    factors: {
+      value: 0.200,
+      quality: 0.339,
+      growth: 0.246,
+      momentum: 0.005,
+      risk: 0.210,
+    },
+  },
 ];
 
 // Helper function to get theme by ID

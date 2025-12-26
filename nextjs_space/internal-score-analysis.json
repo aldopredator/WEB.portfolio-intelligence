@@ -1,0 +1,159 @@
+{
+  "generatedAt": "2025-12-26T10:28:18.391Z",
+  "generatedDate": "2025-12-26",
+  "dataPoints": 406,
+  "return30d": {
+    "samples": 226,
+    "features": 16,
+    "linearRegression": {
+      "r2": 0.1420377163045765,
+      "factors": {
+        "value": 0.10534029833246354,
+        "quality": 0.1798427280995657,
+        "growth": 0.1916902936582947,
+        "momentum": 0.29101334672279844,
+        "risk": 0.23211333318687763
+      }
+    },
+    "ridgeRegression": {
+      "r2": 0.14203741718341467,
+      "lambda": 0.1,
+      "factors": {
+        "value": 0.10330109664535803,
+        "quality": 0.1811675944293191,
+        "growth": 0.19210067596428995,
+        "momentum": 0.29096876094867613,
+        "risk": 0.23246187201235688
+      }
+    },
+    "topFeatures": [
+      {
+        "name": "beta",
+        "coefficient": 1.4142307784672017,
+        "factor": "Risk"
+      },
+      {
+        "name": "sharesOutstanding",
+        "coefficient": 1.3990089231465992,
+        "factor": "Risk"
+      },
+      {
+        "name": "averageVolume",
+        "coefficient": 1.367773644440114,
+        "factor": "Momentum"
+      },
+      {
+        "name": "revenueGrowthQoQ",
+        "coefficient": 1.1947312135153012,
+        "factor": "Growth"
+      },
+      {
+        "name": "heldPercentInsiders",
+        "coefficient": 1.181381176432533,
+        "factor": "Quality"
+      },
+      {
+        "name": "heldPercentInstitutions",
+        "coefficient": 1.124512219659454,
+        "factor": "Quality"
+      },
+      {
+        "name": "profitMargin",
+        "coefficient": 1.09750966390608,
+        "factor": "Quality"
+      },
+      {
+        "name": "pbRatio",
+        "coefficient": 0.8850242857106034,
+        "factor": "Value"
+      },
+      {
+        "name": "debtToEquity",
+        "coefficient": 0.8420543228138477,
+        "factor": "Risk"
+      },
+      {
+        "name": "marketCap",
+        "coefficient": 0.7156937178859905,
+        "factor": "Risk"
+      }
+    ]
+  },
+  "return90d": {
+    "samples": 225,
+    "features": 16,
+    "linearRegression": {
+      "r2": 0.10897215441525154,
+      "factors": {
+        "value": 0.20868577691418783,
+        "quality": 0.3386345801676866,
+        "growth": 0.24091754048962238,
+        "momentum": 0.006047670356916753,
+        "risk": 0.20571443207158638
+      }
+    },
+    "ridgeRegression": {
+      "r2": 0.10896759641384168,
+      "lambda": 0.1,
+      "factors": {
+        "value": 0.2004147794442764,
+        "quality": 0.3389835359216364,
+        "growth": 0.2458939014337849,
+        "momentum": 0.005143880663698418,
+        "risk": 0.2095639025366039
+      }
+    },
+    "topFeatures": [
+      {
+        "name": "pbRatio",
+        "coefficient": 4.8211832228688465,
+        "factor": "Value"
+      },
+      {
+        "name": "roe",
+        "coefficient": 4.204308403748081,
+        "factor": "Quality"
+      },
+      {
+        "name": "profitMargin",
+        "coefficient": 2.9187524913074236,
+        "factor": "Quality"
+      },
+      {
+        "name": "heldPercentInsiders",
+        "coefficient": 2.8539925128023875,
+        "factor": "Quality"
+      },
+      {
+        "name": "revenueGrowthQoQ",
+        "coefficient": 2.230951507514189,
+        "factor": "Growth"
+      },
+      {
+        "name": "marketCap",
+        "coefficient": 1.9801131101425444,
+        "factor": "Risk"
+      },
+      {
+        "name": "sharesOutstanding",
+        "coefficient": 1.895345196562697,
+        "factor": "Risk"
+      },
+      {
+        "name": "heldPercentInstitutions",
+        "coefficient": 1.7379015108418512,
+        "factor": "Quality"
+      },
+      {
+        "name": "earningsGrowthQoQ",
+        "coefficient": 1.5903497795614399,
+        "factor": "Growth"
+      },
+      {
+        "name": "roa",
+        "coefficient": 1.454934763005265,
+        "factor": "Quality"
+      }
+    ]
+  }
+}
