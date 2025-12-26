@@ -12,6 +12,10 @@ interface TransactionRow {
   paidIn: number;
   withdrawn: number;
   ticker?: string;
+  direction?: string;
+  quantity?: number;
+  transactionPrice?: number;
+  ccy?: string;
 }
 
 interface CategorizedTotals {
@@ -164,6 +168,47 @@ export default function CashAggregatorClient() {
     }
     
     return undefined;
+  };
+
+  // Extract direction (Buy/Sell) from transaction details
+  const extractDirection = (details: string): string | undefined => {
+    if (!details.includes('Order Id')) return undefined;
+    
+    const detailsLower = details.toLowerCase();
+    if (detailsLower.includes('bought')) return 'Buy';
+    if (detailsLower.includes('sold')) return 'Sell';
+    
+    return undefined;
+  };
+
+  // Extract quantity from transaction details
+  // Example: "Order Id 45006804 - Bought 3 IonQ @ USD 49.9600"
+  const extractQuantity = (details: string): number | undefined => {
+    if (!details.includes('Order Id')) return undefined;
+    
+    // Pattern: "Bought <quantity>" or "Sold <quantity>"
+    const match = details.match(/(?:Bought|Sold)\s+(\d+(?:\.\d+)?)/i);
+    return match ? parseFloat(match[1]) : undefined;
+  };
+
+  // Extract transaction price from transaction details
+  // Example: "@ USD 49.9600" or "@ 49.96"
+  const extractTransactionPrice = (details: string): number | undefined => {
+    if (!details.includes('Order Id')) return undefined;
+    
+    // Pattern: "@ [CCY] <price>" or "@ <price>"
+    const match = details.match(/@\s+(?:[A-Z]{3}\s+)?([\d,]+\.\d+)/i);
+    return match ? parseFloat(match[1].replace(/,/g, '')) : undefined;
+  };
+
+  // Extract currency from transaction details
+  // Example: "@ USD 49.9600" extracts "USD"
+  const extractCurrency = (details: string): string | undefined => {
+    if (!details.includes('Order Id')) return undefined;
+    
+    // Pattern: "@ <CCY> <price>"
+    const match = details.match(/@\s+([A-Z]{3})\s+[\d,]+\.\d+/i);
+    return match ? match[1] : undefined;
   };
 
   // Categorization logic based on transaction details text
@@ -363,6 +408,10 @@ export default function CashAggregatorClient() {
               paidIn: paidInIndex !== -1 ? parseMoney(row[paidInIndex]) : 0,
               withdrawn: withdrawnIndex !== -1 ? parseMoney(row[withdrawnIndex]) : 0,
               ticker: extractTicker(detailsStr),
+              direction: extractDirection(detailsStr),
+              quantity: extractQuantity(detailsStr),
+              transactionPrice: extractTransactionPrice(detailsStr),
+              ccy: extractCurrency(detailsStr),
             };
 
             transactions.push(transaction);
@@ -1050,6 +1099,18 @@ export default function CashAggregatorClient() {
                     Ticker
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    Direction
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    Quantity
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    Transaction Price
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    CCY
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Account
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
@@ -1084,6 +1145,26 @@ export default function CashAggregatorClient() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-400 font-mono">
                         {transaction.ticker || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                        {transaction.direction ? (
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            transaction.direction === 'Buy' 
+                              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                              : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                          }`}>
+                            {transaction.direction}
+                          </span>
+                        ) : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-slate-300 font-mono">
+                        {transaction.quantity ? transaction.quantity.toLocaleString() : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-slate-300 font-mono">
+                        {transaction.transactionPrice ? transaction.transactionPrice.toFixed(4) : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400 font-mono">
+                        {transaction.ccy || '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                         {transaction.account}
