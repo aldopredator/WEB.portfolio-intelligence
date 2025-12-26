@@ -13,6 +13,7 @@ type ScoredStock = {
   industry: string | null;
   country: string | null;
   portfolio: string;
+  portfolioId: string | null;
   rating: number;
   currentPrice: number | null;
   marketCap: number | null;
@@ -319,7 +320,19 @@ export default function ScoringClient() {
                 {scoredStocks.map((stock, index) => (
                   <tr key={stock.ticker} className="hover:bg-slate-800/30 transition-colors">
                     <td className="px-4 py-3 text-sm text-slate-300">#{index + 1}</td>
-                    <td className="px-4 py-3 text-sm font-medium text-blue-400">{stock.ticker}</td>
+                    <td className="px-4 py-3 text-sm font-medium text-blue-400">
+                      <a
+                        href={`https://www.portfolio-intelligence.co.uk/?stock=${stock.ticker}&portfolio=${stock.portfolioId || ''}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-blue-300 transition-colors inline-flex items-center gap-1"
+                      >
+                        {stock.ticker}
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </a>
+                    </td>
                     <td className="px-4 py-3 text-sm text-slate-300">{stock.company}</td>
                     <td className="px-4 py-3 text-sm text-slate-400">{stock.portfolio}</td>
                     <td className="px-4 py-3 text-center">

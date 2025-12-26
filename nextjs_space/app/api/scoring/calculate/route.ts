@@ -231,6 +231,7 @@ export async function POST(request: NextRequest) {
         industry: stock.industry,
         country: stock.country,
         portfolio: stock.portfolio?.name || 'N/A',
+        portfolioId: stock.portfolio?.id || null,
         rating: stock.rating || 0,
         currentPrice: stock.stockData?.currentPrice || null,
         marketCap: stock.latestMetrics?.marketCap || null,
