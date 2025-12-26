@@ -172,7 +172,7 @@ export default function CashAggregatorClient() {
 
   // Extract direction (Buy/Sell) from transaction details
   const extractDirection = (details: string): string | undefined => {
-    if (!details.includes('Order Id')) return undefined;
+    if (!details.includes('Order Id') || details.toUpperCase().includes('ETF')) return undefined;
     
     const detailsLower = details.toLowerCase();
     if (detailsLower.includes('bought')) return 'Buy';
@@ -1110,9 +1110,6 @@ export default function CashAggregatorClient() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                     CCY
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Account
-                  </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Paid In
                   </th>
@@ -1165,9 +1162,6 @@ export default function CashAggregatorClient() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400 font-mono">
                         {transaction.ccy || '-'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
-                        {transaction.account}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-green-400">
                         {transaction.paidIn > 0 ? formatCurrency(transaction.paidIn) : '-'}
