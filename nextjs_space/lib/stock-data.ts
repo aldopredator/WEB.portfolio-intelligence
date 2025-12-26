@@ -249,6 +249,12 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
             Object.assign(stockEntry.stock_data, polygonStats);
           }
 
+          // Fetch earnings surprises from Finnhub API
+          const earningsSurprises = await fetchEarningsSurprises(ticker);
+          if (earningsSurprises && isRecord(stockEntry)) {
+            stockEntry.earnings_surprises = earningsSurprises as any;
+          }
+
           // Fetch recommendation trends
           const recommendationTrends = await fetchRecommendationTrends(ticker);
           if (recommendationTrends && isRecord(stockEntry)) {
