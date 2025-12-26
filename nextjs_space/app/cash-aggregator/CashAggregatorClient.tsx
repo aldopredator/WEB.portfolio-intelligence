@@ -205,9 +205,33 @@ export default function CashAggregatorClient() {
       let debugInfo: string[] = [];
       const companyLower = stock.company.toLowerCase();
       
-      // Check if ticker symbol appears in the extracted company name
+      // CRITICAL: Check if DB company name closely matches extracted company name
+      // Remove common suffixes and normalize for comparison
+      const normalizeCompanyName = (name: string) => {
+        return name.toLowerCase()
+          .replace(/\s+(ltd|inc|corp|corporation|company|plc|llc|group)\.?$/i, '')
+          .replace(/\s+ser\.?\s*[a-z]$/i, '')  // Remove "ser. B", "ser A"
+          .replace(/\s+class\s+[a-z]$/i, '')    // Remove "Class A", "Class C"
+          .trim();
+      };
+      
+      const normalizedDbCompany = normalizeCompanyName(stock.company);
+      const normalizedTransaction = normalizeCompanyName(companyNameFromTransaction);
+      
+      // If normalized names are very similar (Levenshtein or just exact), give huge bonus
+      if (normalizedDbCompany === normalizedTransaction) {
+        score += 100;
+        debugInfo.push(`exactCompany:+100`);
+      } else if (normalizedTransaction.includes(normalizedDbCompany) || normalizedDbCompany.includes(normalizedTransaction)) {
+        score += 80;
+        debugInfo.push(`containsCompany:+80`);
+      }
+      
+      // Check if ticker symbol appears in the extracted company name (but may have exchange suffix)
+      // Remove exchange suffix like .ST, .L, .PA for matching
+      const tickerWithoutExchange = stock.ticker.split('.')[0];
       try {
-        const tickerRegex = new RegExp(`\\b${escapeRegex(stock.ticker)}\\b`, 'i');
+        const tickerRegex = new RegExp(`\\b${escapeRegex(tickerWithoutExchange)}\\b`, 'i');
         if (tickerRegex.test(companyNameFromTransaction)) {
           score += 50;
           debugInfo.push(`ticker:+50`);
@@ -217,7 +241,7 @@ export default function CashAggregatorClient() {
       }
       
       // Split company name into significant words (ignore common words)
-      const commonWords = ['ltd', 'inc', 'corp', 'corporation', 'company', 'group', 'plc', 'llc', 'the', 'and', 'class', 'common', 'shares'];
+      const commonWords = ['ltd', 'inc', 'corp', 'corporation', 'company', 'group', 'plc', 'llc', 'the', 'and', 'class', 'common', 'shares', 'ser'];
       const companyWords = companyLower.split(/[\s,.-]+/).filter(w => w.length > 3 && !commonWords.includes(w));
       
       let matchedWords = 0;
