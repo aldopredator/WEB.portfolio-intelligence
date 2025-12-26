@@ -46,7 +46,7 @@ export default function CashAggregatorClient() {
   const [chartPeriod, setChartPeriod] = useState<'7D' | '1M' | '3M' | '1Y'>('1Y');
   const [expandedChargesFees, setExpandedChargesFees] = useState(false);
   const [expandedRevenuesIncome, setExpandedRevenuesIncome] = useState(false);
-  const [stocks, setStocks] = useState<Array<{ ticker: string; company: string }>>([]);
+  const [stocks, setStocks] = useState<Array<{ ticker: string; company: string; alternativeTickers: string[] }>>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch stocks for ticker matching
@@ -57,7 +57,8 @@ export default function CashAggregatorClient() {
         if (data.success) {
           setStocks(data.stocks.map((s: any) => ({ 
             ticker: s.ticker, 
-            company: s.company 
+            company: s.company,
+            alternativeTickers: s.alternativeTickers || []
           })));
         }
       })
@@ -106,19 +107,59 @@ export default function CashAggregatorClient() {
   const extractTicker = (details: string): string | undefined => {
     if (!stocks.length) return undefined;
     
+    // Only process lines containing "Order Id" and NOT containing "ETF"
+    if (!details.includes('Order Id') || details.toUpperCase().includes('ETF')) {
+      return undefined;
+    }
+    
     const detailsLower = details.toLowerCase();
     
-    // Try to find company name match in details
+    // Score each stock based on how well it matches
+    const matches: Array<{ ticker: string; score: number }> = [];
+    
     for (const stock of stocks) {
+      let score = 0;
       const companyLower = stock.company.toLowerCase();
-      // Check if company name appears in details
-      if (detailsLower.includes(companyLower)) {
-        return stock.ticker;
+      
+      // Split company name into words for better matching
+      const companyWords = companyLower.split(/[\s,.-]+/).filter(w => w.length > 2);
+      
+      // Check each word of company name
+      for (const word of companyWords) {
+        if (detailsLower.includes(word)) {
+          // Exact word match gets higher score
+          const wordRegex = new RegExp(`\\b${word}\\b`, 'i');
+          if (wordRegex.test(details)) {
+            score += 10;
+          } else {
+            score += 5;
+          }
+        }
       }
-      // Also check for partial matches (first word of company name)
-      const firstWord = companyLower.split(' ')[0];
-      if (firstWord.length > 3 && detailsLower.includes(firstWord)) {
-        return stock.ticker;
+      
+      // Check if full company name appears
+      if (detailsLower.includes(companyLower)) {
+        score += 20;
+      }
+      
+      // Also check alternative tickers in the details
+      for (const altTicker of stock.alternativeTickers) {
+        const altRegex = new RegExp(`\\b${altTicker}\\b`, 'i');
+        if (altRegex.test(details)) {
+          score += 15;
+        }
+      }
+      
+      if (score > 0) {
+        matches.push({ ticker: stock.ticker, score });
+      }
+    }
+    
+    // Return ticker with highest score (minimum threshold of 10)
+    if (matches.length > 0) {
+      matches.sort((a, b) => b.score - a.score);
+      if (matches[0].score >= 10) {
+        return matches[0].ticker;
       }
     }
     

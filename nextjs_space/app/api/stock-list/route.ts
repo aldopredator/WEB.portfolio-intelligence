@@ -10,8 +10,11 @@ export async function GET(request: NextRequest) {
 
     console.log('[API /stock-list] Portfolio filter:', portfolioId || 'ALL');
 
-    // Build where clause - always fetch ALL stocks regardless of portfolio filter
-    const where: any = { isActive: true };
+    // Build where clause - fetch stocks with costPrice populated (securities that user buys/sells)
+    const where: any = { 
+      isActive: true,
+      costPrice: { not: null }
+    };
 
     // Fetch stocks from database with portfolio info
     const stocks = await prisma.stock.findMany({
@@ -19,6 +22,8 @@ export async function GET(request: NextRequest) {
       select: {
         ticker: true,
         company: true,
+        alternativeTickers: true,
+        costPrice: true,
         isActive: true,
         portfolio: {
           select: {
