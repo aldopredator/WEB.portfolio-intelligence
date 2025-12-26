@@ -30,6 +30,8 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
         console.log('[STOCK-DATA] 📋 Fetching ALL active stocks (no portfolio filter)');
       }
       
+      const queryStartTime = Date.now();
+      
       // Fetch all active stocks with their related data AND latest metrics
       const stocks = await prisma.stock.findMany({
       where: { 
@@ -59,10 +61,14 @@ export async function getStockData(portfolioId?: string | null): Promise<StockIn
       },
     });
 
-    console.log(`[STOCK-DATA] ✅ Found ${stocks.length} active stocks in database`);
-    if (stocks.length > 0) {
-      console.log(`[STOCK-DATA] 📋 Tickers: ${stocks.map((s: any) => s.ticker).join(', ')}`);
-    }
+    const queryTime = Date.now() - queryStartTime;
+    console.log(`[STOCK-DATA] ✅ Query completed in ${queryTime}ms - Found ${stocks.length} active stocks`);
+    console.log(`[STOCK-DATA] 📊 Sample stock relations:`, {
+      ticker: stocks[0]?.ticker,
+      hasStockData: !!stocks[0]?.stockData,
+      hasPriceHistory: stocks[0]?.priceHistory?.length || 0,
+      hasMetrics: stocks[0]?.metrics?.length || 0,
+    });
 
     // Update STOCK_CONFIG dynamically
     STOCK_CONFIG = stocks.map((stock: any) => ({
