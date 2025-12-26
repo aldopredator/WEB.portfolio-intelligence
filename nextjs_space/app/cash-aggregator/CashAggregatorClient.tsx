@@ -116,36 +116,27 @@ export default function CashAggregatorClient() {
 
   const activeStatement = statements.find(s => s.id === activeStatementId);
 
-  // Get transaction type for display
+  // Get transaction type for display - only 3 types: Stock, ETF, Cash
   const getTransactionType = (details: string): string => {
     const detailsLower = details.toLowerCase();
     
-    // Income
-    if (detailsLower.includes('dividend') || detailsLower.includes('interest') || 
-        detailsLower.includes('fund distribution') || detailsLower.includes('distribution')) {
-      return 'Income';
-    }
-    
-    // Securities (Buy/Sell)
-    if (detailsLower.includes('bought') || detailsLower.includes('sold') ||
-        detailsLower.includes(' buy') || detailsLower.includes('buy ') ||
-        detailsLower.includes('sell') || detailsLower.includes('purchase') || detailsLower.includes('sale')) {
-      return 'Securities';
-    }
-    
-    // Fees
-    if (detailsLower.includes('fee') || detailsLower.includes('charge') ||
-        detailsLower.includes('fx charge') || detailsLower.includes('customer fee')) {
-      return 'Fees';
-    }
-    
-    // Cash Transfer
+    // Cash - FASTER payments, withdrawals, deposits, interest, cash transfers
     if (detailsLower.includes('faster payment') || detailsLower.includes('faster pmt') ||
-        detailsLower.includes('fast payment') || detailsLower.includes('transfer')) {
-      return 'Cash Transfer';
+        detailsLower.includes('fast payment') || detailsLower.includes('fps') ||
+        detailsLower.includes('withdrawal') || detailsLower.includes('deposit') ||
+        detailsLower.includes('smart investor')) {
+      return 'Cash';
     }
     
-    return 'Other';
+    // ETF - Contains ETF, ETC, UCITS, fund, tracker keywords
+    if (detailsLower.includes('etf') || detailsLower.includes('etc') ||
+        detailsLower.includes('ucits') || detailsLower.includes('tracker') ||
+        (detailsLower.includes('fund') && !detailsLower.includes('fund distribution'))) {
+      return 'ETF';
+    }
+    
+    // Stock - Everything else (stocks, fees, charges, dividends, interest, trades)
+    return 'Stock';
   };
 
   // Helper function to escape regex special characters
@@ -1244,10 +1235,9 @@ export default function CashAggregatorClient() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          transaction.type === 'Income' ? 'text-green-400 bg-green-400/10' :
-                          transaction.type === 'Securities' ? 'text-blue-400 bg-blue-400/10' :
-                          transaction.type === 'Fees' ? 'text-red-400 bg-red-400/10' :
-                          transaction.type === 'Cash Transfer' ? 'text-purple-400 bg-purple-400/10' :
+                          transaction.type === 'Stock' ? 'text-blue-400 bg-blue-400/10' :
+                          transaction.type === 'ETF' ? 'text-purple-400 bg-purple-400/10' :
+                          transaction.type === 'Cash' ? 'text-green-400 bg-green-400/10' :
                           'text-slate-400 bg-slate-400/10'
                         }`}>
                           {transaction.type}
