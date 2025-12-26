@@ -15,6 +15,7 @@ interface TransactionRow {
 
 interface CategorizedTotals {
   fasterPaymentWithdrawal: number;
+  moneyWithdrawal: number;
   bought: number;
   sold: number;
   onlineTransactionFee: number;
@@ -43,6 +44,7 @@ export default function CashAggregatorClient() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [chartPeriod, setChartPeriod] = useState<'7D' | '1M' | '3M' | '1Y'>('1Y');
   const [expandedChargesFees, setExpandedChargesFees] = useState(false);
+  const [expandedRevenuesIncome, setExpandedRevenuesIncome] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load statements from localStorage on mount
@@ -143,11 +145,11 @@ export default function CashAggregatorClient() {
       return { sold: amount };
     }
 
-    // FASTER Payment withdrawals
-    if ((detailsLower.includes('faster payment') || 
-         detailsLower.includes('faster pmt') ||
-         detailsLower.includes('fast payment')) && withdrawn > 0) {
-      return { fasterPaymentWithdrawal: amount };
+    // Money withdrawals (Smart Investor, FPS, etc.)
+    if ((detailsLower.includes('smart investor') && detailsLower.includes('withdrawal')) ||
+        (detailsLower.includes('fps') && withdrawn > 0) ||
+        (detailsLower.includes('one-off withdrawal') && withdrawn > 0)) {
+      return { moneyWithdrawal: amount };
     }
 
     // FASTER Payment deposits (paidIn)
@@ -157,6 +159,13 @@ export default function CashAggregatorClient() {
       return { fasterPaymentWithdrawal: amount };
     }
 
+    // FASTER Payment withdrawals (legacy, if not caught by Smart Investor)
+    if ((detailsLower.includes('faster payment') || 
+         detailsLower.includes('faster pmt') ||
+         detailsLower.includes('fast payment')) && withdrawn > 0) {
+      return { moneyWithdrawal: amount };
+    }
+
     // Other/unclassified
     return { other: amount };
   };
@@ -164,6 +173,7 @@ export default function CashAggregatorClient() {
   const calculateTotals = (transactions: TransactionRow[]): CategorizedTotals => {
     const totals: CategorizedTotals = {
       fasterPaymentWithdrawal: 0,
+      moneyWithdrawal: 0,
       bought: 0,
       sold: 0,
       onlineTransactionFee: 0,
@@ -391,6 +401,7 @@ export default function CashAggregatorClient() {
   const getCategoryLabel = (key: string): string => {
     const labels: Record<string, string> = {
       fasterPaymentWithdrawal: 'Money Top-up',
+      moneyWithdrawal: 'Money Withdrawal',
       bought: 'Bought (Securities)',
       sold: 'Sold (Securities)',
       onlineTransactionFee: 'Online Transaction Fee',
@@ -697,9 +708,52 @@ export default function CashAggregatorClient() {
 
           {/* Category Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {/* Money Top-up (always first) */}
+            {activeStatement.totals.fasterPaymentWithdrawal !== 0 && (
+              <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-slate-400 text-sm">Money Top-up</span>
+                  {activeStatement.totals.fasterPaymentWithdrawal < 0 ? (
+                    <TrendingDown className="w-4 h-4 text-red-400" />
+                  ) : activeStatement.totals.fasterPaymentWithdrawal > 0 ? (
+                    <TrendingUp className="w-4 h-4 text-green-400" />
+                  ) : null}
+                </div>
+                <p className={`text-2xl font-bold text-right ${
+                  activeStatement.totals.fasterPaymentWithdrawal < 0 ? 'text-red-400' : 
+                  activeStatement.totals.fasterPaymentWithdrawal > 0 ? 'text-green-400' : 'text-slate-400'
+                }`}>
+                  {formatCurrency(activeStatement.totals.fasterPaymentWithdrawal)}
+                </p>
+              </div>
+            )}
+
+            {/* Money Withdrawal (right after Top-up) */}
+            {activeStatement.totals.moneyWithdrawal !== 0 && (
+              <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-slate-400 text-sm">Money Withdrawal</span>
+                  {activeStatement.totals.moneyWithdrawal < 0 ? (
+                    <TrendingDown className="w-4 h-4 text-red-400" />
+                  ) : activeStatement.totals.moneyWithdrawal > 0 ? (
+                    <TrendingUp className="w-4 h-4 text-green-400" />
+                  ) : null}
+                </div>
+                <p className={`text-2xl font-bold text-right ${
+                  activeStatement.totals.moneyWithdrawal < 0 ? 'text-red-400' : 
+                  activeStatement.totals.moneyWithdrawal > 0 ? 'text-green-400' : 'text-slate-400'
+                }`}>
+                  {formatCurrency(activeStatement.totals.moneyWithdrawal)}
+                </p>
+              </div>
+            )}
+
+            {/* Other categories (excluding grouped ones) */}
             {Object.entries(activeStatement.totals).map(([key, value]) => {
-              // Skip individual fee categories if they should be grouped
-              if (['onlineTransactionFee', 'internationalTradingCharge', 'fxCharge'].includes(key)) {
+              // Skip categories that are shown separately or grouped
+              if (['fasterPaymentWithdrawal', 'moneyWithdrawal', 'onlineTransactionFee', 
+                   'internationalTradingCharge', 'fxCharge', 'customerFee', 
+                   'interest', 'dividend', 'fundDistribution'].includes(key)) {
                 return null;
               }
 
@@ -732,7 +786,8 @@ export default function CashAggregatorClient() {
               const totalChargesFees = 
                 activeStatement.totals.onlineTransactionFee + 
                 activeStatement.totals.internationalTradingCharge + 
-                activeStatement.totals.fxCharge;
+                activeStatement.totals.fxCharge + 
+                activeStatement.totals.customerFee;
               
               if (totalChargesFees === 0) return null;
 
@@ -768,7 +823,66 @@ export default function CashAggregatorClient() {
                       {[
                         { key: 'onlineTransactionFee', label: 'Online Transaction Fee', value: activeStatement.totals.onlineTransactionFee },
                         { key: 'internationalTradingCharge', label: 'International Trading Charge', value: activeStatement.totals.internationalTradingCharge },
-                        { key: 'fxCharge', label: 'FX Charge', value: activeStatement.totals.fxCharge }
+                        { key: 'fxCharge', label: 'FX Charge', value: activeStatement.totals.fxCharge },
+                        { key: 'customerFee', label: 'Customer Fee', value: activeStatement.totals.customerFee }
+                      ].map(({ key, label, value }) => (
+                        value !== 0 && (
+                          <div key={key} className="flex items-center justify-between text-sm">
+                            <span className="text-slate-500">{label}</span>
+                            <span className={value < 0 ? 'text-red-400' : 'text-green-400'}>
+                              {formatCurrency(value)}
+                            </span>
+                          </div>
+                        )
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* Grouped Revenues/Income Card */}
+            {(() => {
+              const totalRevenuesIncome = 
+                activeStatement.totals.interest + 
+                activeStatement.totals.dividend + 
+                activeStatement.totals.fundDistribution;
+              
+              if (totalRevenuesIncome === 0) return null;
+
+              return (
+                <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">
+                  <button
+                    onClick={() => setExpandedRevenuesIncome(!expandedRevenuesIncome)}
+                    className="w-full"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-slate-400 text-sm flex items-center gap-2">
+                        Revenues/Income
+                        <span className="text-xs text-slate-500">
+                          {expandedRevenuesIncome ? '▼' : '▶'}
+                        </span>
+                      </span>
+                      {totalRevenuesIncome < 0 ? (
+                        <TrendingDown className="w-4 h-4 text-red-400" />
+                      ) : totalRevenuesIncome > 0 ? (
+                        <TrendingUp className="w-4 h-4 text-green-400" />
+                      ) : null}
+                    </div>
+                    <p className={`text-2xl font-bold text-right ${
+                      totalRevenuesIncome < 0 ? 'text-red-400' : totalRevenuesIncome > 0 ? 'text-green-400' : 'text-slate-400'
+                    }`}>
+                      {formatCurrency(totalRevenuesIncome)}
+                    </p>
+                  </button>
+
+                  {/* Expanded Drill-Down */}
+                  {expandedRevenuesIncome && (
+                    <div className="mt-4 pt-4 border-t border-slate-700/50 space-y-2">
+                      {[
+                        { key: 'interest', label: 'Interest', value: activeStatement.totals.interest },
+                        { key: 'dividend', label: 'Dividend', value: activeStatement.totals.dividend },
+                        { key: 'fundDistribution', label: 'Fund Distribution', value: activeStatement.totals.fundDistribution }
                       ].map(({ key, label, value }) => (
                         value !== 0 && (
                           <div key={key} className="flex items-center justify-between text-sm">
