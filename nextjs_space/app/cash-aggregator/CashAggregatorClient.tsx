@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Upload, FileSpreadsheet, Trash2, Download, AlertCircle, TrendingDown, TrendingUp } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 interface TransactionRow {
   date: string;
@@ -40,6 +41,7 @@ export default function CashAggregatorClient() {
   const [activeStatementId, setActiveStatementId] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [chartPeriod, setChartPeriod] = useState<'7D' | '1M' | '3M' | '1Y'>('1M');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load statements from localStorage on mount
@@ -406,6 +408,57 @@ export default function CashAggregatorClient() {
     ? Object.entries(activeStatement.totals).reduce((sum, [_, value]) => sum + value, 0)
     : 0;
 
+  // Calculate FASTER Payment withdrawal trend over time
+  const fasterPaymentTrend = useMemo(() => {
+    if (!activeStatement) return [];
+
+    const fasterPayments = activeStatement.transactions.filter(t => 
+      t.details.toLowerCase().includes('faster payment') && t.paidIn > 0
+    );
+
+    // Group by date and calculate cumulative
+    const dateMap = new Map<string, number>();
+    fasterPayments.forEach(payment => {
+      const existing = dateMap.get(payment.date) || 0;
+      dateMap.set(payment.date, existing + payment.paidIn);
+    });
+
+    // Convert to array and sort by date
+    const sorted = Array.from(dateMap.entries())
+      .map(([date, amount]) => ({ date, amount }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    // Calculate cumulative values
+    let cumulative = 0;
+    return sorted.map(item => {
+      cumulative += item.amount;
+      return {
+        date: item.date,
+        amount: cumulative,
+        label: new Date(item.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+      };
+    });
+  }, [activeStatement]);
+
+  // Filter chart data by period
+  const filteredChartData = useMemo(() => {
+    if (fasterPaymentTrend.length === 0) return [];
+
+    const now = new Date();
+    const periodDays: Record<typeof chartPeriod, number> = {
+      '7D': 7,
+      '1M': 30,
+      '3M': 90,
+      '1Y': 365
+    };
+
+    const cutoffDate = new Date(now.getTime() - periodDays[chartPeriod] * 24 * 60 * 60 * 1000);
+    
+    return fasterPaymentTrend.filter(item => 
+      new Date(item.date) >= cutoffDate
+    );
+  }, [fasterPaymentTrend, chartPeriod]);
+
   return (
     <div className="space-y-6">
       {/* Upload Section */}
@@ -499,9 +552,9 @@ export default function CashAggregatorClient() {
             </button>
           </div>
 
-          {/* FASTER Payment Withdrawal - Highlighted Card with Visual Bar */}
-          {activeStatement.totals.fasterPaymentWithdrawal > 0 && (
-            <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-lg p-6 mb-6">
+          {/* FASTER Payment Withdrawal - Evolution Chart */}
+          {activeStatement.totals.fasterPaymentWithdrawal > 0 && filteredChartData.length > 0 && (
+            <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-lg p-6 mb-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="text-green-400 text-sm font-medium mb-1">💰 FASTER Payment Withdrawal</p>
@@ -511,21 +564,64 @@ export default function CashAggregatorClient() {
                 </div>
                 <TrendingUp className="w-10 h-10 text-green-400" />
               </div>
+
+              <p className="text-slate-400 text-xs mb-4">Total value over time</p>
               
-              {/* Visual Progress Bar */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs text-slate-400">
-                  <span>Cash In</span>
-                  <span>{Math.round((activeStatement.totals.fasterPaymentWithdrawal / Math.abs(netCashFlow || 1)) * 100)}% of net flow</span>
-                </div>
-                <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full transition-all duration-500"
-                    style={{ 
-                      width: `${Math.min(100, (activeStatement.totals.fasterPaymentWithdrawal / (activeStatement.totals.fasterPaymentWithdrawal + Math.abs(activeStatement.totals.bought || 0) + Math.abs(activeStatement.totals.sold || 0))) * 100)}%` 
-                    }}
-                  />
-                </div>
+              {/* Chart */}
+              <div className="h-64 mb-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={filteredChartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+                    <XAxis 
+                      dataKey="label" 
+                      stroke="#64748b" 
+                      fontSize={11}
+                      tickLine={false}
+                    />
+                    <YAxis 
+                      stroke="#64748b" 
+                      fontSize={11}
+                      tickLine={false}
+                      tickFormatter={(value) => `£${(value / 1000).toFixed(0)}k`}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#1e293b',
+                        border: '1px solid #334155',
+                        borderRadius: '8px',
+                        fontSize: '12px'
+                      }}
+                      formatter={(value: number) => [`£${value.toLocaleString()}`, 'Total']}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="amount" 
+                      stroke="#10b981" 
+                      strokeWidth={3}
+                      dot={{ fill: '#10b981', r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Period Selector */}
+              <div className="flex items-center justify-center gap-2">
+                {(['7D', '1M', '3M', '1Y'] as const).map(period => (
+                  <button
+                    key={period}
+                    onClick={() => setChartPeriod(period)}
+                    className={`
+                      px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                      ${chartPeriod === period
+                        ? 'bg-green-500 text-white'
+                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                      }
+                    `}
+                  >
+                    {period}
+                  </button>
+                ))}
               </div>
             </div>
           )}
