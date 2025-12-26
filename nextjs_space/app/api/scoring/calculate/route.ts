@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
           orderBy: {
             date: 'desc',
           },
-          take: 90, // Last 90 days for calculations
+          take: 30, // Last 30 days for momentum calculations
         },
         metrics: {
           select: {
