@@ -81,6 +81,28 @@ export default function CashAggregatorClient() {
       .catch(err => console.error('Failed to fetch stocks:', err));
   }, []);
 
+  // Re-extract tickers when stocks are loaded (fixes race condition on initial load)
+  useEffect(() => {
+    if (stocks.length === 0 || statements.length === 0) return;
+
+    console.log(`🔄 Re-processing ${statements.length} statements with ${stocks.length} stocks loaded`);
+    
+    setStatements(prev => prev.map(statement => ({
+      ...statement,
+      transactions: statement.transactions.map(transaction => {
+        // Only re-process if ticker is missing and it's a Stock type
+        if (!transaction.ticker && transaction.type === 'Stock' && transaction.details.includes('Order Id')) {
+          const newTicker = extractTicker(transaction.details);
+          if (newTicker) {
+            console.log(`✅ Found ticker ${newTicker} for: ${transaction.details.substring(0, 80)}`);
+          }
+          return { ...transaction, ticker: newTicker };
+        }
+        return transaction;
+      })
+    })));
+  }, [stocks]);
+
   // Load statements from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('cashAggregatorStatements');
